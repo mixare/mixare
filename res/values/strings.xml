@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mixare</string>
+    <string name="N">N</string>
+    <string name="NE">NE</string>
+    <string name="E">E</string>
+    <string name="SE">SE</string>
+    <string name="S">S</string>
+    <string name="SW">SW</string>
+    <string name="W">W</string>
+    <string name="NW">NW</string>
+
+</resources>
