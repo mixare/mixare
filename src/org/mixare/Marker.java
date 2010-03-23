@@ -25,7 +25,6 @@ import org.mixare.gui.ScreenLine;
 import org.mixare.gui.TextObj;
 import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
-import org.mixare.render.MixObject;
 import org.mixare.render.MixVector;
 
 import android.graphics.Color;
@@ -39,14 +38,12 @@ public class Marker {
 
 	// State properties
 	float locX, locY, locZ;
-	//	PhysicalPlace geoLoc;
-	public MixObject obj = new MixObject();
-
+	
 	// Pointer to jLayer
 	public Json layer;
 
 	// Draw properties
-	boolean isVisible, isCenterVisible, isLookingAt, isNear;
+	boolean isVisible, isLookingAt, isNear;
 	float deltaCenter;
 	MixVector cMarker = new MixVector();
 	MixVector signMarker = new MixVector();
@@ -60,7 +57,7 @@ public class Marker {
 	MixVector tmpb = new MixVector();
 	MixVector tmpc = new MixVector();
 	
-	MixVector loc = new MixVector();
+	public MixVector loc = new MixVector();
 	MixVector origin = new MixVector(0, 0, 0);
 	MixVector upV = new MixVector(0, 1, 0);
 	ScreenLine pPt = new ScreenLine();
@@ -70,9 +67,8 @@ public class Marker {
 			float addY) {
 		tmpa.set(originalPoint); //1
 		tmpc.set(upV); 
-		tmpa.prod(obj.transform); //2
-		tmpa.add(obj.location); //3
-		tmpc.add(obj.location); //3
+		tmpa.add(loc); //3
+		tmpc.add(loc); //3
 		tmpa.sub(viewCam.lco); //4
 		tmpc.sub(viewCam.lco); //4
 		tmpa.prod(viewCam.transform); //5
@@ -88,7 +84,6 @@ public class Marker {
 
 	void calcV(Camera viewCam) {
 		isVisible = false;
-		isCenterVisible = false;
 		isLookingAt = false;
 		deltaCenter = Float.MAX_VALUE;
 
@@ -97,7 +92,6 @@ public class Marker {
 
 			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
 					viewCam.width, viewCam.height)) {
-				isCenterVisible = true;
 
 				float xDist = cMarker.x - viewCam.width / 2;
 				float yDist = cMarker.y - viewCam.height / 2;
@@ -114,10 +108,7 @@ public class Marker {
 
 
 	void update(Location curGPSFix, long time) {
-		loc.set(locX, locY, locZ);
-		obj.transform.toIdentity();
-		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, obj.location);
-		obj.location.add(loc);
+		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, loc);
 	}
 
 	void calcPaint(Camera viewCam, float addX, float addY) {

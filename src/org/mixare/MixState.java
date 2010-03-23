@@ -28,6 +28,7 @@ public class MixState {
 	public static int NOT_STARTED = 0; 
 	public static int PROCESSING = 1; 
 	public static int READY = 2; 
+	public static int DONE = 3; 
 
 	int nextLStatus = MixState.NOT_STARTED;
 	String downloadId;
@@ -39,7 +40,6 @@ public class MixState {
 
 	public String radius = "20";
 
-	public boolean startNeeded = false;
 	public String startUrl = "";
 
 	public Json jLayer = new Json();

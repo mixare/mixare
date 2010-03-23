@@ -27,8 +27,8 @@ import org.mixare.data.Json;
 
 public class DownloadManager implements Runnable {
 
-	private boolean stop = false, pause = false, action = false;
-	public static int NOT_STARTED = 0, WAITING = 1, WORKING = 2, PAUSED = 3, STOPPED = 4;
+	private boolean stop = false, pause = false, proceed = false;
+	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
 	private int state = NOT_STARTED;
 
 	private int id = 0;
@@ -51,37 +51,37 @@ public class DownloadManager implements Runnable {
 
 		stop = false;
 		pause = false;
-		action = false;
-		state = WAITING;
+		proceed = false;
+		state = CONNECTING;
 
 		while (!stop) {
 			jobId = null;
 			request = null;
 			result = null;
 
-			// Wait for action
+			// Wait for proceed
 			while (!stop && !pause) {
 				synchronized (this) {
 					if (todoList.size() > 0) {
 						jobId = getNextReqId();
 						request = todoList.get(jobId);
-						action = true;
+						proceed = true;
 					}
 				}
 
-				// Do action
-				if (action) {
-					state = WORKING;
+				// Do proceed
+				if (proceed) {
+					state = CONNECTED;
 					currJobId = jobId;
 					result = processRequest(request);
 
 					synchronized (this) {
 						todoList.remove(jobId);
 						doneList.put(jobId, result);
-						action = false;
+						proceed = false;
 					}
 				}
-				state = WAITING;
+				state = CONNECTING;
 
 				if (!stop && !pause)
 					sleep(100);
@@ -92,12 +92,11 @@ public class DownloadManager implements Runnable {
 				state = PAUSED;
 				sleep(100);
 			}
-			state = WAITING;
+			state = CONNECTING;
 		}
 
 		// Do stop
 		state = STOPPED;
-		//clearLists();
 	}
 
 	private void sleep(long ms) {
@@ -196,9 +195,6 @@ public class DownloadManager implements Runnable {
 		stop = true;
 	}
 
-	public int getState() {
-		return state;
-	}
 }
 
 class DownloadRequest {

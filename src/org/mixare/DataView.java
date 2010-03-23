@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.Json;
-import org.mixare.gui.ScreenLine;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
+import org.mixare.gui.ScreenLine;
 import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
@@ -59,10 +59,13 @@ public class DataView {
 	/** The view can be "frozen" for debug purposes */
 	boolean frozen = false;
 
+	/** how many times to re-attempt download */
+	int retry = 0;
+
 	/** default URL */
 	String HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
 
-	
+
 	ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
 	RadarPoints radarPoints = new RadarPoints();
@@ -78,7 +81,7 @@ public class DataView {
 	}
 
 	public void doStart() {
-		state.startNeeded = true;
+		state.nextLStatus = MixState.NOT_STARTED;
 	}
 
 	public boolean isInited() {
@@ -115,10 +118,8 @@ public class DataView {
 		state.screenWidth = width;
 		state.screenHeight = height;
 
-
 		// Load Layer
-		if (state.nextLStatus == MixState.NOT_STARTED
-				|| (state.nextLStatus == MixState.READY && state.startNeeded)) {
+		if (state.nextLStatus == MixState.NOT_STARTED ) {
 
 			DownloadRequest request = new DownloadRequest();
 
@@ -127,7 +128,6 @@ public class DataView {
 			else 
 				request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ state.radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 
-			state.startNeeded = false;
 			state.startUrl = ctx.getStartUrl();
 
 			state.downloadId = ctx.getDownloader().submitJob(request);
@@ -138,37 +138,34 @@ public class DataView {
 			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
 				state.dRes = ctx.getDownloader().getReqResult(state.downloadId);
 
-				state.jLayer = (Json) state.dRes.obj;
-				state.nextLStatus = MixState.READY;
+				if (state.dRes.error && retry < 3) {
+					retry++;
+					state.nextLStatus = MixState.NOT_STARTED;
+
+				} else {
+					retry = 0;
+					state.nextLStatus = MixState.DONE;
+					state.jLayer = (Json) state.dRes.obj;
+
+					// Sort markers by cMarker.z
+					Collections.sort(state.jLayer.markers, new MarkersOrder());
+
+				}
+
+
 			}
 		} 
-		
-		if (!frozen) {
-			// Update markers
-			for (int i = 0; i < state.jLayer.markers.size(); i++) {
-				Marker ma = state.jLayer.markers.get(i);
-				ma.update(state.curFix, System.currentTimeMillis());
-				
-			}
 
-			// Prepare markers for draw
-			for (int i = 0; i < state.jLayer.markers.size(); i++) {
-				Marker ma = state.jLayer.markers.get(i);
-				ma.calcPaint(cam, addX, addY);
-			}
-		}
-		
-		// Sort markers by cMarker.z
-		Collections.sort(state.jLayer.markers, new MarkersOrder());
-
-		// Draw markers
+		// Update markers
 		for (int i = 0; i < state.jLayer.markers.size(); i++) {
 			Marker ma = state.jLayer.markers.get(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
 			if (dist[0] / 1000f < Float.parseFloat(state.radius)) {
-			ma.draw(dw);
+				if (!frozen) ma.update(state.curFix, System.currentTimeMillis());
+				ma.calcPaint(cam, addX, addY);
+				ma.draw(dw);
 			}
 		}
 
@@ -196,7 +193,7 @@ public class DataView {
 		dw.setFontSize(12); 
 		radarText(dw, MixUtils.formatDist(Float.parseFloat(state.radius) * 1000), rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS*2 -10, false);
 		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx + RadarPoints.RADIUS, ry - 5, true); 
-		
+
 		// Get next event
 		UIEvent evt = null;
 		synchronized (uiEvents) {
@@ -210,8 +207,8 @@ public class DataView {
 			evt = null;
 		}
 		if (evt != null && evt.type == UIEvent.CLICK) {
-				handleClickEvent((ClickEvent) evt);
-			}
+			handleClickEvent((ClickEvent) evt);
+		}
 	}
 
 	private void handleKeyEvent(KeyEvent evt) {
@@ -237,7 +234,7 @@ public class DataView {
 		boolean evtHandled = false;
 
 		// Handle event
-		if (state.nextLStatus == MixState.READY) {
+		if (state.nextLStatus == MixState.DONE) {
 			for (int i = state.jLayer.markers.size() - 1; i >= 0
 			&& !evtHandled; i--) {
 				Marker pm = state.jLayer.markers.get(i);

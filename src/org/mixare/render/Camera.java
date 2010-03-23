@@ -61,6 +61,7 @@ public class Camera {
 		prjPoint.x = prjPoint.x + addX + width / 2;
 		prjPoint.y = -prjPoint.y + addY + height / 2;
 	}
+	
 	@Override
 	public String toString() {
 		return "CAM(" + width + "," + height + ")";

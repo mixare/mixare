@@ -279,20 +279,16 @@ LocationListener {
 					locationMgr.requestLocationUpdates(bestP, 100, 1, this);
 				}
 
-				Location lastFix = new Location("reverseGeocoded");
+				//defaulting to our place
+				Location hardFix = new Location("reverseGeocoded");
+				hardFix.setLatitude(46.47122383117541);
+				hardFix.setLongitude(11.260278224944742);
+				hardFix.setAltitude(300);
 
-				lastFix.setLatitude(46.47122383117541);
-				lastFix.setLongitude(11.260278224944742);
-				lastFix.setAltitude(300);
-
-				//Log.d("mixare", lastFix.toString());
 				try {
-					//lastFix = locationMgr.getLastKnownLocation(bestP);
-					//Log.d("mixare", "resume: " + lastFix.toString());
 					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
 				} catch (Exception ex2) {
-					ctx.curLoc = new Location(lastFix);
-					//ex2.printStackTrace();
+					ctx.curLoc = new Location(hardFix);
 				}
 
 				GeomagneticField gmf = new GeomagneticField((float) ctx.curLoc
@@ -311,8 +307,7 @@ LocationListener {
 
 			downloadThread = new Thread(ctx.downloadManager);
 			downloadThread.start();
-
-
+			
 		} catch (Exception ex) {
 			doError(ex);
 
@@ -624,7 +619,6 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					Camera.Size element = itr.next(); 
 					element.width -= w;
 					element.height -= h;
-					Log.d("mixare", "W:" + element.width + " H:" + element.height);
 				} 
 				Collections.sort(supportedSizes, new ResolutionsOrder());
 				parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
@@ -684,6 +678,7 @@ class AugmentedView extends View {
 			MixView.dWindow.setHeight(canvas.getHeight());
 			MixView.dWindow.setCanvas(canvas);
 
+			
 			if (!MixView.view.isInited()) {
 				MixView.view.init(MixView.dWindow.getWidth(),
 						MixView.dWindow.getHeight());
@@ -695,5 +690,3 @@ class AugmentedView extends View {
 		}
 	}
 }
-
-
