@@ -45,11 +45,11 @@ public class MixState {
 	public Json jLayer = new Json();
 	boolean detailsView = false;
 
-	boolean handleEvent(MixContext ctx, String xmlId, String xmlOnPress) {
+	boolean handleEvent(MixContext ctx, String xmlId, String onPress) {
 
-		if (xmlOnPress.startsWith("webpage")) {
+		if (onPress != null && onPress.startsWith("webpage")) {
 			try {
-				String webpage = MixUtils.parseAction(xmlOnPress);
+				String webpage = MixUtils.parseAction(onPress);
 				this.detailsView = true;
 				ctx.loadWebPage(webpage);
 			} catch (Exception ex) {
