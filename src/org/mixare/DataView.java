@@ -36,6 +36,8 @@ import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 
@@ -121,19 +123,35 @@ public class DataView {
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED ) {
 
-			DownloadRequest request = new DownloadRequest();
+			Intent intent = ((Activity) ctx.mixView).getIntent();
+			if (intent.getAction() != null &&
+					intent.getAction().equals("org.mixare.VIEW")) {
+				String[] data = intent.getStringArrayExtra("DATA");
+				for (int i = 0; i < data.length; i++) {
+					Marker marker = Marker.parse(data[0]);
+					System.out.println("marker:"+marker.mId);
+					state.jLayer.markers.add(marker);
+				}
 
-			if (!ctx.getStartUrl().equals(""))
-				request.url = ctx.getStartUrl();
-			else 
-				request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ state.radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
-
-			state.startUrl = ctx.getStartUrl();
-
-			state.downloadId = ctx.getDownloader().submitJob(request);
+				state.nextLStatus = MixState.DONE;
+			} else {
 
 
-			state.nextLStatus = MixState.PROCESSING;
+				DownloadRequest request = new DownloadRequest();
+
+				if (!ctx.getStartUrl().equals(""))
+					request.url = ctx.getStartUrl();
+				else 
+					request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ state.radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
+
+				state.startUrl = ctx.getStartUrl();
+
+				state.downloadId = ctx.getDownloader().submitJob(request);
+
+
+				state.nextLStatus = MixState.PROCESSING;
+			}
+
 		} else if (state.nextLStatus == MixState.PROCESSING) {
 			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
 				state.dRes = ctx.getDownloader().getReqResult(state.downloadId);
