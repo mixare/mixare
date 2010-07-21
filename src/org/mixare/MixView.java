@@ -23,12 +23,17 @@ import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -42,13 +47,17 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -101,13 +110,21 @@ LocationListener {
 	String fErrorTxt;
 	Exception fExeption;
 
+	/*Vectors to store the titles and URLs got from Json for the alternative list view */
+	public Vector<String> listDataVector;
+	public Vector<String> listURL;
 
+	/*string to name & access the preference file in the internal storage*/
+    public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
+    	
 	public void doError(Exception ex1) {
 		if (!fError) {
 			fError = true;
 			fErrorTxt = ex1.toString();
 			fExeption = ex1;
-
+			
+			setErrorDialog();
+			
 			ex1.printStackTrace();
 			try {
 			} catch (Exception ex2) {
@@ -126,25 +143,100 @@ LocationListener {
 		if (fError)
 			throw new Exception();
 	}
+	
+	public void repaint(){
+		view = new DataView(ctx);
+		dWindow = new PaintScreen();
+		SetZoomLevel();
+	}
 
+	public void setErrorDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(view.CONNECITON_ERROR_DIALOG_TEXT));
+        builder.setCancelable(false);
+        
+        /*Retry*/
+        builder.setPositiveButton(view.CONNECITON_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int id) {
+        		fError=false;
+               //TODO improve
+            	try {
+            		repaint();	       		
+            	}
+            	catch(Exception ex){
+            		doError(ex);
+            	}
+            }
+        });
+        /*Open settings*/
+        builder.setNeutralButton(view.CONNECITON_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            	Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
+				startActivityForResult(intent1, 42);
+
+            	//TODO back to camera view after seeing settings
+            }
+        });
+        /*Close application*/
+        builder.setNegativeButton(view.CONNECITON_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int id) {
+            	 /*leave the app but it will still exist in memory*/
+            	 //finish();
+            	 /*the app will be definitely killed*/
+                 System.exit(0);
+              }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+	}
+	
+	public void setGPSDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(view.CONNECITON_GPS_DIALOG_TEXT));
+        builder.setCancelable(false);
+        builder.setPositiveButton(view.CONNECITON_GPS_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int id) {
+        		dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(view.CONNECITON_GPS_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int id) {
+            	 System.exit(0);          	 
+              }
+        });
+        AlertDialog GPSAlert = builder.create();
+        GPSAlert.show();
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		try {
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			
+			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
+			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		    SharedPreferences.Editor editor = settings.edit();
 
-			myZoomBar = new SeekBar(this);
+		    /*check if the application is launched for the first time*/
+		    if(settings.getBoolean("firstAccess",false)==false){
+		    	//if FALSE it is the first time and the license agreements are shown before starting
+				Intent intent = new Intent(MixView.this, MixLicense.class); 
+				startActivity(intent);
+			    editor.putBoolean("firstAccess", true);
+			    editor.commit();
+			}       
+
+		    myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
-			myZoomBar.setProgress(65);
-			myZoomBar
-			.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
+			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
+			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);
 
 			FrameLayout FL = new FrameLayout(this);
@@ -163,14 +255,22 @@ LocationListener {
 			addContentView(FL, new FrameLayout.LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
 					Gravity.BOTTOM));
-
+			
 			if (!isInited) {
-
 				ctx = new MixContext(this);
 				ctx.downloadManager = new DownloadManager(ctx);
+				
+				 
 				dWindow = new PaintScreen();
 				view = new DataView(ctx);
+				
+				/*set the radius in data view to the last selected by the user*/
+				SetZoomLevel(); 
 				isInited = true;
+				
+				if(ctx.isActualLocation()==false){
+			    	setGPSDialog();
+			    }				
 			}
 		} catch (Exception ex) {
 			doError(ex);
@@ -278,8 +378,8 @@ LocationListener {
 				if (isGpsEnabled) {
 					locationMgr.requestLocationUpdates(bestP, 100, 1, this);
 				}
-
-				//defaulting to our place
+				
+				/*defaulting to our place*/
 				Location hardFix = new Location("reverseGeocoded");
 				hardFix.setLatitude(46.47122383117541);
 				hardFix.setLongitude(11.260278224944742);
@@ -301,6 +401,10 @@ LocationListener {
 						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
 						.sin(angleY), 0f, (float) Math.cos(angleY));
 				ctx.declination = gmf.getDeclination();
+				
+				
+				repaint();
+				
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
@@ -333,35 +437,94 @@ LocationListener {
 			}
 		}
 	}
-
+	
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		try {
+	public boolean onCreateOptionsMenu(Menu menu) {
+			int base = Menu.FIRST;
+			/*define the first*/
+			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); //Show Tweets ON or OFF
+			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); //add remove friends to follow
+			MenuItem item3 =menu.add(base, base+2, base+2,  getString(view.MENU_ITEM_3));
+			MenuItem item4 =menu.add(base, base+3, base+3,  getString(view.MENU_ITEM_4));
+			MenuItem item5 =menu.add(base, base+4, base+4,  getString(view.MENU_ITEM_5));
 
-			myZoomBar.setVisibility(View.VISIBLE);
+			/*assign icons to the menu items*/
+			item1.setIcon(android.R.drawable.ic_menu_view);
+			item2.setIcon(android.R.drawable.ic_menu_gallery);
+			item3.setIcon(android.R.drawable.ic_menu_search);
+			item4.setIcon(android.R.drawable.ic_menu_zoom);
+			item5.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 
 			return true;
-		} catch (Exception ex) {
-			doError(ex);
-			return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+			/*Case 1: Choose if you want to show location data from Twitter/ geodata/ costumized information/ URL*/
+			case 1:
+				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();				
+				break;
+			/*Case 2: show all info/location points in the radius in a list*/
+			case 2:
+				listDataVector = view.jLayer.listData;
+				listURL = view.jLayer.listOnPress;
+				
+				//if the list of titles to show in alternative list view is not empty
+				if(listDataVector.size()>0){
+					MixListView.data= listDataVector;
+					MixListView.selectedItemURL= listURL;
+					MixListView.context = ctx;
+					MixListView.dataView = view;
+					Intent intent = new Intent(MixView.this, MixListView.class); 
+					startActivityForResult(intent, 42);
+				}
+				//if the list is empty
+				else{
+					Toast.makeText( this, view.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
+				}
+				break;
+			/*Case 3: Search for location information*/
+			case 3:
+				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();				
+				break;
+			/*Case 4: show the zoom bar*/
+			case 4:
+				myZoomBar.setVisibility(View.VISIBLE);    
+				break;
+			/*Case 5: show license agreements*/
+			case 5:
+				Intent intent1 = new Intent(MixView.this, MixLicense.class); 
+				startActivityForResult(intent1, 42);
+				break;
 		}
+		return true;
 	}
 
+	
 	private void SetZoomLevel() {
+		//TODO improve zoomlevel algorithm
 		int myZoomLevel = myZoomBar.getProgress();
 		float myout = 5;
-		if (myZoomLevel < 25) {
+		if (myZoomLevel <= 26) {
 			myout = myZoomLevel / 25f;
 		} else if (25 < myZoomLevel && myZoomLevel < 50) {
 			myout = (1 + (myZoomLevel - 25)) * 0.38f;
-		} else if (50 < myZoomLevel && myZoomLevel < 75) {
+		} 
+				else if (25== myZoomLevel) {
+					myout = 1;
+				} 
+				else if (50== myZoomLevel) {
+					myout = 10;
+				} 
+		else if (50 < myZoomLevel && myZoomLevel < 75) {
 			myout = (10 + (myZoomLevel - 50)) * 0.83f;
 		} else {
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
 
-		view.state.radius = String.valueOf(myout);
+		view.radius =myout;
 
 		myZoomBar.setVisibility(View.INVISIBLE);
 		view.doStart();
@@ -375,22 +538,29 @@ LocationListener {
 
 		Toast t;
 
-		public void onProgressChanged(SeekBar seekBar, int progress,
-				boolean fromUser) {
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			
 			int myZoomLevel = myZoomBar.getProgress();
 			float myout = 5;
-			if (myZoomLevel < 25) {
+			if (myZoomLevel <= 26) {
 				myout = myZoomLevel / 25f;
-			} else if (25 <= myZoomLevel && myZoomLevel < 50) {
+			} else if (25 < myZoomLevel && myZoomLevel < 50) {
 				myout = (1 + (myZoomLevel - 25)) * 0.38f;
-			} else if (50 <= myZoomLevel && myZoomLevel < 75) {
+			} 
+					else if (25== myZoomLevel) {
+						myout = 1;
+					} 
+					else if (50== myZoomLevel) {
+						myout = 10;
+					} 
+			else if (50 < myZoomLevel && myZoomLevel < 75) {
 				myout = (10 + (myZoomLevel - 50)) * 0.83f;
 			} else {
 				myout = (30 + (myZoomLevel - 75) * 2f);
-			}
+			}			
+			
 			t.setText("Radius: " + String.valueOf(myout));
 			t.show();
-
 		}
 
 		public void onStartTrackingTouch(SeekBar seekBar) {
@@ -399,15 +569,18 @@ LocationListener {
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
+			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		    SharedPreferences.Editor editor = settings.edit();
+		    /*store the zoom range of the zoom bar selected by the user*/
+		    editor.putInt("zoomLevel", myZoomBar.getProgress());
+		    editor.commit();
+			myZoomBar.setVisibility(View.INVISIBLE);
 			t.cancel();
 			SetZoomLevel();
 		}
 
 	};
 
-	public void onAccuracyChanged(Sensor s, int accuracy) {
-		//TODO: do something here
-	}
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
@@ -439,7 +612,7 @@ LocationListener {
 			finalR.prod(tempR);
 			finalR.prod(m3);
 			finalR.prod(m2);
-			finalR.invert(); // TODO: use transpose() instead
+			finalR.invert(); 
 
 			histR[rHistIdx].set(finalR);
 			rHistIdx++;
@@ -460,13 +633,14 @@ LocationListener {
 		}
 	}
 
+	@Override
 	public boolean onTouchEvent(MotionEvent me) {
 		try {
 			killOnError();
 
 			float xPress = me.getX();
 			float yPress = me.getY();
-			if (me.getAction() == me.ACTION_UP) {
+			if (me.getAction() == MotionEvent.ACTION_UP) {
 				view.clickEvent(xPress, yPress);
 			}
 
@@ -478,6 +652,7 @@ LocationListener {
 		}
 	}
 
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		try {
 			killOnError();
@@ -533,6 +708,13 @@ LocationListener {
 			doError(ex);
 		}
 	}
+
+
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
@@ -662,12 +844,14 @@ class AugmentedView extends View {
 	protected void onDraw(Canvas canvas) {
 		try {
 			if (app.fError) {
+
 				Paint errPaint = new Paint();
 				errPaint.setColor(Color.RED);
 				errPaint.setTextSize(16);
-
-				canvas.drawText("ERROR: ", 10, 20, errPaint);
-				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
+				
+				/*Draws the Error code*/
+//				canvas.drawText("ERROR: ", 10, 20, errPaint);
+//				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
 
 				return;
 			}

@@ -36,10 +36,10 @@ import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
+import android.widget.Toast;
 
 
 /**
@@ -60,14 +60,38 @@ public class DataView {
 	public MixState state = new MixState();
 	/** The view can be "frozen" for debug purposes */
 	boolean frozen = false;
-
 	/** how many times to re-attempt download */
 	int retry = 0;
-
 	/** default URL */
 	String HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
+	
+	public Json jLayer = new Json();
+	
+	public float radius = 20;
+	
+	
+	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
+	public int EMPTY_LIST_STRING_ID = R.string.empty_list;
+	public int OPTION_NOT_AVAILABLE_STRING_ID = R.string.option_not_available;
+	public int EMPTY_LIST_STRIG_ID = R.string.empty_list;
+	public int MENU_ITEM_1 = R.string.menu_item_1;
+	public int MENU_ITEM_2 = R.string.menu_item_2;
+	public int MENU_ITEM_3 = R.string.menu_item_3;
+	public int MENU_ITEM_4 = R.string.menu_item_4;
+	public int MENU_ITEM_5 = R.string.menu_item_5;
+	
+	public int CONNECITON_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
+	public int CONNECITON_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
+	public int CONNECITON_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
+	public int CONNECITON_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
+	
+	public int CONNECITON_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
+	public int CONNECITON_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
+	public int CONNECITON_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
 
 
+//	public int ORIENTATON_NORD_ID = R.string.N;
+	
 	ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
 	RadarPoints radarPoints = new RadarPoints();
@@ -123,34 +147,17 @@ public class DataView {
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED ) {
 
-			Intent intent = ((Activity) ctx.mixView).getIntent();
-			if (intent.getAction() != null &&
-					intent.getAction().equals("org.mixare.VIEW")) {
-				String[] data = intent.getStringArrayExtra("DATA");
-				for (int i = 0; i < data.length; i++) {
-					Marker marker = Marker.parse(data[0]);
-					System.out.println("marker:"+marker.mId);
-					state.jLayer.markers.add(marker);
-				}
+			DownloadRequest request = new DownloadRequest();
 
-				state.nextLStatus = MixState.DONE;
-			} else {
+			if (!ctx.getStartUrl().equals(""))
+				request.url = ctx.getStartUrl();
+			else 
+				request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 
+			state.startUrl = ctx.getStartUrl();
+			state.downloadId = ctx.getDownloader().submitJob(request);
 
-				DownloadRequest request = new DownloadRequest();
-
-				if (!ctx.getStartUrl().equals(""))
-					request.url = ctx.getStartUrl();
-				else 
-					request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ state.radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
-
-				state.startUrl = ctx.getStartUrl();
-
-				state.downloadId = ctx.getDownloader().submitJob(request);
-
-
-				state.nextLStatus = MixState.PROCESSING;
-			}
+			state.nextLStatus = MixState.PROCESSING;
 
 		} else if (state.nextLStatus == MixState.PROCESSING) {
 			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
@@ -163,24 +170,21 @@ public class DataView {
 				} else {
 					retry = 0;
 					state.nextLStatus = MixState.DONE;
-					state.jLayer = (Json) state.dRes.obj;
+					jLayer = (Json) state.dRes.obj;
 
-					// Sort markers by cMarker.z
-					Collections.sort(state.jLayer.markers, new MarkersOrder());
-
-				}
-
-
+					//Sort markers by cMarker.z
+					Collections.sort(jLayer.markers, new MarkersOrder());
+				}	
 			}
 		} 
 
 		// Update markers
-		for (int i = 0; i < state.jLayer.markers.size(); i++) {
-			Marker ma = state.jLayer.markers.get(i);
+		for (int i = 0; i < jLayer.markers.size(); i++) {
+			Marker ma = jLayer.markers.get(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
-			if (dist[0] / 1000f < Float.parseFloat(state.radius)) {
+			if (dist[0] / 1000f < radius) {
 				if (!frozen) ma.update(state.curFix, System.currentTimeMillis());
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
@@ -208,8 +212,10 @@ public class DataView {
 		dw.paintLine( lrl.x, lrl.y, rx+RadarPoints.RADIUS, ry+RadarPoints.RADIUS); 
 		dw.paintLine( rrl.x, rrl.y, rx+RadarPoints.RADIUS, ry+RadarPoints.RADIUS); 
 		dw.setColor(Color.rgb(255,255,255));
-		dw.setFontSize(12); 
-		radarText(dw, MixUtils.formatDist(Float.parseFloat(state.radius) * 1000), rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS*2 -10, false);
+		dw.setFontSize(12);
+		
+		//km range
+		radarText(dw, MixUtils.formatDist(radius * 1000), rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS*2 -10, false);
 		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx + RadarPoints.RADIUS, ry - 5, true); 
 
 		// Get next event
@@ -227,7 +233,9 @@ public class DataView {
 		if (evt != null && evt.type == UIEvent.CLICK) {
 			handleClickEvent((ClickEvent) evt);
 		}
+		
 	}
+	
 
 	private void handleKeyEvent(KeyEvent evt) {
 		/** Adjust marker position with keypad */
@@ -253,9 +261,9 @@ public class DataView {
 
 		// Handle event
 		if (state.nextLStatus == MixState.DONE) {
-			for (int i = state.jLayer.markers.size() - 1; i >= 0
+			for (int i = jLayer.markers.size() - 1; i >= 0
 			&& !evtHandled; i--) {
-				Marker pm = state.jLayer.markers.get(i);
+				Marker pm = jLayer.markers.get(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, ctx, state);
 			}

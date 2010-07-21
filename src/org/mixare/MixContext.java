@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -42,6 +43,9 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.text.format.Time;
+import android.util.Log;
+import android.util.TimeUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -61,6 +65,7 @@ public class MixContext {
 	Matrix rotationM = new Matrix();
 
 	float declination = 0f;
+	private boolean actualLocation=false;
 
 	public MixContext(Context appCtx) {
 		this.mixView = (MixView) appCtx;
@@ -70,17 +75,27 @@ public class MixContext {
 
 		int locationHash = 0;
 		try {
-			LocationManager locationMgr = (LocationManager) appCtx
-			.getSystemService(Context.LOCATION_SERVICE);
-			Location lastFix = locationMgr
-			.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			if (lastFix == null)
-				lastFix = locationMgr
-				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			LocationManager locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
+			Location lastFix = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+			Date dt = new Date();
+			long actualTime= dt.getTime();
+			long lastFixTime = lastFix.getTime();
+			long timeDifference = actualTime-lastFixTime;
 
-			if (lastFix != null)
-				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix
-						.getLongitude()).hashCode();
+
+			if(timeDifference> 1200000){//300000 milliseconds = 5 min
+				actualLocation=false;
+			}
+			actualLocation=true;
+			if (lastFix == null){
+				lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				actualLocation=false;
+			}
+
+			if (lastFix != null){
+				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix.getLongitude()).hashCode();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -90,6 +105,9 @@ public class MixContext {
 
 	public boolean isGpsEnabled() {
 		return mixView.isGpsEnabled;
+	}
+	public boolean isActualLocation(){
+		return actualLocation;
 	}
 
 	public DownloadManager getDownloader() {
@@ -135,21 +153,23 @@ public class MixContext {
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
-
+			
 			is = conn.getInputStream();
-
+			
 			return is;
 		} catch (Exception ex) {
 			try {
 				is.close();
-			} catch (Exception ignore) {
+			} catch (Exception ignore) {			
 			}
 			try {
 				conn.disconnect();
-			} catch (Exception ignore) {
-			}
+			} catch (Exception ignore) {			
 
-			throw ex;
+			}
+			
+			throw ex;				
+
 		}
 	}
 
@@ -168,10 +188,12 @@ public class MixContext {
 		} finally {
 			try {
 				is.close();
-			} catch (IOException e) {
+			} catch (IOException e) {			
+
 				e.printStackTrace();
 			}
-		}
+		}			
+
 		return sb.toString();
 	}
 
@@ -182,41 +204,41 @@ public class MixContext {
 		htmlEntities.put("&gt;", ">");
 		htmlEntities.put("&amp;", "&");
 		htmlEntities.put("&quot;", "\"");
-		htmlEntities.put("&agrave;", "à");
-		htmlEntities.put("&Agrave;", "À");
-		htmlEntities.put("&acirc;", "â");
-		htmlEntities.put("&auml;", "ä");
-		htmlEntities.put("&Auml;", "Ä");
-		htmlEntities.put("&Acirc;", "Â");
-		htmlEntities.put("&aring;", "å");
-		htmlEntities.put("&Aring;", "Å");
-		htmlEntities.put("&aelig;", "æ");
-		htmlEntities.put("&AElig;", "Æ");
-		htmlEntities.put("&ccedil;", "ç");
-		htmlEntities.put("&Ccedil;", "Ç");
-		htmlEntities.put("&eacute;", "é");
-		htmlEntities.put("&Eacute;", "É");
-		htmlEntities.put("&egrave;", "è");
-		htmlEntities.put("&Egrave;", "È");
-		htmlEntities.put("&ecirc;", "ê");
-		htmlEntities.put("&Ecirc;", "Ê");
-		htmlEntities.put("&euml;", "ë");
-		htmlEntities.put("&Euml;", "Ë");
-		htmlEntities.put("&iuml;", "ï");
-		htmlEntities.put("&Iuml;", "Ï");
-		htmlEntities.put("&ocirc;", "ô");
-		htmlEntities.put("&Ocirc;", "Ô");
-		htmlEntities.put("&ouml;", "ö");
-		htmlEntities.put("&Ouml;", "Ö");
-		htmlEntities.put("&oslash;", "ø");
-		htmlEntities.put("&Oslash;", "Ø");
-		htmlEntities.put("&szlig;", "ß");
-		htmlEntities.put("&ugrave;", "ù");
-		htmlEntities.put("&Ugrave;", "Ù");
-		htmlEntities.put("&ucirc;", "û");
-		htmlEntities.put("&Ucirc;", "Û");
-		htmlEntities.put("&uuml;", "ü");
-		htmlEntities.put("&Uuml;", "Ü");
+		htmlEntities.put("&agrave;", "ÃƒÂ ");
+		htmlEntities.put("&Agrave;", "Ãƒâ‚¬");
+		htmlEntities.put("&acirc;", "ÃƒÂ¢");
+		htmlEntities.put("&auml;", "ÃƒÂ¤");
+		htmlEntities.put("&Auml;", "Ãƒâ€ž");
+		htmlEntities.put("&Acirc;", "Ãƒâ€š");
+		htmlEntities.put("&aring;", "ÃƒÂ¥");
+		htmlEntities.put("&Aring;", "Ãƒâ€¦");
+		htmlEntities.put("&aelig;", "ÃƒÂ¦");
+		htmlEntities.put("&AElig;", "Ãƒâ€ ");
+		htmlEntities.put("&ccedil;", "ÃƒÂ§");
+		htmlEntities.put("&Ccedil;", "Ãƒâ€¡");
+		htmlEntities.put("&eacute;", "ÃƒÂ©");
+		htmlEntities.put("&Eacute;", "Ãƒâ€°");
+		htmlEntities.put("&egrave;", "ÃƒÂ¨");
+		htmlEntities.put("&Egrave;", "ÃƒË†");
+		htmlEntities.put("&ecirc;", "ÃƒÂª");
+		htmlEntities.put("&Ecirc;", "ÃƒÅ ");
+		htmlEntities.put("&euml;", "ÃƒÂ«");
+		htmlEntities.put("&Euml;", "Ãƒâ€¹");
+		htmlEntities.put("&iuml;", "ÃƒÂ¯");
+		htmlEntities.put("&Iuml;", "Ãƒï¿½");
+		htmlEntities.put("&ocirc;", "ÃƒÂ´");
+		htmlEntities.put("&Ocirc;", "Ãƒâ€�");
+		htmlEntities.put("&ouml;", "ÃƒÂ¶");
+		htmlEntities.put("&Ouml;", "Ãƒâ€“");
+		htmlEntities.put("&oslash;", "ÃƒÂ¸");
+		htmlEntities.put("&Oslash;", "ÃƒËœ");
+		htmlEntities.put("&szlig;", "ÃƒÅ¸");
+		htmlEntities.put("&ugrave;", "ÃƒÂ¹");
+		htmlEntities.put("&Ugrave;", "Ãƒâ„¢");
+		htmlEntities.put("&ucirc;", "ÃƒÂ»");
+		htmlEntities.put("&Ucirc;", "Ãƒâ€º");
+		htmlEntities.put("&uuml;", "ÃƒÂ¼");
+		htmlEntities.put("&Uuml;", "ÃƒÅ“");
 		htmlEntities.put("&nbsp;", " ");
 		htmlEntities.put("&copy;", "\u00a9");
 		htmlEntities.put("&reg;", "\u00ae");
@@ -270,13 +292,16 @@ public class MixContext {
 			
 			return is;
 		} catch (Exception ex) {
+
 			try {
 				is.close();
-			} catch (Exception ignore) {
+			} catch (Exception ignore) {			
+
 			}
 			try {
 				os.close();
-			} catch (Exception ignore) {
+			} catch (Exception ignore) {			
+
 			}
 			try {
 				conn.disconnect();
@@ -285,7 +310,8 @@ public class MixContext {
 
 			if (conn != null && conn.getResponseCode() == 405) {
 				return getHttpGETInputStream(urlStr);
-			} else {
+			} else {		
+
 				throw ex;
 			}
 		}

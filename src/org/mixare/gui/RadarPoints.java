@@ -40,8 +40,8 @@ public class RadarPoints implements ScreenObj {
 	static int radarColor = Color.argb(100, 0, 0, 200);
 	
 	public void paint(PaintScreen dw) {
-		/** radius in state is in KM. */
-		range = Float.parseFloat(view.state.radius) * 1000;
+		/** radius is in KM. */
+		range = view.radius * 1000;
 		/** Draw the radar */
 		dw.setFill(true);
 		dw.setColor(radarColor);
@@ -50,8 +50,8 @@ public class RadarPoints implements ScreenObj {
 		/** put the markers in it */
 		float scale = range / RADIUS;
 
-		for (int i = 0; i < view.state.jLayer.markers.size(); i++) {
-			Marker pm = view.state.jLayer.markers.get(i);
+		for (int i = 0; i < view.jLayer.markers.size(); i++) {
+			Marker pm = view.jLayer.markers.get(i);
 			float x = pm.loc.x / scale;
 			float y = pm.loc.z / scale;
 

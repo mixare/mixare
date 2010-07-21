@@ -25,6 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mixare.data.Json;
 
+import android.util.Log;
+
+
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
@@ -37,9 +40,9 @@ public class DownloadManager implements Runnable {
 	InputStream is;
 
 	private String currJobId = null;
-
+	
 	MixContext ctx;
-
+	
 	public DownloadManager(MixContext ctx) {
 		this.ctx = ctx;
 	}
@@ -68,12 +71,13 @@ public class DownloadManager implements Runnable {
 						proceed = true;
 					}
 				}
-
 				// Do proceed
 				if (proceed) {
 					state = CONNECTED;
 					currJobId = jobId;
+					
 					result = processRequest(request);
+
 
 					synchronized (this) {
 						todoList.remove(jobId);
@@ -94,12 +98,14 @@ public class DownloadManager implements Runnable {
 			}
 			state = CONNECTING;
 		}
-
 		// Do stop
 		state = STOPPED;
 	}
+	public int checkForConnection(){
+		return state;
+	}
 
-	private void sleep(long ms) {
+	private void sleep(long ms){
 		try {
 			Thread.sleep(ms);
 		} catch (java.lang.InterruptedException ex) {
@@ -114,9 +120,12 @@ public class DownloadManager implements Runnable {
 	private DownloadResult processRequest(DownloadRequest request) {
 		DownloadResult result = new DownloadResult();
 		try {
+			if(ctx.getHttpGETInputStream(request.url)!=null){
+				
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
 				String ss = ctx.unescapeHTML(tmp, 0);
+
 				JSONObject root = null;
 				root = new JSONObject(ss);
 				Json layer = new Json();
@@ -137,6 +146,7 @@ public class DownloadManager implements Runnable {
 
 			ctx.returnHttpInputStream(is);
 			is = null;
+			}
 
 		} catch (Exception ex) {
 			result.obj = null;
@@ -156,6 +166,7 @@ public class DownloadManager implements Runnable {
 
 		return result;
 	}
+
 
 	public synchronized void purgeLists() {
 		todoList.clear();

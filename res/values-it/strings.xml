@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">Mixare</string>
+    <string name="N">N</string>
+    <string name="NE">NE</string>
+    <string name="E">E</string>
+    <string name="SE">SE</string>
+    <string name="S">S</string>
+    <string name="SW">SW</string>
+    <string name="W">O</string>
+    <string name="NW">NW</string>
+    
+
+    <string name="empty_list">Purtroppo non sono disponibili informazioni\nin quest\'area. Provare ad aumentare il raggio.</string>
+	<string name="option_not_available">Questa opzione sará disponibile in\nuna versione futura dell\'applicazione!</string>
+	
+	<string name="license">Copyright (C) 2010- Peer internet solutions 
+		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
+		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
+		or at your option) any later version. 
+		\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+		the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public 
+		License for more details. 
+		\n\n You should have received a copy of the GNU General Public License along with this program. 
+		If not, see &lt;http://www.gnu.org/licenses/&gt;
+	</string>
+	
+	<string name="menu_item_1">Scelta dei dati visualizzati</string>
+	<string name="menu_item_2">Lista dei risultati</string>
+	<string name="menu_item_3">Ricerca</string>
+	<string name="menu_item_4">Raggio visualizzato</string>
+	<string name="menu_item_5">Info</string>
+	<string name="menu_item_6">Licenza</string>
+	
+	<string name="connection_error_dialog">I dati non possono essere scaricati!\nControllare che la connessione ad internet sia attiva.</string>
+	<string name="connection_error_dialog_button1">Riprova</string>
+	<string name="connection_error_dialog_button2">Apri impostazioni</string>
+	<string name="connection_error_dialog_button3">Chiudi mixare</string>
+	
+	<string name="connection_GPS_dialog_text">Impossibile ottenere la posizione corretta\nSe si continua é possibile che le informazioni\non saranno mostrate nella posizione corretta.</string>
+	<string name="connection_GPS_dialog_button1">Continua</string>
+	<string name="connection_GPS_dialog_button2">Chiudi mixare</string>
+
+
+</resources>

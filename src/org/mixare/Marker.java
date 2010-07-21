@@ -18,7 +18,6 @@
  */
 package org.mixare;
 
-import org.mixare.data.Json;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.ScreenObj;
 import org.mixare.gui.ScreenLine;
@@ -32,15 +31,11 @@ import android.location.Location;
 
 public class Marker {
 	//	// XML properties
-	public String mId;
 	public String mOnPress;
 	public PhysicalPlace mGeoLoc = new PhysicalPlace();
 
 	// State properties
 	float locX, locY, locZ;
-
-	// Pointer to jLayer
-	public Json layer;
 
 	// Draw properties
 	boolean isVisible, isLookingAt, isNear;
@@ -51,36 +46,16 @@ public class Marker {
 	static int color = Color.rgb(255, 0, 0), decInnerColor = Color.rgb(255, 0, 0), decWorkColor = Color.rgb(50, 50, 255);
 
 	Label txtLab = new Label();
-
+	
 	// Temp properties
 	MixVector tmpa = new MixVector();
 	MixVector tmpb = new MixVector();
 	MixVector tmpc = new MixVector();
-
+	
 	public MixVector loc = new MixVector();
 	MixVector origin = new MixVector(0, 0, 0);
 	MixVector upV = new MixVector(0, 1, 0);
 	ScreenLine pPt = new ScreenLine();
-
-
-	/**
-	 * Parses a marker from CSV.
-	 * Format: id,lat,lng,elevation,title[,webpage]
-	 *
-	 * @param csv
-	 * @return
-	 */
-	public static Marker parse(String csv){
-		String[] values = csv.split(",");
-		Marker marker = new Marker();
-		marker.mId = values[0];
-		marker.mGeoLoc.setLatitude(Double.parseDouble(values[1]));
-		marker.mGeoLoc.setLongitude(Double.parseDouble(values[2]));
-		marker.mGeoLoc.setAltitude(Double.parseDouble(values[3]));
-		marker.mText = values[4];
-		if (values.length > 4) marker.mOnPress = values[5];
-		return marker;
-	}
 
 
 	void cCMarker(MixVector originalPoint, Camera viewCam, float addX,
@@ -93,7 +68,7 @@ public class Marker {
 		tmpc.sub(viewCam.lco); //4
 		tmpa.prod(viewCam.transform); //5
 		tmpc.prod(viewCam.transform); //5
-
+		
 		viewCam.projectPoint(tmpa, tmpb, addX, addY); //6
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
@@ -198,9 +173,13 @@ public class Marker {
 		boolean evtHandled = false;
 
 		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, mId, mOnPress);
+			evtHandled = state.handleEvent(ctx, mOnPress);
 		}
 		return evtHandled;
+	}
+	
+	public String getText(){
+		return mText;
 	}
 }
 
@@ -234,7 +213,7 @@ class Label implements ScreenObj {
 		return height;
 	}
 
-
+	
 }
 
 

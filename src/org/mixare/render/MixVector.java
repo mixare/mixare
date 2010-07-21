@@ -43,6 +43,7 @@ public class MixVector {
 		set(x, y, z);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		MixVector v = (MixVector) obj;
 		return (v.x == x && v.y == y && v.z == z);
@@ -52,6 +53,7 @@ public class MixVector {
 		return (this.x == x && this.y == y && this.z == z);
 	}
 
+	@Override
 	public String toString() {
 		return "<" + x + ", " + y + ", " + z + ">";
 	}

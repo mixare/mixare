@@ -18,12 +18,9 @@
  */
 package org.mixare;
 
-import org.mixare.data.Json;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.location.Location;
 
 public class MixState {
@@ -40,28 +37,18 @@ public class MixState {
 	private float curBearing, curPitch;
 	public float screenWidth, screenHeight;
 
-	public String radius = "20";
-
 	public String startUrl = "";
 
-	public Json jLayer = new Json();
 	boolean detailsView = false;
 
-	boolean handleEvent(MixContext ctx, String xmlId, String onPress) {
+	boolean handleEvent(MixContext ctx, String onPress) {
 
-		if (onPress != null){
-			if (onPress.startsWith("webpage")) {
-				try {
-					String webpage = MixUtils.parseAction(onPress);
-					this.detailsView = true;
-					ctx.loadWebPage(webpage);
-				} catch (Exception ex) {
-				}
-			} else if (onPress.startsWith("return")){
-				Intent intent = new Intent();
-				intent.putExtra("RESULT", xmlId);
-				ctx.mixView.setResult(Activity.RESULT_OK, intent);
-				ctx.mixView.finish();
+		if (onPress != null && onPress.startsWith("webpage")) {
+			try {
+				String webpage = MixUtils.parseAction(onPress);
+				this.detailsView = true;
+				ctx.loadWebPage(webpage);
+			} catch (Exception ex) {
 			}
 		} 
 		return true;
@@ -75,19 +62,19 @@ public class MixState {
 	}
 
 	public void calcPitchBearing(Matrix rotationM) {
-
+	
 		MixVector looking = new MixVector();
 		rotationM.transpose();
 		looking.set(1, 0, 0);
 		looking.prod(rotationM);
 		this.curBearing = (int) (MixUtils.getAngle(0, 0, looking.x, looking.z)  + 360 ) % 360 ;
-
+		
 		rotationM.transpose();
 		looking.set(0, 1, 0);
 		looking.prod(rotationM);
 		this.curPitch = -MixUtils.getAngle(0, 0, looking.y, looking.z);
 
-
+		
 	}
 
 

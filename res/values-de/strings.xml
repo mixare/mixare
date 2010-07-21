@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">Mixare</string>
+    <string name="N">N</string>
+    <string name="NE">NO</string>
+    <string name="E">O</string>
+    <string name="SE">SO</string>
+    <string name="S">S</string>
+    <string name="SW">SW</string>
+    <string name="W">W</string>
+    <string name="NW">NW</string>
+    
+
+    <string name="empty_list">Es tut uns leid, \nFür das Gebiet in diesem Umkreis \nwurden keine Informationen gefunden.
+    \nBitte probieren Sie es mit einem etwas \ngrößerem Radius.</string>
+	<string name="option_not_available">Es tut uns leid, wir arbeiten daran... 
+		\nDiese Option wird Ihnen schon bald \nzur Verfügung stehen!</string>
+	
+	<string name="license">Copyright (C) 2010- Peer internet solutions 
+		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
+		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
+		or at your option) any later version. 
+		\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+		the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public 
+		License for more details. 
+		\n\n You should have received a copy of the GNU General Public License along with this program. 
+		If not, see &lt;http://www.gnu.org/licenses/&gt;
+	</string>
+	
+	<string name="menu_item_1">Wechsle Info Anbieter</string>
+	<string name="menu_item_2">Listen Ansicht</string>
+	<string name="menu_item_3">Suche</string>
+	<string name="menu_item_4">Zoom Level</string>
+	<string name="menu_item_5">Info</string>
+	<string name="menu_item_6">Lizenz</string>
+	
+	<string name="connection_error_dialog">Es tut uns leid, Verbindungsfehler ist aufgetreten! \nBitte kontrollieren Sie ob eine Verbindung zum Internet besteht.</string>
+	<string name="connection_error_dialog_button1">Erneut Versuchen</string>
+	<string name="connection_error_dialog_button2">Einstellungen</string>
+	<string name="connection_error_dialog_button3">Verlassen</string>
+	
+	<string name="connection_GPS_dialog_text">Die GPS position kann nicht aktualisiert werden... \nFalls Sie fortfahren möchten kann es sein 
+		\ndass sich die Informationen nicht am richtigen Platz befinden.</string>
+	<string name="connection_GPS_dialog_button1">Fortfahren</string>
+	<string name="connection_GPS_dialog_button2">Schließen</string>
+
+</resources>

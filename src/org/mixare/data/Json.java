@@ -19,7 +19,7 @@
 package org.mixare.data;
 
 import java.util.ArrayList;
-
+import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +31,11 @@ public class Json {
 	public String lUrl;
 
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
+	//Vector to store the data (titles) showed in the alternative list view
+	public Vector<String> listData= new Vector();
+	//Vector to store the URLs to the corresponding titles 
+	public Vector<String> listOnPress= new Vector();
+
 
 	public Json() {
 	}
@@ -48,38 +53,40 @@ public class Json {
 
 			try {
 
-				String locId = null;
 				jo = root.getJSONObject(i);
 
 				if (jo.has("id")) {
 					//Our own schema
-					locId = jo.getString("id");
 					if (jo.getInt("has_detail_page") != 0) {
 						ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(jo.getString("webpage"));
+						//a Vector with the URLs corresponding to the titles is created
+						listOnPress.add("webpage:" + java.net.URLDecoder.decode(jo.getString("webpage")));
 					}
 
 				} else {
 					//geonames
-					locId = jo.getString("title");
 					ma.mOnPress = "webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl"));
+					listOnPress.add("webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl")));
 				}
 
 				ma.mText = jo.getString("title");
 				refpt.setLatitude(jo.getDouble("lat"));
 				refpt.setLongitude(jo.getDouble("lng"));
 				refpt.setAltitude(jo.getDouble("elevation"));
-				ma.mId = locId;
 				ma.mGeoLoc.setTo(refpt);
 
-
-				ma.layer = this;
-
 				markers.add(ma);
+				
+				//a vector with the titles for the alternative list view is created
+				String title = jo.getString("title");
+				listData.add(title);
 
+				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
+	
 }
