@@ -20,35 +20,119 @@ package org.mixare;
 
 import java.util.Vector;
 
+import org.mixare.gui.PaintScreen;
+
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MixListView extends ListActivity{
 	
-	public static Vector<String> data;
-	public static Vector<String> selectedItemURL;
-	public static MixContext context;
-	public static DataView dataView;
-
+	private static int list=0;
+	
+	private static Vector<String> data = null;
+	private static Vector<String> selectedItemURL= null;
+	private static MixContext context = null;
+	private static DataView dataView = null;
+	private static String info= null;
+	private static String selectedDataSource="Wikipedia";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-
-		setListAdapter(new ArrayAdapter<String>(this,  android.R.layout.simple_list_item_1,data));
-		getListView().setTextFilterEnabled(true);
+		switch(list){
+		case 1:
+			Vector<String> dataSourceMenu = new Vector();
+			dataSourceMenu.add("Wikipedia");
+			dataSourceMenu.add("Twitter");
+//			dataSourceMenu.add("own URL");
+			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dataSourceMenu));
+			getListView().setTextFilterEnabled(true);
+			break;
+		
+		case 2:
+			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,data));
+			getListView().setTextFilterEnabled(true);
+			break;
+		}
 	}
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		Log.d("--------------------------", "pos :" + position);
+		switch(list){
+		/*Data Sources*/
+		case 1:
+			clickOnDataSource(position);		
+			break;
+		
+		/*List View*/
+		case 2:
+			/*if no website is available for this item*/
+			if(selectedItemURL.get(position)==""){				
+				Toast.makeText( this, info, Toast.LENGTH_LONG ).show();			
+			}
+			else{
+				dataView.state.handleEvent(context, selectedItemURL.get(position));
+			}
+			finish();
+			break;
 
-		dataView.state.handleEvent(context, selectedItemURL.get(position));
+		}
 		finish();
 	}
+	public void clickOnDataSource(int position){
+		switch(position){
+			/*WIKIPEDIA*/
+			case 0:
+				setDataSource("Wikipedia");
+				Toast.makeText( this , "Changed to Wikipedia as data source", Toast.LENGTH_LONG ).show();
+				break;
+			
+			/*TWITTER*/
+			case 1:		
+				setDataSource("Twitter");
+				Toast.makeText( this ,"Changed to Twitter as data source", Toast.LENGTH_LONG ).show();	
+				break;
+			/*Own URL*/
+//			case 2:
+//				setDataSource("OwnURL");
+//				Toast.makeText( this ,"sdfwer3rh", Toast.LENGTH_LONG ).show();	
+//				break;
+			
+		}
+		finish();
+	}
+	public static void setDataSource(String source){
+		selectedDataSource = source;
+	}
+	public static String getDataSource(){
+		return selectedDataSource;
+	}
 	
+	public static void setInfoText(String i){
+		info = i;
+	}
+	public static void setDataView(DataView v){
+		dataView = v;
+	}
+	public static void setMixContext(MixContext mc){
+		context = mc;
+	}
+	public static void setTitleVector(Vector<String> t){
+		data = t;
+	}
+	public static void setURLVector(Vector<String> url){
+		selectedItemURL = url;
+	}
+	public static void setList(int l){
+		list = l;
+	}
 }
 
 

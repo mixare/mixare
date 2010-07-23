@@ -26,21 +26,24 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Scelta dei dati visualizzati</string>
-	<string name="menu_item_2">Lista dei risultati</string>
-	<string name="menu_item_3">Ricerca</string>
-	<string name="menu_item_4">Raggio visualizzato</string>
-	<string name="menu_item_5">Info</string>
-	<string name="menu_item_6">Licenza</string>
+	<string name="menu_item_1">Raggio visualizzato</string>
+	<string name="menu_item_2">Scelta dei dati visualizzati</string>
+	<string name="menu_item_3">Lista dei risultati</string>
+	<string name="menu_item_4">Mappa</string>
+	<string name="menu_item_5">Ricerca</string>
+	<string name="menu_item_6">Info</string>
+	<string name="menu_item_7">Licenza</string>
 	
 	<string name="connection_error_dialog">I dati non possono essere scaricati!\nControllare che la connessione ad internet sia attiva.</string>
 	<string name="connection_error_dialog_button1">Riprova</string>
 	<string name="connection_error_dialog_button2">Apri impostazioni</string>
 	<string name="connection_error_dialog_button3">Chiudi mixare</string>
 	
-	<string name="connection_GPS_dialog_text">Impossibile ottenere la posizione corretta\nSe si continua é possibile che le informazioni\non saranno mostrate nella posizione corretta.</string>
+	<string name="connection_GPS_dialog_text">Impossibile ottenere la posizione corretta\nSe si continua é possibile che le informazioni\nnon siano mostrate nella posizione corretta.</string>
 	<string name="connection_GPS_dialog_button1">Continua</string>
 	<string name="connection_GPS_dialog_button2">Chiudi mixare</string>
+
+	<string name="no_website_available">Ci dispiace, non sono disponibili ulteriori informazioni</string>
 
 
 </resources>

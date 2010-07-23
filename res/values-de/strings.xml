@@ -28,12 +28,13 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Wechsle Info Anbieter</string>
-	<string name="menu_item_2">Listen Ansicht</string>
-	<string name="menu_item_3">Suche</string>
-	<string name="menu_item_4">Zoom Level</string>
-	<string name="menu_item_5">Info</string>
-	<string name="menu_item_6">Lizenz</string>
+	<string name="menu_item_1">Radius</string>
+	<string name="menu_item_2">Datenquelle</string>
+	<string name="menu_item_3">Listenansicht</string>
+	<string name="menu_item_4">Karte</string>
+	<string name="menu_item_5">Suche</string>
+	<string name="menu_item_6">Info</string>
+	<string name="menu_item_7">Lizenz</string>
 	
 	<string name="connection_error_dialog">Es tut uns leid, Verbindungsfehler ist aufgetreten! \nBitte kontrollieren Sie ob eine Verbindung zum Internet besteht.</string>
 	<string name="connection_error_dialog_button1">Erneut Versuchen</string>
@@ -44,5 +45,8 @@
 		\ndass sich die Informationen nicht am richtigen Platz befinden.</string>
 	<string name="connection_GPS_dialog_button1">Fortfahren</string>
 	<string name="connection_GPS_dialog_button2">Schließen</string>
+	
+	<string name="no_website_available">Es tut uns leid, es stehen keine weiteren \nInformationen zur Verfügung.</string>
+	
 
 </resources>

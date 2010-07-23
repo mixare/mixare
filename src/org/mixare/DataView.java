@@ -39,7 +39,7 @@ import org.mixare.render.MixVector;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.MenuInflater;
 
 
 /**
@@ -47,6 +47,7 @@ import android.widget.Toast;
  *
  */
 public class DataView {
+
 	/**current context */
 	MixContext ctx;
 
@@ -63,12 +64,18 @@ public class DataView {
 	/** how many times to re-attempt download */
 	int retry = 0;
 	/** default URL */
-	String HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
+	String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
+	String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
+	String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json";
+	
+	private Location curFix;
+	private String startUrl = "";
+	public float screenWidth, screenHeight;
 	
 	public Json jLayer = new Json();
 	
 	public float radius = 20;
-	
+	DownloadResult dRes;
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
 	public int EMPTY_LIST_STRING_ID = R.string.empty_list;
@@ -79,6 +86,9 @@ public class DataView {
 	public int MENU_ITEM_3 = R.string.menu_item_3;
 	public int MENU_ITEM_4 = R.string.menu_item_4;
 	public int MENU_ITEM_5 = R.string.menu_item_5;
+	public int MENU_ITEM_6 = R.string.menu_item_6;
+	public int MENU_ITEM_7 = R.string.menu_item_7;
+
 	
 	public int CONNECITON_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
 	public int CONNECITON_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
@@ -88,6 +98,12 @@ public class DataView {
 	public int CONNECITON_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
 	public int CONNECITON_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
 	public int CONNECITON_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
+	
+	public boolean isLauncherStarted=false;
+	
+	/*if in the listview option for a specific title no website is provided*/
+	public int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
+
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
@@ -137,40 +153,51 @@ public class DataView {
 
 	public void draw(PaintScreen dw) {
 		ctx.getRM(cam.transform);
-		state.curFix = ctx.getCurrentLocation();
+		curFix = ctx.getCurrentLocation();
 
 		state.calcPitchBearing(cam.transform);
 
-		state.screenWidth = width;
-		state.screenHeight = height;
+		screenWidth = width;
+		screenHeight = height;
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED ) {
 
 			DownloadRequest request = new DownloadRequest();
 
-			if (!ctx.getStartUrl().equals(""))
+			if (!ctx.getStartUrl().equals("")){
 				request.url = ctx.getStartUrl();
-			else 
-				request.url = HOME_URL + "?lat="+state.curFix.getLatitude()+"&lng=" + state.curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
+				isLauncherStarted=true;
 
-			state.startUrl = ctx.getStartUrl();
+			}
+			else {
+				if(MixListView.getDataSource()=="Wikipedia")
+					request.url = WIKI_HOME_URL + "?lat="+curFix.getLatitude()+"&lng=" + curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
+				else if(MixListView.getDataSource()=="Twitter")
+					request.url = TWITTER_HOME_URL +"?geocode="+curFix.getLatitude() + "%2C" + curFix.getLongitude()+"%2C" + radius + "km" ;
+	
+				/*buzz*/
+				//request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
+				//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
+			}
+			Log.d("---URL------------------",""+request.url);
+			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 
 			state.nextLStatus = MixState.PROCESSING;
 
 		} else if (state.nextLStatus == MixState.PROCESSING) {
 			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
-				state.dRes = ctx.getDownloader().getReqResult(state.downloadId);
+				dRes = ctx.getDownloader().getReqResult(state.downloadId);
 
-				if (state.dRes.error && retry < 3) {
+				if (dRes.error && retry < 3) {
 					retry++;
 					state.nextLStatus = MixState.NOT_STARTED;
 
 				} else {
 					retry = 0;
 					state.nextLStatus = MixState.DONE;
-					jLayer = (Json) state.dRes.obj;
+					jLayer = (Json) dRes.obj;
 
 					//Sort markers by cMarker.z
 					Collections.sort(jLayer.markers, new MarkersOrder());
@@ -185,7 +212,7 @@ public class DataView {
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
 			if (dist[0] / 1000f < radius) {
-				if (!frozen) ma.update(state.curFix, System.currentTimeMillis());
+				if (!frozen) ma.update(curFix, System.currentTimeMillis());
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
 			}
@@ -213,8 +240,7 @@ public class DataView {
 		dw.paintLine( rrl.x, rrl.y, rx+RadarPoints.RADIUS, ry+RadarPoints.RADIUS); 
 		dw.setColor(Color.rgb(255,255,255));
 		dw.setFontSize(12);
-		
-		//km range
+
 		radarText(dw, MixUtils.formatDist(radius * 1000), rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS*2 -10, false);
 		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx + RadarPoints.RADIUS, ry - 5, true); 
 

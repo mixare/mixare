@@ -37,8 +37,8 @@ class MixUtils {
 	static String formatDec(float val, int dec) {
 		int factor = (int) Math.pow(10, dec);
 
-		int front = (int) (val + 0.5f);
-		int back = (int) Math.abs(val * (factor) + 0.5f) % factor;
+		int front = (int) (val );
+		int back = (int) Math.abs(val * (factor) ) % factor;
 
 		return front + "." + back;
 	}

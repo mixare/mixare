@@ -31,13 +31,11 @@ public class MixState {
 
 	int nextLStatus = MixState.NOT_STARTED;
 	String downloadId;
-	DownloadResult dRes;
+	
 
-	public Location curFix;
+
 	private float curBearing, curPitch;
-	public float screenWidth, screenHeight;
 
-	public String startUrl = "";
 
 	boolean detailsView = false;
 

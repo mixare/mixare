@@ -83,7 +83,17 @@ public class MixContext {
 			long lastFixTime = lastFix.getTime();
 			long timeDifference = actualTime-lastFixTime;
 
-
+			
+			Date lastFixDate = new Date(lastFixTime);
+			
+			MixTextViews.GPS_LONGITUDE = lastFix.getLongitude();
+			MixTextViews.GPS_LATITUDE = lastFix.getLatitude();
+			MixTextViews.GPS_ACURRACY = lastFix.getAccuracy();
+			MixTextViews.GPS_SPEED = lastFix.getSpeed();
+			MixTextViews.GPS_ALTITUDE = lastFix.getAltitude();
+			MixTextViews.GPS_LAST_FIX = lastFixDate.toString();
+			MixTextViews.GPS_ALL = lastFix.toString();
+			
 			if(timeDifference> 1200000){//300000 milliseconds = 5 min
 				actualLocation=false;
 			}

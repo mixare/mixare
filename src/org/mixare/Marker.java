@@ -68,7 +68,7 @@ public class Marker {
 		tmpc.sub(viewCam.lco); //4
 		tmpa.prod(viewCam.transform); //5
 		tmpc.prod(viewCam.transform); //5
-		
+
 		viewCam.projectPoint(tmpa, tmpb, addX, addY); //6
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
@@ -180,6 +180,9 @@ public class Marker {
 	
 	public String getText(){
 		return mText;
+	}
+	public String getURL(){
+		return mOnPress;
 	}
 }
 

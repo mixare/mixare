@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="3" android:versionName="0.2" package="org.mixare">
+      android:versionCode="4" android:versionName="0.3" package="org.mixare" android:installLocation="auto">
 
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"/>
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8"/>
 
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -24,7 +24,7 @@
         </activity>
 <activity android:name="MixListView" android:screenOrientation="user"></activity>
 
-<activity android:name="MixLicense" android:screenOrientation="user"></activity>
+<activity android:name="MixTextViews" android:screenOrientation="user"></activity>
 </application>
 
 <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>

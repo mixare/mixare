@@ -53,20 +53,28 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class MixView extends Activity implements SensorEventListener,
 LocationListener {
@@ -106,9 +114,15 @@ LocationListener {
 	private SeekBar myZoomBar;
 	private WakeLock mWakeLock;
 
-	boolean fError = false;
-	String fErrorTxt;
-	Exception fExeption;
+	private boolean fError = false;
+	private String fErrorTxt;
+	private Exception fExeption;
+	
+	static boolean isZoombarVisible= false;
+	static String zoomLevel;
+	static int zoomProgress;
+	static boolean zoomChangin=false;
+
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 	public Vector<String> listDataVector;
@@ -191,21 +205,7 @@ LocationListener {
 	}
 	
 	public void setGPSDialog(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(view.CONNECITON_GPS_DIALOG_TEXT));
-        builder.setCancelable(false);
-        builder.setPositiveButton(view.CONNECITON_GPS_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int id) {
-        		dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton(view.CONNECITON_GPS_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
-              public void onClick(DialogInterface dialog, int id) {
-            	 System.exit(0);          	 
-              }
-        });
-        AlertDialog GPSAlert = builder.create();
-        GPSAlert.show();
+		Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();	
 	}
 
 	@Override
@@ -226,7 +226,7 @@ LocationListener {
 		    /*check if the application is launched for the first time*/
 		    if(settings.getBoolean("firstAccess",false)==false){
 		    	//if FALSE it is the first time and the license agreements are shown before starting
-				Intent intent = new Intent(MixView.this, MixLicense.class); 
+				Intent intent = new Intent(MixView.this, MixTextViews.class); 
 				startActivity(intent);
 			    editor.putBoolean("firstAccess", true);
 			    editor.commit();
@@ -238,6 +238,7 @@ LocationListener {
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);
+			isZoombarVisible=false;
 
 			FrameLayout FL = new FrameLayout(this);
 
@@ -266,12 +267,11 @@ LocationListener {
 				
 				/*set the radius in data view to the last selected by the user*/
 				SetZoomLevel(); 
-				isInited = true;
-				
-				if(ctx.isActualLocation()==false){
-			    	setGPSDialog();
-			    }				
+				isInited = true;		
 			}
+			if(ctx.isActualLocation()==false){
+		    	setGPSDialog();
+		    }	
 		} catch (Exception ex) {
 			doError(ex);
 		}
@@ -448,56 +448,94 @@ LocationListener {
 			MenuItem item3 =menu.add(base, base+2, base+2,  getString(view.MENU_ITEM_3));
 			MenuItem item4 =menu.add(base, base+3, base+3,  getString(view.MENU_ITEM_4));
 			MenuItem item5 =menu.add(base, base+4, base+4,  getString(view.MENU_ITEM_5));
+			MenuItem item6 =menu.add(base, base+5, base+5,  getString(view.MENU_ITEM_6));
+			MenuItem item7 =menu.add(base, base+6, base+6,  getString(view.MENU_ITEM_7));
 
 			/*assign icons to the menu items*/
-			item1.setIcon(android.R.drawable.ic_menu_view);
-			item2.setIcon(android.R.drawable.ic_menu_gallery);
-			item3.setIcon(android.R.drawable.ic_menu_search);
-			item4.setIcon(android.R.drawable.ic_menu_zoom);
-			item5.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-
+			item1.setIcon(android.R.drawable.ic_menu_zoom);
+			item2.setIcon(android.R.drawable.ic_menu_edit);
+			item3.setIcon(android.R.drawable.ic_menu_view);
+			item4.setIcon(android.R.drawable.ic_menu_mapmode);
+			item5.setIcon(android.R.drawable.ic_menu_search);
+			item6.setIcon(android.R.drawable.ic_menu_info_details);
+			item7.setIcon(android.R.drawable.ic_menu_share);
+			
 			return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			/*Case 1: Choose if you want to show location data from Twitter/ geodata/ costumized information/ URL*/
+			/*Case 1: zoom level*/
 			case 1:
-				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();				
+				myZoomBar.setVisibility(View.VISIBLE);
+				zoomProgress = myZoomBar.getProgress();
+				isZoombarVisible=true;	
 				break;
-			/*Case 2: show all info/location points in the radius in a list*/
-			case 2:
-				listDataVector = view.jLayer.listData;
-				listURL = view.jLayer.listOnPress;
-				
-				//if the list of titles to show in alternative list view is not empty
-				if(listDataVector.size()>0){
-					MixListView.data= listDataVector;
-					MixListView.selectedItemURL= listURL;
-					MixListView.context = ctx;
-					MixListView.dataView = view;
+				/*Data sources*/
+			case 2:		
+				if(view.isLauncherStarted==false){
+					MixListView.setList(1);
 					Intent intent = new Intent(MixView.this, MixListView.class); 
 					startActivityForResult(intent, 42);
 				}
-				//if the list is empty
+				else{
+					Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				}
+				break;
+			/*Case 2: List view*/
+			case 3:
+				MixListView.setList(2);
+				listDataVector = new Vector();
+				listURL = new Vector();
+				/*add all marker items to a title and a URL Vector*/
+				for(int i = 0; i<view.jLayer.markers.size();i++){
+					Marker ma = new Marker();
+					ma = view.jLayer.markers.get(i);
+						listDataVector.add(ma.getText());
+						/*the website for the corresponding title*/
+						if(ma.getURL()!=null)
+							listURL.add(ma.getURL());
+						/*if no website is available for a specific title*/
+						else
+							listURL.add("");
+				}
+				/*if the list of titles to show in alternative list view is not empty*/
+				if(listDataVector.size()>0){
+					MixListView.setTitleVector(listDataVector);
+					MixListView.setURLVector(listURL);
+					MixListView.setMixContext(ctx);
+					MixListView.setDataView(view);
+					MixListView.setInfoText(getString(view.NO_WEBINFO_AVAILABLE));
+					Intent intent1 = new Intent(MixView.this, MixListView.class); 
+					startActivityForResult(intent1, 42);
+				}
+				/*if the list is empty*/
 				else{
 					Toast.makeText( this, view.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
 				}
 				break;
-			/*Case 3: Search for location information*/
-			case 3:
+			/*Case 3: Map View*/
+			case 4:
+				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				break;
+			/*Search*/
+			case 5:
 				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();				
 				break;
-			/*Case 4: show the zoom bar*/
-			case 4:
-				myZoomBar.setVisibility(View.VISIBLE);    
-				break;
-			/*Case 5: show license agreements*/
-			case 5:
-				Intent intent1 = new Intent(MixView.this, MixLicense.class); 
+			/*GPS Information*/
+			case 6:
+				MixTextViews.MENU_VIEW = 1;
+				Intent intent1 = new Intent(MixView.this, MixTextViews.class); 
 				startActivityForResult(intent1, 42);
 				break;
+			/*Case 6: show license agreements*/
+			case 7:
+				MixTextViews.MENU_VIEW = 2;
+				Intent intent2 = new Intent(MixView.this, MixTextViews.class); 
+				startActivityForResult(intent2, 42);
+				break;
+			
 		}
 		return true;
 	}
@@ -527,6 +565,9 @@ LocationListener {
 		view.radius =myout;
 
 		myZoomBar.setVisibility(View.INVISIBLE);
+		isZoombarVisible=false;
+		zoomLevel = String.valueOf(myout);
+		
 		view.doStart();
 		view.clearEvents();
 		downloadThread = new Thread(ctx.downloadManager);
@@ -558,7 +599,9 @@ LocationListener {
 			} else {
 				myout = (30 + (myZoomLevel - 75) * 2f);
 			}			
-			
+			zoomLevel = String.valueOf(myout);
+			zoomProgress = myZoomBar.getProgress();
+
 			t.setText("Radius: " + String.valueOf(myout));
 			t.show();
 		}
@@ -566,6 +609,8 @@ LocationListener {
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
+			zoomChangin= true;
+
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
@@ -575,6 +620,11 @@ LocationListener {
 		    editor.putInt("zoomLevel", myZoomBar.getProgress());
 		    editor.commit();
 			myZoomBar.setVisibility(View.INVISIBLE);
+			isZoombarVisible=false;
+			zoomChangin= false;
+
+			myZoomBar.getProgress();
+			
 			t.cancel();
 			SetZoomLevel();
 		}
@@ -843,18 +893,18 @@ class AugmentedView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		try {
-			if (app.fError) {
-
-				Paint errPaint = new Paint();
-				errPaint.setColor(Color.RED);
-				errPaint.setTextSize(16);
-				
-				/*Draws the Error code*/
+//			if (app.fError) {
+//
+//				Paint errPaint = new Paint();
+//				errPaint.setColor(Color.RED);
+//				errPaint.setTextSize(16);
+//				
+//				/*Draws the Error code*/
 //				canvas.drawText("ERROR: ", 10, 20, errPaint);
 //				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
-
-				return;
-			}
+//
+//				return;
+//			}
 
 			app.killOnError();
 
@@ -866,6 +916,19 @@ class AugmentedView extends View {
 			if (!MixView.view.isInited()) {
 				MixView.view.init(MixView.dWindow.getWidth(),
 						MixView.dWindow.getHeight());
+			}
+			if(MixView.isZoombarVisible){
+				Paint zoomPaint = new Paint();
+				zoomPaint.setColor(Color.WHITE);
+				zoomPaint.setTextSize(14);
+				canvas.drawText("0km", 10, canvas.getHeight()-65, zoomPaint);
+				canvas.drawText("80km", canvas.getWidth()-40, canvas.getHeight()-65, zoomPaint);
+				
+				int height= canvas.getHeight()-65;
+				if(MixView.zoomProgress >97||MixView.zoomProgress <5){
+					height = canvas.getHeight()-80;
+				}
+				canvas.drawText(MixView.zoomLevel,  (canvas.getWidth())/100*MixView.zoomProgress+20, height, zoomPaint);
 			}
 
 			MixView.view.draw(MixView.dWindow);

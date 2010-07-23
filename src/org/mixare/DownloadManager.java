@@ -124,21 +124,36 @@ public class DownloadManager implements Runnable {
 				
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
-				String ss = ctx.unescapeHTML(tmp, 0);
+				//String ss = ctx.unescapeHTML(tmp, 0);
 
+				//Log.d("JSON", ss);
 				JSONObject root = null;
-				root = new JSONObject(ss);
+				root = new JSONObject(tmp);
 				Json layer = new Json();
-				JSONArray results = new JSONArray();
-				if(root.has("results")) {
-					results = root.getJSONArray("results");
-					layer.load(results);
-				}
-				else {
-					results = root.getJSONArray("geonames");
-					layer.load(results);
-				}
-				result.obj = layer;
+				JSONArray results = new JSONArray();				
+					//extra launcher
+					if(root.has("copyright")) {
+						Log.d("----source----------------------", "get source  = südtirolerland");
+						results = root.getJSONArray("results");
+						layer.load(results);
+						result.obj = layer;
+					}
+					//Wikipedia
+					else if(root.has("geonames")|| MixListView.getDataSource()=="Wikipedia"){
+						Log.d("----source----------------------", "get source  = WIKI");
+						results = root.getJSONArray("geonames");
+						layer.load(results);
+						result.obj = layer;
+					}
+					//Twitter
+					else{
+						Log.d("----source----------------------", "get source  = TWITTER ");
+						results = root.getJSONArray("results");
+						layer.load(results);
+						result.obj = layer;
+					}
+			
+				
 
 				result.format = request.format;
 				result.error = false;

@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import org.mixare.Marker;
 import org.mixare.reality.PhysicalPlace;
 
+import android.util.Log;
+
 public class Json {
 
 	public String lUrl;
@@ -54,32 +56,74 @@ public class Json {
 			try {
 
 				jo = root.getJSONObject(i);
-
-				if (jo.has("id")) {
+				
+				//südtirolerland
+				if (jo.has("id")&& jo.has("title")) {
 					//Our own schema
 					if (jo.getInt("has_detail_page") != 0) {
 						ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(jo.getString("webpage"));
 						//a Vector with the URLs corresponding to the titles is created
 						listOnPress.add("webpage:" + java.net.URLDecoder.decode(jo.getString("webpage")));
 					}
+					ma.mText = jo.getString("title");
+					refpt.setLatitude(jo.getDouble("lat"));
+					refpt.setLongitude(jo.getDouble("lng"));
+					refpt.setAltitude(jo.getDouble("elevation"));
+					ma.mGeoLoc.setTo(refpt);
 
-				} else {
-					//geonames
+					markers.add(ma);
+					
+					//a vector with the titles for the alternative list view is created
+					String title = jo.getString("title");
+					listData.add(title);
+
+
+				} 
+				//wikipedia
+				else if(!jo.has("id")&& jo.has("title")){ 
 					ma.mOnPress = "webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl"));
 					listOnPress.add("webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl")));
+					
+					ma.mText = jo.getString("title");
+					refpt.setLatitude(jo.getDouble("lat"));
+					refpt.setLongitude(jo.getDouble("lng"));
+					refpt.setAltitude(jo.getDouble("elevation"));
+					ma.mGeoLoc.setTo(refpt);
+
+					markers.add(ma);
+					
+					//a vector with the titles for the alternative list view is created
+					String title = jo.getString("title");
+					listData.add(title);
+
 				}
-
-				ma.mText = jo.getString("title");
-				refpt.setLatitude(jo.getDouble("lat"));
-				refpt.setLongitude(jo.getDouble("lng"));
-				refpt.setAltitude(jo.getDouble("elevation"));
-				ma.mGeoLoc.setTo(refpt);
-
-				markers.add(ma);
-				
-				//a vector with the titles for the alternative list view is created
-				String title = jo.getString("title");
-				listData.add(title);
+				//twitter
+				else				
+					if(!jo.isNull("geo")) {
+						ma.mOnPress = "";
+						listOnPress.add("");
+	
+						ma.mText = jo.getString("text");					
+						JSONObject geo = jo.getJSONObject("geo");
+						JSONArray coordinates = geo.getJSONArray("coordinates");
+						
+						String lat = coordinates.getString(0);
+						String lng= coordinates.getString(1);
+						Log.d("--------lat----lang-------------", "lng "+lng + "lat "+ lat);
+						
+						refpt.setLatitude(Double.parseDouble(lat));
+						refpt.setLongitude(Double.parseDouble(lng));
+			
+						refpt.setAltitude(0);
+						ma.mGeoLoc.setTo(refpt);
+						
+						markers.add(ma);
+						
+						//a vector with the titles for the alternative list view is created
+						String title = jo.getString("location");
+						listData.add(title);
+					
+					}
 
 				
 			} catch (JSONException e) {
