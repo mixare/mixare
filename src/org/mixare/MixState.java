@@ -21,8 +21,6 @@ package org.mixare;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
-import android.location.Location;
-
 public class MixState {
 	public static int NOT_STARTED = 0; 
 	public static int PROCESSING = 1; 

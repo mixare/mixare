@@ -20,8 +20,6 @@ package org.mixare;
 
 import java.util.Vector;
 
-import org.mixare.gui.PaintScreen;
-
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,6 +47,7 @@ public class MixListView extends ListActivity{
 			Vector<String> dataSourceMenu = new Vector();
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
+			dataSourceMenu.add("Buzz");
 //			dataSourceMenu.add("own URL");
 			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dataSourceMenu));
 			getListView().setTextFilterEnabled(true);
@@ -99,6 +98,10 @@ public class MixListView extends ListActivity{
 				setDataSource("Twitter");
 				Toast.makeText( this ,"Changed to Twitter as data source", Toast.LENGTH_LONG ).show();	
 				break;
+			/*BUZZ*/
+			case 2:
+				setDataSource("Buzz");
+				Toast.makeText( this ,"Changed to Google Buzz as data source", Toast.LENGTH_LONG).show();
 			/*Own URL*/
 //			case 2:
 //				setDataSource("OwnURL");

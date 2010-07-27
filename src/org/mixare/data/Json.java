@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.Marker;
+import org.mixare.MixListView;
 import org.mixare.reality.PhysicalPlace;
 
 import android.util.Log;
@@ -58,7 +59,7 @@ public class Json {
 				jo = root.getJSONObject(i);
 				
 				//südtirolerland
-				if (jo.has("id")&& jo.has("title")) {
+				if (jo.has("id")&& jo.has("title")&& jo.has("lat")) {
 					//Our own schema
 					if (jo.getInt("has_detail_page") != 0) {
 						ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(jo.getString("webpage"));
@@ -80,7 +81,7 @@ public class Json {
 
 				} 
 				//wikipedia
-				else if(!jo.has("id")&& jo.has("title")){ 
+				else if(MixListView.getDataSource()=="Wikipedia"){ 
 					ma.mOnPress = "webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl"));
 					listOnPress.add("webpage:http://" + java.net.URLDecoder.decode(jo.getString("wikipediaUrl")));
 					
@@ -99,7 +100,7 @@ public class Json {
 				}
 				//twitter
 				else				
-					if(!jo.isNull("geo")) {
+					if(MixListView.getDataSource()=="Twitter") {
 						ma.mOnPress = "";
 						listOnPress.add("");
 	
@@ -124,6 +125,23 @@ public class Json {
 						listData.add(title);
 					
 					}
+				// Buzz
+				else if (MixListView.getDataSource()=="Buzz") {
+					String webpage = jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href");
+					ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(webpage);
+					listOnPress.add("webpage:" + java.net.URLDecoder.decode(webpage));
+					
+					ma.mText = jo.getString("title");
+					refpt.setLatitude(Double.valueOf(jo.getString("geocode").split(" ")[0]));
+					refpt.setLongitude(Double.valueOf(jo.getString("geocode").split(" ")[1]));
+					refpt.setAltitude(0);
+					
+					ma.mGeoLoc.setTo(refpt);
+					markers.add(ma);
+					
+					String title = jo.getString("title");
+					listData.add(title);
+				}
 
 				
 			} catch (JSONException e) {

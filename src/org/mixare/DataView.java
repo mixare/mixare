@@ -39,7 +39,6 @@ import org.mixare.render.MixVector;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-import android.view.MenuInflater;
 
 
 /**
@@ -66,7 +65,7 @@ public class DataView {
 	/** default URL */
 	String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
 	String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
-	String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json";
+	String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
 	
 	private Location curFix;
 	private String startUrl = "";
@@ -175,10 +174,9 @@ public class DataView {
 					request.url = WIKI_HOME_URL + "?lat="+curFix.getLatitude()+"&lng=" + curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 				else if(MixListView.getDataSource()=="Twitter")
 					request.url = TWITTER_HOME_URL +"?geocode="+curFix.getLatitude() + "%2C" + curFix.getLongitude()+"%2C" + radius + "km" ;
-	
-				/*buzz*/
-				//request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
-				//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
+				else if(MixListView.getDataSource()=="Buzz")  
+					request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
+					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 			}
 			Log.d("---URL------------------",""+request.url);
 			startUrl = ctx.getStartUrl();
