@@ -21,7 +21,6 @@ package org.mixare;
 import java.io.InputStream;
 import java.util.HashMap;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mixare.data.Json;
 
@@ -130,35 +129,12 @@ public class DownloadManager implements Runnable {
 				JSONObject root = null;
 				root = new JSONObject(tmp);
 				Json layer = new Json();
-				JSONArray results = new JSONArray();				
-				//extra launcher
-				if(root.has("copyright")) {
-					Log.d("----source----------------------", "get source  = mixare schema");
-					results = root.getJSONArray("results");
-				}
-				//Wikipedia
-				else if(root.has("geonames")|| MixListView.getDataSource()=="Wikipedia"){
-					Log.d("----source----------------------", "get source  = WIKI");
-					results = root.getJSONArray("geonames");
-				}
-				//Twitter
-				else if(MixListView.getDataSource()=="Twitter"){
-					Log.d("----source----------------------", "get source  = TWITTER ");
-					results = root.getJSONArray("results");
-				}
-				//Buzz
-				else if(MixListView.getDataSource()=="Buzz"){
-					Log.d("----source----------------------", "get source  = Buzz ");
-					results = root.getJSONObject("data").getJSONArray("items");
-				}
-				else 
-					Log.e("----source----------------------", "invalid source");
 				
-				layer.load(results);
-				result.obj = layer;
-			
-				
+				Log.i(MixView.TAG, "loading JSON data");				
 
+				layer.load(root);
+				result.obj = layer;
+				
 				result.format = request.format;
 				result.error = false;
 				result.errorMsg = null;

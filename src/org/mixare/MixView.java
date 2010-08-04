@@ -69,7 +69,6 @@ import android.widget.Toast;
 public class MixView extends Activity implements SensorEventListener,
 LocationListener {
 
-
 	CameraSurface camScreen;
 	AugmentedView augScreen;
 
@@ -113,6 +112,8 @@ LocationListener {
 	static int zoomProgress;
 	static boolean zoomChangin=false;
 
+	//TAG for logging
+	public static final String TAG = "Mixare";
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 	public Vector<String> listDataVector;

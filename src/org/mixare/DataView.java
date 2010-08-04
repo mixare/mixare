@@ -178,7 +178,7 @@ public class DataView {
 					request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 			}
-			Log.d("---URL------------------",""+request.url);
+			Log.i(MixView.TAG,""+request.url);
 			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 
