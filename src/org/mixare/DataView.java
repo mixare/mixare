@@ -38,6 +38,8 @@ import org.mixare.render.MixVector;
 
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.util.Log;
 
 
@@ -102,6 +104,19 @@ public class DataView {
 	
 	/*if in the listview option for a specific title no website is provided*/
 	public int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
+	public int LICENSE_TEXT = R.string.license;
+	public int LICENSE_TITLE = R.string.license_title;
+	public int CLOSE_BUTTON = R.string.close_button;
+	
+	/*Strings for general information*/
+	public int GENERAL_INFO_TITLE = R.string.general_info_title;
+	public int GENERAL_INFO_TEXT = R.string.general_info_text;
+	public int GPS_LONGITUDE = R.string.longitude;
+	public int GPS_LATITUDE = R.string.latitude;
+	public int GPS_ALTITUDE = R.string.altitude;
+	public int GPS_SPEED = R.string.speed;
+	public int GPS_ACCURACY = R.string.accuracy;
+	public int GPS_LAST_FIX = R.string.gps_last_fix;
 
 
 
@@ -167,7 +182,6 @@ public class DataView {
 			if (!ctx.getStartUrl().equals("")){
 				request.url = ctx.getStartUrl();
 				isLauncherStarted=true;
-
 			}
 			else {
 				if(MixListView.getDataSource()=="Wikipedia")
@@ -215,7 +229,6 @@ public class DataView {
 				ma.draw(dw);
 			}
 		}
-
 		// Draw Radar
 		String	dirTxt = ""; 
 		int bearing = (int) state.getCurBearing(); 
@@ -258,9 +271,16 @@ public class DataView {
 			handleClickEvent((ClickEvent) evt);
 		}
 		
+//		try{
+//			LocationManager locationMgr = ctx.getLocationManager();
+//			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 0, (LocationListener) this);
+//			Log.d("---------------GPSS5----------------", "Location update");
+//		}
+//		catch(Exception e){
+//			Log.d("---------------GPSS6----------------", "GPS update error");
+//		}
 	}
 	
-
 	private void handleKeyEvent(KeyEvent evt) {
 		/** Adjust marker position with keypad */
 		final float CONST = 10f;

@@ -110,7 +110,6 @@ public class Json {
 						
 						String lat = coordinates.getString(0);
 						String lng= coordinates.getString(1);
-						Log.d("--------lat----lang-------------", "lng "+lng + "lat "+ lat);
 						
 						refpt.setLatitude(Double.parseDouble(lat));
 						refpt.setLongitude(Double.parseDouble(lng));

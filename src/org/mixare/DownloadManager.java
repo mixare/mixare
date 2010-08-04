@@ -124,9 +124,7 @@ public class DownloadManager implements Runnable {
 				
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
-				//String ss = ctx.unescapeHTML(tmp, 0);
-
-				//Log.d("JSON", ss);
+				
 				JSONObject root = null;
 				root = new JSONObject(tmp);
 				Json layer = new Json();
@@ -138,17 +136,17 @@ public class DownloadManager implements Runnable {
 				}
 				//Wikipedia
 				else if(root.has("geonames")|| MixListView.getDataSource()=="Wikipedia"){
-					Log.d("----source----------------------", "get source  = WIKI");
+					Log.d("----source----------------------", "get source  = WIKIPEDIA");
 					results = root.getJSONArray("geonames");
 				}
 				//Twitter
 				else if(MixListView.getDataSource()=="Twitter"){
-					Log.d("----source----------------------", "get source  = TWITTER ");
+					Log.d("----source----------------------", "get source  = TWITTER");
 					results = root.getJSONArray("results");
 				}
 				//Buzz
 				else if(MixListView.getDataSource()=="Buzz"){
-					Log.d("----source----------------------", "get source  = Buzz ");
+					Log.d("----source----------------------", "get source  = BUZZ");
 					results = root.getJSONObject("data").getJSONArray("items");
 				}
 				else 

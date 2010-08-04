@@ -45,5 +45,17 @@
 	<string name="connection_GPS_dialog_button2">Close</string>
 	
 	<string name="no_website_available">Sorry, there is no further \ninformation available.</string>
+	
+	<string name="license_title">License</string>
+	<string name="close_button">Close</string>
+	<string name="general_info_title">Gerneral Information</string>
+	
+	<string name="general_info_text">GPS info: </string>
+	<string name="longitude">Longitude: </string>
+	<string name="latitude">Latitude: </string>
+	<string name="altitude">Altitude: </string>
+	<string name="speed">Speed: </string>
+	<string name="accuracy">Accuracy: </string>
+	<string name="gps_last_fix">Last GPS fix: </string>
 
 </resources>

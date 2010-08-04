@@ -41,8 +41,10 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -64,6 +66,8 @@ public class MixContext {
 	float declination = 0f;
 	private boolean actualLocation=false;
 
+	private LocationManager locationMgr;
+	
 	public MixContext(Context appCtx) {
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
@@ -72,31 +76,38 @@ public class MixContext {
 
 		int locationHash = 0;
 		try {
-			LocationManager locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
+			 locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
 			Location lastFix = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			
 			Date dt = new Date();
 			long actualTime= dt.getTime();
 			long lastFixTime = lastFix.getTime();
 			long timeDifference = actualTime-lastFixTime;
-
-			
+		
 			Date lastFixDate = new Date(lastFixTime);
 			
-			MixTextViews.GPS_LONGITUDE = lastFix.getLongitude();
-			MixTextViews.GPS_LATITUDE = lastFix.getLatitude();
-			MixTextViews.GPS_ACURRACY = lastFix.getAccuracy();
-			MixTextViews.GPS_SPEED = lastFix.getSpeed();
-			MixTextViews.GPS_ALTITUDE = lastFix.getAltitude();
-			MixTextViews.GPS_LAST_FIX = lastFixDate.toString();
-			MixTextViews.GPS_ALL = lastFix.toString();
+			MixView.GPS_LONGITUDE = lastFix.getLongitude();
+			MixView.GPS_LATITUDE = lastFix.getLatitude();
+			MixView.GPS_ACURRACY = lastFix.getAccuracy();
+			MixView.GPS_SPEED = lastFix.getSpeed();
+			MixView.GPS_ALTITUDE = lastFix.getAltitude();
+			MixView.GPS_LAST_FIX = lastFixDate.toString();
+			MixView.GPS_ALL = lastFix.toString();
 			
 			if(timeDifference> 1200000){//300000 milliseconds = 5 min
 				actualLocation=false;
+				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, (LocationListener) this);
+				Log.d("---------------GPSS----------------", "Location update");
 			}
 			actualLocation=true;
 			if (lastFix == null){
-				lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				try{
+					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, (LocationListener) this);
+					
+				}
+				catch(Exception e){
+					lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+				}
 				actualLocation=false;
 			}
 
@@ -119,6 +130,12 @@ public class MixContext {
 
 	public DownloadManager getDownloader() {
 		return downloadManager;
+	}
+	public void setLocationManager(LocationManager locationMgr){
+		this.locationMgr= locationMgr;
+	}
+	public LocationManager getLocationManager(){
+		return this.locationMgr;
 	}
 
 

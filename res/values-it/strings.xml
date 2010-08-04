@@ -45,5 +45,16 @@
 
 	<string name="no_website_available">Ci dispiace, non sono disponibili ulteriori informazioni</string>
 
+	<string name="license_title">Licenza</string>
+	<string name="close_button">Chiudi</string>
+	<string name="general_info_title">Informazioni generali</string>
+	
+	<string name="general_info_text">GPS info: </string>
+	<string name="longitude">Longitudine: </string>
+	<string name="latitude">Latitudine: </string>
+	<string name="altitude">Altitudine: </string>
+	<string name="speed">velocità: </string>
+	<string name="acurracy">Precisione: </string>
+	<string name="gps_last_fix">Ultimo GPS update: </string>
 
 </resources>

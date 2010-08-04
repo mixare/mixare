@@ -111,8 +111,17 @@ LocationListener {
 	static boolean isZoombarVisible= false;
 	static String zoomLevel;
 	static int zoomProgress;
-	static boolean zoomChangin=false;
+	static boolean zoomChanging=false;
 
+	/*strings for GPS info assigned in Data View*/
+	//public static String GPS_LOCATION;
+	public static double GPS_LONGITUDE =0;
+	public static double GPS_LATITUDE =0;
+	public static float GPS_ACURRACY =0;
+	public static String GPS_LAST_FIX="";
+	public static double GPS_ALTITUDE=0;
+	public static float GPS_SPEED=0;
+	public static String GPS_ALL="";
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 	public Vector<String> listDataVector;
@@ -194,9 +203,6 @@ LocationListener {
         alert.show();
 	}
 	
-	public void setGPSDialog(){
-		Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();	
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -212,15 +218,6 @@ LocationListener {
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		    SharedPreferences.Editor editor = settings.edit();
-
-		    /*check if the application is launched for the first time*/
-		    if(settings.getBoolean("firstAccess",false)==false){
-		    	//if FALSE it is the first time and the license agreements are shown before starting
-				Intent intent = new Intent(MixView.this, MixTextViews.class); 
-				startActivity(intent);
-			    editor.putBoolean("firstAccess", true);
-			    editor.commit();
-			}       
 
 		    myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
@@ -259,11 +256,42 @@ LocationListener {
 				SetZoomLevel(); 
 				isInited = true;		
 			}
+			
+		    /*check if the application is launched for the first time*/
+		    if(settings.getBoolean("firstAccess",false)==false){
+		    	//if FALSE it is the first time and the license agreements are shown before starting
+		    	AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+				builder1.setMessage(getString(view.LICENSE_TEXT));
+				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+				AlertDialog alert1 = builder1.create();
+				alert1.setTitle(getString(view.LICENSE_TITLE));
+			    alert1.show();
+			    editor.putBoolean("firstAccess", true);
+			    editor.commit();
+			} 
+		    
 			if(ctx.isActualLocation()==false){
-		    	setGPSDialog();
-		    }	
+				locationUpdate();
+				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+			}		
+			
 		} catch (Exception ex) {
 			doError(ex);
+		}
+	}
+	
+	public void locationUpdate(){
+		try{
+			LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		}
+		catch(Exception e){
+			Log.d("GPS Msg", "Location update failed");
+
 		}
 	}
 
@@ -428,13 +456,12 @@ LocationListener {
 		}
 	}
 	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 			int base = Menu.FIRST;
 			/*define the first*/
-			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); //Show Tweets ON or OFF
-			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); //add remove friends to follow
+			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); 
+			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); 
 			MenuItem item3 =menu.add(base, base+2, base+2,  getString(view.MENU_ITEM_3));
 			MenuItem item4 =menu.add(base, base+3, base+3,  getString(view.MENU_ITEM_4));
 			MenuItem item5 =menu.add(base, base+4, base+4,  getString(view.MENU_ITEM_5));
@@ -515,15 +542,36 @@ LocationListener {
 				break;
 			/*GPS Information*/
 			case 6:
-				MixTextViews.MENU_VIEW = 1;
-				Intent intent1 = new Intent(MixView.this, MixTextViews.class); 
-				startActivityForResult(intent1, 42);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(getString(view.GENERAL_INFO_TEXT)+"\n\n" +
+							getString(view.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
+							getString(view.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
+							getString(view.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
+							getString(view.GPS_SPEED) + GPS_SPEED + "km/h\n" +
+							getString(view.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
+							getString(view.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
+				builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+		        AlertDialog alert = builder.create();
+				alert.setTitle(getString(view.GENERAL_INFO_TITLE));
+		        alert.show();
 				break;
-			/*Case 6: show license agreements*/
+			/*Case 6: license agreements*/
 			case 7:
-				MixTextViews.MENU_VIEW = 2;
-				Intent intent2 = new Intent(MixView.this, MixTextViews.class); 
-				startActivityForResult(intent2, 42);
+				AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+				builder1.setMessage(getString(view.LICENSE_TEXT));	
+				/*Retry*/
+				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+				AlertDialog alert1 = builder1.create();
+				alert1.setTitle(getString(view.LICENSE_TITLE));
+			    alert1.show();
 				break;
 			
 		}
@@ -599,7 +647,7 @@ LocationListener {
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			zoomChangin= true;
+			zoomChanging= true;
 
 		}
 
@@ -611,7 +659,7 @@ LocationListener {
 		    editor.commit();
 			myZoomBar.setVisibility(View.INVISIBLE);
 			isZoombarVisible=false;
-			zoomChangin= false;
+			zoomChanging= false;
 
 			myZoomBar.getProgress();
 			
@@ -842,8 +890,31 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					element.width -= w;
 					element.height -= h;
 				} 
-				Collections.sort(supportedSizes, new ResolutionsOrder());
-				parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
+				
+//				Collections.sort(supportedSizes, new ResolutionsOrder());
+				//TODO improve algorithm
+				int preferredSizeIndex=0;
+				int checkWidth =0;
+				int bestDistance = Integer.MAX_VALUE;
+				for (int i = 0; i < supportedSizes.size()-1; i++) {		
+					if(supportedSizes.get(i).width==0){
+						preferredSizeIndex = i;
+					}
+					else{						
+						if(supportedSizes.get(i).width <0)
+							checkWidth =(supportedSizes.get(i).width)*(-1);
+						else 
+							checkWidth = supportedSizes.get(i).width;
+						
+						if(checkWidth < bestDistance){
+							bestDistance = checkWidth;
+							preferredSizeIndex = i;
+						}
+					}
+				}
+				
+				parameters.setPreviewSize(w + supportedSizes.get(preferredSizeIndex).width, h + supportedSizes.get(preferredSizeIndex).height);
+				//parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
 			} catch (Exception ex) {
 				parameters.setPreviewSize(480 , 320);
 			}
@@ -858,12 +929,12 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 
 }
 
-class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
-	public int compare(Camera.Size left, Camera.Size right) {
-
-		return Float.compare(left.width + left.height, right.width + right.height);
-	}
-}
+//class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
+//	public int compare(Camera.Size left, Camera.Size right) {
+//
+//		return Float.compare(left.width + left.height, right.width + right.height);
+//	}
+//}
 
 class AugmentedView extends View {
 	MixView app;
