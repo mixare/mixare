@@ -112,6 +112,8 @@ LocationListener {
 	static String zoomLevel;
 	static int zoomProgress;
 	static boolean zoomChanging=false;
+	 //TAG for logging
+	public static final String TAG = "Mixare";
 
 	/*strings for GPS info assigned in Data View*/
 	//public static String GPS_LOCATION;
@@ -287,11 +289,13 @@ LocationListener {
 	public void locationUpdate(){
 		try{
 			LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
-			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-		}
-		catch(Exception e){
-			Log.d("GPS Msg", "Location update failed");
+			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 100, this);
+			Log.d("GPS Msg", "Location update succeeded");
 
+		}
+		catch(Exception ex){
+			Log.d("GPS Msg", "Location update failed");
+			ex.printStackTrace();
 		}
 	}
 
@@ -534,7 +538,12 @@ LocationListener {
 				break;
 			/*Case 3: Map View*/
 			case 4:
-				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				MixMap.setMarkerList(view.jLayer.markers);
+				MixMap.setDataView(view);
+				MixMap.setMixContext(ctx);
+				Intent intent2 = new Intent(MixView.this, MixMap.class); 
+				startActivityForResult(intent2, 42);
+				//Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
 				break;
 			/*Search*/
 			case 5:
@@ -550,7 +559,7 @@ LocationListener {
 							getString(view.GPS_SPEED) + GPS_SPEED + "km/h\n" +
 							getString(view.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
 							getString(view.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
-				builder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
 		        	public void onClick(DialogInterface dialog, int id) {
 		        		dialog.dismiss();
 		            }
@@ -717,7 +726,8 @@ LocationListener {
 				ctx.rotationM.set(smoothR);
 			}
 		} catch (Exception ex) {
-			doError(ex);
+			//doError(ex);
+			ex.printStackTrace();
 		}
 	}
 
@@ -734,8 +744,8 @@ LocationListener {
 
 			return true;
 		} catch (Exception ex) {
-			doError(ex);
-
+			//doError(ex);
+			ex.printStackTrace();
 			return super.onTouchEvent(me);
 		}
 	}
@@ -762,8 +772,8 @@ LocationListener {
 			}
 
 		} catch (Exception ex) {
-			doError(ex);
-
+			//doError(ex);
+			ex.printStackTrace();
 			return super.onKeyDown(keyCode, event);
 		}
 	}
@@ -785,6 +795,7 @@ LocationListener {
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
+			locationUpdate();
 
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (ctx.curLoc) {
@@ -793,7 +804,7 @@ LocationListener {
 				isGpsEnabled = true;
 			}
 		} catch (Exception ex) {
-			doError(ex);
+			ex.printStackTrace();
 		}
 	}
 

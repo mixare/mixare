@@ -73,6 +73,7 @@ public class Marker {
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
 		signMarker.set(tmpb); //7
+		
 	}
 
 

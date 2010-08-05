@@ -116,72 +116,49 @@ public class DownloadManager implements Runnable {
 	private String getNextReqId() {
 		return todoList.keySet().iterator().next();
 	}
+	
+	 private DownloadResult processRequest(DownloadRequest request) {
+		 DownloadResult result = new DownloadResult();
+		 try {
+			 if(ctx.getHttpGETInputStream(request.url)!=null){
+				 is = ctx.getHttpGETInputStream(request.url);
+				 String tmp = ctx.getHttpInputString(is);
+				 //String ss = ctx.unescapeHTML(tmp, 0);
+		
+				 JSONObject root = null;
+				 root = new JSONObject(tmp);
+				 Json layer = new Json();
+		
+				 Log.i(MixView.TAG, "loading JSON data");
+		
+				 layer.load(root);
+				 result.obj = layer;
+		
+				 result.format = request.format;
+				 result.error = false;
+				 result.errorMsg = null;
+		
+				 ctx.returnHttpInputStream(is);
+				 is = null;
+			 }
+		 } 
+		 catch (Exception ex) {
+			 result.obj = null;
+			 result.error = true;
+			 result.errorMsg = ex.getMessage();
+			 result.errorRequest = request;
 
-	private DownloadResult processRequest(DownloadRequest request) {
-		DownloadResult result = new DownloadResult();
-		try {
-			if(ctx.getHttpGETInputStream(request.url)!=null){
-				
-				is = ctx.getHttpGETInputStream(request.url);
-				String tmp = ctx.getHttpInputString(is);
-				
-				JSONObject root = null;
-				root = new JSONObject(tmp);
-				Json layer = new Json();
-				JSONArray results = new JSONArray();				
-				//extra launcher
-				if(root.has("copyright")) {
-					Log.d("----source----------------------", "get source  = mixare schema");
-					results = root.getJSONArray("results");
-				}
-				//Wikipedia
-				else if(root.has("geonames")|| MixListView.getDataSource()=="Wikipedia"){
-					Log.d("----source----------------------", "get source  = WIKIPEDIA");
-					results = root.getJSONArray("geonames");
-				}
-				//Twitter
-				else if(MixListView.getDataSource()=="Twitter"){
-					Log.d("----source----------------------", "get source  = TWITTER");
-					results = root.getJSONArray("results");
-				}
-				//Buzz
-				else if(MixListView.getDataSource()=="Buzz"){
-					Log.d("----source----------------------", "get source  = BUZZ");
-					results = root.getJSONObject("data").getJSONArray("items");
-				}
-				else 
-					Log.e("----source----------------------", "invalid source");
-				
-				layer.load(results);
-				result.obj = layer;
-			
-				
+			 try {
+				 ctx.returnHttpInputStream(is);
+			 } 
+			 catch (Exception ignore) { }
 
-				result.format = request.format;
-				result.error = false;
-				result.errorMsg = null;
+			 ex.printStackTrace();
+		 }
 
-			ctx.returnHttpInputStream(is);
-			is = null;
-			}
+		 currJobId = null;
 
-		} catch (Exception ex) {
-			result.obj = null;
-			result.error = true;
-			result.errorMsg = ex.getMessage();
-			result.errorRequest = request;
-
-			try {
-				ctx.returnHttpInputStream(is);
-			} catch (Exception ignore) {
-			}
-
-			ex.printStackTrace();
-		}
-
-		currJobId = null;
-
-		return result;
+		 return result;
 	}
 
 

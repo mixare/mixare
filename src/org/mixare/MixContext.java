@@ -76,7 +76,7 @@ public class MixContext {
 
 		int locationHash = 0;
 		try {
-			 locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
+			locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
 			Location lastFix = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			
 			Date dt = new Date();
@@ -97,7 +97,6 @@ public class MixContext {
 			if(timeDifference> 1200000){//300000 milliseconds = 5 min
 				actualLocation=false;
 				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, (LocationListener) this);
-				Log.d("---------------GPSS----------------", "Location update");
 			}
 			actualLocation=true;
 			if (lastFix == null){

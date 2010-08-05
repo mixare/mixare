@@ -183,6 +183,8 @@ public class DataView {
 				request.url = ctx.getStartUrl();
 				isLauncherStarted=true;
 			}
+			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
+
 			else {
 				if(MixListView.getDataSource()=="Wikipedia")
 					request.url = WIKI_HOME_URL + "?lat="+curFix.getLatitude()+"&lng=" + curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
@@ -192,7 +194,7 @@ public class DataView {
 					request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 			}
-			Log.d("---URL------------------",""+request.url);
+			Log.i("-------------------"+MixView.TAG,""+request.url);
 			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 
@@ -270,15 +272,7 @@ public class DataView {
 		if (evt != null && evt.type == UIEvent.CLICK) {
 			handleClickEvent((ClickEvent) evt);
 		}
-		
-//		try{
-//			LocationManager locationMgr = ctx.getLocationManager();
-//			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 0, (LocationListener) this);
-//			Log.d("---------------GPSS5----------------", "Location update");
-//		}
-//		catch(Exception e){
-//			Log.d("---------------GPSS6----------------", "GPS update error");
-//		}
+
 	}
 	
 	private void handleKeyEvent(KeyEvent evt) {
