@@ -25,10 +25,10 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Zoom level</string>
-	<string name="menu_item_2">Data Source</string>
-	<string name="menu_item_3">List view</string>
-	<string name="menu_item_4">Map view</string>
+	<string name="menu_item_1">Data Source</string>
+	<string name="menu_item_2">List view</string>
+	<string name="menu_item_3">Map view</string>
+	<string name="menu_item_4">Zoom level</string>
 	<string name="menu_item_5">Search</string>
 	<string name="menu_item_6">Info</string>
 	<string name="menu_item_7">License</string>
@@ -57,5 +57,10 @@
 	<string name="speed">Speed: </string>
 	<string name="accuracy">Accuracy: </string>
 	<string name="gps_last_fix">Last GPS fix: </string>
+	
+	<string name="map_menu_normal_mode">Map</string>
+	<string name="map_menu_satellite_mode">Satellite</string>
+	<string name="map_menu_cam_mode">Camera</string>
+	<string name="map_my_location">My Location</string>
 
 </resources>

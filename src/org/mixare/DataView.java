@@ -38,8 +38,6 @@ import org.mixare.render.MixVector;
 
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.util.Log;
 
 
@@ -118,6 +116,10 @@ public class DataView {
 	public int GPS_ACCURACY = R.string.accuracy;
 	public int GPS_LAST_FIX = R.string.gps_last_fix;
 
+	public int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
+	public int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
+	public int MENU_CAM_MODE = R.string.map_menu_cam_mode;
+	public int MAP_MY_LOCATION = R.string.map_my_location;
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
@@ -194,7 +196,7 @@ public class DataView {
 					request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 			}
-			Log.i("-------------------"+MixView.TAG,""+request.url);
+			Log.i(MixView.TAG,""+request.url);
 			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 

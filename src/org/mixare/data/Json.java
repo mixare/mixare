@@ -19,7 +19,6 @@
 package org.mixare.data;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,14 +30,8 @@ import org.mixare.reality.PhysicalPlace;
 import android.util.Log;
 
 public class Json {
-
-	public String lUrl;
 	
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
-	//Vector to store the data (titles) showed in the alternative list view
-	public Vector<String> listData= new Vector();
-	//Vector to store the URLs to the corresponding titles
-	public Vector<String> listOnPress= new Vector();
 	public static final int MAX_OBJECTS = 50;
 	
 	
@@ -96,8 +89,8 @@ public class Json {
 				jo.getDouble("lat"),
 				jo.getDouble("lng"),
 				jo.getDouble("elevation"),
-				jo.getString("wikipediaUrl"));
-		
+				"http://"+jo.getString("wikipediaUrl"));
+			Log.d("url.............................", jo.getString("wikipediaUrl"));
 		}
 	}
 	

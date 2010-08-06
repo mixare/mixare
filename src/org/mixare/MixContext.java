@@ -44,12 +44,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 public class MixContext {
@@ -96,12 +96,12 @@ public class MixContext {
 			
 			if(timeDifference> 1200000){//300000 milliseconds = 5 min
 				actualLocation=false;
-				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, (LocationListener) this);
+				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, (LocationListener) this);
 			}
 			actualLocation=true;
 			if (lastFix == null){
 				try{
-					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 100, (LocationListener) this);
+					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, (LocationListener) this);
 					
 				}
 				catch(Exception e){
@@ -147,8 +147,6 @@ public class MixContext {
 		else { 
 			return ""; 
 		}
-
-
 	}
 
 	public void getRM(Matrix dest) {
@@ -377,9 +375,18 @@ public class MixContext {
 			is.close();
 	}
 
-	public void loadWebPage(String url) throws Exception {
+	public void loadMixViewWebPage(String url) throws Exception {
 		// TODO
 		WebView webview = new WebView(mixView);
+		
+		webview.setWebViewClient(new WebViewClient() {
+			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
+			     view.loadUrl(url);
+				return true;
+			}
+
+		});
+				
 		Dialog d = new Dialog(mixView) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
@@ -392,7 +399,38 @@ public class MixContext {
 		d.addContentView(webview, new FrameLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 				Gravity.BOTTOM));
+
 		d.show();
+		
+		webview.loadUrl(url);
+	}
+	public void loadWebPage(String url, Context context) throws Exception {
+		// TODO
+		WebView webview = new WebView(context);
+		
+		webview.setWebViewClient(new WebViewClient() {
+			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
+			     view.loadUrl(url);
+				return true;
+			}
+
+		});
+				
+		Dialog d = new Dialog(context) {
+			public boolean onKeyDown(int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_BACK)
+					this.dismiss();
+				return true;
+			}
+		};
+		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		d.getWindow().setGravity(Gravity.BOTTOM);
+		d.addContentView(webview, new FrameLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
+				Gravity.BOTTOM));
+
+		d.show();
+		
 		webview.loadUrl(url);
 	}
 

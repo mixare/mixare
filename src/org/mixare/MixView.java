@@ -277,7 +277,7 @@ LocationListener {
 			} 
 		    
 			if(ctx.isActualLocation()==false){
-				locationUpdate();
+			//	locationUpdate();
 				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}		
 			
@@ -289,7 +289,7 @@ LocationListener {
 	public void locationUpdate(){
 		try{
 			LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
-			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 100, this);
+			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, this);
 			Log.d("GPS Msg", "Location update succeeded");
 
 		}
@@ -473,10 +473,11 @@ LocationListener {
 			MenuItem item7 =menu.add(base, base+6, base+6,  getString(view.MENU_ITEM_7));
 
 			/*assign icons to the menu items*/
-			item1.setIcon(android.R.drawable.ic_menu_zoom);
-			item2.setIcon(android.R.drawable.ic_menu_edit);
-			item3.setIcon(android.R.drawable.ic_menu_view);
-			item4.setIcon(android.R.drawable.ic_menu_mapmode);
+			
+			item1.setIcon(android.R.drawable.ic_menu_edit);
+			item2.setIcon(android.R.drawable.ic_menu_view);
+			item3.setIcon(android.R.drawable.ic_menu_mapmode);
+			item4.setIcon(android.R.drawable.ic_menu_zoom);
 			item5.setIcon(android.R.drawable.ic_menu_search);
 			item6.setIcon(android.R.drawable.ic_menu_info_details);
 			item7.setIcon(android.R.drawable.ic_menu_share);
@@ -487,14 +488,8 @@ LocationListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			/*Case 1: zoom level*/
-			case 1:
-				myZoomBar.setVisibility(View.VISIBLE);
-				zoomProgress = myZoomBar.getProgress();
-				isZoombarVisible=true;	
-				break;
-				/*Data sources*/
-			case 2:		
+			/*Data sources*/
+			case 1:		
 				if(view.isLauncherStarted==false){
 					MixListView.setList(1);
 					Intent intent = new Intent(MixView.this, MixListView.class); 
@@ -504,8 +499,8 @@ LocationListener {
 					Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
 				}
 				break;
-			/*Case 2: List view*/
-			case 3:
+			/*List view*/
+			case 2:
 				MixListView.setList(2);
 				listDataVector = new Vector();
 				listURL = new Vector();
@@ -536,14 +531,19 @@ LocationListener {
 					Toast.makeText( this, view.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
 				}
 				break;
-			/*Case 3: Map View*/
-			case 4:
+			/*Map View*/
+			case 3:
 				MixMap.setMarkerList(view.jLayer.markers);
 				MixMap.setDataView(view);
 				MixMap.setMixContext(ctx);
 				Intent intent2 = new Intent(MixView.this, MixMap.class); 
-				startActivityForResult(intent2, 42);
-				//Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				startActivityForResult(intent2, 20);
+				break;
+			/*zoom level*/
+			case 4:
+				myZoomBar.setVisibility(View.VISIBLE);
+				zoomProgress = myZoomBar.getProgress();
+				isZoombarVisible=true;	
 				break;
 			/*Search*/
 			case 5:
@@ -795,7 +795,7 @@ LocationListener {
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
-			locationUpdate();
+			//locationUpdate();
 
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (ctx.curLoc) {

@@ -26,10 +26,10 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Raggio visualizzato</string>
-	<string name="menu_item_2">Scelta dei dati visualizzati</string>
-	<string name="menu_item_3">Lista dei risultati</string>
-	<string name="menu_item_4">Mappa</string>
+	<string name="menu_item_1">Scelta dei dati visualizzati</string>
+	<string name="menu_item_2">Lista dei risultati</string>
+	<string name="menu_item_3">Mappa</string>
+	<string name="menu_item_4">Raggio visualizzato</string>
 	<string name="menu_item_5">Ricerca</string>
 	<string name="menu_item_6">Info</string>
 	<string name="menu_item_7">Licenza</string>
@@ -56,5 +56,10 @@
 	<string name="speed">velocità: </string>
 	<string name="acurracy">Precisione: </string>
 	<string name="gps_last_fix">Ultimo GPS update: </string>
+	
+	<string name="map_menu_normal_mode">Mappa</string>
+	<string name="map_menu_satellite_mode">Satellite</string>
+	<string name="map_menu_cam_mode">Telecamera</string>
+	<string name="map_my_location">La mia posizione</string>
 
 </resources>
