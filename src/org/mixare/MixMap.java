@@ -48,7 +48,7 @@ public class MixMap extends MapActivity{
 	    map = this;
 	    
 	    setMapContext(this);
-	    mapView= new MapView(this, "0327vO6h2PcKeMFBCtVK4XcPTq-b2tsXrsdbSqw");//private key : "0327vO6h2PcJo-bWWc6Vuc9woahxZV7ZMjFe4YQ");//
+	    mapView= new MapView(this, "0327vO6h2PcKeMFBCtVK4XcPTq-b2tsXrsdbSqw");
 	    mapView.setBuiltInZoomControls(true);
 	    mapView.setClickable(true);
 	    mapView.setSatellite(true);
