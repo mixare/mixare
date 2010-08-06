@@ -21,8 +21,10 @@ package org.mixare;
 import java.util.Vector;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -63,7 +65,6 @@ public class MixListView extends ListActivity{
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		Log.d("--------------------------", "pos :" + position);
 		switch(list){
 		/*Data Sources*/
 		case 1:
@@ -77,13 +78,20 @@ public class MixListView extends ListActivity{
 				Toast.makeText( this, info, Toast.LENGTH_LONG ).show();			
 			}
 			else{
-				dataView.state.handleEvent(context, selectedItemURL.get(position));
+				String url = selectedItemURL.get(position);
+				try {
+					if (url != null && url.startsWith("webpage")) {
+						String newUrl = MixUtils.parseAction(url);
+						dataView.ctx.loadWebPage(newUrl, this);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			finish();
 			break;
 
 		}
-		finish();
+		
 	}
 	public void clickOnDataSource(int position){
 		switch(position){
@@ -111,13 +119,57 @@ public class MixListView extends ListActivity{
 		}
 		finish();
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+			int base = Menu.FIRST;
+			/*define the first*/
+			MenuItem item1 =menu.add(base, base, base, getString(dataView.MENU_ITEM_3)); 
+			MenuItem item2 =menu.add(base, base+1, base+1, getString(dataView.MENU_CAM_MODE));
+//			MenuItem item3 =menu.add(base, base+2, base+2, getString(dataView.MAP_MY_LOCATION)); 
+//			MenuItem item4 =menu.add(base, base+3, base+3, getString(dataView.MENU_ITEM_2)); 
+//			MenuItem item5 =menu.add(base, base+4, base+4, getString(dataView.MAP_MENU_CAM_MODE)); 
+
+			/*assign icons to the menu items*/
+			item1.setIcon(android.R.drawable.ic_menu_mapmode);
+			item2.setIcon(android.R.drawable.ic_menu_camera);
+//			item3.setIcon(android.R.drawable.ic_menu_mylocation);
+//			item4.setIcon(android.R.drawable.ic_menu_view);
+//			item5.setIcon(android.R.drawable.ic_menu_camera);
+
+			return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		switch(item.getItemId()){
+			/*Map View*/
+			case 1:
+				createMixMap();
+				finish();
+				break;
+			/*back to Camera View*/
+			case 2:
+				finish();
+				break;
+		}
+		return true;
+	}
+	public void createMixMap(){
+		MixMap.setMarkerList(dataView.jLayer.markers);
+		MixMap.setDataView(dataView);
+		MixMap.setMixContext(dataView.ctx);
+		Intent intent2 = new Intent(MixListView.this, MixMap.class); 
+		startActivityForResult(intent2, 20);
+	}
+	
+	
 	public static void setDataSource(String source){
 		selectedDataSource = source;
 	}
 	public static String getDataSource(){
 		return selectedDataSource;
 	}
-	
 	public static void setInfoText(String i){
 		info = i;
 	}
