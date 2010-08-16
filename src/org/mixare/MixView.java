@@ -110,10 +110,19 @@ LocationListener {
 	static boolean isZoombarVisible= false;
 	static String zoomLevel;
 	static int zoomProgress;
-	static boolean zoomChangin=false;
-
-	//TAG for logging
+	static boolean zoomChanging=false;
+	 //TAG for logging
 	public static final String TAG = "Mixare";
+
+	/*strings for GPS info assigned in Data View*/
+	//public static String GPS_LOCATION;
+	public static double GPS_LONGITUDE =0;
+	public static double GPS_LATITUDE =0;
+	public static float GPS_ACURRACY =0;
+	public static String GPS_LAST_FIX="";
+	public static double GPS_ALTITUDE=0;
+	public static float GPS_SPEED=0;
+	public static String GPS_ALL="";
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 	public Vector<String> listDataVector;
@@ -195,9 +204,6 @@ LocationListener {
         alert.show();
 	}
 	
-	public void setGPSDialog(){
-		Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();	
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -213,15 +219,6 @@ LocationListener {
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		    SharedPreferences.Editor editor = settings.edit();
-
-		    /*check if the application is launched for the first time*/
-		    if(settings.getBoolean("firstAccess",false)==false){
-		    	//if FALSE it is the first time and the license agreements are shown before starting
-				Intent intent = new Intent(MixView.this, MixTextViews.class); 
-				startActivity(intent);
-			    editor.putBoolean("firstAccess", true);
-			    editor.commit();
-			}       
 
 		    myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
@@ -260,11 +257,44 @@ LocationListener {
 				SetZoomLevel(); 
 				isInited = true;		
 			}
+			
+		    /*check if the application is launched for the first time*/
+		    if(settings.getBoolean("firstAccess",false)==false){
+		    	//if FALSE it is the first time and the license agreements are shown before starting
+		    	AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+				builder1.setMessage(getString(view.LICENSE_TEXT));
+				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+				AlertDialog alert1 = builder1.create();
+				alert1.setTitle(getString(view.LICENSE_TITLE));
+			    alert1.show();
+			    editor.putBoolean("firstAccess", true);
+			    editor.commit();
+			} 
+		    
 			if(ctx.isActualLocation()==false){
-		    	setGPSDialog();
-		    }	
+			//	locationUpdate();
+				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+			}		
+			
 		} catch (Exception ex) {
 			doError(ex);
+		}
+	}
+	
+	public void locationUpdate(){
+		try{
+			LocationManager locManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+			locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, this);
+			Log.d("GPS Msg", "Location update succeeded");
+
+		}
+		catch(Exception ex){
+			Log.d("GPS Msg", "Location update failed");
+			ex.printStackTrace();
 		}
 	}
 
@@ -429,13 +459,12 @@ LocationListener {
 		}
 	}
 	
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 			int base = Menu.FIRST;
 			/*define the first*/
-			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); //Show Tweets ON or OFF
-			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); //add remove friends to follow
+			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); 
+			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); 
 			MenuItem item3 =menu.add(base, base+2, base+2,  getString(view.MENU_ITEM_3));
 			MenuItem item4 =menu.add(base, base+3, base+3,  getString(view.MENU_ITEM_4));
 			MenuItem item5 =menu.add(base, base+4, base+4,  getString(view.MENU_ITEM_5));
@@ -443,10 +472,11 @@ LocationListener {
 			MenuItem item7 =menu.add(base, base+6, base+6,  getString(view.MENU_ITEM_7));
 
 			/*assign icons to the menu items*/
-			item1.setIcon(android.R.drawable.ic_menu_zoom);
-			item2.setIcon(android.R.drawable.ic_menu_edit);
-			item3.setIcon(android.R.drawable.ic_menu_view);
-			item4.setIcon(android.R.drawable.ic_menu_mapmode);
+			
+			item1.setIcon(android.R.drawable.ic_menu_edit);
+			item2.setIcon(android.R.drawable.ic_menu_view);
+			item3.setIcon(android.R.drawable.ic_menu_mapmode);
+			item4.setIcon(android.R.drawable.ic_menu_zoom);
 			item5.setIcon(android.R.drawable.ic_menu_search);
 			item6.setIcon(android.R.drawable.ic_menu_info_details);
 			item7.setIcon(android.R.drawable.ic_menu_share);
@@ -457,14 +487,8 @@ LocationListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			/*Case 1: zoom level*/
-			case 1:
-				myZoomBar.setVisibility(View.VISIBLE);
-				zoomProgress = myZoomBar.getProgress();
-				isZoombarVisible=true;	
-				break;
-				/*Data sources*/
-			case 2:		
+			/*Data sources*/
+			case 1:		
 				if(view.isLauncherStarted==false){
 					MixListView.setList(1);
 					Intent intent = new Intent(MixView.this, MixListView.class); 
@@ -474,8 +498,8 @@ LocationListener {
 					Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
 				}
 				break;
-			/*Case 2: List view*/
-			case 3:
+			/*List view*/
+			case 2:
 				MixListView.setList(2);
 				listDataVector = new Vector();
 				listURL = new Vector();
@@ -506,9 +530,19 @@ LocationListener {
 					Toast.makeText( this, view.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
 				}
 				break;
-			/*Case 3: Map View*/
+			/*Map View*/
+			case 3:
+				MixMap.setMarkerList(view.jLayer.markers);
+				MixMap.setDataView(view);
+				MixMap.setMixContext(ctx);
+				Intent intent2 = new Intent(MixView.this, MixMap.class); 
+				startActivityForResult(intent2, 20);
+				break;
+			/*zoom level*/
 			case 4:
-				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				myZoomBar.setVisibility(View.VISIBLE);
+				zoomProgress = myZoomBar.getProgress();
+				isZoombarVisible=true;	
 				break;
 			/*Search*/
 			case 5:
@@ -516,15 +550,36 @@ LocationListener {
 				break;
 			/*GPS Information*/
 			case 6:
-				MixTextViews.MENU_VIEW = 1;
-				Intent intent1 = new Intent(MixView.this, MixTextViews.class); 
-				startActivityForResult(intent1, 42);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(getString(view.GENERAL_INFO_TEXT)+"\n\n" +
+							getString(view.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
+							getString(view.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
+							getString(view.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
+							getString(view.GPS_SPEED) + GPS_SPEED + "km/h\n" +
+							getString(view.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
+							getString(view.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
+				builder.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+		        AlertDialog alert = builder.create();
+				alert.setTitle(getString(view.GENERAL_INFO_TITLE));
+		        alert.show();
 				break;
-			/*Case 6: show license agreements*/
+			/*Case 6: license agreements*/
 			case 7:
-				MixTextViews.MENU_VIEW = 2;
-				Intent intent2 = new Intent(MixView.this, MixTextViews.class); 
-				startActivityForResult(intent2, 42);
+				AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+				builder1.setMessage(getString(view.LICENSE_TEXT));	
+				/*Retry*/
+				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		        	public void onClick(DialogInterface dialog, int id) {
+		        		dialog.dismiss();
+		            }
+		        });
+				AlertDialog alert1 = builder1.create();
+				alert1.setTitle(getString(view.LICENSE_TITLE));
+			    alert1.show();
 				break;
 			
 		}
@@ -600,7 +655,7 @@ LocationListener {
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			zoomChangin= true;
+			zoomChanging= true;
 
 		}
 
@@ -612,7 +667,7 @@ LocationListener {
 		    editor.commit();
 			myZoomBar.setVisibility(View.INVISIBLE);
 			isZoombarVisible=false;
-			zoomChangin= false;
+			zoomChanging= false;
 
 			myZoomBar.getProgress();
 			
@@ -670,7 +725,8 @@ LocationListener {
 				ctx.rotationM.set(smoothR);
 			}
 		} catch (Exception ex) {
-			doError(ex);
+			//doError(ex);
+			ex.printStackTrace();
 		}
 	}
 
@@ -687,8 +743,8 @@ LocationListener {
 
 			return true;
 		} catch (Exception ex) {
-			doError(ex);
-
+			//doError(ex);
+			ex.printStackTrace();
 			return super.onTouchEvent(me);
 		}
 	}
@@ -715,8 +771,8 @@ LocationListener {
 			}
 
 		} catch (Exception ex) {
-			doError(ex);
-
+			//doError(ex);
+			ex.printStackTrace();
 			return super.onKeyDown(keyCode, event);
 		}
 	}
@@ -738,6 +794,7 @@ LocationListener {
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
+			//locationUpdate();
 
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (ctx.curLoc) {
@@ -746,7 +803,7 @@ LocationListener {
 				isGpsEnabled = true;
 			}
 		} catch (Exception ex) {
-			doError(ex);
+			ex.printStackTrace();
 		}
 	}
 
@@ -843,8 +900,31 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					element.width -= w;
 					element.height -= h;
 				} 
-				Collections.sort(supportedSizes, new ResolutionsOrder());
-				parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
+				
+//				Collections.sort(supportedSizes, new ResolutionsOrder());
+				//TODO improve algorithm
+				int preferredSizeIndex=0;
+				int checkWidth =0;
+				int bestDistance = Integer.MAX_VALUE;
+				for (int i = 0; i < supportedSizes.size()-1; i++) {		
+					if(supportedSizes.get(i).width==0){
+						preferredSizeIndex = i;
+					}
+					else{						
+						if(supportedSizes.get(i).width <0)
+							checkWidth =(supportedSizes.get(i).width)*(-1);
+						else 
+							checkWidth = supportedSizes.get(i).width;
+						
+						if(checkWidth < bestDistance){
+							bestDistance = checkWidth;
+							preferredSizeIndex = i;
+						}
+					}
+				}
+				
+				parameters.setPreviewSize(w + supportedSizes.get(preferredSizeIndex).width, h + supportedSizes.get(preferredSizeIndex).height);
+				//parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
 			} catch (Exception ex) {
 				parameters.setPreviewSize(480 , 320);
 			}
@@ -859,12 +939,12 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 
 }
 
-class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
-	public int compare(Camera.Size left, Camera.Size right) {
-
-		return Float.compare(left.width + left.height, right.width + right.height);
-	}
-}
+//class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
+//	public int compare(Camera.Size left, Camera.Size right) {
+//
+//		return Float.compare(left.width + left.height, right.width + right.height);
+//	}
+//}
 
 class AugmentedView extends View {
 	MixView app;

@@ -43,7 +43,7 @@ public class MixState {
 			try {
 				String webpage = MixUtils.parseAction(onPress);
 				this.detailsView = true;
-				ctx.loadWebPage(webpage);
+				ctx.loadMixViewWebPage(webpage);
 			} catch (Exception ex) {
 			}
 		} 

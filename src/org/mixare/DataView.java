@@ -102,7 +102,24 @@ public class DataView {
 	
 	/*if in the listview option for a specific title no website is provided*/
 	public int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
+	public int LICENSE_TEXT = R.string.license;
+	public int LICENSE_TITLE = R.string.license_title;
+	public int CLOSE_BUTTON = R.string.close_button;
+	
+	/*Strings for general information*/
+	public int GENERAL_INFO_TITLE = R.string.general_info_title;
+	public int GENERAL_INFO_TEXT = R.string.general_info_text;
+	public int GPS_LONGITUDE = R.string.longitude;
+	public int GPS_LATITUDE = R.string.latitude;
+	public int GPS_ALTITUDE = R.string.altitude;
+	public int GPS_SPEED = R.string.speed;
+	public int GPS_ACCURACY = R.string.accuracy;
+	public int GPS_LAST_FIX = R.string.gps_last_fix;
 
+	public int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
+	public int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
+	public int MENU_CAM_MODE = R.string.map_menu_cam_mode;
+	public int MAP_MY_LOCATION = R.string.map_my_location;
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
@@ -167,8 +184,9 @@ public class DataView {
 			if (!ctx.getStartUrl().equals("")){
 				request.url = ctx.getStartUrl();
 				isLauncherStarted=true;
-
 			}
+			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
+
 			else {
 				if(MixListView.getDataSource()=="Wikipedia")
 					request.url = WIKI_HOME_URL + "?lat="+curFix.getLatitude()+"&lng=" + curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
@@ -215,7 +233,6 @@ public class DataView {
 				ma.draw(dw);
 			}
 		}
-
 		// Draw Radar
 		String	dirTxt = ""; 
 		int bearing = (int) state.getCurBearing(); 
@@ -257,10 +274,9 @@ public class DataView {
 		if (evt != null && evt.type == UIEvent.CLICK) {
 			handleClickEvent((ClickEvent) evt);
 		}
-		
+
 	}
 	
-
 	private void handleKeyEvent(KeyEvent evt) {
 		/** Adjust marker position with keypad */
 		final float CONST = 10f;

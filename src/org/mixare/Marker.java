@@ -73,6 +73,7 @@ public class Marker {
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
 		signMarker.set(tmpb); //7
+		
 	}
 
 
@@ -152,8 +153,15 @@ public class Marker {
 		}
 
 		if (isVisible) {
-
+			//default color
 			dw.setColor(color);
+			if(MixListView.getDataSource()=="Wikipedia")
+				dw.setColor(Color.rgb(255, 0, 0));
+			if(MixListView.getDataSource()=="Buzz")
+				dw.setColor(Color.rgb(4, 228, 20));
+			if(MixListView.getDataSource()=="Twitter")
+				dw.setColor(Color.rgb(50, 204, 255));
+			
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
 			dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
