@@ -120,6 +120,7 @@ public class DataView {
 	public int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
 	public int MENU_CAM_MODE = R.string.map_menu_cam_mode;
 	public int MAP_MY_LOCATION = R.string.map_my_location;
+	public int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
