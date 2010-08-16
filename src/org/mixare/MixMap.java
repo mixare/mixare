@@ -208,12 +208,15 @@ public class MixMap extends MapActivity{
 	public static Context getMapContext(){
 		return thisContext;
 	}
+	public static void startPointMsg(){
+		Toast.makeText(getMapContext(), getDataView().MAP_CURRENT_LOCATION_CLICK, Toast.LENGTH_LONG).show();
+	}
+
 
 }
 
 
 class MixOverlay extends ItemizedOverlay{
-	boolean itemPressed = false;
 
 	private ArrayList<OverlayItem> overlayItems = new ArrayList<OverlayItem>();
 	
@@ -233,11 +236,13 @@ class MixOverlay extends ItemizedOverlay{
 	
 	@Override
 	protected boolean onTap(int index){
-		itemPressed = true;
-		String url = MixMap.getDataView().jLayer.markers.get(index).getURL();
-
-		Log.d("MapView", "opern url: "+url);
-		if(MixMap.getDataView().jLayer.markers.get(index).getURL()!= null){
+		if(size()==1){
+			MixMap.startPointMsg();
+		}
+		
+		else if(MixMap.getDataView().jLayer.markers.get(index).getURL()!= null){
+			String url = MixMap.getDataView().jLayer.markers.get(index).getURL();
+			Log.d("MapView", "opern url: "+url);
 			try {
 				if (url != null && url.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(url);
@@ -247,8 +252,6 @@ class MixOverlay extends ItemizedOverlay{
 				e.printStackTrace();
 			}
 		}
-		else
-			Log.d("MapView", "no further info available");
 		
 		return true;
 	}

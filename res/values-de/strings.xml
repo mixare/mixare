@@ -64,5 +64,8 @@
 	<string name="map_menu_satellite_mode">Satellit</string>
 	<string name="map_menu_cam_mode">Kamera</string>
 	<string name="map_my_location">Mein Standort</string>
+	
+	<string name="map_current_location_click">Dein Standort</string>
+	
 
 </resources>
