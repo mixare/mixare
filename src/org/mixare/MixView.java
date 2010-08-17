@@ -384,11 +384,13 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				c.setAccuracy(Criteria.ACCURACY_FINE);
 				//c.setBearingRequired(true);
 				
-				
+				locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
+
 				String bestP = locationMgr.getBestProvider(c, true);
 				isGpsEnabled = locationMgr.isProviderEnabled(bestP);
 
-				
+
 				/*defaulting to our place*/
 				Location hardFix = new Location("reverseGeocoded");
 				hardFix.setLatitude(46.47122383117541);
@@ -397,8 +399,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 				
 				try {
-					locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, this);
 					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
 				} catch (Exception ex2) {
 					ctx.curLoc = new Location(hardFix);
