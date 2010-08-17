@@ -82,7 +82,10 @@ public class TextObj implements ScreenObj {
 			float lineWidth = dw.getTextWidth(line);
 
 			if (lineWidth > areaWidth) {
-				lineList.add(prevLine);
+				// If the first word is longer than lineWidth 
+				// prevLine is empty and should be ignored
+				if(prevLine.length()>0)
+					lineList.add(prevLine);
 
 				start = prevEnd;
 			}
