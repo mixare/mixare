@@ -793,7 +793,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		}
 	}
 
-	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 
