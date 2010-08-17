@@ -85,7 +85,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private SensorManager sensorMgr;
 	private List<Sensor> sensors;
 	private Sensor sensorGrav, sensorMag;
-	private LocationManager locationMgr;
+	public static LocationManager locationMgr;
 	boolean isGpsEnabled = false;
 
 	int rHistIdx = 0;
@@ -211,10 +211,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			
+			this.mWakeLock.acquire();
 			locationMgr=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
-			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, this);
-			
+			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
+
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 			
@@ -277,9 +277,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			    editor.putBoolean("firstAccess", true);
 			    editor.commit();
 			} 
-		    
-		   
-		    
+
 			if(ctx.isActualLocation()==false){
 			//	locationUpdate?
 				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
@@ -335,8 +333,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		super.onResume();
 
 		try {
-	
 			this.mWakeLock.acquire();
+
 			killOnError();
 			ctx.mixView = this;
 			view.doStart();
@@ -385,9 +383,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 				c.setAccuracy(Criteria.ACCURACY_FINE);
 				//c.setBearingRequired(true);
-				locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, this);
-
+				
 				
 				String bestP = locationMgr.getBestProvider(c, true);
 				isGpsEnabled = locationMgr.isProviderEnabled(bestP);
@@ -401,6 +397,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 				
 				try {
+					locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, this);
 					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
 				} catch (Exception ex2) {
 					ctx.curLoc = new Location(hardFix);
@@ -543,8 +541,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				break;
 			/*GPS Information*/
 			case 6:
+				ctx.setCurrentGPSInfo();
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(getString(view.GENERAL_INFO_TEXT)+"\n\n" +
+				builder.setMessage(getString(view.GENERAL_INFO_TEXT)+ "\n\n" +
 							getString(view.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
 							getString(view.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
 							getString(view.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
@@ -718,7 +717,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				ctx.rotationM.set(smoothR);
 			}
 		} catch (Exception ex) {
-			//doError(ex);
 			ex.printStackTrace();
 		}
 	}
@@ -764,7 +762,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 
 		} catch (Exception ex) {
-			//doError(ex);
 			ex.printStackTrace();
 			return super.onKeyDown(keyCode, event);
 		}
@@ -776,7 +773,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	public void onProviderEnabled(String provider) {
 		isGpsEnabled = locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -786,12 +782,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
-
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (ctx.curLoc) {
 					ctx.curLoc = location;
 				}
-				 
 				isGpsEnabled = true;
 			}
 		} catch (Exception ex) {
@@ -802,6 +796,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
+
 	}
 
 }

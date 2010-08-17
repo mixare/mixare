@@ -77,7 +77,6 @@ public class DownloadManager implements Runnable {
 					
 					result = processRequest(request);
 
-
 					synchronized (this) {
 						todoList.remove(jobId);
 						doneList.put(jobId, result);

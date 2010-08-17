@@ -60,7 +60,7 @@ public class MixContext {
 
 	DownloadManager downloadManager;
 
-	Location curLoc;
+	Location curLoc=null;
 	Matrix rotationM = new Matrix();
 
 	float declination = 0f;
@@ -77,7 +77,9 @@ public class MixContext {
 		int locationHash = 0;
 		try {
 			locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
-			Location lastFix = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+			Location lastFix= locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
 			if (lastFix == null){
 				lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			}
@@ -89,16 +91,6 @@ public class MixContext {
 			long lastFixTime = lastFix.getTime();
 			long timeDifference = actualTime-lastFixTime;
 		
-			Date lastFixDate = new Date(lastFixTime);
-			
-			MixView.GPS_LONGITUDE = lastFix.getLongitude();
-			MixView.GPS_LATITUDE = lastFix.getLatitude();
-			MixView.GPS_ACURRACY = lastFix.getAccuracy();
-			MixView.GPS_SPEED = lastFix.getSpeed();
-			MixView.GPS_ALTITUDE = lastFix.getAltitude();
-			MixView.GPS_LAST_FIX = lastFixDate.toString();
-			MixView.GPS_ALL = lastFix.toString();
-			
 			if(timeDifference> 1200000){//20 min --- 300000 milliseconds = 5 min
 				actualLocation=false;
 			}
@@ -110,6 +102,26 @@ public class MixContext {
 		}
 
 		rand = new Random(System.currentTimeMillis() + locationHash);
+	}
+	
+	public void setCurrentGPSInfo(){
+		Location lastFix;
+		if(curLoc!=null){
+			lastFix = curLoc;
+		}
+		else
+			lastFix= locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		long lastFixTime = lastFix.getTime();
+		Date lastFixDate = new Date(lastFixTime);
+		
+		MixView.GPS_LONGITUDE = lastFix.getLongitude();
+		MixView.GPS_LATITUDE = lastFix.getLatitude();
+		MixView.GPS_ACURRACY = lastFix.getAccuracy();
+		MixView.GPS_SPEED = lastFix.getSpeed();
+		MixView.GPS_ALTITUDE = lastFix.getAltitude();
+		MixView.GPS_LAST_FIX = lastFixDate.toString();
+		MixView.GPS_ALL = lastFix.toString();
 	}
 
 	public boolean isGpsEnabled() {
@@ -178,7 +190,6 @@ public class MixContext {
 			try {
 				conn.disconnect();
 			} catch (Exception ignore) {			
-
 			}
 			
 			throw ex;				
