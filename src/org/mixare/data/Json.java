@@ -90,7 +90,6 @@ public class Json {
 				jo.getDouble("lng"),
 				jo.getDouble("elevation"),
 				"http://"+jo.getString("wikipediaUrl"));
-			Log.d("url.............................", jo.getString("wikipediaUrl"));
 		}
 	}
 	

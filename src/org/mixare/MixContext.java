@@ -66,7 +66,7 @@ public class MixContext {
 	float declination = 0f;
 	private boolean actualLocation=false;
 
-	private LocationManager locationMgr;
+	LocationManager locationMgr;
 	
 	public MixContext(Context appCtx) {
 		this.mixView = (MixView) appCtx;
@@ -78,7 +78,12 @@ public class MixContext {
 		try {
 			locationMgr = (LocationManager) appCtx.getSystemService(Context.LOCATION_SERVICE);
 			Location lastFix = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			
+			if (lastFix == null){
+				lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			}
+			if (lastFix != null){
+				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix.getLongitude()).hashCode();
+			}
 			Date dt = new Date();
 			long actualTime= dt.getTime();
 			long lastFixTime = lastFix.getTime();
@@ -94,25 +99,12 @@ public class MixContext {
 			MixView.GPS_LAST_FIX = lastFixDate.toString();
 			MixView.GPS_ALL = lastFix.toString();
 			
-			if(timeDifference> 1200000){//300000 milliseconds = 5 min
-				actualLocation=false;
-				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, (LocationListener) this);
-			}
-			actualLocation=true;
-			if (lastFix == null){
-				try{
-					locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, (LocationListener) this);
-					
-				}
-				catch(Exception e){
-					lastFix = locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-				}
+			if(timeDifference> 1200000){//20 min --- 300000 milliseconds = 5 min
 				actualLocation=false;
 			}
-
-			if (lastFix != null){
-				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix.getLongitude()).hashCode();
-			}
+			else
+				actualLocation=true;
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
