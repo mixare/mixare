@@ -110,7 +110,7 @@ public class MixMap extends MapActivity{
 			MenuItem item4 =menu.add(base, base+3, base+3, getString(dataView.MENU_ITEM_2)); 
 			MenuItem item5 =menu.add(base, base+4, base+4, getString(dataView.MENU_CAM_MODE)); 
 
-
+			
 			/*assign icons to the menu items*/
 			item1.setIcon(android.R.drawable.ic_menu_gallery);
 			item2.setIcon(android.R.drawable.ic_menu_mapmode);
@@ -149,30 +149,8 @@ public class MixMap extends MapActivity{
 		return true;
 	}
 	public void createListView(){
-		Vector<String> listDataVector;
-		Vector<String> listURL;
 		MixListView.setList(2);
-		listDataVector = new Vector();
-		listURL = new Vector();
-		/*add all marker items to a title and a URL Vector*/
-		for(int i = 0; i<dataView.jLayer.markers.size();i++){
-			Marker ma = new Marker();
-			ma = dataView.jLayer.markers.get(i);
-				listDataVector.add(ma.getText());
-				/*the website for the corresponding title*/
-				if(ma.getURL()!=null)
-					listURL.add(ma.getURL());
-				/*if no website is available for a specific title*/
-				else
-					listURL.add("");
-		}
-		/*if the list of titles to show in alternative list view is not empty*/
-		if(listDataVector.size()>0){
-			MixListView.setTitleVector(listDataVector);
-			MixListView.setURLVector(listURL);
-			MixListView.setMixContext(ctx);
-			MixListView.setDataView(dataView);
-			MixListView.setInfoText(getString(dataView.NO_WEBINFO_AVAILABLE));
+		if(dataView.jLayer.markers.size()>0){
 			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
 			startActivityForResult(intent1, 42);
 		}
@@ -191,6 +169,7 @@ public class MixMap extends MapActivity{
 	public static void setMarkerList(ArrayList<Marker> maList){
 		markerList= maList;
 	}
+	
 	public static DataView getDataView(){
 		return dataView;
 	}

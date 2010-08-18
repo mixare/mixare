@@ -67,5 +67,8 @@
 	
 	<string name="map_current_location_click">Dein Standort</string>
 	
-
+	<string name="data_source_change_wikipedia">Wikipedia wurde als Datenquelle gewählt</string>
+	<string name="data_source_change_twitter">Twitter wurde als Datenquelle gewählt</string>
+	<string name="data_source_change_buzz">Google Buzz wurde als Datenquelle gewählt</string>
+	
 </resources>

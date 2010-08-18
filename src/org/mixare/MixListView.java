@@ -34,11 +34,11 @@ public class MixListView extends ListActivity{
 	
 	private static int list=0;
 	
-	private static Vector<String> data = null;
+	private static Vector<String> listViewMenu = null;
 	private static Vector<String> selectedItemURL= null;
+	private static Vector<String> dataSourceMenu= null;
 	private static MixContext context = null;
 	private static DataView dataView = null;
-	private static String info= null;
 	private static String selectedDataSource="Wikipedia";
 	
 	@Override
@@ -49,7 +49,7 @@ public class MixListView extends ListActivity{
 		
 		switch(list){
 		case 1:
-			Vector<String> dataSourceMenu = new Vector();
+			dataSourceMenu = new Vector();
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
 			dataSourceMenu.add("Buzz");
@@ -59,9 +59,24 @@ public class MixListView extends ListActivity{
 			break;
 		
 		case 2:
-			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,data));
+			selectedItemURL = new Vector();
+			listViewMenu = new Vector();
+			/*add all marker items to a title and a URL Vector*/
+			for(int i = 0; i<dataView.jLayer.markers.size();i++){
+				Marker ma = new Marker();
+				ma = dataView.jLayer.markers.get(i);
+				listViewMenu.add(ma.getText());
+					/*the website for the corresponding title*/
+					if(ma.getURL()!=null)
+						selectedItemURL.add(ma.getURL());
+					/*if no website is available for a specific title*/
+					else
+						selectedItemURL.add("");
+			}
+			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listViewMenu));
 			getListView().setTextFilterEnabled(true);
 			break;
+			
 		}
 	}
 	
@@ -84,7 +99,7 @@ public class MixListView extends ListActivity{
 	public void clickOnListView(int position){
 		/*if no website is available for this item*/
 		if(selectedItemURL.get(position)==""){				
-			Toast.makeText( this, info, Toast.LENGTH_LONG ).show();			
+			Toast.makeText( this, getString(dataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
 		}
 		else{
 			String url = selectedItemURL.get(position);
@@ -104,19 +119,19 @@ public class MixListView extends ListActivity{
 			/*WIKIPEDIA*/
 			case 0:
 				setDataSource("Wikipedia");
-				Toast.makeText( this , "Changed to Wikipedia as data source", Toast.LENGTH_LONG ).show();
+				Toast.makeText( this , getString(dataView.DATA_SOURCE_CHANGE_WIKIPEDIA), Toast.LENGTH_LONG ).show();
 				break;
 			
 			/*TWITTER*/
 			case 1:		
 				setDataSource("Twitter");
-				Toast.makeText( this ,"Changed to Twitter as data source", Toast.LENGTH_LONG ).show();	
+				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_TWITTER), Toast.LENGTH_LONG ).show();	
 				break;
 				
 			/*BUZZ*/
 			case 2:
 				setDataSource("Buzz");
-				Toast.makeText( this ,"Changed to Google Buzz as data source", Toast.LENGTH_LONG).show();
+				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_BUZZ), Toast.LENGTH_LONG).show();
 			/*Own URL*/
 //			case 3:
 //				setDataSource("OwnURL");
@@ -159,35 +174,18 @@ public class MixListView extends ListActivity{
 	}
 	
 	public void createMixMap(){
-		MixMap.setMarkerList(dataView.jLayer.markers);
-		MixMap.setDataView(dataView);
-		MixMap.setMixContext(dataView.ctx);
 		Intent intent2 = new Intent(MixListView.this, MixMap.class); 
 		startActivityForResult(intent2, 20);
 	}
 	
-	
 	public static void setDataSource(String source){
 		selectedDataSource = source;
 	}
+	
 	public static String getDataSource(){
 		return selectedDataSource;
 	}
-	public static void setInfoText(String i){
-		info = i;
-	}
-	public static void setDataView(DataView v){
-		dataView = v;
-	}
-	public static void setMixContext(MixContext mc){
-		context = mc;
-	}
-	public static void setTitleVector(Vector<String> t){
-		data = t;
-	}
-	public static void setURLVector(Vector<String> url){
-		selectedItemURL = url;
-	}
+	
 	public static void setList(int l){
 		list = l;
 	}

@@ -492,25 +492,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			/*List view*/
 			case 2:
 				MixListView.setList(2);
-				listDataVector = new Vector();
-				listURL = new Vector();
-				/*add all marker items to a title and a URL Vector*/
-				for(int i = 0; i<view.jLayer.markers.size();i++){
-					Marker ma = new Marker();
-					ma = view.jLayer.markers.get(i);
-						listDataVector.add(ma.getText());
-						/*the website for the corresponding title*/
-						if(ma.getURL()!=null)
-							listURL.add(ma.getURL());
-						/*if no website is available for a specific title*/
-						else
-							listURL.add("");
-				}
 				/*if the list of titles to show in alternative list view is not empty*/
-				if(listDataVector.size()>0){
-					MixListView.setTitleVector(listDataVector);
-					MixListView.setURLVector(listURL);
-					MixListView.setInfoText(getString(view.NO_WEBINFO_AVAILABLE));
+				if(view.jLayer.markers.size()>0){
 					Intent intent1 = new Intent(MixView.this, MixListView.class); 
 					startActivityForResult(intent1, 42);
 				}
@@ -572,7 +555,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		}
 		return true;
 	}
-
 	
 	private void SetZoomLevel() {
 		//TODO improve zoomlevel algorithm

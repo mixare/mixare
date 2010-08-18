@@ -59,10 +59,13 @@
 	
 	<string name="map_menu_normal_mode">Mappa</string>
 	<string name="map_menu_satellite_mode">Satellite</string>
-	<string name="map_menu_cam_mode">Telecamera</string>
+	<string name="map_menu_cam_mode">Camera</string>
 	<string name="map_my_location">La mia posizione</string>
 	
 	<string name="map_current_location_click">La tua posizione</string>
 	
-
+	<string name="data_source_change_wikipedia">Wikipedia è adesso la fonte dei dati</string>
+	<string name="data_source_change_twitter">Twitter è adesso la fonte dei dati</string>
+	<string name="data_source_change_buzz">Google Buz è adesso la fonte dei dati</string>
+	
 </resources>

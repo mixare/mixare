@@ -36,6 +36,7 @@ import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
@@ -121,6 +122,10 @@ public class DataView {
 	public int MENU_CAM_MODE = R.string.map_menu_cam_mode;
 	public int MAP_MY_LOCATION = R.string.map_my_location;
 	public int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
+
+	public int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
+	public int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
+	public int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
