@@ -44,6 +44,9 @@ public class MixListView extends ListActivity{
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		context = MixView.ctx;
+		dataView = MixView.view;
+		
 		switch(list){
 		case 1:
 			Vector<String> dataSourceMenu = new Vector();
@@ -66,33 +69,36 @@ public class MixListView extends ListActivity{
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		switch(list){
-		/*Data Sources*/
-		case 1:
-			clickOnDataSource(position);		
-			break;
-		
-		/*List View*/
-		case 2:
-			/*if no website is available for this item*/
-			if(selectedItemURL.get(position)==""){				
-				Toast.makeText( this, info, Toast.LENGTH_LONG ).show();			
-			}
-			else{
-				String url = selectedItemURL.get(position);
-				try {
-					if (url != null && url.startsWith("webpage")) {
-						String newUrl = MixUtils.parseAction(url);
-						dataView.ctx.loadWebPage(newUrl, this);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			break;
-
+			/*Data Sources*/
+			case 1:
+				clickOnDataSource(position);		
+				break;
+			
+			/*List View*/
+			case 2:
+				clickOnListView(position);
+				break;
 		}
 		
 	}
+	public void clickOnListView(int position){
+		/*if no website is available for this item*/
+		if(selectedItemURL.get(position)==""){				
+			Toast.makeText( this, info, Toast.LENGTH_LONG ).show();			
+		}
+		else{
+			String url = selectedItemURL.get(position);
+			try {
+				if (url != null && url.startsWith("webpage")) {
+					String newUrl = MixUtils.parseAction(url);
+					dataView.ctx.loadWebPage(newUrl, this);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void clickOnDataSource(int position){
 		switch(position){
 			/*WIKIPEDIA*/
@@ -106,12 +112,13 @@ public class MixListView extends ListActivity{
 				setDataSource("Twitter");
 				Toast.makeText( this ,"Changed to Twitter as data source", Toast.LENGTH_LONG ).show();	
 				break;
+				
 			/*BUZZ*/
 			case 2:
 				setDataSource("Buzz");
 				Toast.makeText( this ,"Changed to Google Buzz as data source", Toast.LENGTH_LONG).show();
 			/*Own URL*/
-//			case 2:
+//			case 3:
 //				setDataSource("OwnURL");
 //				Toast.makeText( this ,"sdfwer3rh", Toast.LENGTH_LONG ).show();	
 //				break;
@@ -123,20 +130,15 @@ public class MixListView extends ListActivity{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 			int base = Menu.FIRST;
-			/*define the first*/
-			MenuItem item1 =menu.add(base, base, base, getString(dataView.MENU_ITEM_3)); 
-			MenuItem item2 =menu.add(base, base+1, base+1, getString(dataView.MENU_CAM_MODE));
-//			MenuItem item3 =menu.add(base, base+2, base+2, getString(dataView.MAP_MY_LOCATION)); 
-//			MenuItem item4 =menu.add(base, base+3, base+3, getString(dataView.MENU_ITEM_2)); 
-//			MenuItem item5 =menu.add(base, base+4, base+4, getString(dataView.MAP_MENU_CAM_MODE)); 
+			
+			/*define menu items*/
+			MenuItem item1 = menu.add(base, base, base, getString(dataView.MENU_ITEM_3)); 
+			MenuItem item2 = menu.add(base, base+1, base+1, getString(dataView.MENU_CAM_MODE));
 
 			/*assign icons to the menu items*/
 			item1.setIcon(android.R.drawable.ic_menu_mapmode);
 			item2.setIcon(android.R.drawable.ic_menu_camera);
-//			item3.setIcon(android.R.drawable.ic_menu_mylocation);
-//			item4.setIcon(android.R.drawable.ic_menu_view);
-//			item5.setIcon(android.R.drawable.ic_menu_camera);
-
+			
 			return true;
 	}
 	
@@ -155,6 +157,7 @@ public class MixListView extends ListActivity{
 		}
 		return true;
 	}
+	
 	public void createMixMap(){
 		MixMap.setMarkerList(dataView.jLayer.markers);
 		MixMap.setDataView(dataView);

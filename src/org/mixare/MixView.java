@@ -483,7 +483,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				if(view.isLauncherStarted==false){
 					MixListView.setList(1);
 					Intent intent = new Intent(MixView.this, MixListView.class); 
-					startActivityForResult(intent, 42);
+					startActivityForResult(intent, 40);
 				}
 				else{
 					Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
@@ -510,8 +510,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				if(listDataVector.size()>0){
 					MixListView.setTitleVector(listDataVector);
 					MixListView.setURLVector(listURL);
-					MixListView.setMixContext(ctx);
-					MixListView.setDataView(view);
 					MixListView.setInfoText(getString(view.NO_WEBINFO_AVAILABLE));
 					Intent intent1 = new Intent(MixView.this, MixListView.class); 
 					startActivityForResult(intent1, 42);
@@ -523,9 +521,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				break;
 			/*Map View*/
 			case 3:
-				MixMap.setMarkerList(view.jLayer.markers);
-				MixMap.setDataView(view);
-				MixMap.setMixContext(ctx);
 				Intent intent2 = new Intent(MixView.this, MixMap.class); 
 				startActivityForResult(intent2, 20);
 				break;

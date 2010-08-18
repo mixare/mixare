@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -45,6 +44,9 @@ public class MixMap extends MapActivity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    dataView = MixView.view;
+	    ctx = MixView.ctx;
+	    setMarkerList(dataView.jLayer.markers);
 	    map = this;
 	    
 	    setMapContext(this);
