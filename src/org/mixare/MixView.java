@@ -578,11 +578,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		return true;
 	}
 
-	
-	private void SetZoomLevel() {
-		//TODO improve zoomlevel algorithm
+public float calcZoomLevel(){
+		
 		int myZoomLevel = myZoomBar.getProgress();
 		float myout = 5;
+		
 		if (myZoomLevel <= 26) {
 			myout = myZoomLevel / 25f;
 		} else if (25 < myZoomLevel && myZoomLevel < 50) {
@@ -599,6 +599,18 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		} else {
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
+		
+		/*Twitter Json file not available for radius <1km 
+		 *smallest radius is set to 1km*/
+		if(MixListView.getDataSource().equals("Twitter")&&myZoomBar.getProgress()<100){
+			myout++;
+		}
+	
+		return myout;
+	}
+
+	private void SetZoomLevel() {
+		float myout = calcZoomLevel();
 
 		view.radius =myout;
 
@@ -614,29 +626,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	};
 
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-
 		Toast t;
 
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			
-			int myZoomLevel = myZoomBar.getProgress();
-			float myout = 5;
-			if (myZoomLevel <= 26) {
-				myout = myZoomLevel / 25f;
-			} else if (25 < myZoomLevel && myZoomLevel < 50) {
-				myout = (1 + (myZoomLevel - 25)) * 0.38f;
-			} 
-					else if (25== myZoomLevel) {
-						myout = 1;
-					} 
-					else if (50== myZoomLevel) {
-						myout = 10;
-					} 
-			else if (50 < myZoomLevel && myZoomLevel < 75) {
-				myout = (10 + (myZoomLevel - 50)) * 0.83f;
-			} else {
-				myout = (30 + (myZoomLevel - 75) * 2f);
-			}			
+			float myout = calcZoomLevel();
+					
 			zoomLevel = String.valueOf(myout);
 			zoomProgress = myZoomBar.getProgress();
 
@@ -978,8 +972,14 @@ class AugmentedView extends View {
 				Paint zoomPaint = new Paint();
 				zoomPaint.setColor(Color.WHITE);
 				zoomPaint.setTextSize(14);
-				canvas.drawText("0km", canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
-				canvas.drawText("80km", canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
+				String startKM, endKM;
+				endKM = "80km";
+				startKM = "0km";
+				if(MixListView.getDataSource().equals("Twitter")){
+					startKM = "1km";
+				}
+				canvas.drawText(startKM, canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
+				canvas.drawText(endKM, canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
 				
 				int height= canvas.getHeight()/100*85;
 				if(MixView.zoomProgress >92||MixView.zoomProgress <6){
