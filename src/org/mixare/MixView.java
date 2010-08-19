@@ -211,7 +211,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			this.mWakeLock.acquire();
 			locationMgr=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
 			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
 
@@ -279,7 +278,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			} 
 
 			if(ctx.isActualLocation()==false){
-			//	locationUpdate?
 				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}		
 
@@ -418,9 +416,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
 						.sin(angleY), 0f, (float) Math.cos(angleY));
 				ctx.declination = gmf.getDeclination();
-				
-				
-				repaint();
 				
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
