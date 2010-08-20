@@ -19,10 +19,22 @@
 package org.mixare;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.data.Json;
+import org.mixare.data.XMLHandler;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import android.util.Log;
 
@@ -124,19 +136,48 @@ public class DownloadManager implements Runnable {
 				String tmp = ctx.getHttpInputString(is);
 				//String ss = ctx.unescapeHTML(tmp, 0);
 
-				//Log.d("JSON", ss);
-				JSONObject root = null;
-				root = new JSONObject(tmp);
 				Json layer = new Json();
 				
-				Log.i(MixView.TAG, "loading JSON data");				
+				// try loading JSON DATA
+				try {
 
-				layer.load(root);
-				result.obj = layer;
-				
-				result.format = request.format;
-				result.error = false;
-				result.errorMsg = null;
+					Log.d(MixView.TAG, "try to load JSON data");
+					 
+					JSONObject root = new JSONObject(tmp);
+					
+					Log.i(MixView.TAG, "loading JSON data");				
+
+					layer.load(root);
+					result.obj = layer;
+					
+					result.format = request.format;
+					result.error = false;
+					result.errorMsg = null;
+					
+				}
+				catch (JSONException e) {
+
+					Log.d(MixView.TAG, "no JSON data");
+					Log.d(MixView.TAG, "try to load XML data");
+					
+					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			        //Document doc = builder.parse(is);
+					Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+
+					//Document doc = builder.parse(is);
+			        
+					XMLHandler xml = new XMLHandler();
+					
+
+					Log.i(MixView.TAG, "loading XML data");	
+					xml.load(doc);
+
+					result.obj = xml;
+					
+					result.format = request.format;
+					result.error = false;
+					result.errorMsg = null;				
+				}
 
 			ctx.returnHttpInputStream(is);
 			is = null;

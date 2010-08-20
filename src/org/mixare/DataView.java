@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
+import org.mixare.data.DataHandler;
 import org.mixare.data.Json;
+import org.mixare.data.XMLHandler;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -36,7 +38,6 @@ import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
@@ -67,12 +68,19 @@ public class DataView {
 	String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
 	String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
 	String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
+
+	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
+	// eg. only railway stations:
+	String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
+	// all objects that have names: 
+	//caution! produces hugh amount of data (megabytes), only use with very small radii
+	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	
 	private Location curFix;
 	private String startUrl = "";
 	public float screenWidth, screenHeight;
 	
-	public Json jLayer = new Json();
+	public DataHandler jLayer = new DataHandler();
 	
 	public float radius = 20;
 	DownloadResult dRes;
@@ -126,6 +134,7 @@ public class DataView {
 	public int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
 	public int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
 	public int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
+	public int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
 
 
 //	public int ORIENTATON_NORD_ID = R.string.N;
@@ -194,13 +203,16 @@ public class DataView {
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
 
 			else {
+				double lat = curFix.getLatitude(), lon = curFix.getLongitude();
 				if(MixListView.getDataSource()=="Wikipedia")
-					request.url = WIKI_HOME_URL + "?lat="+curFix.getLatitude()+"&lng=" + curFix.getLongitude() + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
+					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 				else if(MixListView.getDataSource()=="Twitter")
-					request.url = TWITTER_HOME_URL +"?geocode="+curFix.getLatitude() + "%2C" + curFix.getLongitude()+"%2C" + radius + "km" ;
+					request.url = TWITTER_HOME_URL +"?geocode="+lat + "%2C" + lon+"%2C" + radius + "km" ;
 				else if(MixListView.getDataSource()=="Buzz")  
-					request.url = BUZZ_HOME_URL + "&lat="+curFix.getLatitude()+"&lon=" + curFix.getLongitude() + "&radius="+ radius*1000;
+					request.url = BUZZ_HOME_URL + "&lat="+lat+"&lon=" + lon + "&radius="+ radius*1000;
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
+				else if(MixListView.getDataSource()=="OpenStreetMap")
+					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			}
 			Log.i(MixView.TAG,request.url);
 			startUrl = ctx.getStartUrl();
@@ -219,7 +231,7 @@ public class DataView {
 				} else {
 					retry = 0;
 					state.nextLStatus = MixState.DONE;
-					jLayer = (Json) dRes.obj;
+					jLayer = (DataHandler) dRes.obj;
 
 					//Sort markers by cMarker.z
 					Collections.sort(jLayer.markers, new MarkersOrder());

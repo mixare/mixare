@@ -53,6 +53,7 @@ public class MixListView extends ListActivity{
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
 			dataSourceMenu.add("Buzz");
+			dataSourceMenu.add("OpenStreetMap");
 //			dataSourceMenu.add("own URL");
 			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dataSourceMenu));
 			getListView().setTextFilterEnabled(true);
@@ -127,11 +128,19 @@ public class MixListView extends ListActivity{
 				setDataSource("Twitter");
 				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_TWITTER), Toast.LENGTH_LONG ).show();	
 				break;
-				
+
 			/*BUZZ*/
 			case 2:
 				setDataSource("Buzz");
 				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_BUZZ), Toast.LENGTH_LONG).show();
+				break;
+				
+			/*OSM*/
+			case 3:
+				setDataSource("OpenStreetMap");
+				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_OSM), Toast.LENGTH_LONG).show();
+				break;
+				
 			/*Own URL*/
 //			case 3:
 //				setDataSource("OwnURL");

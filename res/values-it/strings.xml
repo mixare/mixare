@@ -67,5 +67,6 @@
 	<string name="data_source_change_wikipedia">Wikipedia è adesso la fonte dei dati</string>
 	<string name="data_source_change_twitter">Twitter è adesso la fonte dei dati</string>
 	<string name="data_source_change_buzz">Google Buz è adesso la fonte dei dati</string>
+	<string name="data_source_change_osm">OpenStreetMap è adesso la fonte dei dati</string>
 	
 </resources>

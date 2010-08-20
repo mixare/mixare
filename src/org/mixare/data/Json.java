@@ -18,26 +18,15 @@
 */
 package org.mixare.data;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mixare.Marker;
 import org.mixare.MixView;
-import org.mixare.reality.PhysicalPlace;
 
 import android.util.Log;
 
-public class Json {
-	
-	public ArrayList<Marker> markers = new ArrayList<Marker>();
-	public static final int MAX_OBJECTS = 50;
-	
-	
-	public Json() {
-	}
-	
+public class Json extends DataHandler {
+		
 	public void processBuzzJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
 		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
 			Log.d(MixView.TAG, "processing Google Buzz JSON data");
@@ -91,22 +80,6 @@ public class Json {
 				jo.getDouble("elevation"),
 				"http://"+jo.getString("wikipediaUrl"));
 		}
-	}
-	
-	private void createMarker(String title, double latitude, double longitude, double elevation, String link) {
-		PhysicalPlace refpt = new PhysicalPlace();
-		Marker ma = new Marker();
-		
-		if(link != null && link.length()>0) {
-			ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(link);
-		}
-		
-		ma.mText = title;
-		refpt.setLatitude(latitude);
-		refpt.setLongitude(longitude);
-		refpt.setAltitude(elevation);
-		ma.mGeoLoc.setTo(refpt);
-		markers.add(ma);
 	}
 	
 	public void load(JSONObject root) {

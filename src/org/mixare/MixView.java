@@ -396,6 +396,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				hardFix.setLatitude(46.47122383117541);
 				hardFix.setLongitude(11.260278224944742);
 				hardFix.setAltitude(300);
+				
+/*				hardFix.setLatitude(48.19616);
+				hardFix.setLongitude(16.36886);
+				hardFix.setAltitude(200); */
 
 				
 				try {
