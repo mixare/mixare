@@ -85,7 +85,7 @@ public class MixListView extends ListActivity{
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		switch(list){
-			/*Data Sources*/
+			/*Data Sources*/  
 			case 1:
 				clickOnDataSource(position);		
 				break;
