@@ -381,7 +381,8 @@ public class MixContext {
 	public void loadMixViewWebPage(String url) throws Exception {
 		// TODO
 		WebView webview = new WebView(mixView);
-		
+		webview.getSettings().setJavaScriptEnabled(true);
+
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
 			     view.loadUrl(url);
