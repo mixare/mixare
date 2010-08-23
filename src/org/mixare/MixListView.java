@@ -18,16 +18,26 @@
  */
 package org.mixare;
 
+import java.util.List;
 import java.util.Vector;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MixListView extends ListActivity{
@@ -36,17 +46,24 @@ public class MixListView extends ListActivity{
 	
 	private static Vector<String> listViewMenu = null;
 	private static Vector<String> selectedItemURL= null;
-	private static Vector<String> dataSourceMenu= null;
+	public static Vector<String> dataSourceMenu= null;
 	private static MixContext context = null;
 	private static DataView dataView = null;
 	private static String selectedDataSource="Wikipedia";
-	
+	/*to check which data source is active*/
+	private int clickedDataSourceItem = 0;
+	public static TextView listTextView=null;
+	public static ImageView listIcon=null;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		context = MixView.ctx;
 		dataView = MixView.view;
-		
+		listTextView = new TextView(this);
+		listTextView.setText("hallotest");
+		listIcon = new ImageView(this);
+
 		switch(list){
 		case 1:
 			dataSourceMenu = new Vector();
@@ -55,8 +72,26 @@ public class MixListView extends ListActivity{
 			dataSourceMenu.add("Buzz");
 			dataSourceMenu.add("OpenStreetMap");
 //			dataSourceMenu.add("own URL");
-			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dataSourceMenu));
-			getListView().setTextFilterEnabled(true);
+			
+			//getListView().setBackgroundResource()(Color.WHITE);
+//			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice,dataSourceMenu));
+//			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+//			getListView().setTextFilterEnabled(true);
+//			getListView().setBackgroundColor(Color.WHITE);
+//
+//			/*check which Data Source is active and set radio button*/
+//			if(getDataSource().equals("Wikipedia"))
+//				clickedDataSourceItem=0;
+//			if(getDataSource().equals("Twitter"))
+//				clickedDataSourceItem=1;
+//			if(getDataSource().equals("Buzz"))
+//				clickedDataSourceItem=2;
+//			if(getDataSource().equals("OpenStreetMap"))
+//				clickedDataSourceItem=3;
+//			
+//			getListView().setItemChecked(clickedDataSourceItem, true);
+			
+			setListAdapter(new ListItemAdapter(this));
 			break;
 		
 		case 2:
@@ -120,25 +155,25 @@ public class MixListView extends ListActivity{
 			/*WIKIPEDIA*/
 			case 0:
 				setDataSource("Wikipedia");
-				Toast.makeText( this , getString(dataView.DATA_SOURCE_CHANGE_WIKIPEDIA), Toast.LENGTH_LONG ).show();
+				//Toast.makeText( this , getString(dataView.DATA_SOURCE_CHANGE_WIKIPEDIA), Toast.LENGTH_LONG ).show();
 				break;
 			
 			/*TWITTER*/
 			case 1:		
 				setDataSource("Twitter");
-				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_TWITTER), Toast.LENGTH_LONG ).show();	
+				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_TWITTER), Toast.LENGTH_LONG ).show();	
 				break;
 
 			/*BUZZ*/
 			case 2:
 				setDataSource("Buzz");
-				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_BUZZ), Toast.LENGTH_LONG).show();
+				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_BUZZ), Toast.LENGTH_LONG).show();
 				break;
 				
 			/*OSM*/
 			case 3:
 				setDataSource("OpenStreetMap");
-				Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_OSM), Toast.LENGTH_LONG).show();
+				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_OSM), Toast.LENGTH_LONG).show();
 				break;
 				
 			/*Own URL*/
@@ -148,7 +183,7 @@ public class MixListView extends ListActivity{
 //				break;
 			
 		}
-		finish();
+	//	finish();
 	}
 	
 	@Override
@@ -200,6 +235,56 @@ public class MixListView extends ListActivity{
 	}
 }
 
+class ListItemAdapter extends BaseAdapter {
+	private LayoutInflater myInflater;
+	private Bitmap edit_icon;
+	
+	public ListItemAdapter(Context context) {
+		myInflater = LayoutInflater.from(context);
+		edit_icon = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_edit);
+	}
 
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
 
+        if(convertView==null){
+	        convertView = myInflater.inflate(R.layout.main, );
+	
+	        holder = new ViewHolder();
+	        holder.text =  MixListView.listTextView;
+	        holder.icon = MixListView.listIcon;
+	        convertView.setTag(holder); 
+        }
+        else{
+        	holder = (ViewHolder) convertView.getTag();
+        }
+        holder.text.setText(MixListView.dataSourceMenu.get(position));
+        holder.icon.setImageBitmap(edit_icon);
 
+        return convertView;
+    }
+
+    private class ViewHolder {
+        TextView text;
+        ImageView icon;
+
+    }
+
+	@Override
+	public int getCount() {
+		// TODO Auto-generated method stub
+		return MixListView.dataSourceMenu.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return position;
+	}
+
+	@Override
+	public long getItemId(int id) {
+		return id;
+	}
+
+}

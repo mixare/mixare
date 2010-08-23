@@ -4,5 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+    <ImageView android:id="@+id/icon"
+        android:layout_width="160dip"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_datasource"/>
+    
 </LinearLayout>
 

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.mixare.R.drawable;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
@@ -468,7 +469,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			MenuItem item7 =menu.add(base, base+6, base+6,  getString(view.MENU_ITEM_7));
 
 			/*assign icons to the menu items*/
-			item1.setIcon(android.R.drawable.ic_menu_edit);
+			item1.setIcon(drawable.icon_datasource);
 			item2.setIcon(android.R.drawable.ic_menu_view);
 			item3.setIcon(android.R.drawable.ic_menu_mapmode);
 			item4.setIcon(android.R.drawable.ic_menu_zoom);
