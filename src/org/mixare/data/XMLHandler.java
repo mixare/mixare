@@ -28,17 +28,17 @@ public class XMLHandler extends DataHandler {
         	for(int j=0;j<tags.getLength();j++) {
         		Node tag = tags.item(j);
         		if(tag.getNodeType()!=Node.TEXT_NODE) {
-	        		String key = tag.getAttributes().getNamedItem("k").getTextContent();
+	        		String key = tag.getAttributes().getNamedItem("k").getNodeValue();
 	        		if (key.equals("name")) {
 	        			
-	        			String name = tag.getAttributes().getNamedItem("v").getTextContent();
-	                	double lat = Double.valueOf(att.getNamedItem("lat").getTextContent());
-	                	double lon = Double.valueOf(att.getNamedItem("lon").getTextContent());
+	        			String name = tag.getAttributes().getNamedItem("v").getNodeValue();
+	                	double lat = Double.valueOf(att.getNamedItem("lat").getNodeValue());
+	                	double lon = Double.valueOf(att.getNamedItem("lon").getNodeValue());
 	        			
 	                	Log.d(MixView.TAG,"OSM Node: "+name+" lat "+lat+" lon "+lon+"\n");
 
 	                	if(markers.size()<MAX_OBJECTS)
-	                		createMarker(name, lat, lon, 0, "http://www.openstreetmap.org/?node="+att.getNamedItem("id").getTextContent());
+	                		createMarker(name, lat, lon, 0, "http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue());
 	        			//skip to next node
 	        			continue;
 	        		}
