@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
@@ -77,7 +76,6 @@ public class DataView {
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	
 	private Location curFix;
-	private String startUrl = "";
 	public float screenWidth, screenHeight;
 	
 	public DataHandler jLayer = new DataHandler();
@@ -213,9 +211,13 @@ public class DataView {
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 				else if(MixListView.getDataSource()=="OpenStreetMap")
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
+				else if(MixListView.getDataSource()=="OwnURL"){
+					request.url = MixListView.customizedURL;
+	        		Log.d("customized URL: ",""+MixListView.customizedURL);
+				}
+				
 			}
 			Log.i(MixView.TAG,request.url);
-			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 
 			state.nextLStatus = MixState.PROCESSING;

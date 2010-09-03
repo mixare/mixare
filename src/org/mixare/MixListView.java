@@ -20,24 +20,27 @@ package org.mixare;
 
 import java.util.Vector;
 
-import android.R.color;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,20 +53,21 @@ public class MixListView extends ListActivity{
 	private static Vector<String> listViewMenu = null;
 	private static Vector<String> selectedItemURL= null;
 	public static Vector<String> dataSourceMenu= null;
-	private static MixContext context = null;
+	public static Vector<String> dataSourceDescription= null;
+	private static MixContext mixCtx = null;
 	private static DataView dataView = null;
 	private static String selectedDataSource="Wikipedia";
 	/*to check which data source is active*/
 	private int clickedDataSourceItem = 0;
 	private ListItemAdapter adapter=null;
-
-
-
+	public static String customizedURL="http://mixare.org/geotest.php";
+	private static Context ctx;
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		context = MixView.ctx;
-		dataView = MixView.view;		
+		mixCtx = MixView.ctx;
+		dataView = MixView.view;	
+		ctx = this;
 
 		switch(list){
 		case 1:
@@ -72,42 +76,21 @@ public class MixListView extends ListActivity{
 			dataSourceMenu.add("Twitter");
 			dataSourceMenu.add("Buzz");
 			dataSourceMenu.add("OpenStreetMap");
-//			dataSourceMenu.add("own URL");
+			dataSourceMenu.add("own URL");
 			
-			//getListView().setBackgroundResource()(Color.WHITE);
-//			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice,dataSourceMenu));
-//			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//			getListView().setTextFilterEnabled(true);
-//			getListView().setBackgroundColor(Color.WHITE);
-//
-			/*check which Data Source is active and set radio button*/
-			
-//			if(getDataSource().equals("Wikipedia"))
-//				adapter.changeColor(0, Color.DKGRAY);
-//			if(getDataSource().equals("Twitter"))
-//				adapter.changeColor(1, Color.DKGRAY);
-//			if(getDataSource().equals("Buzz"))
-//				adapter.changeColor(2, Color.DKGRAY);
-//			if(getDataSource().equals("OpenStreetMap"))
-//				adapter.changeColor(3, Color.DKGRAY);
-//			
-//			getListView().setItemChecked(clickedDataSourceItem, true);
+			dataSourceDescription = new Vector();
+			dataSourceDescription.add("no change...");
+			dataSourceDescription.add("no change...");
+			dataSourceDescription.add("no change...");
+			dataSourceDescription.add("no change...");
+			dataSourceDescription.add("example: http://mixare.org/geotest.php");
+
 			adapter = new ListItemAdapter(this);
 			adapter.colorSource(getDataSource());
-			setListAdapter(adapter);
 			getListView().setTextFilterEnabled(true);
 			
-			getListView().setOnCreateContextMenuListener(new OnCreateContextMenuListener() {							
-				@Override
-				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-					 int index=0;
-					 menu.setHeaderTitle("Twitter Menu");
-					 MenuItem item1 = menu.add(index, index, index, "All infos");
-					 MenuItem item2 = menu.add(index, index+1, index+1, "Followers");
-					 MenuItem item3 = menu.add(index, index+2, index+2, "Groups");
-					 MenuItem item4 = menu.add(index, index+3, index+3, "Log IN");
-					
-				}});
+			setListAdapter(adapter);
+
 			break;
 		
 		case 2:
@@ -131,6 +114,7 @@ public class MixListView extends ListActivity{
 			
 		}
 	}
+
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -166,6 +150,58 @@ public class MixListView extends ListActivity{
 		}
 	}
 	
+	public static void createContextMenu(ImageView icon){
+		
+		
+		 icon.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {				
+				@Override
+				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+					 int index=0;
+					 switch(ListItemAdapter.itemPosition){
+					 	case 0:
+							 menu.setHeaderTitle("Wiki Menu");
+							 menu.add(index, index, index, "We are working on it...");			
+							 break;
+					 	case 1:
+					 		 menu.setHeaderTitle("Twitter Menu");
+							 menu.add(index, index, index, "We are working on it...");
+							 break;
+					 	case 2:
+					 		 menu.setHeaderTitle("Buzz Menu");
+							 menu.add(index, index, index, "We are working on it...");
+							 break;
+					 	case 3:
+					 		 menu.setHeaderTitle("OpenStreetMap Menu");
+							 menu.add(index, index, index, "We are working on it...");
+							 break;
+					 	case 4:
+							AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+							alert.setTitle("insert your own URL:");
+							
+							final EditText input = new EditText(ctx); 
+							input.setText(customizedURL);
+							alert.setView(input);
+							
+							alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					        	public void onClick(DialogInterface dialog, int id) {       		
+					        		Editable value = input.getText();
+					        		customizedURL = ""+value;
+					            }
+					        });
+							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					        	public void onClick(DialogInterface dialog, int id) {       		
+					        		dialog.dismiss();
+					            }
+					        });
+						    alert.show();
+					 		break;
+					 }
+				}
+	        });
+
+	}
+
+	
 	public void clickOnDataSource(int position){
 		switch(position){
 			/*WIKIPEDIA*/
@@ -173,7 +209,6 @@ public class MixListView extends ListActivity{
 				setDataSource("Wikipedia");
 				adapter.colorSource(getDataSource());
 				setListAdapter(adapter);
-				//Toast.makeText( this , getString(dataView.DATA_SOURCE_CHANGE_WIKIPEDIA), Toast.LENGTH_LONG ).show();
 				break;
 			
 			/*TWITTER*/
@@ -181,7 +216,6 @@ public class MixListView extends ListActivity{
 				setDataSource("Twitter");
 				adapter.colorSource(getDataSource());
 				setListAdapter(adapter);
-				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_TWITTER), Toast.LENGTH_LONG ).show();	
 				break;
 
 			/*BUZZ*/
@@ -189,7 +223,6 @@ public class MixListView extends ListActivity{
 				setDataSource("Buzz");
 				adapter.colorSource(getDataSource());
 				setListAdapter(adapter);
-				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_BUZZ), Toast.LENGTH_LONG).show();
 				break;
 				
 			/*OSM*/
@@ -197,18 +230,17 @@ public class MixListView extends ListActivity{
 				setDataSource("OpenStreetMap");
 				adapter.colorSource(getDataSource());
 				setListAdapter(adapter);
-				//Toast.makeText( this ,getString(dataView.DATA_SOURCE_CHANGE_OSM), Toast.LENGTH_LONG).show();
 				break;
 				
 			/*Own URL*/
-//			case 3:
-//				setDataSource("OwnURL");
-//				Toast.makeText( this ,"sdfwer3rh", Toast.LENGTH_LONG ).show();	
-//				break;
-			
+			case 4:
+				setDataSource("OwnURL");
+				adapter.colorSource(getDataSource());
+				setListAdapter(adapter);
+				break;
 		}
-	//	finish();
 	}
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -240,19 +272,17 @@ public class MixListView extends ListActivity{
 		}
 		return true;
 	}
+
 	@Override
     public boolean onContextItemSelected(MenuItem item) {
 		switch(item.getItemId()){
 			case 1: 
-				finish();
 				break;
 			case 2: 
-				finish();
 				break;
 		}
 		return false;
 	}
-		
 	
 	public void createMixMap(){
 		Intent intent2 = new Intent(MixListView.this, MixMap.class); 
@@ -270,82 +300,97 @@ public class MixListView extends ListActivity{
 	public static void setList(int l){
 		list = l;
 	}
+
 }
 
 class ListItemAdapter extends BaseAdapter {
 	private LayoutInflater myInflater;
-	private Bitmap edit_icon;
-	private ViewHolder holder;
-	private View row;
-	//private int[] colors = new int[] { 0x30FF0000, 0x300000FF,0x3000FF00, 0x000FFFF0 };
-	private int[] colors = new int[] {0,0,0,0};
-	//private View view=null;
+	static ViewHolder holder;
+	private int[] bgcolors = new int[] {0,0,0,0,0};
+	private int[] textcolors = new int[] {Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE};
+	private int[] descriptioncolors = new int[] {Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY};
+
+	public static boolean icon_clicked = false;
+
+	public static int itemPosition =0;
+
 	public ListItemAdapter(Context context) {
 		myInflater = LayoutInflater.from(context);
-		//edit_icon = BitmapFactory.decodeResource(context.getResources(), android.R.drawable.ic_menu_edit);
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		
+	public View getView(final int position, View convertView, ViewGroup parent) {
+		itemPosition =position;
         if(convertView==null){
 	        convertView = myInflater.inflate(R.layout.main, null);
 	
 	        holder = new ViewHolder();
 	        holder.text = (TextView) convertView.findViewById(R.id.list_text);
-	        	        
+	        holder.description = (TextView) convertView.findViewById(R.id.description_text);
+
 	        holder.icon = (ImageView) convertView.findViewById(R.id.icon);
-	        convertView.setTag(holder); 
+	        convertView.setTag(holder);
         }
         else{
         	holder = (ViewHolder) convertView.getTag();
         }
        
         holder.icon.setPadding(20, 8, 20, 8);
-        holder.icon.setClickable(true);
-//        holder.icon.setOnClickListener(new View.OnClickListener() {
-//        	public void onClick(View v) {
-//        		holder.icon;
-//        	}
-//        });
-        holder.text.setPadding(20, 18, 0, 0);
+        holder.icon.setClickable(true);        
+        
+        holder.icon.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				icon_clicked = true;
+				itemPosition = position;
+		
+				return false;
+			}
+		});
+        
+		MixListView.createContextMenu(holder.icon);
+
+        holder.text.setPadding(20, 8, 0, 0);
+        holder.description.setPadding(20, 40, 0, 0);
+
         holder.text.setText(MixListView.dataSourceMenu.get(position));
-        int colorPos = position % colors.length;
-     	convertView.setBackgroundColor(colors[colorPos]);
-    	row = convertView;
-    	
+        holder.description.setText(MixListView.dataSourceDescription.get(position));
+        
+        int colorPos = position % bgcolors.length;
+     	convertView.setBackgroundColor(bgcolors[colorPos]);
+     	holder.text.setTextColor(textcolors[colorPos]);
+     	holder.description.setTextColor(descriptioncolors[colorPos]);
+    	    	
         return convertView;
     }
-	public void changeColor(int index, int color){
-		if(index<colors.length)
-				colors[index]=color;
+
+	public void changeColor(int index, int bgcolor, int textcolor){
+		if(index<bgcolors.length){
+				bgcolors[index]=bgcolor;
+				textcolors[index]= textcolor;
+		}
 		else {
-				colors[index]=0;
 				Log.d("Color Error", "too large index");
 		}
 	}
+	
 	public void colorSource(String source){
-		for (int i = 0; i < colors.length; i++) {
-			colors[i]=0;
+		for (int i = 0; i < bgcolors.length; i++) {
+			bgcolors[i]=0;
+			textcolors[i]=Color.WHITE;
 		}
 		if(source.equals("Wikipedia"))
-			changeColor(0, Color.DKGRAY);
+			changeColor(0, Color.WHITE, Color.DKGRAY);
 		if(source.equals("Twitter"))
-			changeColor(1, Color.DKGRAY);
+			changeColor(1, Color.WHITE, Color.DKGRAY);
 		if(source.equals("Buzz"))
-			changeColor(2, Color.DKGRAY);
+			changeColor(2, Color.WHITE, Color.DKGRAY);
 		if(source.equals("OpenStreetMap"))
-			changeColor(3, Color.DKGRAY);
+			changeColor(3, Color.WHITE, Color.DKGRAY);
+		if(source.equals("OwnURL"))
+			changeColor(4, Color.WHITE, Color.DKGRAY);
 	}
 	
-	public ImageView getIcon(){
-		return holder.icon;
-	}
-
-//    public View getView(){
-//    	return view;
-//    }
-
 	@Override
 	public int getCount() {
 		return MixListView.dataSourceMenu.size();
@@ -353,17 +398,17 @@ class ListItemAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int position) {
-		return position;
+		return this;
 	}
 
 	@Override
-	public long getItemId(int id) {
-		return id;
+	public long getItemId(int position) {
+		return position;
 	}
 	
     private class ViewHolder {
 		TextView text;
+		TextView description;
         ImageView icon;
     }
-
 }

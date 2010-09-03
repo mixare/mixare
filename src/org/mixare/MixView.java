@@ -186,16 +186,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
             public void onClick(DialogInterface dialog, int id) {
             	Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
 				startActivityForResult(intent1, 42);
-
-            	//TODO back to camera view after seeing settings
             }
         });
         /*Close application*/
         builder.setNegativeButton(view.CONNECITON_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
               public void onClick(DialogInterface dialog, int id) {
-            	 /*leave the app but it will still exist in memory*/
-            	 //finish();
-            	 /*the app will be definitely killed*/
                  System.exit(0);
               }
         });
@@ -212,7 +207,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			this.mWakeLock.acquire();
 			locationMgr=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
 			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
 
@@ -264,7 +258,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			
 		    /*check if the application is launched for the first time*/
 		    if(settings.getBoolean("firstAccess",false)==false){
-		    	//if FALSE it is the first time and the license agreements are shown before starting
 		    	AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
 				builder1.setMessage(getString(view.LICENSE_TEXT));
 				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
@@ -391,17 +384,19 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				String bestP = locationMgr.getBestProvider(c, true);
 				isGpsEnabled = locationMgr.isProviderEnabled(bestP);
 
-
 				/*defaulting to our place*/
 				Location hardFix = new Location("reverseGeocoded");
-				hardFix.setLatitude(46.47122383117541);
-				hardFix.setLongitude(11.260278224944742);
+
+				hardFix.setLatitude(0);
+				hardFix.setLongitude(0);
+//				hardFix.setLatitude(46.480302);
+//				hardFix.setLongitude(11.296005);
+				
+				/*New York*/
+//				hardFix.setLatitude(40.731510);
+//				hardFix.setLongitude(-73.991547);
 				hardFix.setAltitude(300);
 				
-/*				hardFix.setLatitude(48.19616);
-				hardFix.setLongitude(16.36886);
-				hardFix.setAltitude(200); */
-
 				
 				try {
 					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
@@ -419,9 +414,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
 						.sin(angleY), 0f, (float) Math.cos(angleY));
 				ctx.declination = gmf.getDeclination();
-				
-				
-				repaint();
 				
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
@@ -648,7 +640,7 @@ public float calcZoomLevel(){
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-			killOnError();
+//			killOnError();
 
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 				grav[0] = evt.values[0];
@@ -771,9 +763,7 @@ public float calcZoomLevel(){
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-
 	}
-
 }
 
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
