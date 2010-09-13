@@ -283,7 +283,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			} 
 
 			if(ctx.isActualLocation()==false){
-			//	locationUpdate?
 				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
 
