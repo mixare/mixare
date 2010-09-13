@@ -181,7 +181,7 @@ public class MixContext {
 			
 			return is;
 		} catch (Exception ex) {
-			MixListView.setDataSource("Wikipedia");
+			//MixListView.setDataSource("Wikipedia");
 			try {
 				is.close();
 			} catch (Exception ignore) {			

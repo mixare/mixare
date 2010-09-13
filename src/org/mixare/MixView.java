@@ -20,16 +20,19 @@ package org.mixare;
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import org.mixare.R.drawable;
 import org.mixare.gui.PaintScreen;
+import org.mixare.gui.TextObj;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -61,12 +64,15 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
+import android.widget.TableLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MixView extends Activity implements SensorEventListener,LocationListener {
+public class MixView extends Activity implements SensorEventListener,LocationListener, OnTouchListener{
 
 	CameraSurface camScreen;
 	AugmentedView augScreen;
@@ -122,6 +128,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public static double GPS_ALTITUDE=0;
 	public static float GPS_SPEED=0;
 	public static String GPS_ALL="";
+	public static TextView searchNotificationTxt;
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 	public Vector<String> listDataVector;
@@ -203,6 +210,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		super.onCreate(savedInstanceState);
 		
 		try {
+			handleIntent(getIntent());
 			
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
@@ -216,7 +224,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		    SharedPreferences.Editor editor = settings.edit();
-
+		    
 		    myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
@@ -224,12 +232,13 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			isZoombarVisible=false;
-
+			
 			FrameLayout FL = new FrameLayout(this);
 
 			FL.setMinimumWidth(3000);
 			FL.addView(myZoomBar);
 			FL.setPadding(10, 0, 10, 10);
+			
 
 			camScreen = new CameraSurface(this);
 			augScreen = new AugmentedView(this);
@@ -241,6 +250,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			addContentView(FL, new FrameLayout.LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
 					Gravity.BOTTOM));
+			
 			
 			if (!isInited) {
 				ctx = new MixContext(this);
@@ -275,13 +285,53 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			if(ctx.isActualLocation()==false){
 			//	locationUpdate?
 				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-			}		
+			}	
 
 		} catch (Exception ex) {
 			doError(ex);
 		}
 	}
 	
+	private void handleIntent(Intent intent) {
+	    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+	      String query = intent.getStringExtra(SearchManager.QUERY);
+	      doMixSearch(query);
+	    }
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+	    setIntent(intent);
+	    handleIntent(intent);
+	}
+	
+	private void doMixSearch(String query) {
+		if(view.frozen==false){
+			MixListView.originalMarkerList=view.jLayer.markers;
+			MixMap.originalMarkerList=view.jLayer.markers;
+		}
+		
+		ArrayList<Marker> searchResults =new ArrayList<Marker>();
+		Log.d("SEARCH-------------------0", ""+query);
+		if(view.jLayer.markers.size()>0){
+			for(int i = 0; i<view.jLayer.markers.size();i++){
+				Marker ma = new Marker();
+				ma = view.jLayer.markers.get(i);
+				if(ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
+					searchResults.add(ma);
+					/*the website for the corresponding title*/
+				}
+			}
+		}
+		if(searchResults.size()>0){
+			view.frozen = true;
+			view.jLayer.markers = searchResults;
+			
+		}
+		else
+			Toast.makeText( this, getString(view.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+	}
+
 
 	@Override
 	protected void onPause() {
@@ -387,10 +437,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				/*defaulting to our place*/
 				Location hardFix = new Location("reverseGeocoded");
 
-				hardFix.setLatitude(0);
-				hardFix.setLongitude(0);
-//				hardFix.setLatitude(46.480302);
-//				hardFix.setLongitude(11.296005);
+//				hardFix.setLatitude(0);
+//				hardFix.setLongitude(0);
+				
+				hardFix.setLatitude(46.480302);
+				hardFix.setLongitude(11.296005);
 				
 				/*New York*/
 //				hardFix.setLatitude(40.731510);
@@ -421,6 +472,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			downloadThread = new Thread(ctx.downloadManager);
 			downloadThread.start();
+
 			
 		} catch (Exception ex) {
 			doError(ex);
@@ -446,6 +498,25 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			}
 		}
+		
+		Log.d("-------------------------------------------","resume");
+		if(view.frozen&&searchNotificationTxt==null){
+		
+			searchNotificationTxt = new TextView(this);
+			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+			searchNotificationTxt.setPadding(10, 2, 0, 0);			
+			searchNotificationTxt.setText(getString(view.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(view.SEARCH_ACTIVE_2));;
+			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
+			searchNotificationTxt.setTextColor(Color.WHITE);
+		
+			searchNotificationTxt.setOnTouchListener(this);
+			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		}
+		else if(view.frozen==false &&searchNotificationTxt!=null){
+			searchNotificationTxt.setVisibility(View.GONE);
+			MixView.searchNotificationTxt = null;
+		}
+
 	}
 	
 	@Override
@@ -488,7 +559,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				break;
 			/*List view*/
 			case 2:
-				MixListView.setList(2);
+				
+					MixListView.setList(2);
 				/*if the list of titles to show in alternative list view is not empty*/
 				if(view.jLayer.markers.size()>0){
 					Intent intent1 = new Intent(MixView.this, MixListView.class); 
@@ -512,7 +584,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				break;
 			/*Search*/
 			case 5:
-				Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();				
+				onSearchRequested();
 				break;
 			/*GPS Information*/
 			case 6:
@@ -764,6 +836,15 @@ public float calcZoomLevel(){
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+			view.frozen=false;
+			searchNotificationTxt.setVisibility(View.GONE);
+			MixView.searchNotificationTxt = null;
+
+		return false;
+	}
 }
 
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
@@ -886,8 +967,6 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 			ex.printStackTrace();
 		}
 	}
-
-
 }
 
 //class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
@@ -897,8 +976,12 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 //	}
 //}
 
-class AugmentedView extends View {
+class AugmentedView extends View{
 	MixView app;
+	int xSearch=200;
+	int ySearch = 10;
+	int searchObjWidth = 0;
+	int searchObjHeight=0;
 
 	public AugmentedView(Context context) {
 		super(context);
@@ -932,9 +1015,9 @@ class AugmentedView extends View {
 
 			MixView.dWindow.setWidth(canvas.getWidth());
 			MixView.dWindow.setHeight(canvas.getHeight());
+		
 			MixView.dWindow.setCanvas(canvas);
 
-			
 			if (!MixView.view.isInited()) {
 				MixView.view.init(MixView.dWindow.getWidth(),
 						MixView.dWindow.getHeight());

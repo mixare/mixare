@@ -62,7 +62,7 @@ public class Marker {
 			float addY) {
 		tmpa.set(originalPoint); //1
 		tmpc.set(upV); 
-		tmpa.add(loc); //3
+		tmpa.add(loc); //3 
 		tmpc.add(loc); //3
 		tmpa.sub(viewCam.lco); //4
 		tmpc.sub(viewCam.lco); //4
