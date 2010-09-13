@@ -1,8 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/row_layout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-</LinearLayout>
+  
+  <TextView android:id="@+id/list_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="textview"
+        android:textColor="#ffffff"
+        android:layout_gravity="top" 
+        android:textSize="22sp" 
+        android:layout_alignParentLeft="true"/>
+
+ <TextView android:id="@+id/description_text"
+        android:layout_width="260dip"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:layout_gravity="bottom" 
+        android:textSize="11sp" 
+        android:text="no changes"
+        android:layout_alignParentLeft="true"/>
+        
+    <ImageView android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+		android:layout_gravity="right"  
+		android:src="@drawable/icon_edit"
+		android:layout_alignParentRight="true"
+        />
+        
+</RelativeLayout>
 

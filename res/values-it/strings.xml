@@ -2,6 +2,8 @@
 
 <resources>
     <string name="app_name">Mixare</string>
+    <string name="search_hint">Cerca Luogo</string>
+
     <string name="N">N</string>
     <string name="NE">NE</string>
     <string name="E">E</string>
@@ -68,5 +70,11 @@
 	<string name="data_source_change_twitter">Twitter è adesso la fonte dei dati</string>
 	<string name="data_source_change_buzz">Google Buzz è adesso la fonte dei dati</string>
 	<string name="data_source_change_osm">OpenStreetMap è adesso la fonte dei dati</string>
+	
+	<string name="search_failed_notification">Nessun risultato di ricerca</string>
+	<string name="source_openstreetmap">Stazioni nei dintorni</string>
+	
+	<string name="search_active_1">Ricera nella fonte dei dati di</string>
+	<string name="search_active_2">. Clica qui per terminare la ricerca</string>
 	
 </resources>

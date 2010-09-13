@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mixare</string>
+    <string name="search_hint">Search Location</string>
+    
     <string name="N">N</string>
     <string name="NE">NE</string>
     <string name="E">E</string>
@@ -69,5 +71,10 @@
 	<string name="data_source_change_twitter">Changed to Twitter as data source</string>
 	<string name="data_source_change_buzz">Changed to Google Buzz as data source</string>
 	<string name="data_source_change_osm">Changed to OpenStreetMap as data source</string>
-
+	
+	<string name="search_failed_notification">No search results</string>
+	<string name="source_openstreetmap">Stations around</string>
+	
+	<string name="search_active_1">Search on data source</string>
+	<string name="search_active_2">. Touch to terminate search</string>
 </resources>

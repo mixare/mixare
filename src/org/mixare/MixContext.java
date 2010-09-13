@@ -41,7 +41,6 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.view.Gravity;
@@ -55,7 +54,7 @@ import android.widget.FrameLayout;
 public class MixContext {
 	public MixView mixView;
 	Context ctx;
-
+	boolean isURLvalid = true;
 	Random rand;
 
 	DownloadManager downloadManager;
@@ -169,7 +168,6 @@ public class MixContext {
 	throws Exception {
 		InputStream is = null;
 		HttpURLConnection conn = null;
-
 		if (urlStr.startsWith("content://"))
 			return getContentInputStream(urlStr, null);
 
@@ -183,6 +181,7 @@ public class MixContext {
 			
 			return is;
 		} catch (Exception ex) {
+			//MixListView.setDataSource("Wikipedia");
 			try {
 				is.close();
 			} catch (Exception ignore) {			

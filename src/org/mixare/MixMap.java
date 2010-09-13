@@ -4,14 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
@@ -22,7 +29,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-public class MixMap extends MapActivity{
+public class MixMap extends MapActivity implements OnTouchListener{
 	
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
@@ -34,6 +41,9 @@ public class MixMap extends MapActivity{
 	private MapView mapView;
 	static MixMap map;
 	private static Context thisContext;
+	private static TextView searchNotificationTxt;
+	public static ArrayList<Marker> originalMarkerList=null;
+	
 	
 	@Override
 	protected boolean isRouteDisplayed() {
@@ -48,9 +58,9 @@ public class MixMap extends MapActivity{
 	    ctx = MixView.ctx;
 	    setMarkerList(dataView.jLayer.markers);
 	    map = this;
-	    
+
 	    setMapContext(this);
-	    mapView= new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA");
+	    mapView= new MapView(this, "0327vO6h2PcKeMFBCtVK4XcPTq-b2tsXrsdbSqw");
 	    mapView.setBuiltInZoomControls(true);
 	    mapView.setClickable(true);
 	    mapView.setSatellite(true);
@@ -60,13 +70,24 @@ public class MixMap extends MapActivity{
 	       
 		setStartPoint();
 		createOverlay();
+		
+		if(dataView.frozen){
+			searchNotificationTxt = new TextView(this);
+			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+			searchNotificationTxt.setPadding(10, 2, 0, 0);			
+			searchNotificationTxt.setText(getString(dataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(dataView.SEARCH_ACTIVE_2));
+			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
+			searchNotificationTxt.setTextColor(Color.WHITE);
+		
+			searchNotificationTxt.setOnTouchListener(this);
+			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		}
+		
+		
 	}
 	
+	
 	public void setStartPoint(){
-//		LocationManager locationMgr = (LocationManager)getSystemService(LOCATION_SERVICE);
-//		Location location = locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-
 		Location location = ctx.getCurrentLocation();
 		MapController controller;
 
@@ -80,7 +101,7 @@ public class MixMap extends MapActivity{
 	}
 	
 	public void createOverlay(){
-		mapOverlays= mapView.getOverlays();
+		mapOverlays=mapView.getOverlays();
 		OverlayItem item; 
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
 		MixOverlay mixOverlay = new MixOverlay(drawable);
@@ -91,6 +112,7 @@ public class MixMap extends MapActivity{
 			mixOverlay.addOverlay(item);
 			mapOverlays.add(mixOverlay);
 		}
+	
 		MixOverlay myOverlay;
 	    drawable = this.getResources().getDrawable(R.drawable.loc_icon);
 	    myOverlay = new MixOverlay(drawable);
@@ -148,6 +170,7 @@ public class MixMap extends MapActivity{
 		}
 		return true;
 	}
+	
 	public void createListView(){
 		MixListView.setList(2);
 		if(dataView.jLayer.markers.size()>0){
@@ -159,8 +182,6 @@ public class MixMap extends MapActivity{
 			Toast.makeText( this, dataView.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
 		}
 	}
-
-	
 
 	public static ArrayList<Marker> getMarkerList(){
 		return markerList;
@@ -196,7 +217,61 @@ public class MixMap extends MapActivity{
 	public static void startPointMsg(){
 		Toast.makeText(getMapContext(), getDataView().MAP_CURRENT_LOCATION_CLICK, Toast.LENGTH_LONG).show();
 	}
+	
+	private void handleIntent(Intent intent) {
+	    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+	      String query = intent.getStringExtra(SearchManager.QUERY);
+	      doMixSearch(query);
+	    }
+	}
 
+	@Override
+	public void onNewIntent(Intent intent) {
+	    setIntent(intent);
+	    handleIntent(intent);
+	}
+	
+	private void doMixSearch(String query) {
+		if(dataView.frozen==false){
+			originalMarkerList=dataView.jLayer.markers;
+			MixListView.originalMarkerList= dataView.jLayer.markers;
+		}
+		markerList = new ArrayList<Marker>();
+	
+		for(int i = 0; i<dataView.jLayer.markers.size();i++){
+			Marker ma = new Marker();
+			ma = dataView.jLayer.markers.get(i);
+
+			if(ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
+				markerList.add(ma);
+			}
+		}
+		if(markerList.size()==0){
+			Toast.makeText( this, getString(dataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+		}
+		else{
+			dataView.jLayer.markers = markerList;
+			dataView.frozen = true;
+			
+			finish();
+			Intent intent1 = new Intent(this, MixMap.class); 
+			startActivityForResult(intent1, 42);
+		}
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+			dataView.frozen=false;
+			dataView.jLayer.markers= originalMarkerList;
+			
+			searchNotificationTxt.setVisibility(View.INVISIBLE);
+			searchNotificationTxt = null;
+			finish();
+			Intent intent1 = new Intent(this, MixMap.class); 
+			startActivityForResult(intent1, 42);
+		
+		return false;
+	}
 
 }
 

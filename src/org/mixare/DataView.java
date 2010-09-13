@@ -29,11 +29,11 @@ import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
+import org.mixare.gui.TextObj;
 import org.mixare.render.Camera;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
@@ -41,6 +41,8 @@ import org.mixare.render.MixVector;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.TextView;
 
 
 /**
@@ -77,7 +79,6 @@ public class DataView {
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	
 	private Location curFix;
-	private String startUrl = "";
 	public float screenWidth, screenHeight;
 	
 	public DataHandler jLayer = new DataHandler();
@@ -135,9 +136,10 @@ public class DataView {
 	public int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
 	public int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
 	public int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
-
-
-//	public int ORIENTATON_NORD_ID = R.string.N;
+	public int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
+	public int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;
+	public int SEARCH_ACTIVE_1=R.string.search_active_1;
+	public int SEARCH_ACTIVE_2=R.string.search_active_2;
 	
 	ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
@@ -148,7 +150,7 @@ public class DataView {
 	ScreenLine rrl = new ScreenLine();
 	float rx = 10, ry = 20;
 	public float addX = 0, addY = 0;
-
+	
 	public DataView(MixContext ctx) {
 		this.ctx = ctx;
 	}
@@ -192,7 +194,7 @@ public class DataView {
 		screenHeight = height;
 
 		// Load Layer
-		if (state.nextLStatus == MixState.NOT_STARTED ) {
+		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 
 			DownloadRequest request = new DownloadRequest();
 
@@ -203,7 +205,7 @@ public class DataView {
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
 
 			else {
-				double lat = curFix.getLatitude(), lon = curFix.getLongitude();
+				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				if(MixListView.getDataSource()=="Wikipedia")
 					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 				else if(MixListView.getDataSource()=="Twitter")
@@ -213,9 +215,12 @@ public class DataView {
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 				else if(MixListView.getDataSource()=="OpenStreetMap")
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
+				else if(MixListView.getDataSource()=="OwnURL")
+					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
+				
+				
 			}
 			Log.i(MixView.TAG,request.url);
-			startUrl = ctx.getStartUrl();
 			state.downloadId = ctx.getDownloader().submitJob(request);
 
 			state.nextLStatus = MixState.PROCESSING;
@@ -246,11 +251,13 @@ public class DataView {
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
 			if (dist[0] / 1000f < radius) {
-				if (!frozen) ma.update(curFix, System.currentTimeMillis());
+				if (!frozen) 
+					ma.update(curFix, System.currentTimeMillis());
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
 			}
 		}
+
 		// Draw Radar
 		String	dirTxt = ""; 
 		int bearing = (int) state.getCurBearing(); 
@@ -313,14 +320,13 @@ public class DataView {
 			frozen = !frozen;
 		}
 	}
-
+	
 	boolean handleClickEvent(ClickEvent evt) {
 		boolean evtHandled = false;
 
 		// Handle event
 		if (state.nextLStatus == MixState.DONE) {
-			for (int i = jLayer.markers.size() - 1; i >= 0
-			&& !evtHandled; i--) {
+			for (int i = jLayer.markers.size() - 1; i >= 0 && !evtHandled; i--) {
 				Marker pm = jLayer.markers.get(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, ctx, state);
