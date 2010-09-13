@@ -161,7 +161,8 @@ public class Marker {
 				dw.setColor(Color.rgb(4, 228, 20));
 			if(MixListView.getDataSource()=="Twitter")
 				dw.setColor(Color.rgb(50, 204, 255));
-			
+			if(MixListView.getDataSource()=="OpenStreetMap")
+				dw.setColor(Color.rgb(255, 168, 0));
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
 			dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);

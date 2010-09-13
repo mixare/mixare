@@ -73,7 +73,7 @@
 	<string name="data_source_change_osm">Changed to OpenStreetMap as data source</string>
 	
 	<string name="search_failed_notification">No search results</string>
-	<string name="source_openstreetmap">Stations in the vincity</string>
+	<string name="source_openstreetmap">Stations around</string>
 	
 	<string name="search_active_1">Search on data source</string>
 	<string name="search_active_2">. Touch to terminate search</string>

@@ -205,7 +205,7 @@ public class DataView {
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
 
 			else {
-				double lat = curFix.getLatitude(), lon = curFix.getLongitude();
+				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				if(MixListView.getDataSource()=="Wikipedia")
 					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
 				else if(MixListView.getDataSource()=="Twitter")
@@ -215,10 +215,9 @@ public class DataView {
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
 				else if(MixListView.getDataSource()=="OpenStreetMap")
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
-				else if(MixListView.getDataSource()=="OwnURL"){
-					request.url = MixListView.customizedURL;
-	        		Log.d("customized URL: ",""+MixListView.customizedURL);
-				}
+				else if(MixListView.getDataSource()=="OwnURL")
+					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
+				
 				
 			}
 			Log.i(MixView.TAG,request.url);

@@ -297,40 +297,30 @@ public class MixListView extends ListActivity{
 			case 0:
 				setDataSource("Wikipedia");
 				finish();
-				//adapter.colorSource(getDataSource());
-				//setListAdapter(adapter);
 				break;
 			
 			/*TWITTER*/
 			case 1:		
 				setDataSource("Twitter");
 				finish();
-//				adapter.colorSource(getDataSource());
-//				setListAdapter(adapter);
 				break;
 
 			/*BUZZ*/
 			case 2:
 				setDataSource("Buzz");
 				finish();
-//				adapter.colorSource(getDataSource());
-//				setListAdapter(adapter);
 				break;
 				
 			/*OSM*/
 			case 3:
 				setDataSource("OpenStreetMap");
 				finish();
-//				adapter.colorSource(getDataSource());
-//				setListAdapter(adapter);
 				break;
 				
 			/*Own URL*/
 			case 4:
 				setDataSource("OwnURL");
 				finish();
-//				adapter.colorSource(getDataSource());
-//				setListAdapter(adapter);
 				break;
 		}
 	}
