@@ -66,15 +66,15 @@
 	
 	<string name="map_current_location_click">La tua posizione</string>
 	
-	<string name="data_source_change_wikipedia">Wikipedia è adesso la fonte dei dati</string>
-	<string name="data_source_change_twitter">Twitter è adesso la fonte dei dati</string>
-	<string name="data_source_change_buzz">Google Buzz è adesso la fonte dei dati</string>
-	<string name="data_source_change_osm">OpenStreetMap è adesso la fonte dei dati</string>
+	<string name="data_source_change_wikipedia">Vengono mostrati dati da Wikipedia</string>
+	<string name="data_source_change_twitter">Vengono mostrati dati da Twitter</string>
+	<string name="data_source_change_buzz">Vengono mostrati dati da Google Buzz</string>
+	<string name="data_source_change_osm">Vengono mostrati dati da OpenStreetMap</string>
 	
 	<string name="search_failed_notification">Nessun risultato di ricerca</string>
 	<string name="source_openstreetmap">Stazioni nei dintorni</string>
 	
-	<string name="search_active_1">Ricera nella fonte dei dati di</string>
-	<string name="search_active_2">. Clica qui per terminare la ricerca</string>
+	<string name="search_active_1">Ricerca nella fonte dei dati di</string>
+	<string name="search_active_2">. Clicca qui per terminare la ricerca</string>
 	
 </resources>
