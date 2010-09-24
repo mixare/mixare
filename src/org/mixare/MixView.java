@@ -27,7 +27,6 @@ import java.util.Vector;
 
 import org.mixare.R.drawable;
 import org.mixare.gui.PaintScreen;
-import org.mixare.gui.TextObj;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
@@ -232,6 +231,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			isZoombarVisible=false;
+			
+			MixListView.setDataSource("Bus & Stations");
 			
 			FrameLayout FL = new FrameLayout(this);
 
@@ -491,7 +492,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				if (ctx != null) {
 					if (ctx.downloadManager != null)
 						ctx.downloadManager.stop();
-
 				}
 			} catch (Exception ignore) {
 

@@ -80,4 +80,10 @@
 	<string name="search_active_1">Suche in der Datenquelle</string>
 	<string name="search_active_2">. Hier klicken um die Suche zu Beenden</string>
 	
+		<string name="bus">Busse</string>
+	<string name="stations">Haltestellen</string>
+	<string name="bus_stations">Busse e Haltestellen</string>
+			<string name="nacht">Lange Nacht der Forschung</string>
+	
+	
 </resources>

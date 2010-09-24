@@ -26,7 +26,9 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.XMLHandler;
@@ -141,6 +143,14 @@ public class DataView {
 	public int SEARCH_ACTIVE_1=R.string.search_active_1;
 	public int SEARCH_ACTIVE_2=R.string.search_active_2;
 	
+	public int BUS=R.string.bus;
+	public int STATION=R.string.stations;
+	public int BUS_STATION=R.string.bus_stations;
+	public int NACHT=R.string.nacht;
+	
+	private long startTime, endTime;
+	private Date dt = new Date();
+	
 	ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
 	RadarPoints radarPoints = new RadarPoints();
@@ -182,6 +192,12 @@ public class DataView {
 		}
 		frozen = false;
 		isInit = true;
+		
+		
+		
+		startTime = dt.getTime();
+		Log.d("startTime..............", "starttime: "+startTime);
+
 	}
 
 	public void draw(PaintScreen dw) {
@@ -193,8 +209,15 @@ public class DataView {
 		screenWidth = width;
 		screenHeight = height;
 
+		
+		
+		
+		
+		
+		
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
+			Log.d("update..............", "00");
 
 			DownloadRequest request = new DownloadRequest();
 
@@ -217,7 +240,12 @@ public class DataView {
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
 				else if(MixListView.getDataSource()=="OwnURL")
 					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
-				
+				else if(MixListView.getDataSource()=="Bus & Stations")
+					request.url = "http://mixare.org/luna2010/luna.php";
+				else if(MixListView.getDataSource()=="Bus")
+					request.url = "http://www.mixare.org/luna2010/busses.php";
+				else if(MixListView.getDataSource()=="Stations")
+					request.url = "http://mixare.org/luna2010/stations.php";
 				
 			}
 			Log.i(MixView.TAG,request.url);
@@ -226,6 +254,7 @@ public class DataView {
 			state.nextLStatus = MixState.PROCESSING;
 
 		} else if (state.nextLStatus == MixState.PROCESSING) {
+			Log.d("update..............", "1");
 			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
 				dRes = ctx.getDownloader().getReqResult(state.downloadId);
 
@@ -242,7 +271,9 @@ public class DataView {
 					Collections.sort(jLayer.markers, new MarkersOrder());
 				}	
 			}
+
 		} 
+		
 
 		// Update markers
 		for (int i = 0; i < jLayer.markers.size(); i++) {
@@ -299,7 +330,17 @@ public class DataView {
 		if (evt != null && evt.type == UIEvent.CLICK) {
 			handleClickEvent((ClickEvent) evt);
 		}
-
+		
+		
+		dt = new Date();
+		endTime = dt.getTime();
+		Log.d("endtime..............", "endtime: "+endTime);
+		long timeDifference = endTime-startTime;
+		if(timeDifference > 10000){
+			state.nextLStatus = MixState.NOT_STARTED;
+			Log.d("update..............", "update: "+ timeDifference);
+			startTime = endTime;
+		}
 	}
 	
 	private void handleKeyEvent(KeyEvent evt) {

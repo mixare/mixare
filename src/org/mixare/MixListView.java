@@ -79,6 +79,9 @@ public class MixListView extends ListActivity{
 		switch(list){
 		case 1:
 			dataSourceMenu = new Vector();
+			dataSourceMenu.add(getString(dataView.BUS_STATION));
+			dataSourceMenu.add(getString(dataView.STATION));
+			dataSourceMenu.add(getString(dataView.BUS));
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
 			dataSourceMenu.add("Buzz");
@@ -86,6 +89,9 @@ public class MixListView extends ListActivity{
 			dataSourceMenu.add("Own URL");
 			
 			dataSourceDescription = new Vector();
+			dataSourceDescription.add(getString(dataView.NACHT));
+			dataSourceDescription.add(getString(dataView.NACHT));
+			dataSourceDescription.add(getString(dataView.NACHT));
 			dataSourceDescription.add("");
 			dataSourceDescription.add("");
 			dataSourceDescription.add("");
@@ -294,31 +300,49 @@ public class MixListView extends ListActivity{
 			dataView.frozen=false;
 		switch(position){
 			/*WIKIPEDIA*/
-			case 0:
+		
+		case 0:
+			setDataSource("Bus & Stations");
+			finish();
+			break;
+		
+		/*TWITTER*/
+		case 1:		
+			setDataSource("Stations");
+			finish();
+			break;
+
+		/*BUZZ*/
+		case 2:
+			setDataSource("Bus");
+			finish();
+			break;
+			
+		case 3:
 				setDataSource("Wikipedia");
 				finish();
 				break;
 			
 			/*TWITTER*/
-			case 1:		
+			case 4:		
 				setDataSource("Twitter");
 				finish();
 				break;
 
 			/*BUZZ*/
-			case 2:
+			case 5:
 				setDataSource("Buzz");
 				finish();
 				break;
 				
 			/*OSM*/
-			case 3:
+			case 6:
 				setDataSource("OpenStreetMap");
 				finish();
 				break;
 				
 			/*Own URL*/
-			case 4:
+			case 7:
 				setDataSource("OwnURL");
 				finish();
 				break;
@@ -397,8 +421,8 @@ class ListItemAdapter extends BaseAdapter {
 	private LayoutInflater myInflater;
 	static ViewHolder holder;
 	private int[] bgcolors = new int[] {0,0,0,0,0};
-	private int[] textcolors = new int[] {Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE};
-	private int[] descriptioncolors = new int[] {Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY};
+	private int[] textcolors = new int[] {Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE};
+	private int[] descriptioncolors = new int[] {Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY};
 
 	public static boolean icon_clicked = false;
 
@@ -443,7 +467,7 @@ class ListItemAdapter extends BaseAdapter {
              MixListView.createContextMenu(holder.icon);
 //        }
         
-             if(position!=4){
+             if(position!=7){
             	 holder.icon.setVisibility(View.INVISIBLE);
              }
 		
@@ -477,16 +501,22 @@ class ListItemAdapter extends BaseAdapter {
 			bgcolors[i]=0;
 			textcolors[i]=Color.WHITE;
 		}
-		if(source.equals("Wikipedia"))
+		if(source.equals("Bus & Stations"))
 			changeColor(0, Color.WHITE, Color.DKGRAY);
-		if(source.equals("Twitter"))
+		if(source.equals("Stations"))
 			changeColor(1, Color.WHITE, Color.DKGRAY);
-		if(source.equals("Buzz"))
+		if(source.equals("Bus"))
 			changeColor(2, Color.WHITE, Color.DKGRAY);
-		if(source.equals("OpenStreetMap"))
+		if(source.equals("Wikipedia"))
 			changeColor(3, Color.WHITE, Color.DKGRAY);
-		if(source.equals("OwnURL"))
+		if(source.equals("Twitter"))
 			changeColor(4, Color.WHITE, Color.DKGRAY);
+		if(source.equals("Buzz"))
+			changeColor(5, Color.WHITE, Color.DKGRAY);
+		if(source.equals("OpenStreetMap"))
+			changeColor(6, Color.WHITE, Color.DKGRAY);
+		if(source.equals("OwnURL"))
+			changeColor(7, Color.WHITE, Color.DKGRAY);
 	}
 	
 	@Override

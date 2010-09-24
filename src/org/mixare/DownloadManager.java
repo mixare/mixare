@@ -30,10 +30,6 @@ import org.json.JSONObject;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import android.util.Log;

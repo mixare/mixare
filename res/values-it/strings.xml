@@ -77,4 +77,8 @@
 	<string name="search_active_1">Ricerca nella fonte dei dati di</string>
 	<string name="search_active_2">. Clicca qui per terminare la ricerca</string>
 	
+		<string name="bus">Autobus</string>
+	<string name="stations">Stazioni</string>
+	<string name="bus_stations">Autobus e Stazioni</string>
+	<string name="nacht">Lunga notte della ricerca</string>
 </resources>
