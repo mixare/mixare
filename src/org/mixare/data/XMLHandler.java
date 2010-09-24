@@ -64,8 +64,7 @@ public class XMLHandler extends DataHandler {
         
         // If the root tag is called "osm" we got an 
         // openstreetmap .osm xml document
-        if(root.getTagName().equals("osm"))
+        if ("osm".equals(root.getTagName()))
         	processOSM(root);
-     
 	}
 }

@@ -52,6 +52,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 public class MixContext {
+	
 	public MixView mixView;
 	Context ctx;
 	boolean isURLvalid = true;
@@ -59,7 +60,7 @@ public class MixContext {
 
 	DownloadManager downloadManager;
 
-	Location curLoc=null;
+	Location curLoc;
 	Matrix rotationM = new Matrix();
 
 	float declination = 0f;
@@ -89,13 +90,8 @@ public class MixContext {
 			long actualTime= dt.getTime();
 			long lastFixTime = lastFix.getTime();
 			long timeDifference = actualTime-lastFixTime;
-		
-			if(timeDifference> 1200000){//20 min --- 300000 milliseconds = 5 min
-				actualLocation=false;
-			}
-			else
-				actualLocation=true;
-			
+
+			actualLocation = timeDifference <= 1200000;	//20 min --- 300000 milliseconds = 5 min			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -105,9 +101,8 @@ public class MixContext {
 	
 	public void setCurrentGPSInfo(){
 		Location lastFix;
-		if(curLoc!=null){
+		if (curLoc != null)
 			lastFix = curLoc;
-		}
 		else
 			lastFix= locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
@@ -124,8 +119,9 @@ public class MixContext {
 	}
 
 	public boolean isGpsEnabled() {
-		return mixView.isGpsEnabled;
+		return mixView.isGpsEnabled();
 	}
+
 	public boolean isActualLocation(){
 		return actualLocation;
 	}
@@ -133,16 +129,16 @@ public class MixContext {
 	public DownloadManager getDownloader() {
 		return downloadManager;
 	}
+	
 	public void setLocationManager(LocationManager locationMgr){
 		this.locationMgr= locationMgr;
 	}
+	
 	public LocationManager getLocationManager(){
 		return this.locationMgr;
 	}
 
-
 	public String getStartUrl() {
-
 		Intent intent = ((Activity) mixView).getIntent();
 		if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) { 
 			return intent.getData().toString(); 
@@ -197,12 +193,11 @@ public class MixContext {
 	}
 
 	public String getHttpInputString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is),
-				8 * 1024);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
 		StringBuilder sb = new StringBuilder();
 
-		String line = null;
 		try {
+			String line;
 			while ((line = reader.readLine()) != null) {
 				sb.append(line + "\n");
 			}
@@ -211,12 +206,10 @@ public class MixContext {
 		} finally {
 			try {
 				is.close();
-			} catch (IOException e) {			
-
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}			
-
+		}
 		return sb.toString();
 	}
 

@@ -50,15 +50,17 @@ public class Compatibility {
 	}
 
 	/** If it's running on a new phone, let's get the supported preview sizes, before it was fixed to 480 x 320*/
+	@SuppressWarnings("unchecked")
 	public static List<Camera.Size> getSupportedPreviewSizes(Camera.Parameters params) {
 		List<Camera.Size> retList = null;
 
 		try {
 			Object retObj = mParameters_getSupportedPreviewSizes.invoke(params);
-			if (retObj != null ) {
-				retList = (List<Camera.Size>) retObj;
+			if (retObj != null) {
+				retList = (List<Camera.Size>)retObj;
 			}
-		} catch (InvocationTargetException ite) {
+		}
+		catch (InvocationTargetException ite) {
 			/* unpack original exception when possible */
 			Throwable cause = ite.getCause();
 			if (cause instanceof RuntimeException) {

@@ -33,16 +33,11 @@ import org.mixare.data.XMLHandler;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
-import org.mixare.gui.TextObj;
 import org.mixare.render.Camera;
-import org.mixare.render.Matrix;
-import org.mixare.render.MixVector;
 
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 
 
 /**
@@ -52,107 +47,135 @@ import android.widget.TextView;
 public class DataView {
 
 	/**current context */
-	MixContext ctx;
+	private MixContext ctx;
 
 	/** is the view Inited? */
-	boolean isInit = false;
+	private boolean isInit = false;
 	/** width and height of the view*/
-	int width, height;
+	private int width, height;
 	/** _NOT_ the android camera, the class that takes care of the transformation*/
-	Camera cam;
+	private Camera cam;
 	/** */
 	public MixState state = new MixState();
 	/** The view can be "frozen" for debug purposes */
-	boolean frozen = false;
+	private boolean frozen;
 	/** how many times to re-attempt download */
-	int retry = 0;
+	private int retry = 0;
+
 	/** default URL */
-	String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
-	String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
-	String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
+	private static final String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
+	private static final String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
+	private static final String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
 
 	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
 	// eg. only railway stations:
-	String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
+	private static final String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
 	// all objects that have names: 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
-	
+
 	private Location curFix;
-	public float screenWidth, screenHeight;
+//	private float screenWidth, screenHeight;
 	
-	public DataHandler jLayer = new DataHandler();
+	private DataHandler dataHandler = new DataHandler();
 	
-	public float radius = 20;
-	DownloadResult dRes;
+	private float radius = 20;
+	private DownloadResult dRes;
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
-	public int EMPTY_LIST_STRING_ID = R.string.empty_list;
-	public int OPTION_NOT_AVAILABLE_STRING_ID = R.string.option_not_available;
-	public int EMPTY_LIST_STRIG_ID = R.string.empty_list;
-	public int MENU_ITEM_1 = R.string.menu_item_1;
-	public int MENU_ITEM_2 = R.string.menu_item_2;
-	public int MENU_ITEM_3 = R.string.menu_item_3;
-	public int MENU_ITEM_4 = R.string.menu_item_4;
-	public int MENU_ITEM_5 = R.string.menu_item_5;
-	public int MENU_ITEM_6 = R.string.menu_item_6;
-	public int MENU_ITEM_7 = R.string.menu_item_7;
+	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
+	public static final int OPTION_NOT_AVAILABLE_STRING_ID = R.string.option_not_available;
+	public static final int EMPTY_LIST_STRIG_ID = R.string.empty_list;
+	public static final int MENU_ITEM_1 = R.string.menu_item_1;
+	public static final int MENU_ITEM_2 = R.string.menu_item_2;
+	public static final int MENU_ITEM_3 = R.string.menu_item_3;
+	public static final int MENU_ITEM_4 = R.string.menu_item_4;
+	public static final int MENU_ITEM_5 = R.string.menu_item_5;
+	public static final int MENU_ITEM_6 = R.string.menu_item_6;
+	public static final int MENU_ITEM_7 = R.string.menu_item_7;
 
+	public static final int CONNECITON_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
+	public static final int CONNECITON_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
+	public static final int CONNECITON_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
+	public static final int CONNECITON_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
 	
-	public int CONNECITON_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
-	public int CONNECITON_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
-	public int CONNECITON_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
-	public int CONNECITON_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
-	
-	public int CONNECITON_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
-	public int CONNECITON_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
-	public int CONNECITON_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
-	
-	public boolean isLauncherStarted=false;
-	
+	public static final int CONNECITON_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
+	public static final int CONNECITON_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
+	public static final int CONNECITON_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
+
 	/*if in the listview option for a specific title no website is provided*/
-	public int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
-	public int LICENSE_TEXT = R.string.license;
-	public int LICENSE_TITLE = R.string.license_title;
-	public int CLOSE_BUTTON = R.string.close_button;
+	public static final int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
+	public static final int LICENSE_TEXT = R.string.license;
+	public static final int LICENSE_TITLE = R.string.license_title;
+	public static final int CLOSE_BUTTON = R.string.close_button;
 	
 	/*Strings for general information*/
-	public int GENERAL_INFO_TITLE = R.string.general_info_title;
-	public int GENERAL_INFO_TEXT = R.string.general_info_text;
-	public int GPS_LONGITUDE = R.string.longitude;
-	public int GPS_LATITUDE = R.string.latitude;
-	public int GPS_ALTITUDE = R.string.altitude;
-	public int GPS_SPEED = R.string.speed;
-	public int GPS_ACCURACY = R.string.accuracy;
-	public int GPS_LAST_FIX = R.string.gps_last_fix;
+	public static final int GENERAL_INFO_TITLE = R.string.general_info_title;
+	public static final int GENERAL_INFO_TEXT = R.string.general_info_text;
+	public static final int GPS_LONGITUDE = R.string.longitude;
+	public static final int GPS_LATITUDE = R.string.latitude;
+	public static final int GPS_ALTITUDE = R.string.altitude;
+	public static final int GPS_SPEED = R.string.speed;
+	public static final int GPS_ACCURACY = R.string.accuracy;
+	public static final int GPS_LAST_FIX = R.string.gps_last_fix;
 
-	public int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
-	public int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
-	public int MENU_CAM_MODE = R.string.map_menu_cam_mode;
-	public int MAP_MY_LOCATION = R.string.map_my_location;
-	public int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
+	public static final int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
+	public static final int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
+	public static final int MENU_CAM_MODE = R.string.map_menu_cam_mode;
+	public static final int MAP_MY_LOCATION = R.string.map_my_location;
+	public static final int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
 
-	public int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
-	public int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
-	public int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
-	public int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
-	public int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
-	public int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;
-	public int SEARCH_ACTIVE_1=R.string.search_active_1;
-	public int SEARCH_ACTIVE_2=R.string.search_active_2;
+	public static final int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
+	public static final int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
+	public static final int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
+	public static final int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
+	public static final int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
+	public static final int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;
+	public static final int SEARCH_ACTIVE_1=R.string.search_active_1;
+	public static final int SEARCH_ACTIVE_2=R.string.search_active_2;
+		
+	private boolean isLauncherStarted;
 	
-	ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
+	private ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
-	RadarPoints radarPoints = new RadarPoints();
-	Matrix rInv = new Matrix();
-	MixVector looking = new MixVector();
-	ScreenLine lrl = new ScreenLine();
-	ScreenLine rrl = new ScreenLine();
-	float rx = 10, ry = 20;
-	public float addX = 0, addY = 0;
+	private RadarPoints radarPoints = new RadarPoints();
+//	private Matrix rInv = new Matrix();
+//	private MixVector looking = new MixVector();
+	private ScreenLine lrl = new ScreenLine();
+	private ScreenLine rrl = new ScreenLine();
+	private float rx = 10, ry = 20;
+	private float addX = 0, addY = 0;
 	
 	public DataView(MixContext ctx) {
 		this.ctx = ctx;
+	}
+	
+	public MixContext getContext() {
+		return ctx;
+	}
+
+	public boolean isLauncherStarted() {
+		return isLauncherStarted;
+	}
+	
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
+	
+	public float getRadius() {
+		return radius;
+	}
+
+	public void setRadius(float radius) {
+		this.radius = radius;
+	}
+	
+	public DataHandler getDataHandler() {
+		return dataHandler;
 	}
 
 	public void doStart() {
@@ -190,15 +213,15 @@ public class DataView {
 
 		state.calcPitchBearing(cam.transform);
 
-		screenWidth = width;
-		screenHeight = height;
+//		screenWidth = width;
+//		screenHeight = height;
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 
 			DownloadRequest request = new DownloadRequest();
 
-			if (!ctx.getStartUrl().equals("")){
+			if (ctx.getStartUrl().length() > 0){
 				request.url = ctx.getStartUrl();
 				isLauncherStarted=true;
 			}
@@ -206,19 +229,18 @@ public class DataView {
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				if(MixListView.getDataSource()=="Wikipedia")
+				String dataSource = MixListView.getDataSource();
+				if ("Wikipedia".equals(dataSource))
 					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
-				else if(MixListView.getDataSource()=="Twitter")
+				else if("Twitter".equals(dataSource))
 					request.url = TWITTER_HOME_URL +"?geocode="+lat + "%2C" + lon+"%2C" + radius + "km" ;
-				else if(MixListView.getDataSource()=="Buzz")  
+				else if("Buzz".equals(dataSource))  
 					request.url = BUZZ_HOME_URL + "&lat="+lat+"&lon=" + lon + "&radius="+ radius*1000;
 					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
-				else if(MixListView.getDataSource()=="OpenStreetMap")
+				else if("OpenStreetMap".equals(dataSource))
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
-				else if(MixListView.getDataSource()=="OwnURL")
+				else if("OwnURL".equals(dataSource))
 					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
-				
-				
 			}
 			Log.i(MixView.TAG,request.url);
 			state.downloadId = ctx.getDownloader().submitJob(request);
@@ -232,21 +254,20 @@ public class DataView {
 				if (dRes.error && retry < 3) {
 					retry++;
 					state.nextLStatus = MixState.NOT_STARTED;
-
 				} else {
 					retry = 0;
 					state.nextLStatus = MixState.DONE;
-					jLayer = (DataHandler) dRes.obj;
+					dataHandler = (DataHandler) dRes.obj;
 
 					//Sort markers by cMarker.z
-					Collections.sort(jLayer.markers, new MarkersOrder());
+					Collections.sort(dataHandler.markers, MarkersOrder.getInstance());
 				}	
 			}
 		} 
 
 		// Update markers
-		for (int i = 0; i < jLayer.markers.size(); i++) {
-			Marker ma = jLayer.markers.get(i);
+		for (int i = 0; i < dataHandler.markers.size(); i++) {
+			Marker ma = dataHandler.markers.get(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
@@ -292,32 +313,23 @@ public class DataView {
 				uiEvents.remove(0);
 			}
 		}
-		if (evt != null && evt.type == UIEvent.KEY) {
-			handleKeyEvent((KeyEvent) evt);
-			evt = null;
+		if (evt != null) {
+			switch (evt.type) {
+				case UIEvent.KEY:	handleKeyEvent((KeyEvent) evt);		break;
+				case UIEvent.CLICK:	handleClickEvent((ClickEvent) evt);	break;
+			}
 		}
-		if (evt != null && evt.type == UIEvent.CLICK) {
-			handleClickEvent((ClickEvent) evt);
-		}
-
 	}
-	
+
 	private void handleKeyEvent(KeyEvent evt) {
 		/** Adjust marker position with keypad */
 		final float CONST = 10f;
-		if (evt.keyCode == KEYCODE_DPAD_LEFT) {
-			addX -= CONST;
-		} else if (evt.keyCode == KEYCODE_DPAD_RIGHT) {
-			addX += CONST;
-		} else if (evt.keyCode == KEYCODE_DPAD_DOWN) {
-			addY += CONST;
-		} else if (evt.keyCode == KEYCODE_DPAD_UP) {
-			addY -= CONST;
-		}
-
-		/** freeze the overlay with the camera button */
-		if (evt.keyCode == KEYCODE_CAMERA) {
-			frozen = !frozen;
+		switch (evt.keyCode) {
+			case KEYCODE_DPAD_LEFT:		addX -= CONST;		break;
+			case KEYCODE_DPAD_RIGHT:	addX += CONST;		break;
+			case KEYCODE_DPAD_DOWN:		addY += CONST;		break;
+			case KEYCODE_DPAD_UP:		addY -= CONST;		break;
+			case KEYCODE_CAMERA:		frozen = !frozen;	break;	// freeze the overlay with the camera button
 		}
 	}
 	
@@ -326,8 +338,8 @@ public class DataView {
 
 		// Handle event
 		if (state.nextLStatus == MixState.DONE) {
-			for (int i = jLayer.markers.size() - 1; i >= 0 && !evtHandled; i--) {
-				Marker pm = jLayer.markers.get(i);
+			for (int i = dataHandler.markers.size() - 1; i >= 0 && !evtHandled; i--) {
+				Marker pm = dataHandler.markers.get(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, ctx, state);
 			}
@@ -347,8 +359,7 @@ public class DataView {
 			dw.setFill(false);
 			dw.paintRect(x - w / 2, y - h / 2, w, h);
 		}
-		dw.paintText(padw + x - w / 2, padh + dw.getTextAsc() + y - h / 2,
-				txt);
+		dw.paintText(padw + x - w / 2, padh + dw.getTextAsc() + y - h / 2, txt);
 	}
 
 
@@ -372,7 +383,9 @@ public class DataView {
 }
 
 class UIEvent {
-	public static int CLICK = 0, KEY = 1;
+	public static final int CLICK	= 0;
+	public static final int KEY		= 1;
+	
 	public int type;
 }
 

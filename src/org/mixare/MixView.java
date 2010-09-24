@@ -23,11 +23,10 @@ import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.mixare.R.drawable;
+import org.mixare.data.DataHandler;
 import org.mixare.gui.PaintScreen;
-import org.mixare.gui.TextObj;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
@@ -68,55 +67,53 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MixView extends Activity implements SensorEventListener,LocationListener, OnTouchListener{
 
-	CameraSurface camScreen;
-	AugmentedView augScreen;
+	private CameraSurface camScreen;
+	private AugmentedView augScreen;
 
-	static boolean isInited = false;
-	static MixContext ctx;
+	private boolean isInited;
+	private MixContext ctx;
 	static PaintScreen dWindow;
 	static DataView view;
-	Thread downloadThread;
+	private Thread downloadThread;
 
-	float RTmp[] = new float[9];
-	float R[] = new float[9];
-	float I[] = new float[9];
-	float grav[] = new float[3];
-	float mag[] = new float[3];
+	private float RTmp[] = new float[9];
+	private float R[] = new float[9];
+	private float I[] = new float[9];
+	private float grav[] = new float[3];
+	private float mag[] = new float[3];
 
 	private SensorManager sensorMgr;
 	private List<Sensor> sensors;
 	private Sensor sensorGrav, sensorMag;
-	public static LocationManager locationMgr;
-	boolean isGpsEnabled = false;
+	private LocationManager locationMgr;
+	private boolean isGpsEnabled;
 
-	int rHistIdx = 0;
-	Matrix tempR = new Matrix();
-	Matrix finalR = new Matrix();
-	Matrix smoothR = new Matrix();
-	Matrix histR[] = new Matrix[60];
-	Matrix m1 = new Matrix();
-	Matrix m2 = new Matrix();
-	Matrix m3 = new Matrix();
-	Matrix m4 = new Matrix();
+	private int rHistIdx = 0;
+	private Matrix tempR = new Matrix();
+	private Matrix finalR = new Matrix();
+	private Matrix smoothR = new Matrix();
+	private Matrix histR[] = new Matrix[60];
+	private Matrix m1 = new Matrix();
+	private Matrix m2 = new Matrix();
+	private Matrix m3 = new Matrix();
+	private Matrix m4 = new Matrix();
 
 	private SeekBar myZoomBar;
 	private WakeLock mWakeLock;
 
 	private boolean fError = false;
-	private String fErrorTxt;
-	private Exception fExeption;
-	
-	static boolean isZoombarVisible= false;
-	static String zoomLevel;
-	static int zoomProgress;
-	static boolean zoomChanging=false;
-	 //TAG for logging
+//	private String fErrorTxt;
+//	private Exception fExeption;
+
+	private String zoomLevel;
+	private int zoomProgress;
+//	private boolean zoomChanging;
+	//TAG for logging
 	public static final String TAG = "Mixare";
 
 	/*strings for GPS info assigned in Data View*/
@@ -131,20 +128,36 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public static TextView searchNotificationTxt;
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
-	public Vector<String> listDataVector;
-	public Vector<String> listURL;
+//	private Vector<String> listDataVector;
+//	private Vector<String> listURL;
 
 	/*string to name & access the preference file in the internal storage*/
-    public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
-    	
+	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
+
+	public boolean isGpsEnabled() {
+		return isGpsEnabled;
+	}
+	
+	public boolean isZoombarVisible() {
+		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
+	}
+
+	public String getZoomLevel() {
+		return zoomLevel;
+	}
+	
+	public int getZoomProgress() {
+		return zoomProgress;
+	}
+	
 	public void doError(Exception ex1) {
 		if (!fError) {
 			fError = true;
-			fErrorTxt = ex1.toString();
-			fExeption = ex1;
-			
+//			fErrorTxt = ex1.toString();
+//			fExeption = ex1;
+
 			setErrorDialog();
-			
+
 			ex1.printStackTrace();
 			try {
 			} catch (Exception ex2) {
@@ -155,7 +168,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		try {
 			augScreen.invalidate();
 		} catch (Exception ignore) {
-
 		}
 	}
 
@@ -163,55 +175,55 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		if (fError)
 			throw new Exception();
 	}
-	
-	public void repaint(){
+
+	public void repaint() {
 		view = new DataView(ctx);
 		dWindow = new PaintScreen();
-		SetZoomLevel();
+		setZoomLevel();
 	}
 
 	public void setErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(getString(view.CONNECITON_ERROR_DIALOG_TEXT));
-        builder.setCancelable(false);
-        
-        /*Retry*/
-        builder.setPositiveButton(view.CONNECITON_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int id) {
-        		fError=false;
-               //TODO improve
-            	try {
-            		repaint();	       		
-            	}
-            	catch(Exception ex){
-            		doError(ex);
-            	}
-            }
-        });
-        /*Open settings*/
-        builder.setNeutralButton(view.CONNECITON_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            	Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
+		builder.setMessage(getString(DataView.CONNECITON_ERROR_DIALOG_TEXT));
+		builder.setCancelable(false);
+
+		/*Retry*/
+		builder.setPositiveButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				fError=false;
+				//TODO improve
+				try {
+					repaint();	       		
+				}
+				catch(Exception ex){
+					doError(ex);
+				}
+			}
+		});
+		/*Open settings*/
+		builder.setNeutralButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
 				startActivityForResult(intent1, 42);
-            }
-        });
-        /*Close application*/
-        builder.setNegativeButton(view.CONNECITON_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
-              public void onClick(DialogInterface dialog, int id) {
-                 System.exit(0);
-              }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+			}
+		});
+		/*Close application*/
+		builder.setNegativeButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				System.exit(0);
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		try {
 			handleIntent(getIntent());
-			
+
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
@@ -220,25 +232,24 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			
+
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		    SharedPreferences.Editor editor = settings.edit();
-		    
-		    myZoomBar = new SeekBar(this);
+			SharedPreferences.Editor editor = settings.edit();
+
+			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
-			myZoomBar.setVisibility(View.INVISIBLE);
-			isZoombarVisible=false;
-			
+			myZoomBar.setVisibility(View.INVISIBLE);			
+
 			FrameLayout FL = new FrameLayout(this);
 
 			FL.setMinimumWidth(3000);
 			FL.addView(myZoomBar);
 			FL.setPadding(10, 0, 10, 10);
-			
+
 
 			camScreen = new CameraSurface(this);
 			augScreen = new AugmentedView(this);
@@ -250,87 +261,86 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			addContentView(FL, new FrameLayout.LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
 					Gravity.BOTTOM));
-			
-			
+
+
 			if (!isInited) {
 				ctx = new MixContext(this);
 
 				ctx.downloadManager = new DownloadManager(ctx);
-				
-				 
+
+
 				dWindow = new PaintScreen();
 				view = new DataView(ctx);
-				
+
 				/*set the radius in data view to the last selected by the user*/
-				SetZoomLevel(); 
+				setZoomLevel(); 
 				isInited = true;		
 			}
-			
-		    /*check if the application is launched for the first time*/
-		    if(settings.getBoolean("firstAccess",false)==false){
-		    	AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-				builder1.setMessage(getString(view.LICENSE_TEXT));
-				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
-		        	public void onClick(DialogInterface dialog, int id) {
-		        		dialog.dismiss();
-		            }
-		        });
+
+			/*check if the application is launched for the first time*/
+			if(settings.getBoolean("firstAccess",false)==false){
+				AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+				builder1.setMessage(getString(DataView.LICENSE_TEXT));
+				builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
 				AlertDialog alert1 = builder1.create();
-				alert1.setTitle(getString(view.LICENSE_TITLE));
-			    alert1.show();
-			    editor.putBoolean("firstAccess", true);
-			    editor.commit();
+				alert1.setTitle(getString(DataView.LICENSE_TITLE));
+				alert1.show();
+				editor.putBoolean("firstAccess", true);
+				editor.commit();
 			} 
 
 			if(ctx.isActualLocation()==false){
-				Toast.makeText( this, getString(view.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
 
 		} catch (Exception ex) {
 			doError(ex);
 		}
 	}
-	
+
 	private void handleIntent(Intent intent) {
-	    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-	      String query = intent.getStringExtra(SearchManager.QUERY);
-	      doMixSearch(query);
-	    }
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			doMixSearch(query);
+		}
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-	    setIntent(intent);
-	    handleIntent(intent);
+		setIntent(intent);
+		handleIntent(intent);
 	}
-	
+
 	private void doMixSearch(String query) {
-		if(view.frozen==false){
-			MixListView.originalMarkerList=view.jLayer.markers;
-			MixMap.originalMarkerList=view.jLayer.markers;
+		DataHandler jLayer = view.getDataHandler();
+		if(!view.isFrozen()){
+			MixListView.originalMarkerList = jLayer.markers;
+			MixMap.originalMarkerList = jLayer.markers;
 		}
-		
+
 		ArrayList<Marker> searchResults =new ArrayList<Marker>();
 		Log.d("SEARCH-------------------0", ""+query);
-		if(view.jLayer.markers.size()>0){
-			for(int i = 0; i<view.jLayer.markers.size();i++){
+		if (jLayer.markers.size() > 0) {
+			for(int i = 0; i < jLayer.markers.size(); i++) {
 				Marker ma = new Marker();
-				ma = view.jLayer.markers.get(i);
+				ma = jLayer.markers.get(i);
 				if(ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
 					searchResults.add(ma);
 					/*the website for the corresponding title*/
 				}
 			}
 		}
-		if(searchResults.size()>0){
-			view.frozen = true;
-			view.jLayer.markers = searchResults;
-			
+		if (searchResults.size()>0){
+			view.setFrozen(true);
+			jLayer.markers = searchResults;
 		}
 		else
-			Toast.makeText( this, getString(view.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
 	}
-
 
 	@Override
 	protected void onPause() {
@@ -353,10 +363,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				locationMgr.removeUpdates(this);
 			} catch (Exception ignore) {
 			}
-			try {
-				locationMgr = null;
-			} catch (Exception ignore) {
-			}
+			locationMgr = null;
 
 			try {
 				ctx.downloadManager.stop();
@@ -417,7 +424,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				sensorMag = sensors.get(0);
 			}
 
-
 			sensorMgr.registerListener(this, sensorGrav, SENSOR_DELAY_GAME);
 			sensorMgr.registerListener(this, sensorMag, SENSOR_DELAY_GAME);
 
@@ -426,7 +432,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 				c.setAccuracy(Criteria.ACCURACY_FINE);
 				//c.setBearingRequired(true);
-				
+
 				locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
 
@@ -436,18 +442,17 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				/*defaulting to our place*/
 				Location hardFix = new Location("reverseGeocoded");
 
-//				hardFix.setLatitude(0);
-//				hardFix.setLongitude(0);
-				
+				//				hardFix.setLatitude(0);
+				//				hardFix.setLongitude(0);
+
 				hardFix.setLatitude(46.480302);
 				hardFix.setLongitude(11.296005);
-				
+
 				/*New York*/
-//				hardFix.setLatitude(40.731510);
-//				hardFix.setLongitude(-73.991547);
+				//				hardFix.setLatitude(40.731510);
+				//				hardFix.setLongitude(-73.991547);
 				hardFix.setAltitude(300);
-				
-				
+
 				try {
 					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
 				} catch (Exception ex2) {
@@ -464,205 +469,193 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
 						.sin(angleY), 0f, (float) Math.cos(angleY));
 				ctx.declination = gmf.getDeclination();
-				
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-
 			downloadThread = new Thread(ctx.downloadManager);
 			downloadThread.start();
-
-			
 		} catch (Exception ex) {
 			doError(ex);
-
 			try {
 				if (sensorMgr != null) {
 					sensorMgr.unregisterListener(this, sensorGrav);
 					sensorMgr.unregisterListener(this, sensorMag);
 					sensorMgr = null;
 				}
-
 				if (locationMgr != null) {
 					locationMgr.removeUpdates(this);
 					locationMgr = null;
 				}
-
 				if (ctx != null) {
 					if (ctx.downloadManager != null)
 						ctx.downloadManager.stop();
-
 				}
 			} catch (Exception ignore) {
-
 			}
 		}
-		
+
 		Log.d("-------------------------------------------","resume");
-		if(view.frozen&&searchNotificationTxt==null){
-		
+		if (view.isFrozen() && searchNotificationTxt == null){
 			searchNotificationTxt = new TextView(this);
-			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+			searchNotificationTxt.setWidth(dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(view.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(view.SEARCH_ACTIVE_2));;
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));;
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
-		
+
 			searchNotificationTxt.setOnTouchListener(this);
 			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		}
-		else if(view.frozen==false &&searchNotificationTxt!=null){
+		else if(!view.isFrozen() && searchNotificationTxt != null){
 			searchNotificationTxt.setVisibility(View.GONE);
-			MixView.searchNotificationTxt = null;
+			searchNotificationTxt = null;
 		}
-
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-			int base = Menu.FIRST;
-			/*define the first*/
-			MenuItem item1 =menu.add(base, base, base, getString(view.MENU_ITEM_1)); 
-			MenuItem item2 =menu.add(base, base+1, base+1,  getString(view.MENU_ITEM_2)); 
-			MenuItem item3 =menu.add(base, base+2, base+2,  getString(view.MENU_ITEM_3));
-			MenuItem item4 =menu.add(base, base+3, base+3,  getString(view.MENU_ITEM_4));
-			MenuItem item5 =menu.add(base, base+4, base+4,  getString(view.MENU_ITEM_5));
-			MenuItem item6 =menu.add(base, base+5, base+5,  getString(view.MENU_ITEM_6));
-			MenuItem item7 =menu.add(base, base+6, base+6,  getString(view.MENU_ITEM_7));
+		int base = Menu.FIRST;
+		/*define the first*/
+		MenuItem item1 =menu.add(base, base, base, getString(DataView.MENU_ITEM_1)); 
+		MenuItem item2 =menu.add(base, base+1, base+1,  getString(DataView.MENU_ITEM_2)); 
+		MenuItem item3 =menu.add(base, base+2, base+2,  getString(DataView.MENU_ITEM_3));
+		MenuItem item4 =menu.add(base, base+3, base+3,  getString(DataView.MENU_ITEM_4));
+		MenuItem item5 =menu.add(base, base+4, base+4,  getString(DataView.MENU_ITEM_5));
+		MenuItem item6 =menu.add(base, base+5, base+5,  getString(DataView.MENU_ITEM_6));
+		MenuItem item7 =menu.add(base, base+6, base+6,  getString(DataView.MENU_ITEM_7));
 
-			/*assign icons to the menu items*/
-			item1.setIcon(drawable.icon_datasource);
-			item2.setIcon(android.R.drawable.ic_menu_view);
-			item3.setIcon(android.R.drawable.ic_menu_mapmode);
-			item4.setIcon(android.R.drawable.ic_menu_zoom);
-			item5.setIcon(android.R.drawable.ic_menu_search);
-			item6.setIcon(android.R.drawable.ic_menu_info_details);
-			item7.setIcon(android.R.drawable.ic_menu_share);
-			
-			return true;
+		/*assign icons to the menu items*/
+		item1.setIcon(drawable.icon_datasource);
+		item2.setIcon(android.R.drawable.ic_menu_view);
+		item3.setIcon(android.R.drawable.ic_menu_mapmode);
+		item4.setIcon(android.R.drawable.ic_menu_zoom);
+		item5.setIcon(android.R.drawable.ic_menu_search);
+		item6.setIcon(android.R.drawable.ic_menu_info_details);
+		item7.setIcon(android.R.drawable.ic_menu_share);
+
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			/*Data sources*/
-			case 1:		
-				if(view.isLauncherStarted==false){
-					MixListView.setList(1);
-					Intent intent = new Intent(MixView.this, MixListView.class); 
-					startActivityForResult(intent, 40);
-				}
-				else{
-					Toast.makeText( this, getString(view.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
-				}
-				break;
+		/*Data sources*/
+		case 1:		
+			if(!view.isLauncherStarted()){
+				MixListView.setList(1);
+				Intent intent = new Intent(MixView.this, MixListView.class); 
+				startActivityForResult(intent, 40);
+			}
+			else{
+				Toast.makeText( this, getString(DataView.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+			}
+			break;
 			/*List view*/
-			case 2:
-				
-					MixListView.setList(2);
-				/*if the list of titles to show in alternative list view is not empty*/
-				if(view.jLayer.markers.size()>0){
-					Intent intent1 = new Intent(MixView.this, MixListView.class); 
-					startActivityForResult(intent1, 42);
-				}
-				/*if the list is empty*/
-				else{
-					Toast.makeText( this, view.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
-				}
-				break;
+		case 2:
+
+			MixListView.setList(2);
+			/*if the list of titles to show in alternative list view is not empty*/
+			if (view.getDataHandler().markers.size() > 0) {
+				Intent intent1 = new Intent(MixView.this, MixListView.class); 
+				startActivityForResult(intent1, 42);
+			}
+			/*if the list is empty*/
+			else{
+				Toast.makeText( this, DataView.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
+			}
+			break;
 			/*Map View*/
-			case 3:
-				Intent intent2 = new Intent(MixView.this, MixMap.class); 
-				startActivityForResult(intent2, 20);
-				break;
+		case 3:
+			Intent intent2 = new Intent(MixView.this, MixMap.class); 
+			startActivityForResult(intent2, 20);
+			break;
 			/*zoom level*/
-			case 4:
-				myZoomBar.setVisibility(View.VISIBLE);
-				zoomProgress = myZoomBar.getProgress();
-				isZoombarVisible=true;	
-				break;
+		case 4:
+			myZoomBar.setVisibility(View.VISIBLE);
+			zoomProgress = myZoomBar.getProgress();
+			break;
 			/*Search*/
-			case 5:
-				onSearchRequested();
-				break;
+		case 5:
+			onSearchRequested();
+			break;
 			/*GPS Information*/
-			case 6:
-				ctx.setCurrentGPSInfo();
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(getString(view.GENERAL_INFO_TEXT)+ "\n\n" +
-							getString(view.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
-							getString(view.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
-							getString(view.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
-							getString(view.GPS_SPEED) + GPS_SPEED + "km/h\n" +
-							getString(view.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
-							getString(view.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
-				builder.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
-		        	public void onClick(DialogInterface dialog, int id) {
-		        		dialog.dismiss();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-				alert.setTitle(getString(view.GENERAL_INFO_TITLE));
-		        alert.show();
-				break;
+		case 6:
+			ctx.setCurrentGPSInfo();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
+					getString(DataView.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
+					getString(DataView.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
+					getString(DataView.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
+					getString(DataView.GPS_SPEED) + GPS_SPEED + "km/h\n" +
+					getString(DataView.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
+					getString(DataView.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
+			builder.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.setTitle(getString(DataView.GENERAL_INFO_TITLE));
+			alert.show();
+			break;
 			/*Case 6: license agreements*/
-			case 7:
-				AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-				builder1.setMessage(getString(view.LICENSE_TEXT));	
-				/*Retry*/
-				builder1.setNegativeButton(getString(view.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
-		        	public void onClick(DialogInterface dialog, int id) {
-		        		dialog.dismiss();
-		            }
-		        });
-				AlertDialog alert1 = builder1.create();
-				alert1.setTitle(getString(view.LICENSE_TITLE));
-			    alert1.show();
-				break;
-			
+		case 7:
+			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+			builder1.setMessage(getString(DataView.LICENSE_TEXT));	
+			/*Retry*/
+			builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			});
+			AlertDialog alert1 = builder1.create();
+			alert1.setTitle(getString(DataView.LICENSE_TITLE));
+			alert1.show();
+			break;
+
 		}
 		return true;
 	}
-public float calcZoomLevel(){
-		
+	
+	public float calcZoomLevel(){
+
 		int myZoomLevel = myZoomBar.getProgress();
 		float myout = 5;
-		
+
 		if (myZoomLevel <= 26) {
 			myout = myZoomLevel / 25f;
 		} else if (25 < myZoomLevel && myZoomLevel < 50) {
 			myout = (1 + (myZoomLevel - 25)) * 0.38f;
 		} 
-				else if (25== myZoomLevel) {
-					myout = 1;
-				} 
-				else if (50== myZoomLevel) {
-					myout = 10;
-				} 
+		else if (25== myZoomLevel) {
+			myout = 1;
+		} 
+		else if (50== myZoomLevel) {
+			myout = 10;
+		} 
 		else if (50 < myZoomLevel && myZoomLevel < 75) {
 			myout = (10 + (myZoomLevel - 50)) * 0.83f;
 		} else {
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
-		
+
 		/*Twitter Json file not available for radius <1km 
 		 *smallest radius is set to 1km*/
-		if(MixListView.getDataSource().equals("Twitter")&&myZoomBar.getProgress()<100){
+		if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
 			myout++;
 		}
-	
+
 		return myout;
 	}
 
-	private void SetZoomLevel() {
+	private void setZoomLevel() {
 		float myout = calcZoomLevel();
 
-		view.radius =myout;
+		view.setRadius(myout);
 
 		myZoomBar.setVisibility(View.INVISIBLE);
-		isZoombarVisible=false;
 		zoomLevel = String.valueOf(myout);
-		
+
 		view.doStart();
 		view.clearEvents();
 		downloadThread = new Thread(ctx.downloadManager);
@@ -675,7 +668,7 @@ public float calcZoomLevel(){
 
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 			float myout = calcZoomLevel();
-					
+
 			zoomLevel = String.valueOf(myout);
 			zoomProgress = myZoomBar.getProgress();
 
@@ -686,24 +679,22 @@ public float calcZoomLevel(){
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			zoomChanging= true;
-
+//			zoomChanging= true;
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		    SharedPreferences.Editor editor = settings.edit();
-		    /*store the zoom range of the zoom bar selected by the user*/
-		    editor.putInt("zoomLevel", myZoomBar.getProgress());
-		    editor.commit();
+			SharedPreferences.Editor editor = settings.edit();
+			/*store the zoom range of the zoom bar selected by the user*/
+			editor.putInt("zoomLevel", myZoomBar.getProgress());
+			editor.commit();
 			myZoomBar.setVisibility(View.INVISIBLE);
-			isZoombarVisible=false;
-			zoomChanging= false;
+//			zoomChanging= false;
 
 			myZoomBar.getProgress();
-			
+
 			t.cancel();
-			SetZoomLevel();
+			setZoomLevel();
 		}
 
 	};
@@ -711,7 +702,7 @@ public float calcZoomLevel(){
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-//			killOnError();
+			//			killOnError();
 
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 				grav[0] = evt.values[0];
@@ -833,14 +824,13 @@ public float calcZoomLevel(){
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-			view.frozen=false;
-			searchNotificationTxt.setVisibility(View.GONE);
-			MixView.searchNotificationTxt = null;
+		view.setFrozen(false);
+		searchNotificationTxt.setVisibility(View.GONE);
+		MixView.searchNotificationTxt = null;
 
 		return false;
 	}
@@ -931,8 +921,8 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					element.width -= w;
 					element.height -= h;
 				} 
-				
-//				Collections.sort(supportedSizes, new ResolutionsOrder());
+
+				//				Collections.sort(supportedSizes, new ResolutionsOrder());
 				//TODO improve algorithm
 				int preferredSizeIndex=0;
 				int checkWidth =0;
@@ -946,14 +936,14 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 							checkWidth =(supportedSizes.get(i).width)*(-1);
 						else 
 							checkWidth = supportedSizes.get(i).width;
-						
+
 						if(checkWidth < bestDistance){
 							bestDistance = checkWidth;
 							preferredSizeIndex = i;
 						}
 					}
 				}
-				
+
 				parameters.setPreviewSize(w + supportedSizes.get(preferredSizeIndex).width, h + supportedSizes.get(preferredSizeIndex).height);
 				//parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
 			} catch (Exception ex) {
@@ -975,7 +965,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 //	}
 //}
 
-class AugmentedView extends View{
+class AugmentedView extends View {
 	MixView app;
 	int xSearch=200;
 	int ySearch = 10;
@@ -997,31 +987,30 @@ class AugmentedView extends View{
 	@Override
 	protected void onDraw(Canvas canvas) {
 		try {
-//			if (app.fError) {
-//
-//				Paint errPaint = new Paint();
-//				errPaint.setColor(Color.RED);
-//				errPaint.setTextSize(16);
-//				
-//				/*Draws the Error code*/
-//				canvas.drawText("ERROR: ", 10, 20, errPaint);
-//				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
-//
-//				return;
-//			}
+			//			if (app.fError) {
+			//
+			//				Paint errPaint = new Paint();
+			//				errPaint.setColor(Color.RED);
+			//				errPaint.setTextSize(16);
+			//				
+			//				/*Draws the Error code*/
+			//				canvas.drawText("ERROR: ", 10, 20, errPaint);
+			//				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
+			//
+			//				return;
+			//			}
 
 			app.killOnError();
 
 			MixView.dWindow.setWidth(canvas.getWidth());
 			MixView.dWindow.setHeight(canvas.getHeight());
-		
+
 			MixView.dWindow.setCanvas(canvas);
 
 			if (!MixView.view.isInited()) {
-				MixView.view.init(MixView.dWindow.getWidth(),
-						MixView.dWindow.getHeight());
+				MixView.view.init(MixView.dWindow.getWidth(), MixView.dWindow.getHeight());
 			}
-			if(MixView.isZoombarVisible){
+			if (app.isZoombarVisible()){
 				Paint zoomPaint = new Paint();
 				zoomPaint.setColor(Color.WHITE);
 				zoomPaint.setTextSize(14);
@@ -1033,12 +1022,13 @@ class AugmentedView extends View{
 				}
 				canvas.drawText(startKM, canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
 				canvas.drawText(endKM, canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
-				
+
 				int height= canvas.getHeight()/100*85;
-				if(MixView.zoomProgress >92||MixView.zoomProgress <6){
+				int zoomProgress = app.getZoomProgress();
+				if (zoomProgress > 92 || zoomProgress < 6) {
 					height = canvas.getHeight()/100*80;
 				}
-				canvas.drawText(MixView.zoomLevel,  (canvas.getWidth())/100*MixView.zoomProgress+20, height, zoomPaint);
+				canvas.drawText(app.getZoomLevel(),  (canvas.getWidth())/100*zoomProgress+20, height, zoomPaint);
 			}
 
 			MixView.view.draw(MixView.dWindow);

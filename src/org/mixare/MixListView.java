@@ -21,6 +21,8 @@ package org.mixare;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import org.mixare.data.DataHandler;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -40,7 +42,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -49,43 +50,51 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MixListView extends ListActivity{
-	
-	private static int list=0;
-	
-	private static Vector<String> listViewMenu = null;
-	private static Vector<String> selectedItemURL= null;
-	public static Vector<String> dataSourceMenu= null;
-	public static Vector<String> dataSourceDescription= null;
-	private static MixContext mixCtx = null;
-	private static DataView dataView = null;
-	private static String selectedDataSource="Wikipedia";
+public class MixListView extends ListActivity {
+
+	private static int list;
+
+	private Vector<String> listViewMenu;
+	private Vector<String> selectedItemURL;
+	private Vector<String> dataSourceMenu;
+	private Vector<String> dataSourceDescription;
+	//	private static MixContext mixCtx = null;
+	private DataView dataView;
+	private static String selectedDataSource = "Wikipedia";
 	/*to check which data source is active*/
-	private int clickedDataSourceItem = 0;
-	private ListItemAdapter adapter=null;
+	//	private int clickedDataSourceItem = 0;
+	private ListItemAdapter adapter;
 	public static String customizedURL="http://mixare.org/geotest.php";
 	private static Context ctx;
 	private static String searchQuery = "";
-	public static ArrayList<Marker> searchResultMarkers =null;
-	public static ArrayList<Marker> originalMarkerList=null;
+	public static ArrayList<Marker> searchResultMarkers;
+	public static ArrayList<Marker> originalMarkerList;
+
+	public Vector<String> getDataSourceMenu() {
+		return dataSourceMenu;
+	}
 	
+	public Vector<String> getDataSourceDescription() {
+		return dataSourceDescription;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		mixCtx = MixView.ctx;
+		//		mixCtx = MixView.ctx;
 		dataView = MixView.view;	
 		ctx = this;
 
 		switch(list){
 		case 1:
-			dataSourceMenu = new Vector();
+			dataSourceMenu = new Vector<String>();
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
 			dataSourceMenu.add("Buzz");
-			dataSourceMenu.add(getString(dataView.SOURCE_OPENSTREETMAP));
+			dataSourceMenu.add(getString(DataView.SOURCE_OPENSTREETMAP));
 			dataSourceMenu.add("Own URL");
-			
-			dataSourceDescription = new Vector();
+
+			dataSourceDescription = new Vector<String>();
 			dataSourceDescription.add("");
 			dataSourceDescription.add("");
 			dataSourceDescription.add("");
@@ -95,305 +104,306 @@ public class MixListView extends ListActivity{
 			adapter = new ListItemAdapter(this);
 			adapter.colorSource(getDataSource());
 			getListView().setTextFilterEnabled(true);
-			
+
 			setListAdapter(adapter);
 			break;
-		
+
 		case 2:
-			selectedItemURL = new Vector();
-			listViewMenu = new Vector();
-			if(dataView.frozen&&dataView.jLayer.markers.size()>0){
+			selectedItemURL = new Vector<String>();
+			listViewMenu = new Vector<String>();
+			DataHandler jLayer = dataView.getDataHandler();
+			if (dataView.isFrozen() && jLayer.markers.size()>0){
 				selectedItemURL.add("search");
 			}
 			/*add all marker items to a title and a URL Vector*/
-			for(int i = 0; i<dataView.jLayer.markers.size();i++){
+			for (int i = 0; i < jLayer.markers.size(); i++) {
 				Marker ma = new Marker();
-				ma = dataView.jLayer.markers.get(i);
+				ma = jLayer.markers.get(i);
 				listViewMenu.add(ma.getText());
-					/*the website for the corresponding title*/
-					if(ma.getURL()!=null)
-						selectedItemURL.add(ma.getURL());
-					/*if no website is available for a specific title*/
-					else
-						selectedItemURL.add("");
+				/*the website for the corresponding title*/
+				if(ma.getURL()!=null)
+					selectedItemURL.add(ma.getURL());
+				/*if no website is available for a specific title*/
+				else
+					selectedItemURL.add("");
 			}
 
-			if(dataView.frozen){
-				
+			if (dataView.isFrozen()) {
+
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(dataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(dataView.SEARCH_ACTIVE_2));
+				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));
 				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
 				searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 				searchNotificationTxt.setTextColor(Color.WHITE);
-				
+
 				getListView().addHeaderView(searchNotificationTxt);
-				
+
 			}
-			
+
 			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listViewMenu));
 			getListView().setTextFilterEnabled(true);
 			break;
 
 		}
 	}
-	
+
 	private void handleIntent(Intent intent) {
-	    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-	      String query = intent.getStringExtra(SearchManager.QUERY);
-	      doMixSearch(query);
-	    }
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			doMixSearch(query);
+		}
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-	    setIntent(intent);
-	    handleIntent(intent);
+		setIntent(intent);
+		handleIntent(intent);
 	}
-	
+
 	private void doMixSearch(String query) {
-		if(dataView.frozen==false){
-			originalMarkerList=dataView.jLayer.markers;
-			MixMap.originalMarkerList= dataView.jLayer.markers;
+		DataHandler jLayer = dataView.getDataHandler();
+		if (!dataView.isFrozen()) {
+			originalMarkerList = jLayer.markers;
+			MixMap.originalMarkerList = jLayer.markers;
 		}
-		originalMarkerList=dataView.jLayer.markers;
+		originalMarkerList = jLayer.markers;
 		searchResultMarkers = new ArrayList<Marker>();
 		Log.d("SEARCH-------------------0", ""+query);
 		setSearchQuery(query);
 
-		selectedItemURL = new Vector();
-		listViewMenu = new Vector();
-		for(int i = 0; i<dataView.jLayer.markers.size();i++){
+		selectedItemURL = new Vector<String>();
+		listViewMenu = new Vector<String>();
+		for(int i = 0; i < jLayer.markers.size();i++){
 			Marker ma = new Marker();
-			ma = dataView.jLayer.markers.get(i);
+			ma = jLayer.markers.get(i);
 
-			if(ma.getText().toLowerCase().indexOf(searchQuery.toLowerCase())!=-1){
+			if (ma.getText().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
 				searchResultMarkers.add(ma);
 				listViewMenu.add(ma.getText());
-					/*the website for the corresponding title*/
-					if(ma.getURL()!=null)
-						selectedItemURL.add(ma.getURL());
-					/*if no website is available for a specific title*/
-					else
-						selectedItemURL.add("");
+				/*the website for the corresponding title*/
+				if (ma.getURL() != null)
+					selectedItemURL.add(ma.getURL());
+				/*if no website is available for a specific title*/
+				else
+					selectedItemURL.add("");
 			}
 		}
-		if(listViewMenu.size()==0){
-			Toast.makeText( this, getString(dataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+		if (listViewMenu.size() == 0) {
+			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
 		}
-		else{
-			dataView.jLayer.markers = searchResultMarkers;
-			dataView.frozen = true;
+		else {
+			jLayer.markers = searchResultMarkers;
+			dataView.setFrozen(true);
 			setList(2);
 			finish();
 			Intent intent1 = new Intent(this, MixListView.class); 
 			startActivityForResult(intent1, 42);
 		}
-		
 	}
 
-	
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		switch(list){
-			/*Data Sources*/  
-			case 1:
-				clickOnDataSource(position);		
-				break;
-			
+		/*Data Sources*/  
+		case 1:
+			clickOnDataSource(position);		
+			break;
+
 			/*List View*/
-			case 2:
-				clickOnListView(position);
-				break;
+		case 2:
+			clickOnListView(position);
+			break;
 		}
-		
+
 	}
 	public void clickOnListView(int position){
 		/*if no website is available for this item*/
-		if(selectedItemURL.get(position)==""){				
-			Toast.makeText( this, getString(dataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
-		}
-		else if(selectedItemURL.get(position)=="search"){
-			dataView.frozen=false;
-			dataView.jLayer.markers= originalMarkerList;
+		String selectedURL = position < selectedItemURL.size() ? selectedItemURL.get(position) : null;
+		if (selectedURL == null || selectedURL.length() <= 0)
+			Toast.makeText( this, getString(DataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
+		else if("search".equals(selectedURL)){
+			dataView.setFrozen(false);
+			dataView.getDataHandler().markers = originalMarkerList;
 			setList(2);
 			finish();
 			Intent intent1 = new Intent(this, MixListView.class); 
 			startActivityForResult(intent1, 42);
 		}
-		else{
-			String url = selectedItemURL.get(position);
+		else {
 			try {
-				if (url != null && url.startsWith("webpage")) {
-					String newUrl = MixUtils.parseAction(url);
-					dataView.ctx.loadWebPage(newUrl, this);
+				if (selectedURL.startsWith("webpage")) {
+					String newUrl = MixUtils.parseAction(selectedURL);
+					dataView.getContext().loadWebPage(newUrl, this);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	public static void createContextMenu(ImageView icon){
-		
-		
-		 icon.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {				
-				@Override
-				public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-					 int index=0;
-					 switch(ListItemAdapter.itemPosition){
-					 	case 0:
-							 menu.setHeaderTitle("Wiki Menu");
-							 menu.add(index, index, index, "We are working on it...");			
-							 break;
-					 	case 1:
-					 		 menu.setHeaderTitle("Twitter Menu");
-							 menu.add(index, index, index, "We are working on it...");
-							 break;
-					 	case 2:
-					 		 menu.setHeaderTitle("Buzz Menu");
-							 menu.add(index, index, index, "We are working on it...");
-							 break;
-					 	case 3:
-					 		 menu.setHeaderTitle("OpenStreetMap Menu");
-							 menu.add(index, index, index, "We are working on it...");
-							 break;
-					 	case 4:
-							AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-							alert.setTitle("insert your own URL:");
-							
-							final EditText input = new EditText(ctx); 
-							input.setText(customizedURL);
-							alert.setView(input);
-							
-							alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					        	public void onClick(DialogInterface dialog, int id) {       		
-					        		Editable value = input.getText();
-					        		customizedURL = ""+value;
-					            }
-					        });
-							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					        	public void onClick(DialogInterface dialog, int id) {       		
-					        		dialog.dismiss();
-					            }
-					        });
-						    alert.show();
-					 		break;
-					 }
+
+	public static void createContextMenu(ImageView icon) {
+		icon.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {				
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+				int index=0;
+				switch(ListItemAdapter.itemPosition){
+				case 0:
+					menu.setHeaderTitle("Wiki Menu");
+					menu.add(index, index, index, "We are working on it...");			
+					break;
+				case 1:
+					menu.setHeaderTitle("Twitter Menu");
+					menu.add(index, index, index, "We are working on it...");
+					break;
+				case 2:
+					menu.setHeaderTitle("Buzz Menu");
+					menu.add(index, index, index, "We are working on it...");
+					break;
+				case 3:
+					menu.setHeaderTitle("OpenStreetMap Menu");
+					menu.add(index, index, index, "We are working on it...");
+					break;
+				case 4:
+					AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+					alert.setTitle("insert your own URL:");
+
+					final EditText input = new EditText(ctx); 
+					input.setText(customizedURL);
+					alert.setView(input);
+
+					alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {       		
+							Editable value = input.getText();
+							customizedURL = ""+value;
+						}
+					});
+					alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {       		
+							dialog.dismiss();
+						}
+					});
+					alert.show();
+					break;
 				}
-	        });
+			}
+		});
 
 	}
 
-	
 	public void clickOnDataSource(int position){
-		if(dataView.frozen==true)
-			dataView.frozen=false;
+		if(dataView.isFrozen())
+			dataView.setFrozen(false);
 		switch(position){
-			/*WIKIPEDIA*/
-			case 0:
-				setDataSource("Wikipedia");
-				finish();
-				break;
-			
+		/*WIKIPEDIA*/
+		case 0:
+			setDataSource("Wikipedia");
+			finish();
+			break;
+
 			/*TWITTER*/
-			case 1:		
-				setDataSource("Twitter");
-				finish();
-				break;
+		case 1:		
+			setDataSource("Twitter");
+			finish();
+			break;
 
 			/*BUZZ*/
-			case 2:
-				setDataSource("Buzz");
-				finish();
-				break;
-				
+		case 2:
+			setDataSource("Buzz");
+			finish();
+			break;
+
 			/*OSM*/
-			case 3:
-				setDataSource("OpenStreetMap");
-				finish();
-				break;
-				
+		case 3:
+			setDataSource("OpenStreetMap");
+			finish();
+			break;
+
 			/*Own URL*/
-			case 4:
-				setDataSource("OwnURL");
-				finish();
-				break;
+		case 4:
+			setDataSource("OwnURL");
+			finish();
+			break;
 		}
 	}
-	
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-			int base = Menu.FIRST;
-			
-			/*define menu items*/
-			MenuItem item1 = menu.add(base, base, base, getString(dataView.MENU_ITEM_3)); 
-			MenuItem item2 = menu.add(base, base+1, base+1, getString(dataView.MENU_CAM_MODE));
+		int base = Menu.FIRST;
 
-			/*assign icons to the menu items*/
-			item1.setIcon(android.R.drawable.ic_menu_mapmode);
-			item2.setIcon(android.R.drawable.ic_menu_camera);
-			
-			return true;
+		/*define menu items*/
+		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
+		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
+
+		/*assign icons to the menu items*/
+		item1.setIcon(android.R.drawable.ic_menu_mapmode);
+		item2.setIcon(android.R.drawable.ic_menu_camera);
+
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
-			/*Map View*/
-			case 1:
-				createMixMap();
-				finish();
-				break;
+		/*Map View*/
+		case 1:
+			createMixMap();
+			finish();
+			break;
 			/*back to Camera View*/
-			case 2:
-				finish();
-				break;
+		case 2:
+			finish();
+			break;
 		}
 		return true;
 	}
 
 	@Override
-    public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(MenuItem item) {
 		switch(item.getItemId()){
-			case 1: 
-				break;
-			case 2: 
-				break;
+		case 1: 
+			break;
+		case 2: 
+			break;
 		}
 		return false;
 	}
-	
+
 	public void createMixMap(){
 		Intent intent2 = new Intent(MixListView.this, MixMap.class); 
 		startActivityForResult(intent2, 20);
 	}
-	
-	public static void setDataSource(String source){
+
+	public void setDataSource(String source){
 		selectedDataSource = source;
 	}
-	
+
 	public static String getDataSource(){
 		return selectedDataSource;
 	}
-	
+
 	public static void setList(int l){
 		list = l;
 	}
+
 	public static String getSearchQuery(){
 		return searchQuery;
 	}
+
 	public static void setSearchQuery(String query){
 		searchQuery = query;
 	}
-
 }
 
 class ListItemAdapter extends BaseAdapter {
+
+	private MixListView mixListView;
+
 	private LayoutInflater myInflater;
 	static ViewHolder holder;
 	private int[] bgcolors = new int[] {0,0,0,0,0};
@@ -404,94 +414,91 @@ class ListItemAdapter extends BaseAdapter {
 
 	public static int itemPosition =0;
 
-	public ListItemAdapter(Context context) {
-		myInflater = LayoutInflater.from(context);
+	public ListItemAdapter(MixListView mixListView) {
+		this.mixListView = mixListView;
+		myInflater = LayoutInflater.from(mixListView);
 	}
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		itemPosition =position;
-        if(convertView==null){
-	        convertView = myInflater.inflate(R.layout.main, null);
-	
-	        holder = new ViewHolder();
-	        holder.text = (TextView) convertView.findViewById(R.id.list_text);
-	        holder.description = (TextView) convertView.findViewById(R.id.description_text);
+		itemPosition = position;
+		if (convertView==null) {
+			convertView = myInflater.inflate(R.layout.main, null);
 
-	        
-	        convertView.setTag(holder);
-        }
-        else{
-        	holder = (ViewHolder) convertView.getTag();
-        }
-       
-        	
-        	holder.icon = (ImageView) convertView.findViewById(R.id.icon);
-        	
-        	 holder.icon.setPadding(20, 8, 20, 8);
-             holder.icon.setClickable(true);        
-             
-             holder.icon.setOnTouchListener(new View.OnTouchListener() {
-     			@Override
-     			public boolean onTouch(View v, MotionEvent event) {
-     				icon_clicked = true;
-     				itemPosition = position;
-     		
-     				return false;
-     			}
-     		});
-             MixListView.createContextMenu(holder.icon);
-//        }
-        
-             if(position!=4){
-            	 holder.icon.setVisibility(View.INVISIBLE);
-             }
-		
-        
-        holder.text.setPadding(20, 8, 0, 0);
-        holder.description.setPadding(20, 40, 0, 0);
+			holder = new ViewHolder();
+			holder.text = (TextView) convertView.findViewById(R.id.list_text);
+			holder.description = (TextView) convertView.findViewById(R.id.description_text);
 
-        holder.text.setText(MixListView.dataSourceMenu.get(position));
-        holder.description.setText(MixListView.dataSourceDescription.get(position));
-        
-        int colorPos = position % bgcolors.length;
-     	convertView.setBackgroundColor(bgcolors[colorPos]);
-     	holder.text.setTextColor(textcolors[colorPos]);
-     	holder.description.setTextColor(descriptioncolors[colorPos]);
-    	    	
-        return convertView;
-    }
+			convertView.setTag(holder);
+		}
+		else{
+			holder = (ViewHolder) convertView.getTag();
+		}
+
+		holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+
+		holder.icon.setPadding(20, 8, 20, 8);
+		holder.icon.setClickable(true);        
+
+		holder.icon.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				icon_clicked = true;
+				itemPosition = position;
+
+				return false;
+			}
+		});
+		MixListView.createContextMenu(holder.icon);
+
+		if(position!=4){
+			holder.icon.setVisibility(View.INVISIBLE);
+		}
+
+
+		holder.text.setPadding(20, 8, 0, 0);
+		holder.description.setPadding(20, 40, 0, 0);
+
+		holder.text.setText(mixListView.getDataSourceMenu().get(position));
+		holder.description.setText(mixListView.getDataSourceDescription().get(position));
+
+		int colorPos = position % bgcolors.length;
+		convertView.setBackgroundColor(bgcolors[colorPos]);
+		holder.text.setTextColor(textcolors[colorPos]);
+		holder.description.setTextColor(descriptioncolors[colorPos]);
+
+		return convertView;
+	}
 
 	public void changeColor(int index, int bgcolor, int textcolor){
-		if(index<bgcolors.length){
-				bgcolors[index]=bgcolor;
-				textcolors[index]= textcolor;
+		if (index < bgcolors.length) {
+			bgcolors[index]=bgcolor;
+			textcolors[index]= textcolor;
 		}
-		else {
-				Log.d("Color Error", "too large index");
-		}
+		else
+			Log.d("Color Error", "too large index");
 	}
-	
+
 	public void colorSource(String source){
 		for (int i = 0; i < bgcolors.length; i++) {
 			bgcolors[i]=0;
 			textcolors[i]=Color.WHITE;
 		}
-		if(source.equals("Wikipedia"))
+		if (source.equals("Wikipedia"))
 			changeColor(0, Color.WHITE, Color.DKGRAY);
-		if(source.equals("Twitter"))
+		else if (source.equals("Twitter"))
 			changeColor(1, Color.WHITE, Color.DKGRAY);
-		if(source.equals("Buzz"))
+		else if (source.equals("Buzz"))
 			changeColor(2, Color.WHITE, Color.DKGRAY);
-		if(source.equals("OpenStreetMap"))
+		else if (source.equals("OpenStreetMap"))
 			changeColor(3, Color.WHITE, Color.DKGRAY);
-		if(source.equals("OwnURL"))
+		else if (source.equals("OwnURL"))
 			changeColor(4, Color.WHITE, Color.DKGRAY);
 	}
-	
+
 	@Override
 	public int getCount() {
-		return MixListView.dataSourceMenu.size();
+		return mixListView.getDataSourceMenu().size();
 	}
 
 	@Override
@@ -503,10 +510,10 @@ class ListItemAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return position;
 	}
-	
-    private class ViewHolder {
+
+	private class ViewHolder {
 		TextView text;
 		TextView description;
-        ImageView icon;
-    }
+		ImageView icon;
+	}
 }

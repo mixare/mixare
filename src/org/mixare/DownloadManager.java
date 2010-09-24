@@ -30,14 +30,9 @@ import org.json.JSONObject;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import android.util.Log;
-
 
 public class DownloadManager implements Runnable {
 
@@ -51,9 +46,9 @@ public class DownloadManager implements Runnable {
 	InputStream is;
 
 	private String currJobId = null;
-	
+
 	MixContext ctx;
-	
+
 	public DownloadManager(MixContext ctx) {
 		this.ctx = ctx;
 	}
@@ -86,7 +81,7 @@ public class DownloadManager implements Runnable {
 				if (proceed) {
 					state = CONNECTED;
 					currJobId = jobId;
-					
+
 					result = processRequest(request);
 
 					synchronized (this) {
@@ -111,6 +106,7 @@ public class DownloadManager implements Runnable {
 		// Do stop
 		state = STOPPED;
 	}
+
 	public int checkForConnection(){
 		return state;
 	}
@@ -131,59 +127,57 @@ public class DownloadManager implements Runnable {
 		DownloadResult result = new DownloadResult();
 		try {
 			if(ctx.getHttpGETInputStream(request.url)!=null){
-				
+
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
 				//String ss = ctx.unescapeHTML(tmp, 0);
 
 				Json layer = new Json();
-				
+
 				// try loading JSON DATA
 				try {
 
 					Log.d(MixView.TAG, "try to load JSON data");
-					 
+
 					JSONObject root = new JSONObject(tmp);
-					
+
 					Log.i(MixView.TAG, "loading JSON data");				
 
 					layer.load(root);
 					result.obj = layer;
-					
+
 					result.format = request.format;
 					result.error = false;
 					result.errorMsg = null;
-					
+
 				}
 				catch (JSONException e) {
 
 					Log.d(MixView.TAG, "no JSON data");
 					Log.d(MixView.TAG, "try to load XML data");
-					
+
 					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			        //Document doc = builder.parse(is);
+					//Document doc = builder.parse(is);
 					Document doc = builder.parse(new InputSource(new StringReader(tmp)));
 
 					//Document doc = builder.parse(is);
-			        
+
 					XMLHandler xml = new XMLHandler();
-					
 
 					Log.i(MixView.TAG, "loading XML data");	
 					xml.load(doc);
 
 					result.obj = xml;
-					
+
 					result.format = request.format;
 					result.error = false;
 					result.errorMsg = null;				
 				}
-
-			ctx.returnHttpInputStream(is);
-			is = null;
+				ctx.returnHttpInputStream(is);
+				is = null;
 			}
-
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			result.obj = null;
 			result.error = true;
 			result.errorMsg = ex.getMessage();
@@ -201,7 +195,6 @@ public class DownloadManager implements Runnable {
 
 		return result;
 	}
-
 
 	public synchronized void purgeLists() {
 		todoList.clear();

@@ -18,6 +18,8 @@
  */
 package org.mixare;
 
+import java.util.Comparator;
+
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.ScreenObj;
 import org.mixare.gui.ScreenLine;
@@ -155,13 +157,14 @@ public class Marker {
 		if (isVisible) {
 			//default color
 			dw.setColor(color);
-			if(MixListView.getDataSource()=="Wikipedia")
+			String dataSource = MixListView.getDataSource();
+			if ("Wikipedia".equals(dataSource))
 				dw.setColor(Color.rgb(255, 0, 0));
-			if(MixListView.getDataSource()=="Buzz")
+			else if ("Buzz".equals(dataSource))
 				dw.setColor(Color.rgb(4, 228, 20));
-			if(MixListView.getDataSource()=="Twitter")
+			else if ("Twitter".equals(dataSource))
 				dw.setColor(Color.rgb(50, 204, 255));
-			if(MixListView.getDataSource()=="OpenStreetMap")
+			else if ("OpenStreetMap".equals(dataSource))
 				dw.setColor(Color.rgb(255, 168, 0));
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
@@ -190,6 +193,7 @@ public class Marker {
 	public String getText(){
 		return mText;
 	}
+
 	public String getURL(){
 		return mOnPress;
 	}
@@ -224,8 +228,6 @@ class Label implements ScreenObj {
 	public float getHeight() {
 		return height;
 	}
-
-	
 }
 
 
@@ -234,7 +236,20 @@ class Label implements ScreenObj {
  * @author daniele
  *
  */
-class MarkersOrder implements java.util.Comparator<Object> {
+class MarkersOrder implements Comparator<Object> {
+
+	private static MarkersOrder instance;	// singleton
+	
+	public static MarkersOrder getInstance() {
+		if (instance == null)
+			instance = new MarkersOrder();
+		return instance;
+	}
+	
+	/** Private, use getInstance() */
+	private MarkersOrder() {
+	}
+
 	public int compare(Object left, Object right) {
 		Marker leftPm = (Marker) left;
 		Marker rightPm = (Marker) right;

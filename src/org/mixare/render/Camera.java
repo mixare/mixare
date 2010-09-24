@@ -19,7 +19,9 @@
 package org.mixare.render;
 
 public class Camera {
-	public static float DEFAULT_VIEW_ANGLE = (float) Math.toRadians(45);
+	
+	public static final float DEFAULT_VIEW_ANGLE = (float) Math.toRadians(45);
+	
 	public int width, height;
 
 	public Matrix transform = new Matrix();
@@ -38,7 +40,6 @@ public class Camera {
 
 		transform.toIdentity();
 		lco.set(0, 0, 0);
-
 	}
 
 	public void setViewAngle(float viewAngle) {
@@ -51,7 +52,6 @@ public class Camera {
 		this.viewAngle = viewAngle;
 		this.dist = (width / 2) / (float) Math.tan(viewAngle / 2);
 	}
-
 
 	public void projectPoint(MixVector orgPoint, MixVector prjPoint, float addX,
 			float addY) {
