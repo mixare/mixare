@@ -112,16 +112,15 @@ public class MixListView extends ListActivity {
 			selectedItemURL = new Vector<String>();
 			listViewMenu = new Vector<String>();
 			DataHandler jLayer = dataView.getDataHandler();
-			if (dataView.isFrozen() && jLayer.markers.size()>0){
+			if (dataView.isFrozen() && jLayer.getMarkerCount() > 0){
 				selectedItemURL.add("search");
 			}
 			/*add all marker items to a title and a URL Vector*/
-			for (int i = 0; i < jLayer.markers.size(); i++) {
-				Marker ma = new Marker();
-				ma = jLayer.markers.get(i);
+			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
+				Marker ma = jLayer.getMarker(i);
 				listViewMenu.add(ma.getText());
 				/*the website for the corresponding title*/
-				if(ma.getURL()!=null)
+				if (ma.getURL()!=null)
 					selectedItemURL.add(ma.getURL());
 				/*if no website is available for a specific title*/
 				else
@@ -166,19 +165,19 @@ public class MixListView extends ListActivity {
 	private void doMixSearch(String query) {
 		DataHandler jLayer = dataView.getDataHandler();
 		if (!dataView.isFrozen()) {
-			originalMarkerList = jLayer.markers;
-			MixMap.originalMarkerList = jLayer.markers;
+			originalMarkerList = jLayer.getMarkerList();
+			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
-		originalMarkerList = jLayer.markers;
+		originalMarkerList = jLayer.getMarkerList();
 		searchResultMarkers = new ArrayList<Marker>();
 		Log.d("SEARCH-------------------0", ""+query);
 		setSearchQuery(query);
 
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<String>();
-		for(int i = 0; i < jLayer.markers.size();i++){
+		for(int i = 0; i < jLayer.getMarkerCount();i++){
 			Marker ma = new Marker();
-			ma = jLayer.markers.get(i);
+			ma = jLayer.getMarker(i);
 
 			if (ma.getText().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
 				searchResultMarkers.add(ma);
@@ -195,7 +194,7 @@ public class MixListView extends ListActivity {
 			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
 		}
 		else {
-			jLayer.markers = searchResultMarkers;
+			jLayer.setMarkerList(searchResultMarkers);
 			dataView.setFrozen(true);
 			setList(2);
 			finish();
@@ -221,6 +220,7 @@ public class MixListView extends ListActivity {
 		}
 
 	}
+
 	public void clickOnListView(int position){
 		/*if no website is available for this item*/
 		String selectedURL = position < selectedItemURL.size() ? selectedItemURL.get(position) : null;
@@ -228,7 +228,7 @@ public class MixListView extends ListActivity {
 			Toast.makeText( this, getString(DataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
 		else if("search".equals(selectedURL)){
 			dataView.setFrozen(false);
-			dataView.getDataHandler().markers = originalMarkerList;
+			dataView.getDataHandler().setMarkerList(originalMarkerList);
 			setList(2);
 			finish();
 			Intent intent1 = new Intent(this, MixListView.class); 

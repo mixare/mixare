@@ -37,9 +37,12 @@ public class XMLHandler extends DataHandler {
 	        			
 	                	Log.d(MixView.TAG,"OSM Node: "+name+" lat "+lat+" lon "+lon+"\n");
 
-	                	if(markers.size()<MAX_OBJECTS)
-	                		createMarker(name, lat, lon, 0, "http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue());
-	        			//skip to next node
+	                	// This check will be done inside the createMarker method 
+	                	//if(markers.size()<MAX_OBJECTS)
+	                	
+	                	createMarker(name, lat, lon, 0, "http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue());
+	        			
+	                	//skip to next node
 	        			continue;
 	        		}
         		}

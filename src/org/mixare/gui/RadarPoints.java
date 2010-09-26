@@ -52,8 +52,8 @@ public class RadarPoints implements ScreenObj {
 		float scale = range / RADIUS;
 
 		DataHandler jLayer = view.getDataHandler();
-		for (int i = 0; i < jLayer.markers.size(); i++) {
-			Marker pm = jLayer.markers.get(i);
+		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
+			Marker pm = jLayer.getMarker(i);
 			float x = pm.loc.x / scale;
 			float y = pm.loc.z / scale;
 

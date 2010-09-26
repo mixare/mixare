@@ -5,16 +5,22 @@ import java.util.ArrayList;
 import org.mixare.Marker;
 import org.mixare.reality.PhysicalPlace;
 
+/**
+ * DataHandler is the model which provides the Marker Objects.
+ * 
+ * DataHandler is also the Factory for new Marker objects.
+ */
 public class DataHandler {
 
-	public ArrayList<Marker> markers = new ArrayList<Marker>();
-	public static final int MAX_OBJECTS = 50;
+	private static final int MAX_OBJECTS = 50;
+
+	private ArrayList<Marker> markerList = new ArrayList<Marker>();
 
 	protected Marker createMarker(String title, double latitude, double longitude, double elevation, String link) {
 		PhysicalPlace refpt = new PhysicalPlace();
 		Marker ma = new Marker();
 
-		if(link != null && link.length()>0) {
+		if (link != null && link.length() > 0) {
 			ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(link);
 		}
 
@@ -23,16 +29,30 @@ public class DataHandler {
 		refpt.setLongitude(longitude);
 		refpt.setAltitude(elevation);
 		ma.mGeoLoc.setTo(refpt);
-		if(markers.size()<MAX_OBJECTS)
-			markers.add(ma);
+		if (markerList.size() < MAX_OBJECTS)
+			markerList.add(ma);
 		return ma;
 	}
-
-	public ArrayList<Marker> getMarkers() {
-		return markers;
+	
+	/**
+	 * @deprecated Nobody should get direct access to the list
+	 */
+	public ArrayList getMarkerList() {
+		return markerList;
+	}
+	
+	/**
+	 * @deprecated Nobody should get direct access to the list
+	 */
+	public void setMarkerList(ArrayList markerList) {
+		this.markerList = markerList;
 	}
 
-	public void setMarkers(ArrayList<Marker> markers) {
-		this.markers = markers;
+	public int getMarkerCount() {
+		return markerList.size();
+	}
+	
+	public Marker getMarker(int index) {
+		return markerList.get(index);
 	}
 }

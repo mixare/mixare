@@ -318,25 +318,25 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private void doMixSearch(String query) {
 		DataHandler jLayer = view.getDataHandler();
 		if(!view.isFrozen()){
-			MixListView.originalMarkerList = jLayer.markers;
-			MixMap.originalMarkerList = jLayer.markers;
+			MixListView.originalMarkerList = jLayer.getMarkerList();
+			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
 
 		ArrayList<Marker> searchResults =new ArrayList<Marker>();
 		Log.d("SEARCH-------------------0", ""+query);
-		if (jLayer.markers.size() > 0) {
-			for(int i = 0; i < jLayer.markers.size(); i++) {
+		if (jLayer.getMarkerCount() > 0) {
+			for(int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = new Marker();
-				ma = jLayer.markers.get(i);
-				if(ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
+				ma = jLayer.getMarker(i);
+				if(ma.getText().toLowerCase().indexOf(query.toLowerCase()) != -1){
 					searchResults.add(ma);
 					/*the website for the corresponding title*/
 				}
 			}
 		}
-		if (searchResults.size()>0){
+		if (searchResults.size() > 0){
 			view.setFrozen(true);
-			jLayer.markers = searchResults;
+			jLayer.setMarkerList(searchResults);
 		}
 		else
 			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
@@ -555,7 +555,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			MixListView.setList(2);
 			/*if the list of titles to show in alternative list view is not empty*/
-			if (view.getDataHandler().markers.size() > 0) {
+			if (view.getDataHandler().getMarkerCount() > 0) {
 				Intent intent1 = new Intent(MixView.this, MixListView.class); 
 				startActivityForResult(intent1, 42);
 			}

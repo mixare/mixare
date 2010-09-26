@@ -37,9 +37,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 	private static ArrayList<Marker> markerList;
 	private static DataView dataView;
-	private MixContext ctx;
 	private static GeoPoint startPoint;
+
+	private MixContext ctx;
 	private MapView mapView;
+
 	static MixMap map;
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
@@ -56,7 +58,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		super.onCreate(savedInstanceState);
 		dataView = MixView.view;
 		ctx = dataView.getContext();
-		setMarkerList(dataView.getDataHandler().markers);
+		setMarkerList(dataView.getDataHandler().getMarkerList());
 		map = this;
 
 		setMapContext(this);
@@ -71,7 +73,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		setStartPoint();
 		createOverlay();
 
-		if(dataView.isFrozen()){
+		if (dataView.isFrozen()){
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
@@ -169,7 +171,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 	public void createListView(){
 		MixListView.setList(2);
-		if (dataView.getDataHandler().markers.size() > 0) {
+		if (dataView.getDataHandler().getMarkerCount() > 0) {
 			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
 			startActivityForResult(intent1, 42);
 		}
@@ -184,7 +186,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 //	}
 
 	public void setMarkerList(ArrayList<Marker> maList){
-		markerList= maList;
+		markerList = maList;
 	}
 
 	public DataView getDataView(){
@@ -235,14 +237,13 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private void doMixSearch(String query) {
 		DataHandler jLayer = dataView.getDataHandler();
 		if (!dataView.isFrozen()) {
-			originalMarkerList = jLayer.markers;
-			MixListView.originalMarkerList = jLayer.markers;
+			originalMarkerList = jLayer.getMarkerList();
+			MixListView.originalMarkerList = jLayer.getMarkerList();
 		}
 		markerList = new ArrayList<Marker>();
 
-		for(int i = 0; i < jLayer.markers.size(); i++) {
-			Marker ma = new Marker();
-			ma = jLayer.markers.get(i);
+		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
+			Marker ma = jLayer.getMarker(i);
 
 			if (ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
 				markerList.add(ma);
@@ -252,7 +253,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
 		}
 		else{
-			jLayer.markers = markerList;
+			jLayer.setMarkerList(markerList);
 			dataView.setFrozen(true);
 
 			finish();
@@ -264,7 +265,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
-		dataView.getDataHandler().markers = originalMarkerList;
+		dataView.getDataHandler().setMarkerList(originalMarkerList);
 
 		searchNotificationTxt.setVisibility(View.INVISIBLE);
 		searchNotificationTxt = null;
@@ -300,10 +301,10 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 
 	@Override
 	protected boolean onTap(int index){
-		if (size()==1)
+		if (size() == 1)
 			mixMap.startPointMsg();
-		else if (mixMap.getDataView().getDataHandler().markers.get(index).getURL()!= null) {
-			String url = mixMap.getDataView().getDataHandler().markers.get(index).getURL();
+		else if (mixMap.getDataView().getDataHandler().getMarker(index).getURL() !=  null) {
+			String url = mixMap.getDataView().getDataHandler().getMarker(index).getURL();
 			Log.d("MapView", "opern url: "+url);
 			try {
 				if (url != null && url.startsWith("webpage")) {

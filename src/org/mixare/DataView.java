@@ -260,14 +260,14 @@ public class DataView {
 					dataHandler = (DataHandler) dRes.obj;
 
 					//Sort markers by cMarker.z
-					Collections.sort(dataHandler.markers, MarkersOrder.getInstance());
+					Collections.sort(dataHandler.getMarkerList(), MarkersOrder.getInstance());
 				}	
 			}
 		} 
 
 		// Update markers
-		for (int i = 0; i < dataHandler.markers.size(); i++) {
-			Marker ma = dataHandler.markers.get(i);
+		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
+			Marker ma = dataHandler.getMarker(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
 			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
@@ -338,8 +338,8 @@ public class DataView {
 
 		// Handle event
 		if (state.nextLStatus == MixState.DONE) {
-			for (int i = dataHandler.markers.size() - 1; i >= 0 && !evtHandled; i--) {
-				Marker pm = dataHandler.markers.get(i);
+			for (int i = dataHandler.getMarkerCount() - 1; i >= 0 && !evtHandled; i--) {
+				Marker pm = dataHandler.getMarker(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, ctx, state);
 			}
