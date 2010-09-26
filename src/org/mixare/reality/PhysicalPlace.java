@@ -23,6 +23,7 @@ import org.mixare.render.MixVector;
 import android.location.Location;
 
 public class PhysicalPlace {
+	
 	double latitude;
 	double longitude;
 	double altitude;

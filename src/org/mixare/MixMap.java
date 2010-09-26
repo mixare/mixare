@@ -106,7 +106,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		MixOverlay mixOverlay = new MixOverlay(this, drawable);
 
 		for (int i = 0; i < markerList.size(); i++) {
-			GeoPoint point = new GeoPoint((int)(markerList.get(i).mGeoLoc.getLatitude()*1E6), (int)(markerList.get(i).mGeoLoc.getLongitude()*1E6));
+			GeoPoint point = new GeoPoint((int)(markerList.get(i).getLatitude()*1E6), (int)(markerList.get(i).getLongitude()*1E6));
 			item = new OverlayItem(point, "", "");
 			mixOverlay.addOverlay(item);
 			mapOverlays.add(mixOverlay);
@@ -245,7 +245,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
 			Marker ma = jLayer.getMarker(i);
 
-			if (ma.getText().toLowerCase().indexOf(query.toLowerCase())!=-1){
+			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
 				markerList.add(ma);
 			}
 		}

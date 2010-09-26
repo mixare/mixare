@@ -312,9 +312,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		Log.d("SEARCH-------------------0", ""+query);
 		if (jLayer.getMarkerCount() > 0) {
 			for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-				Marker ma = new Marker();
-				ma = jLayer.getMarker(i);
-				if(ma.getText().toLowerCase().indexOf(query.toLowerCase()) != -1){
+				Marker ma = jLayer.getMarker(i);
+				if(ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1){
 					searchResults.add(ma);
 					/*the website for the corresponding title*/
 				}

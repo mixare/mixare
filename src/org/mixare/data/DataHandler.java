@@ -1,9 +1,9 @@
 package org.mixare.data;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import org.mixare.Marker;
-import org.mixare.reality.PhysicalPlace;
 
 /**
  * DataHandler is the model which provides the Marker Objects.
@@ -13,25 +13,16 @@ import org.mixare.reality.PhysicalPlace;
 public class DataHandler {
 
 	private static final int MAX_OBJECTS = 50;
-
 	private ArrayList<Marker> markerList = new ArrayList<Marker>();
 
-	protected Marker createMarker(String title, double latitude, double longitude, double elevation, String link) {
-		PhysicalPlace refpt = new PhysicalPlace();
-		Marker ma = new Marker();
-
-		if (link != null && link.length() > 0) {
-			ma.mOnPress = "webpage:" + java.net.URLDecoder.decode(link);
-		}
-
-		ma.mText = title;
-		refpt.setLatitude(latitude);
-		refpt.setLongitude(longitude);
-		refpt.setAltitude(elevation);
-		ma.mGeoLoc.setTo(refpt);
-		if (markerList.size() < MAX_OBJECTS)
+	public void createMarker(String title, double latitude, double longitude, double elevation, String link) {
+		if (markerList.size() < MAX_OBJECTS) {
+			String URL = null;
+			if (link != null && link.length() > 0)
+				URL = "webpage:" + URLDecoder.decode(link);
+			Marker ma = new Marker(title, latitude, longitude, elevation, URL);
 			markerList.add(ma);
-		return ma;
+		}
 	}
 	
 	/**

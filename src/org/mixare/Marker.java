@@ -32,40 +32,75 @@ import android.graphics.Color;
 import android.location.Location;
 
 public class Marker {
-	// XML properties
-	public String mOnPress;
-	public PhysicalPlace mGeoLoc = new PhysicalPlace();
 
-	// State properties
-	float locX, locY, locZ;
+	private String title;
+	private String URL;
+	private PhysicalPlace mGeoLoc;
 
 	// Draw properties
-	boolean isVisible, isLookingAt, isNear;
-	float deltaCenter;
+	private boolean isVisible;
+//	private boolean isLookingAt;
+//	private boolean isNear;
+//	private float deltaCenter;
 	MixVector cMarker = new MixVector();
-	MixVector signMarker = new MixVector();
-	MixVector oMarker = new MixVector();
-	static int color = Color.rgb(255, 0, 0), decInnerColor = Color.rgb(255, 0, 0), decWorkColor = Color.rgb(50, 50, 255);
-
-	Label txtLab = new Label();
+	private MixVector signMarker = new MixVector();
+//	private MixVector oMarker = new MixVector();
 	
+	private static final int COLOR_DEFAULT = Color.rgb(255, 0, 0);
+
 	// Temp properties
-	MixVector tmpa = new MixVector();
-	MixVector tmpb = new MixVector();
-	MixVector tmpc = new MixVector();
+	private MixVector tmpa = new MixVector();
+	private MixVector tmpb = new MixVector();
+	private MixVector tmpc = new MixVector();
 	
-	public MixVector loc = new MixVector();
-	MixVector origin = new MixVector(0, 0, 0);
-	MixVector upV = new MixVector(0, 1, 0);
-	ScreenLine pPt = new ScreenLine();
+	private MixVector locationVector = new MixVector();
+	private MixVector origin = new MixVector(0, 0, 0);
+	private MixVector upV = new MixVector(0, 1, 0);
+	private ScreenLine pPt = new ScreenLine();
 
+	private Label txtLab = new Label();
+	private TextObj textBlock;
+	
+	public Marker(String title, double latitude, double longitude, double altitude, String URL) {
+		super();
 
-	void cCMarker(MixVector originalPoint, Camera viewCam, float addX,
-			float addY) {
+		this.title = title;
+		this.mGeoLoc = new PhysicalPlace();
+		this.mGeoLoc.setLatitude(latitude);
+		this.mGeoLoc.setLongitude(longitude);
+		this.mGeoLoc.setAltitude(altitude);
+		this.URL = URL;
+	}
+
+	public String getTitle(){
+		return title;
+	}
+
+	public String getURL(){
+		return URL;
+	}
+
+	public double getLatitude() {
+		return mGeoLoc.getLatitude();
+	}
+	
+	public double getLongitude() {
+		return mGeoLoc.getLongitude();
+	}
+	
+	public double getAltitude() {
+		return mGeoLoc.getAltitude();
+	}
+	
+	public MixVector getLocationVector() {
+		return locationVector;
+	}
+	
+	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
 		tmpa.set(originalPoint); //1
 		tmpc.set(upV); 
-		tmpa.add(loc); //3 
-		tmpc.add(loc); //3
+		tmpa.add(locationVector); //3 
+		tmpc.add(locationVector); //3
 		tmpa.sub(viewCam.lco); //4
 		tmpc.sub(viewCam.lco); //4
 		tmpa.prod(viewCam.transform); //5
@@ -75,15 +110,12 @@ public class Marker {
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
 		signMarker.set(tmpb); //7
-		
 	}
 
-
-
-	void calcV(Camera viewCam) {
+	private void calcV(Camera viewCam) {
 		isVisible = false;
-		isLookingAt = false;
-		deltaCenter = Float.MAX_VALUE;
+//		isLookingAt = false;
+//		deltaCenter = Float.MAX_VALUE;
 
 		if (cMarker.z < -1f) {
 			isVisible = true;
@@ -91,45 +123,44 @@ public class Marker {
 			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
 					viewCam.width, viewCam.height)) {
 
-				float xDist = cMarker.x - viewCam.width / 2;
-				float yDist = cMarker.y - viewCam.height / 2;
-				float dist = xDist * xDist + yDist * yDist;
+//				float xDist = cMarker.x - viewCam.width / 2;
+//				float yDist = cMarker.y - viewCam.height / 2;
+//				float dist = xDist * xDist + yDist * yDist;
 
-				deltaCenter = (float) Math.sqrt(dist);
-
-				if (dist < 50 * 50) {
-					isLookingAt = true;
-				}
+//				deltaCenter = (float) Math.sqrt(dist);
+//
+//				if (dist < 50 * 50) {
+//					isLookingAt = true;
+//				}
 			}
 		}
 	}
 
-
-	void update(Location curGPSFix, long time) {
-		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, loc);
+	public void update(Location curGPSFix, long time) {
+		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, locationVector);
 	}
 
-	void calcPaint(Camera viewCam, float addX, float addY) {
+	public void calcPaint(Camera viewCam, float addX, float addY) {
 		cCMarker(origin, viewCam, addX, addY);
 		calcV(viewCam);
 	}
 
-	void calcPaint(Camera viewCam) {
-		cCMarker(origin, viewCam, 0, 0);
-	}
+//	private void calcPaint(Camera viewCam) {
+//		cCMarker(origin, viewCam, 0, 0);
+//	}
 
-	boolean isClickValid(float x, float y) {
+	private boolean isClickValid(float x, float y) {
 		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 				signMarker.x, signMarker.y);
 
 		pPt.x = x - signMarker.x;
 		pPt.y = y - signMarker.y;
 		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
-		pPt.x += txtLab.x;
-		pPt.y += txtLab.y;
+		pPt.x += txtLab.getX();
+		pPt.y += txtLab.getY();
 
-		float objX = txtLab.x - txtLab.getWidth() / 2;
-		float objY = txtLab.y - txtLab.getHeight() / 2;
+		float objX = txtLab.getX() - txtLab.getWidth() / 2;
+		float objY = txtLab.getY() - txtLab.getHeight() / 2;
 		float objW = txtLab.getWidth();
 		float objH = txtLab.getHeight();
 
@@ -141,22 +172,19 @@ public class Marker {
 		}
 	}
 
-	public String mText;
-	TextObj textBlock;
-
-	void draw(PaintScreen dw) {
+	public void draw(PaintScreen dw) {
 
 		//TODO: grandezza cerchi e trasparenza
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
 		if (textBlock == null) {
-			textBlock = new TextObj(mText, Math.round(maxHeight / 2f) + 1,
+			textBlock = new TextObj(title, Math.round(maxHeight / 2f) + 1,
 					160, dw);
 		}
 
 		if (isVisible) {
 			//default color
-			dw.setColor(color);
+			dw.setColor(COLOR_DEFAULT);
 			String dataSource = MixListView.getDataSource();
 			if ("Wikipedia".equals(dataSource))
 				dw.setColor(Color.rgb(255, 0, 0));
@@ -181,34 +209,26 @@ public class Marker {
 		}
 	}
 
-	boolean fClick(float x, float y, MixContext ctx, MixState state) {
+	public boolean fClick(float x, float y, MixContext ctx, MixState state) {
 		boolean evtHandled = false;
 
 		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, mOnPress);
+			evtHandled = state.handleEvent(ctx, URL);
 		}
 		return evtHandled;
-	}
-	
-	public String getText(){
-		return mText;
-	}
-
-	public String getURL(){
-		return mOnPress;
 	}
 }
 
 
 class Label implements ScreenObj {
-	float x, y, w, h;
-	float width, height;
-	ScreenObj obj;
+	private float x, y;
+	private float width, height;
+	private ScreenObj obj;
 
 	public void prepare(ScreenObj drawObj) {
 		obj = drawObj;
-		w = obj.getWidth();
-		h = obj.getHeight();
+		float w = obj.getWidth();
+		float h = obj.getHeight();
 
 		x = w / 2;
 		y = 0;
@@ -219,6 +239,14 @@ class Label implements ScreenObj {
 
 	public void paint(PaintScreen dw) {
 		dw.paintObj(obj, x, y, 0, 1);
+	}
+	
+	public float getX() {
+		return x;
+	}
+	
+	public float getY() {
+		return y;
 	}
 
 	public float getWidth() {
@@ -234,7 +262,6 @@ class Label implements ScreenObj {
 /**
  * Compares the markers. The closer they are the higher in the stack.
  * @author daniele
- *
  */
 class MarkersOrder implements Comparator<Object> {
 

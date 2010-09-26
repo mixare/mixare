@@ -118,7 +118,7 @@ public class MixListView extends ListActivity {
 			/*add all marker items to a title and a URL Vector*/
 			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = jLayer.getMarker(i);
-				listViewMenu.add(ma.getText());
+				listViewMenu.add(ma.getTitle());
 				/*the website for the corresponding title*/
 				if (ma.getURL()!=null)
 					selectedItemURL.add(ma.getURL());
@@ -176,12 +176,11 @@ public class MixListView extends ListActivity {
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<String>();
 		for(int i = 0; i < jLayer.getMarkerCount();i++){
-			Marker ma = new Marker();
-			ma = jLayer.getMarker(i);
+			Marker ma = jLayer.getMarker(i);
 
-			if (ma.getText().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
+			if (ma.getTitle().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
 				searchResultMarkers.add(ma);
-				listViewMenu.add(ma.getText());
+				listViewMenu.add(ma.getTitle());
 				/*the website for the corresponding title*/
 				if (ma.getURL() != null)
 					selectedItemURL.add(ma.getURL());

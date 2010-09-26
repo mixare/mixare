@@ -277,7 +277,7 @@ public class DataView {
 			Marker ma = dataHandler.getMarker(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
-			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude(), dist);
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude(), dist);
 			if (dist[0] / 1000f < radius) {
 				if (!frozen) 
 					ma.update(curFix, System.currentTimeMillis());
