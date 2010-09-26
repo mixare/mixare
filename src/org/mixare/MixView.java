@@ -21,6 +21,7 @@ package org.mixare;
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,9 +77,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private AugmentedView augScreen;
 
 	private boolean isInited;
-	private MixContext ctx;
+	private MixContext mixContext;
 	static PaintScreen dWindow;
-	static DataView view;
+	static DataView dataView;
 	private Thread downloadThread;
 
 	private float RTmp[] = new float[9];
@@ -107,24 +108,13 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private WakeLock mWakeLock;
 
 	private boolean fError = false;
-//	private String fErrorTxt;
-//	private Exception fExeption;
 
 	private String zoomLevel;
 	private int zoomProgress;
-//	private boolean zoomChanging;
+
 	//TAG for logging
 	public static final String TAG = "Mixare";
 
-	/*strings for GPS info assigned in Data View*/
-	//public static String GPS_LOCATION;
-	public static double GPS_LONGITUDE =0;
-	public static double GPS_LATITUDE =0;
-	public static float GPS_ACURRACY =0;
-	public static String GPS_LAST_FIX="";
-	public static double GPS_ALTITUDE=0;
-	public static float GPS_SPEED=0;
-	public static String GPS_ALL="";
 	public static TextView searchNotificationTxt;
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
@@ -153,8 +143,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public void doError(Exception ex1) {
 		if (!fError) {
 			fError = true;
-//			fErrorTxt = ex1.toString();
-//			fExeption = ex1;
 
 			setErrorDialog();
 
@@ -177,7 +165,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 
 	public void repaint() {
-		view = new DataView(ctx);
+		dataView = new DataView(mixContext);
 		dWindow = new PaintScreen();
 		setZoomLevel();
 	}
@@ -244,12 +232,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);			
 
-			FrameLayout FL = new FrameLayout(this);
+			FrameLayout frameLayout = new FrameLayout(this);
 
-			FL.setMinimumWidth(3000);
-			FL.addView(myZoomBar);
-			FL.setPadding(10, 0, 10, 10);
-
+			frameLayout.setMinimumWidth(3000);
+			frameLayout.addView(myZoomBar);
+			frameLayout.setPadding(10, 0, 10, 10);
 
 			camScreen = new CameraSurface(this);
 			augScreen = new AugmentedView(this);
@@ -258,19 +245,18 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			addContentView(augScreen, new LayoutParams(
 					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-			addContentView(FL, new FrameLayout.LayoutParams(
+			addContentView(frameLayout, new FrameLayout.LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
 					Gravity.BOTTOM));
 
-
 			if (!isInited) {
-				ctx = new MixContext(this);
+				mixContext = new MixContext(this);
 
-				ctx.downloadManager = new DownloadManager(ctx);
+				mixContext.downloadManager = new DownloadManager(mixContext);
 
 
 				dWindow = new PaintScreen();
-				view = new DataView(ctx);
+				dataView = new DataView(mixContext);
 
 				/*set the radius in data view to the last selected by the user*/
 				setZoomLevel(); 
@@ -293,7 +279,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				editor.commit();
 			} 
 
-			if(ctx.isActualLocation()==false){
+			if(mixContext.isActualLocation()==false){
 				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
 
@@ -316,8 +302,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 
 	private void doMixSearch(String query) {
-		DataHandler jLayer = view.getDataHandler();
-		if(!view.isFrozen()){
+		DataHandler jLayer = dataView.getDataHandler();
+		if(!dataView.isFrozen()){
 			MixListView.originalMarkerList = jLayer.getMarkerList();
 			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
@@ -335,7 +321,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 		}
 		if (searchResults.size() > 0){
-			view.setFrozen(true);
+			dataView.setFrozen(true);
 			jLayer.setMarkerList(searchResults);
 		}
 		else
@@ -366,7 +352,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			locationMgr = null;
 
 			try {
-				ctx.downloadManager.stop();
+				mixContext.downloadManager.stop();
 			} catch (Exception ignore) {
 			}
 
@@ -386,9 +372,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			this.mWakeLock.acquire();
 
 			killOnError();
-			ctx.mixView = this;
-			view.doStart();
-			view.clearEvents();
+			mixContext.mixView = this;
+			dataView.doStart();
+			dataView.clearEvents();
 
 			double angleX, angleY;
 
@@ -454,25 +440,25 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				hardFix.setAltitude(300);
 
 				try {
-					ctx.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
+					mixContext.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
 				} catch (Exception ex2) {
-					ctx.curLoc = new Location(hardFix);
+					mixContext.curLoc = new Location(hardFix);
 				}
 
-				GeomagneticField gmf = new GeomagneticField((float) ctx.curLoc
-						.getLatitude(), (float) ctx.curLoc.getLongitude(),
-						(float) ctx.curLoc.getAltitude(), System
+				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
+						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
+						(float) mixContext.curLoc.getAltitude(), System
 						.currentTimeMillis());
 
 				angleY = Math.toRadians(-gmf.getDeclination());
 				m4.set((float) Math.cos(angleY), 0f,
 						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
 						.sin(angleY), 0f, (float) Math.cos(angleY));
-				ctx.declination = gmf.getDeclination();
+				mixContext.declination = gmf.getDeclination();
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			downloadThread = new Thread(ctx.downloadManager);
+			downloadThread = new Thread(mixContext.downloadManager);
 			downloadThread.start();
 		} catch (Exception ex) {
 			doError(ex);
@@ -486,16 +472,16 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 					locationMgr.removeUpdates(this);
 					locationMgr = null;
 				}
-				if (ctx != null) {
-					if (ctx.downloadManager != null)
-						ctx.downloadManager.stop();
+				if (mixContext != null) {
+					if (mixContext.downloadManager != null)
+						mixContext.downloadManager.stop();
 				}
 			} catch (Exception ignore) {
 			}
 		}
 
 		Log.d("-------------------------------------------","resume");
-		if (view.isFrozen() && searchNotificationTxt == null){
+		if (dataView.isFrozen() && searchNotificationTxt == null){
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
@@ -506,7 +492,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			searchNotificationTxt.setOnTouchListener(this);
 			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		}
-		else if(!view.isFrozen() && searchNotificationTxt != null){
+		else if(!dataView.isFrozen() && searchNotificationTxt != null){
 			searchNotificationTxt.setVisibility(View.GONE);
 			searchNotificationTxt = null;
 		}
@@ -541,7 +527,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		switch(item.getItemId()){
 		/*Data sources*/
 		case 1:		
-			if(!view.isLauncherStarted()){
+			if(!dataView.isLauncherStarted()){
 				MixListView.setList(1);
 				Intent intent = new Intent(MixView.this, MixListView.class); 
 				startActivityForResult(intent, 40);
@@ -555,7 +541,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			MixListView.setList(2);
 			/*if the list of titles to show in alternative list view is not empty*/
-			if (view.getDataHandler().getMarkerCount() > 0) {
+			if (dataView.getDataHandler().getMarkerCount() > 0) {
 				Intent intent1 = new Intent(MixView.this, MixListView.class); 
 				startActivityForResult(intent1, 42);
 			}
@@ -580,15 +566,15 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			break;
 			/*GPS Information*/
 		case 6:
-			ctx.setCurrentGPSInfo();
+			Location currentGPSInfo = mixContext.getCurrentGPSInfo();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
-					getString(DataView.GPS_LONGITUDE) + GPS_LONGITUDE + "\n" +
-					getString(DataView.GPS_LATITUDE) + GPS_LATITUDE + "\n" +
-					getString(DataView.GPS_ALTITUDE)+ GPS_ALTITUDE + "m\n" +
-					getString(DataView.GPS_SPEED) + GPS_SPEED + "km/h\n" +
-					getString(DataView.GPS_ACCURACY) + GPS_ACURRACY + "m\n" +
-					getString(DataView.GPS_LAST_FIX) + GPS_LAST_FIX + "\n");
+					getString(DataView.GPS_LONGITUDE) + currentGPSInfo.getLongitude() + "\n" +
+					getString(DataView.GPS_LATITUDE) + currentGPSInfo.getLatitude() + "\n" +
+					getString(DataView.GPS_ALTITUDE)+ currentGPSInfo.getAltitude() + "m\n" +
+					getString(DataView.GPS_SPEED) + currentGPSInfo.getSpeed() + "km/h\n" +
+					getString(DataView.GPS_ACCURACY) + currentGPSInfo.getAccuracy() + "m\n" +
+					getString(DataView.GPS_LAST_FIX) + new Date(currentGPSInfo.getTime()).toString() + "\n");
 			builder.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
@@ -651,14 +637,14 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private void setZoomLevel() {
 		float myout = calcZoomLevel();
 
-		view.setRadius(myout);
+		dataView.setRadius(myout);
 
 		myZoomBar.setVisibility(View.INVISIBLE);
 		zoomLevel = String.valueOf(myout);
 
-		view.doStart();
-		view.clearEvents();
-		downloadThread = new Thread(ctx.downloadManager);
+		dataView.doStart();
+		dataView.clearEvents();
+		downloadThread = new Thread(mixContext.downloadManager);
 		downloadThread.start();
 
 	};
@@ -743,8 +729,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 			smoothR.mult(1 / (float) histR.length);
 
-			synchronized (ctx.rotationM) {
-				ctx.rotationM.set(smoothR);
+			synchronized (mixContext.rotationM) {
+				mixContext.rotationM.set(smoothR);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -759,7 +745,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			float xPress = me.getX();
 			float yPress = me.getY();
 			if (me.getAction() == MotionEvent.ACTION_UP) {
-				view.clickEvent(xPress, yPress);
+				dataView.clickEvent(xPress, yPress);
 			}
 
 			return true;
@@ -776,9 +762,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			killOnError();
 
 			if (keyCode == KeyEvent.KEYCODE_BACK) {
-				if (view.state.detailsView) {
-					view.keyEvent(keyCode);
-					view.state.detailsView = false;
+				if (dataView.isDetailsView()) {
+					dataView.keyEvent(keyCode);
+					dataView.setDetailsView(false);
 					return true;
 				} else {
 					return super.onKeyDown(keyCode, event);
@@ -787,7 +773,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				return super.onKeyDown(keyCode, event);
 			}
 			else {
-				view.keyEvent(keyCode);
+				dataView.keyEvent(keyCode);
 				return false;
 			}
 
@@ -813,8 +799,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		try {
 			killOnError();
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
-				synchronized (ctx.curLoc) {
-					ctx.curLoc = location;
+				synchronized (mixContext.curLoc) {
+					mixContext.curLoc = location;
 				}
 				isGpsEnabled = true;
 			}
@@ -828,7 +814,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		view.setFrozen(false);
+		dataView.setFrozen(false);
 		searchNotificationTxt.setVisibility(View.GONE);
 		MixView.searchNotificationTxt = null;
 
@@ -1007,8 +993,8 @@ class AugmentedView extends View {
 
 			MixView.dWindow.setCanvas(canvas);
 
-			if (!MixView.view.isInited()) {
-				MixView.view.init(MixView.dWindow.getWidth(), MixView.dWindow.getHeight());
+			if (!MixView.dataView.isInited()) {
+				MixView.dataView.init(MixView.dWindow.getWidth(), MixView.dWindow.getHeight());
 			}
 			if (app.isZoombarVisible()){
 				Paint zoomPaint = new Paint();
@@ -1031,7 +1017,7 @@ class AugmentedView extends View {
 				canvas.drawText(app.getZoomLevel(),  (canvas.getWidth())/100*zoomProgress+20, height, zoomPaint);
 			}
 
-			MixView.view.draw(MixView.dWindow);
+			MixView.dataView.draw(MixView.dWindow);
 		} catch (Exception ex) {
 			app.doError(ex);
 		}

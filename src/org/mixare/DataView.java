@@ -47,20 +47,24 @@ import android.util.Log;
 public class DataView {
 
 	/**current context */
-	private MixContext ctx;
+	private MixContext mixContext;
 
 	/** is the view Inited? */
-	private boolean isInit = false;
+	private boolean isInit;
+	
 	/** width and height of the view*/
 	private int width, height;
+	
 	/** _NOT_ the android camera, the class that takes care of the transformation*/
 	private Camera cam;
-	/** */
-	public MixState state = new MixState();
+
+	private MixState state = new MixState();
+	
 	/** The view can be "frozen" for debug purposes */
 	private boolean frozen;
+	
 	/** how many times to re-attempt download */
-	private int retry = 0;
+	private int retry;
 
 	/** default URL */
 	private static final String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
@@ -75,10 +79,7 @@ public class DataView {
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 
 	private Location curFix;
-//	private float screenWidth, screenHeight;
-	
-	private DataHandler dataHandler = new DataHandler();
-	
+	private DataHandler dataHandler = new DataHandler();	
 	private float radius = 20;
 	private DownloadResult dRes;
 	
@@ -139,19 +140,20 @@ public class DataView {
 	private ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
 	private RadarPoints radarPoints = new RadarPoints();
-//	private Matrix rInv = new Matrix();
-//	private MixVector looking = new MixVector();
 	private ScreenLine lrl = new ScreenLine();
 	private ScreenLine rrl = new ScreenLine();
 	private float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
-	
+
+	/**
+	 * Constructor
+	 */
 	public DataView(MixContext ctx) {
-		this.ctx = ctx;
+		this.mixContext = ctx;
 	}
 	
 	public MixContext getContext() {
-		return ctx;
+		return mixContext;
 	}
 
 	public boolean isLauncherStarted() {
@@ -176,6 +178,14 @@ public class DataView {
 	
 	public DataHandler getDataHandler() {
 		return dataHandler;
+	}
+	
+	public boolean isDetailsView() {
+		return state.isDetailsView();
+	}
+	
+	public void setDetailsView(boolean detailsView) {
+		state.setDetailsView(detailsView);
 	}
 
 	public void doStart() {
@@ -208,22 +218,19 @@ public class DataView {
 	}
 
 	public void draw(PaintScreen dw) {
-		ctx.getRM(cam.transform);
-		curFix = ctx.getCurrentLocation();
+		mixContext.getRM(cam.transform);
+		curFix = mixContext.getCurrentLocation();
 
 		state.calcPitchBearing(cam.transform);
-
-//		screenWidth = width;
-//		screenHeight = height;
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 
 			DownloadRequest request = new DownloadRequest();
 
-			if (ctx.getStartUrl().length() > 0){
-				request.url = ctx.getStartUrl();
-				isLauncherStarted=true;
+			if (mixContext.getStartUrl().length() > 0){
+				request.url = mixContext.getStartUrl();
+				isLauncherStarted = true;
 			}
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
 
@@ -243,13 +250,13 @@ public class DataView {
 					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
 			}
 			Log.i(MixView.TAG,request.url);
-			state.downloadId = ctx.getDownloader().submitJob(request);
+			state.downloadId = mixContext.getDownloader().submitJob(request);
 
 			state.nextLStatus = MixState.PROCESSING;
 
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			if (ctx.getDownloader().isReqComplete(state.downloadId)) {
-				dRes = ctx.getDownloader().getReqResult(state.downloadId);
+			if (mixContext.getDownloader().isReqComplete(state.downloadId)) {
+				dRes = mixContext.getDownloader().getReqResult(state.downloadId);
 
 				if (dRes.error && retry < 3) {
 					retry++;
@@ -263,14 +270,14 @@ public class DataView {
 					Collections.sort(dataHandler.getMarkerList(), MarkersOrder.getInstance());
 				}	
 			}
-		} 
+		}
 
 		// Update markers
 		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
 			Marker ma = dataHandler.getMarker(i);
 			float[] dist = new float[1];
 			dist[0] = 0;
-			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), ctx.getCurrentLocation().getLatitude(), ctx.getCurrentLocation().getLongitude(), dist);
+			Location.distanceBetween(ma.mGeoLoc.getLatitude(), ma.mGeoLoc.getLongitude(), mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude(), dist);
 			if (dist[0] / 1000f < radius) {
 				if (!frozen) 
 					ma.update(curFix, System.currentTimeMillis());
@@ -341,7 +348,7 @@ public class DataView {
 			for (int i = dataHandler.getMarkerCount() - 1; i >= 0 && !evtHandled; i--) {
 				Marker pm = dataHandler.getMarker(i);
 
-				evtHandled = pm.fClick(evt.x, evt.y, ctx, state);
+				evtHandled = pm.fClick(evt.x, evt.y, mixContext, state);
 			}
 		}
 		return evtHandled;

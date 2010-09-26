@@ -31,11 +31,12 @@ public class MixState {
 	int nextLStatus = MixState.NOT_STARTED;
 	String downloadId;
 
-	private float curBearing, curPitch;
+	private float curBearing;
+	private float curPitch;
 
-	boolean detailsView = false;
+	private boolean detailsView;
 
-	boolean handleEvent(MixContext ctx, String onPress) {
+	public boolean handleEvent(MixContext ctx, String onPress) {
 		if (onPress != null && onPress.startsWith("webpage")) {
 			try {
 				String webpage = MixUtils.parseAction(onPress);
@@ -53,6 +54,14 @@ public class MixState {
 
 	public float getCurPitch() {
 		return curPitch;
+	}
+	
+	public boolean isDetailsView() {
+		return detailsView;
+	}
+	
+	public void setDetailsView(boolean detailsView) {
+		this.detailsView = detailsView;
 	}
 
 	public void calcPitchBearing(Matrix rotationM) {

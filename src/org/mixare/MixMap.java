@@ -56,7 +56,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dataView = MixView.view;
+		dataView = MixView.dataView;
 		ctx = dataView.getContext();
 		setMarkerList(dataView.getDataHandler().getMarkerList());
 		map = this;

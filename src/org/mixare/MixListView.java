@@ -82,7 +82,7 @@ public class MixListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//		mixCtx = MixView.ctx;
-		dataView = MixView.view;	
+		dataView = MixView.dataView;	
 		ctx = this;
 
 		switch(list){

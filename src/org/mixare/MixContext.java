@@ -52,7 +52,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 public class MixContext {
-	
+
 	public MixView mixView;
 	Context ctx;
 	boolean isURLvalid = true;
@@ -99,23 +99,8 @@ public class MixContext {
 		rand = new Random(System.currentTimeMillis() + locationHash);
 	}
 	
-	public void setCurrentGPSInfo(){
-		Location lastFix;
-		if (curLoc != null)
-			lastFix = curLoc;
-		else
-			lastFix= locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		
-		long lastFixTime = lastFix.getTime();
-		Date lastFixDate = new Date(lastFixTime);
-		
-		MixView.GPS_LONGITUDE = lastFix.getLongitude();
-		MixView.GPS_LATITUDE = lastFix.getLatitude();
-		MixView.GPS_ACURRACY = lastFix.getAccuracy();
-		MixView.GPS_SPEED = lastFix.getSpeed();
-		MixView.GPS_ALTITUDE = lastFix.getAltitude();
-		MixView.GPS_LAST_FIX = lastFixDate.toString();
-		MixView.GPS_ALL = lastFix.toString();
+	public Location getCurrentGPSInfo() {
+		return curLoc != null ? curLoc : locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 	}
 
 	public boolean isGpsEnabled() {
@@ -131,11 +116,11 @@ public class MixContext {
 	}
 	
 	public void setLocationManager(LocationManager locationMgr){
-		this.locationMgr= locationMgr;
+		this.locationMgr = locationMgr;
 	}
 	
 	public LocationManager getLocationManager(){
-		return this.locationMgr;
+		return locationMgr;
 	}
 
 	public String getStartUrl() {
