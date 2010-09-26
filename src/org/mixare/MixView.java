@@ -107,15 +107,15 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private SeekBar myZoomBar;
 	private WakeLock mWakeLock;
 
-	private boolean fError = false;
+	private boolean fError;
 
 	private String zoomLevel;
 	private int zoomProgress;
 
+	private TextView searchNotificationTxt;
+
 	//TAG for logging
 	public static final String TAG = "Mixare";
-
-	public static TextView searchNotificationTxt;
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
 //	private Vector<String> listDataVector;
@@ -815,9 +815,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
-		searchNotificationTxt.setVisibility(View.GONE);
-		MixView.searchNotificationTxt = null;
-
+		if (searchNotificationTxt != null) {
+			searchNotificationTxt.setVisibility(View.GONE);
+			searchNotificationTxt = null;
+		}
 		return false;
 	}
 }

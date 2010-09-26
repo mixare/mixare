@@ -32,7 +32,7 @@ import android.graphics.Color;
 import android.location.Location;
 
 public class Marker {
-	//	// XML properties
+	// XML properties
 	public String mOnPress;
 	public PhysicalPlace mGeoLoc = new PhysicalPlace();
 
