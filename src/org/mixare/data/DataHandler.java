@@ -15,12 +15,12 @@ public class DataHandler {
 	private static final int MAX_OBJECTS = 50;
 	private ArrayList<Marker> markerList = new ArrayList<Marker>();
 
-	public void createMarker(String title, double latitude, double longitude, double elevation, String link) {
+	public void createMarker(String title, double latitude, double longitude, double elevation, String link, DataSource.DATASOURCE datasource) {
 		if (markerList.size() < MAX_OBJECTS) {
 			String URL = null;
 			if (link != null && link.length() > 0)
 				URL = "webpage:" + URLDecoder.decode(link);
-			Marker ma = new Marker(title, latitude, longitude, elevation, URL);
+			Marker ma = new Marker(title, latitude, longitude, elevation, URL, datasource);
 			markerList.add(ma);
 		}
 	}

@@ -111,7 +111,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	private String zoomLevel;
 	private int zoomProgress;
-
+	
 	private TextView searchNotificationTxt;
 
 	//TAG for logging
@@ -231,7 +231,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);			
-
+			
 			FrameLayout frameLayout = new FrameLayout(this);
 
 			frameLayout.setMinimumWidth(3000);
@@ -484,7 +484,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));;
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList()+ getString(DataView.SEARCH_ACTIVE_2));;
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -626,10 +626,12 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 		/*Twitter Json file not available for radius <1km 
 		 *smallest radius is set to 1km*/
-		if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
+		//should be taken care when downloading from twitter, because multiple 
+		//datasource can be selected
+	/*	if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
 			myout++;
 		}
-
+*/
 		return myout;
 	}
 
@@ -647,7 +649,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		downloadThread.start();
 
 	};
-
+	
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 		Toast t;
 
@@ -1003,9 +1005,9 @@ class AugmentedView extends View {
 				String startKM, endKM;
 				endKM = "80km";
 				startKM = "0km";
-				if(MixListView.getDataSource().equals("Twitter")){
+				/*if(MixListView.getDataSource().equals("Twitter")){
 					startKM = "1km";
-				}
+				}*/
 				canvas.drawText(startKM, canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
 				canvas.drawText(endKM, canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
 

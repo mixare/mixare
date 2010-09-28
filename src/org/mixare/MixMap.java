@@ -39,7 +39,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static DataView dataView;
 	private static GeoPoint startPoint;
 
-	private MixContext ctx;
+	private MixContext mixContext;
 	private MapView mapView;
 
 	static MixMap map;
@@ -57,7 +57,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataView = MixView.dataView;
-		ctx = dataView.getContext();
+		mixContext = dataView.getContext();
 		setMarkerList(dataView.getDataHandler().getMarkerList());
 		map = this;
 
@@ -77,7 +77,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -87,7 +87,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void setStartPoint() {
-		Location location = ctx.getCurrentLocation();
+		Location location = mixContext.getCurrentLocation();
 		MapController controller;
 
 		double latitude = location.getLatitude()*1E6;

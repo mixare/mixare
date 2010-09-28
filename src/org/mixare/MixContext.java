@@ -31,13 +31,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.mixare.data.DataSource;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -51,7 +54,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-public class MixContext {
+public class MixContext extends ContextWrapper {
 
 	public MixView mixView;
 	Context ctx;
@@ -68,9 +71,19 @@ public class MixContext {
 
 	LocationManager locationMgr;
 	
+	private HashMap<DataSource.DATASOURCE,Boolean> selectedDataSources=new HashMap<DataSource.DATASOURCE,Boolean>();
+	
 	public MixContext(Context appCtx) {
+	
+		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
+
+		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+			// fill the selectedDataSources HashMap with saved settings
+			selectedDataSources.put(source, settings.getBoolean(source.toString(), false));
+		}
 
 		rotationM.toIdentity();
 
@@ -415,4 +428,36 @@ public class MixContext {
 		webview.loadUrl(url);
 	}
 
+
+
+	public void setDataSource(DataSource.DATASOURCE source, Boolean selection){
+		selectedDataSources.put(source,selection);
+		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean(source.toString(), selection);
+		editor.commit();
+	}
+               
+	public Boolean getDataSource(DataSource.DATASOURCE source) {
+		return selectedDataSources.get(source);
+	}
+	
+	public void toogleDataSource(DataSource.DATASOURCE source) {
+		setDataSource(source, !selectedDataSources.get(source));
+	}
+	
+	public String getDataSourcesStringList() {
+		String ret="";
+		boolean first=true;
+		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+			if(getDataSource(source)) {
+				if(!first) {
+					ret+=", ";
+				}	
+				ret+=source.toString();
+				first=false;
+			}	
+		}
+		return ret;
+	}
 }

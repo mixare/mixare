@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource.DATASOURCE;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -58,9 +59,9 @@ public class MixListView extends ListActivity {
 	private Vector<String> selectedItemURL;
 	private Vector<String> dataSourceMenu;
 	private Vector<String> dataSourceDescription;
-	//	private static MixContext mixCtx = null;
+	private MixContext mixContext;
 	private DataView dataView;
-	private static String selectedDataSource = "Wikipedia";
+	//private static String selectedDataSource = "Wikipedia";
 	/*to check which data source is active*/
 	//	private int clickedDataSourceItem = 0;
 	private ListItemAdapter adapter;
@@ -84,6 +85,7 @@ public class MixListView extends ListActivity {
 		//		mixCtx = MixView.ctx;
 		dataView = MixView.dataView;	
 		ctx = this;
+		mixContext = dataView.getContext();
 
 		switch(list){
 		case 1:
@@ -102,7 +104,7 @@ public class MixListView extends ListActivity {
 			dataSourceDescription.add("example: http://mixare.org/geotest.php");
 
 			adapter = new ListItemAdapter(this);
-			adapter.colorSource(getDataSource());
+			//adapter.colorSource(getDataSource());
 			getListView().setTextFilterEnabled(true);
 
 			setListAdapter(adapter);
@@ -131,7 +133,7 @@ public class MixListView extends ListActivity {
 
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));
+				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
@@ -300,31 +302,31 @@ public class MixListView extends ListActivity {
 		switch(position){
 		/*WIKIPEDIA*/
 		case 0:
-			setDataSource("Wikipedia");
+			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
 			finish();
 			break;
 
 			/*TWITTER*/
 		case 1:		
-			setDataSource("Twitter");
+			mixContext.toogleDataSource(DATASOURCE.TWITTER);
 			finish();
 			break;
 
 			/*BUZZ*/
 		case 2:
-			setDataSource("Buzz");
+			mixContext.toogleDataSource(DATASOURCE.BUZZ);
 			finish();
 			break;
 
 			/*OSM*/
 		case 3:
-			setDataSource("OpenStreetMap");
+			mixContext.toogleDataSource(DATASOURCE.OSM);
 			finish();
 			break;
 
 			/*Own URL*/
 		case 4:
-			setDataSource("OwnURL");
+			mixContext.toogleDataSource(DATASOURCE.OWNURL);
 			finish();
 			break;
 		}
@@ -378,13 +380,13 @@ public class MixListView extends ListActivity {
 		startActivityForResult(intent2, 20);
 	}
 
-	public void setDataSource(String source){
+	/*public void setDataSource(String source){
 		selectedDataSource = source;
 	}
 
 	public static String getDataSource(){
 		return selectedDataSource;
-	}
+	}*/
 
 	public static void setList(int l){
 		list = l;
@@ -483,6 +485,7 @@ class ListItemAdapter extends BaseAdapter {
 			bgcolors[i]=0;
 			textcolors[i]=Color.WHITE;
 		}
+		
 		if (source.equals("Wikipedia"))
 			changeColor(0, Color.WHITE, Color.DKGRAY);
 		else if (source.equals("Twitter"))

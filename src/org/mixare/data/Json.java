@@ -33,7 +33,8 @@ public class Json extends DataHandler {
 			createMarker( jo.getString("title"),
 					Double.valueOf(jo.getString("geocode").split(" ")[0]),
 					Double.valueOf(jo.getString("geocode").split(" ")[1]),0,
-					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"));
+					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"),
+					DataSource.DATASOURCE.BUZZ);
 		}
 	}
 
@@ -46,7 +47,8 @@ public class Json extends DataHandler {
 			createMarker( jo.getString("text"),
 					Double.parseDouble(coordinates.getString(0)),
 					Double.parseDouble(coordinates.getString(1)),
-					0,null);
+					0,null,
+					DataSource.DATASOURCE.TWITTER);
 		}
 	}
 
@@ -64,7 +66,8 @@ public class Json extends DataHandler {
 					jo.getDouble("lat"),
 					jo.getDouble("lng"),
 					jo.getDouble("elevation"),
-					link);
+					link,
+					DataSource.DATASOURCE.OWNURL);
 
 		}
 	}
@@ -78,7 +81,8 @@ public class Json extends DataHandler {
 					jo.getDouble("lat"),
 					jo.getDouble("lng"),
 					jo.getDouble("elevation"),
-					"http://"+jo.getString("wikipediaUrl"));
+					"http://"+jo.getString("wikipediaUrl"),
+					DataSource.DATASOURCE.WIKIPEDIA);
 		}
 	}
 

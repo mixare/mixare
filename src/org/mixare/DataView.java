@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.XMLHandler;
+import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -65,18 +65,6 @@ public class DataView {
 	
 	/** how many times to re-attempt download */
 	private int retry;
-
-	/** default URL */
-	private static final String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
-	private static final String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
-	private static final String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
-
-	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
-	// eg. only railway stations:
-	private static final String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	// all objects that have names: 
-	//caution! produces hugh amount of data (megabytes), only use with very small radii
-	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
@@ -236,18 +224,11 @@ public class DataView {
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				String dataSource = MixListView.getDataSource();
-				if ("Wikipedia".equals(dataSource))
-					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
-				else if("Twitter".equals(dataSource))
-					request.url = TWITTER_HOME_URL +"?geocode="+lat + "%2C" + lon+"%2C" + radius + "km" ;
-				else if("Buzz".equals(dataSource))  
-					request.url = BUZZ_HOME_URL + "&lat="+lat+"&lon=" + lon + "&radius="+ radius*1000;
-					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
-				else if("OpenStreetMap".equals(dataSource))
-					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
-				else if("OwnURL".equals(dataSource))
-					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
+				
+				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+					if(mixContext.getDataSource(source))
+						request.url=DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage());
+				}
 			}
 			Log.i(MixView.TAG,request.url);
 			state.downloadId = mixContext.getDownloader().submitJob(request);

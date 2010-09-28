@@ -40,7 +40,9 @@ public class XMLHandler extends DataHandler {
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
 	                	
-	                	createMarker(name, lat, lon, 0, "http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue());
+	                	createMarker(name, lat, lon, 0, 
+	                			"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(),
+	                			DataSource.DATASOURCE.OSM);
 	        			
 	                	//skip to next node
 	        			continue;

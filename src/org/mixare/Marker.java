@@ -20,9 +20,10 @@ package org.mixare;
 
 import java.util.Comparator;
 
+import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
-import org.mixare.gui.ScreenObj;
 import org.mixare.gui.ScreenLine;
+import org.mixare.gui.ScreenObj;
 import org.mixare.gui.TextObj;
 import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
@@ -36,6 +37,8 @@ public class Marker {
 	private String title;
 	private String URL;
 	private PhysicalPlace mGeoLoc;
+	// From which datasource does this marker originate
+	private DataSource.DATASOURCE datasource;
 
 	// Draw properties
 	private boolean isVisible;
@@ -61,7 +64,7 @@ public class Marker {
 	private Label txtLab = new Label();
 	private TextObj textBlock;
 	
-	public Marker(String title, double latitude, double longitude, double altitude, String URL) {
+	public Marker(String title, double latitude, double longitude, double altitude, String URL, DataSource.DATASOURCE datasource) {
 		super();
 
 		this.title = title;
@@ -70,8 +73,9 @@ public class Marker {
 		this.mGeoLoc.setLongitude(longitude);
 		this.mGeoLoc.setAltitude(altitude);
 		this.URL = URL;
+		this.datasource = datasource;
 	}
-
+	
 	public String getTitle(){
 		return title;
 	}
@@ -185,15 +189,14 @@ public class Marker {
 		if (isVisible) {
 			//default color
 			dw.setColor(COLOR_DEFAULT);
-			String dataSource = MixListView.getDataSource();
-			if ("Wikipedia".equals(dataSource))
-				dw.setColor(Color.rgb(255, 0, 0));
-			else if ("Buzz".equals(dataSource))
-				dw.setColor(Color.rgb(4, 228, 20));
-			else if ("Twitter".equals(dataSource))
-				dw.setColor(Color.rgb(50, 204, 255));
-			else if ("OpenStreetMap".equals(dataSource))
-				dw.setColor(Color.rgb(255, 168, 0));
+			
+			switch(datasource) {
+				case WIKIPEDIA:	dw.setColor(Color.rgb(255, 0, 0)); break;
+				case BUZZ:	dw.setColor(Color.rgb(4, 228, 20)); break;
+				case TWITTER:	dw.setColor(Color.rgb(50, 204, 255)); break;
+				case OSM:	dw.setColor(Color.rgb(255, 168, 0)); break;
+			}
+			
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
 			dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
