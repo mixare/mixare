@@ -230,10 +230,15 @@ public class DataView {
 						request.url=DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage());
 				}
 			}
-			Log.i(MixView.TAG,request.url);
-			state.downloadId = mixContext.getDownloader().submitJob(request);
+			
+			// If a datasource is selected 
+			if(request.url != null) {
+				Log.i(MixView.TAG,""+request.url);
+				state.downloadId = mixContext.getDownloader().submitJob(request);
 
-			state.nextLStatus = MixState.PROCESSING;
+				state.nextLStatus = MixState.PROCESSING;				
+			}
+
 
 		} else if (state.nextLStatus == MixState.PROCESSING) {
 			if (mixContext.getDownloader().isReqComplete(state.downloadId)) {

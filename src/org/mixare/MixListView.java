@@ -45,6 +45,8 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -59,6 +61,7 @@ public class MixListView extends ListActivity {
 	private Vector<String> selectedItemURL;
 	private Vector<String> dataSourceMenu;
 	private Vector<String> dataSourceDescription;
+	private Vector<Boolean> dataSourceChecked;
 	private MixContext mixContext;
 	private DataView dataView;
 	//private static String selectedDataSource = "Wikipedia";
@@ -79,6 +82,10 @@ public class MixListView extends ListActivity {
 		return dataSourceDescription;
 	}
 
+	public Vector<Boolean> getDataSourceChecked() {
+		return dataSourceChecked;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -89,6 +96,8 @@ public class MixListView extends ListActivity {
 
 		switch(list){
 		case 1:
+			
+			//TODO: this needs some cleanup
 			dataSourceMenu = new Vector<String>();
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
@@ -102,6 +111,13 @@ public class MixListView extends ListActivity {
 			dataSourceDescription.add("");
 			dataSourceDescription.add("(OpenStreetMap)");
 			dataSourceDescription.add("example: http://mixare.org/geotest.php");
+			
+			dataSourceChecked = new Vector<Boolean>();
+			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.WIKIPEDIA));
+			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.TWITTER));
+			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.BUZZ));
+			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.OSM));
+			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.OWNURL));
 
 			adapter = new ListItemAdapter(this);
 			//adapter.colorSource(getDataSource());
@@ -303,31 +319,26 @@ public class MixListView extends ListActivity {
 		/*WIKIPEDIA*/
 		case 0:
 			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
-			finish();
 			break;
 
 			/*TWITTER*/
 		case 1:		
 			mixContext.toogleDataSource(DATASOURCE.TWITTER);
-			finish();
 			break;
 
 			/*BUZZ*/
 		case 2:
 			mixContext.toogleDataSource(DATASOURCE.BUZZ);
-			finish();
 			break;
 
 			/*OSM*/
 		case 3:
 			mixContext.toogleDataSource(DATASOURCE.OSM);
-			finish();
 			break;
 
 			/*Own URL*/
 		case 4:
 			mixContext.toogleDataSource(DATASOURCE.OWNURL);
-			finish();
 			break;
 		}
 	}
@@ -429,14 +440,15 @@ class ListItemAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.text = (TextView) convertView.findViewById(R.id.list_text);
 			holder.description = (TextView) convertView.findViewById(R.id.description_text);
-
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.list_checkbox);
+			holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+			
 			convertView.setTag(holder);
 		}
 		else{
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.icon = (ImageView) convertView.findViewById(R.id.icon);
 
 		holder.icon.setPadding(20, 8, 20, 8);
 		holder.icon.setClickable(true);        
@@ -456,12 +468,22 @@ class ListItemAdapter extends BaseAdapter {
 			holder.icon.setVisibility(View.INVISIBLE);
 		}
 
+		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+					mixListView.clickOnDataSource(position);
+			}
+			
+		});
+		
 		holder.text.setPadding(20, 8, 0, 0);
 		holder.description.setPadding(20, 40, 0, 0);
 
 		holder.text.setText(mixListView.getDataSourceMenu().get(position));
 		holder.description.setText(mixListView.getDataSourceDescription().get(position));
+		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
 
 		int colorPos = position % bgcolors.length;
 		convertView.setBackgroundColor(bgcolors[colorPos]);
@@ -516,6 +538,7 @@ class ListItemAdapter extends BaseAdapter {
 	private class ViewHolder {
 		TextView text;
 		TextView description;
+		CheckBox checkbox;
 		ImageView icon;
 	}
 }
