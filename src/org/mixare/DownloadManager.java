@@ -158,22 +158,26 @@ public class DownloadManager implements Runnable {
 					Log.d(MixView.TAG, "no JSON data");
 					Log.d(MixView.TAG, "try to load XML data");
 
-					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-					//Document doc = builder.parse(is);
-					Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+					try {
+						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+						//Document doc = builder.parse(is);
+						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
 
-					//Document doc = builder.parse(is);
+						//Document doc = builder.parse(is);
 
-					XMLHandler xml = new XMLHandler();
+						XMLHandler xml = new XMLHandler();
 
-					Log.i(MixView.TAG, "loading XML data");	
-					xml.load(doc);
+						Log.i(MixView.TAG, "loading XML data");	
+						xml.load(doc);
 
-					result.obj = xml;
+						result.obj = xml;
 
-					result.format = request.format;
-					result.error = false;
-					result.errorMsg = null;				
+						result.format = request.format;
+						result.error = false;
+						result.errorMsg = null;
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}				
 				}
 				ctx.returnHttpInputStream(is);
 				is = null;

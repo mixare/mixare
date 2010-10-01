@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.mixare.Marker;
-import org.mixare.MarkersOrder;
 import org.mixare.MixView;
 
 import android.location.Location;
@@ -35,7 +34,7 @@ public class DataHandler {
 	}
 	
 	public void sortMarkerList() {
-		Collections.sort(markerList, MarkersOrder.getInstance()); 
+		Collections.sort(markerList); 
 	}
 	
 	public void updateDistances(double lat, double lon) {
