@@ -29,7 +29,7 @@ public class Json extends DataHandler {
 
 	public void processBuzzJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
 		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
-			Log.d(MixView.TAG, "processing Google Buzz JSON data");
+			Log.v(MixView.TAG, "processing Google Buzz JSON data");
 			createMarker( jo.getString("title"),
 					Double.valueOf(jo.getString("geocode").split(" ")[0]),
 					Double.valueOf(jo.getString("geocode").split(" ")[1]),0,
@@ -40,7 +40,7 @@ public class Json extends DataHandler {
 
 	public void processTwitterJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
 		if (jo.has("geo")&& !jo.isNull("geo")) {
-			Log.d(MixView.TAG, "processing Twitter JSON data");
+			Log.v(MixView.TAG, "processing Twitter JSON data");
 			JSONObject geo = jo.getJSONObject("geo");
 			JSONArray coordinates = geo.getJSONArray("coordinates");
 
@@ -56,7 +56,7 @@ public class Json extends DataHandler {
 
 		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") && jo.has("has_detail_page")) {
 
-			Log.d(MixView.TAG, "processing Mixare JSON data");
+			Log.v(MixView.TAG, "processing Mixare JSON data");
 			String link=null;
 
 			if(jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
@@ -76,7 +76,7 @@ public class Json extends DataHandler {
 
 		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") && jo.has("wikipediaUrl")) {
 
-			Log.d(MixView.TAG, "processing Wikipedia JSON data");
+			Log.v(MixView.TAG, "processing Wikipedia JSON data");
 			createMarker( jo.getString("title"),
 					jo.getDouble("lat"),
 					jo.getDouble("lng"),

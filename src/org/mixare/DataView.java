@@ -25,7 +25,6 @@ import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.DataHandler;
@@ -69,7 +68,6 @@ public class DataView {
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
 	private float radius = 20;
-	private DownloadResult dRes;
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
 	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
@@ -133,6 +131,8 @@ public class DataView {
 	private float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
 
+
+	public static final int MAX_OBJECTS = 30;
 	/**
 	 * Constructor
 	 */
@@ -204,6 +204,14 @@ public class DataView {
 		frozen = false;
 		isInit = true;
 	}
+	
+	public void requestData(String url) {
+		DownloadRequest request = new DownloadRequest();
+		request.url=url;
+		mixContext.getDownloader().submitJob(request);
+		state.nextLStatus = MixState.PROCESSING;
+		Log.i(MixView.TAG,url);		
+	}
 
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
@@ -213,63 +221,67 @@ public class DataView {
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-
-			DownloadRequest request = new DownloadRequest();
-
+			
+			dataHandler.clearMarkerList();
+			
 			if (mixContext.getStartUrl().length() > 0){
-				request.url = mixContext.getStartUrl();
+				requestData(mixContext.getStartUrl());
 				isLauncherStarted = true;
 			}
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
+			
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-					if(mixContext.getDataSource(source))
-						request.url=DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage());
+					if(mixContext.isDataSourceSelected(source))
+						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()));
 				}
 			}
 			
-			// If a datasource is selected 
-			if(request.url != null) {
-				Log.i(MixView.TAG,""+request.url);
-				state.downloadId = mixContext.getDownloader().submitJob(request);
+			// if no datasources are activated
+			if(state.nextLStatus==MixState.NOT_STARTED) 
+				state.nextLStatus=MixState.DONE;
+			
+			//TODO:
+			//state.downloadId = mixContext.getDownloader().submitJob(request);
 
-				state.nextLStatus = MixState.PROCESSING;				
-			}
-
-
+		
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			if (mixContext.getDownloader().isReqComplete(state.downloadId)) {
-				dRes = mixContext.getDownloader().getReqResult(state.downloadId);
-
+			DownloadManager dm=mixContext.getDownloader();
+			DownloadResult dRes;
+			
+			while((dRes=dm.getNextResult())!=null)
+			{
 				if (dRes.error && retry < 3) {
 					retry++;
-					state.nextLStatus = MixState.NOT_STARTED;
-				} else {
-					retry = 0;
-					state.nextLStatus = MixState.DONE;
-					dataHandler = (DataHandler) dRes.obj;
-
-					//Sort markers by cMarker.z
-					Collections.sort(dataHandler.getMarkerList(), MarkersOrder.getInstance());
-				}	
+					mixContext.getDownloader().submitJob(dRes.errorRequest);
+				}
+				if(!dRes.error) {
+					//jLayer = (DataHandler) dRes.obj;
+					Log.i(MixView.TAG,"Adding Markers");
+					dataHandler.addMarkers(((DataHandler) dRes.obj).getMarkerList());
+				}
+			}
+			if(dm.isDone()) {
+				retry=0;
+				state.nextLStatus = MixState.DONE;
 			}
 		}
 
+		dataHandler.updateDistances(mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude());
+		
 		// Update markers
-		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
+		for (int i = 0; i < Math.min(dataHandler.getMarkerCount(),MAX_OBJECTS); i++) {
+		//for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
 			Marker ma = dataHandler.getMarker(i);
-			float[] dist = new float[1];
-			dist[0] = 0;
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude(), dist);
-			if (dist[0] / 1000f < radius) {
+			if (ma.getDistance() / 1000f < radius) {
 				if (!frozen) 
 					ma.update(curFix, System.currentTimeMillis());
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
-			}
+			} 
 		}
 
 		// Draw Radar
@@ -312,6 +324,7 @@ public class DataView {
 				case UIEvent.CLICK:	handleClickEvent((ClickEvent) evt);	break;
 			}
 		}
+		state.nextLStatus = MixState.PROCESSING;				
 	}
 
 	private void handleKeyEvent(KeyEvent evt) {

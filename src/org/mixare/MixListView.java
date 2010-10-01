@@ -19,6 +19,7 @@
 package org.mixare;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
@@ -71,8 +72,8 @@ public class MixListView extends ListActivity {
 	public static String customizedURL="http://mixare.org/geotest.php";
 	private static Context ctx;
 	private static String searchQuery = "";
-	public static ArrayList<Marker> searchResultMarkers;
-	public static ArrayList<Marker> originalMarkerList;
+	public static List<Marker> searchResultMarkers;
+	public static List<Marker> originalMarkerList;
 
 	public Vector<String> getDataSourceMenu() {
 		return dataSourceMenu;
@@ -113,11 +114,11 @@ public class MixListView extends ListActivity {
 			dataSourceDescription.add("example: http://mixare.org/geotest.php");
 			
 			dataSourceChecked = new Vector<Boolean>();
-			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.WIKIPEDIA));
-			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.TWITTER));
-			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.BUZZ));
-			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.OSM));
-			dataSourceChecked.add(mixContext.getDataSource(DATASOURCE.OWNURL));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.WIKIPEDIA));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.TWITTER));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.BUZZ));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OSM));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OWNURL));
 
 			adapter = new ListItemAdapter(this);
 			//adapter.colorSource(getDataSource());
@@ -227,7 +228,9 @@ public class MixListView extends ListActivity {
 		switch(list){
 		/*Data Sources*/  
 		case 1:
-			clickOnDataSource(position);		
+			//clickOnDataSource(position);	
+			CheckBox cb = (CheckBox) v.findViewById(R.id.list_checkbox);
+			cb.toggle();
 			break;
 
 			/*List View*/
@@ -467,6 +470,7 @@ class ListItemAdapter extends BaseAdapter {
 		if(position!=4){
 			holder.icon.setVisibility(View.INVISIBLE);
 		}
+		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
 
 		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -483,7 +487,6 @@ class ListItemAdapter extends BaseAdapter {
 
 		holder.text.setText(mixListView.getDataSourceMenu().get(position));
 		holder.description.setText(mixListView.getDataSourceDescription().get(position));
-		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
 
 		int colorPos = position % bgcolors.length;
 		convertView.setBackgroundColor(bgcolors[colorPos]);

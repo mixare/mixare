@@ -35,7 +35,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
 
-	private static ArrayList<Marker> markerList;
+	private static List<Marker> markerList;
 	private static DataView dataView;
 	private static GeoPoint startPoint;
 
@@ -45,7 +45,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	static MixMap map;
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
-	public static ArrayList<Marker> originalMarkerList;
+	public static List<Marker> originalMarkerList;
 
 
 	@Override
@@ -185,7 +185,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 //		return markerList;
 //	}
 
-	public void setMarkerList(ArrayList<Marker> maList){
+	public void setMarkerList(List<Marker> maList){
 		markerList = maList;
 	}
 

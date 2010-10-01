@@ -125,6 +125,8 @@ public class DownloadManager implements Runnable {
 
 	private DownloadResult processRequest(DownloadRequest request) {
 		DownloadResult result = new DownloadResult();
+		//assume an error until everything is fine
+		result.error = true;
 		try {
 			if(ctx.getHttpGETInputStream(request.url)!=null){
 
@@ -179,7 +181,6 @@ public class DownloadManager implements Runnable {
 		}
 		catch (Exception ex) {
 			result.obj = null;
-			result.error = true;
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
@@ -204,7 +205,7 @@ public class DownloadManager implements Runnable {
 	public synchronized String submitJob(DownloadRequest job) {
 		String jobId = "ID_" + (id++);
 		todoList.put(jobId, job);
-
+		Log.i(MixView.TAG,"Submitted Job with "+jobId+", format: " +job.format+", params: "+job.params+", url: "+job.url);
 		return jobId;
 	}
 
@@ -233,7 +234,19 @@ public class DownloadManager implements Runnable {
 	public void stop() {
 		stop = true;
 	}
-
+	
+	public synchronized DownloadResult getNextResult() {
+		if(!doneList.isEmpty()) {
+			String nextId=doneList.keySet().iterator().next();
+			DownloadResult result = doneList.get(nextId);
+			doneList.remove(nextId);
+			return result;
+		}
+		return null;
+	}
+	public Boolean isDone() {
+		return todoList.isEmpty();
+	}
 }
 
 class DownloadRequest {

@@ -438,7 +438,7 @@ public class MixContext extends ContextWrapper {
 		editor.commit();
 	}
                
-	public Boolean getDataSource(DataSource.DATASOURCE source) {
+	public Boolean isDataSourceSelected(DataSource.DATASOURCE source) {
 		return selectedDataSources.get(source);
 	}
 	
@@ -450,7 +450,7 @@ public class MixContext extends ContextWrapper {
 		String ret="";
 		boolean first=true;
 		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-			if(getDataSource(source)) {
+			if(isDataSourceSelected(source)) {
 				if(!first) {
 					ret+=", ";
 				}	

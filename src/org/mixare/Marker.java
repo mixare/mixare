@@ -18,8 +18,6 @@
  */
 package org.mixare;
 
-import java.util.Comparator;
-
 import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.ScreenLine;
@@ -32,11 +30,12 @@ import org.mixare.render.MixVector;
 import android.graphics.Color;
 import android.location.Location;
 
-public class Marker {
+public class Marker implements Comparable<Marker> {
 
 	private String title;
 	private String URL;
 	private PhysicalPlace mGeoLoc;
+	private double distance;
 	// From which datasource does this marker originate
 	private DataSource.DATASOURCE datasource;
 
@@ -45,7 +44,7 @@ public class Marker {
 //	private boolean isLookingAt;
 //	private boolean isNear;
 //	private float deltaCenter;
-	MixVector cMarker = new MixVector();
+	public MixVector cMarker = new MixVector();
 	private MixVector signMarker = new MixVector();
 //	private MixVector oMarker = new MixVector();
 	
@@ -220,6 +219,24 @@ public class Marker {
 		}
 		return evtHandled;
 	}
+
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+
+	@Override
+	public int compareTo(Marker another) {
+
+		Marker leftPm = this;
+		Marker rightPm = another;
+
+		return Double.compare(leftPm.getDistance(), rightPm.getDistance());
+
+	}
 }
 
 
@@ -258,32 +275,5 @@ class Label implements ScreenObj {
 
 	public float getHeight() {
 		return height;
-	}
-}
-
-
-/**
- * Compares the markers. The closer they are the higher in the stack.
- * @author daniele
- */
-class MarkersOrder implements Comparator<Object> {
-
-	private static MarkersOrder instance;	// singleton
-	
-	public static MarkersOrder getInstance() {
-		if (instance == null)
-			instance = new MarkersOrder();
-		return instance;
-	}
-	
-	/** Private, use getInstance() */
-	private MarkersOrder() {
-	}
-
-	public int compare(Object left, Object right) {
-		Marker leftPm = (Marker) left;
-		Marker rightPm = (Marker) right;
-
-		return Float.compare(leftPm.cMarker.z, rightPm.cMarker.z);
 	}
 }

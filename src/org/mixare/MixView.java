@@ -430,13 +430,18 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				//				hardFix.setLatitude(0);
 				//				hardFix.setLongitude(0);
 
-				hardFix.setLatitude(46.480302);
+/*				hardFix.setLatitude(46.480302);
 				hardFix.setLongitude(11.296005);
-
+				hardFix.setAltitude(300);
+*/
 				/*New York*/
 				//				hardFix.setLatitude(40.731510);
 				//				hardFix.setLongitude(-73.991547);
-				hardFix.setAltitude(300);
+				
+				// TU Wien
+				hardFix.setLatitude(48.196349);
+				hardFix.setLongitude(16.368653);
+				hardFix.setAltitude(0);
 
 				try {
 					mixContext.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
