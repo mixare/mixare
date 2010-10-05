@@ -247,7 +247,7 @@ public class DataView {
 				else if("OpenStreetMap".equals(dataSource))
 					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
 				else if("OwnURL".equals(dataSource))
-					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
+					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt) + "&radius=" + Double.toString(radius);
 			}
 			Log.i(MixView.TAG,request.url);
 			state.downloadId = mixContext.getDownloader().submitJob(request);
