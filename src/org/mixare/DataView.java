@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
+import org.mixare.data.DataSource.DATAFORMAT;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -205,12 +206,12 @@ public class DataView {
 		isInit = true;
 	}
 	
-	public void requestData(String url) {
+	public void requestData(String url,DATAFORMAT dataformat) {
 		DownloadRequest request = new DownloadRequest();
+		request.format=dataformat;
 		request.url=url;
 		mixContext.getDownloader().submitJob(request);
-		state.nextLStatus = MixState.PROCESSING;
-		Log.i(MixView.TAG,url);		
+		state.nextLStatus = MixState.PROCESSING;			
 	}
 
 	public void draw(PaintScreen dw) {
@@ -225,7 +226,7 @@ public class DataView {
 			dataHandler.clearMarkerList();
 			
 			if (mixContext.getStartUrl().length() > 0){
-				requestData(mixContext.getStartUrl());
+				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE);
 				isLauncherStarted = true;
 			}
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
@@ -236,7 +237,7 @@ public class DataView {
 				
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
 					if(mixContext.isDataSourceSelected(source))
-						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()));
+						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source));
 				}
 			}
 			
@@ -261,7 +262,7 @@ public class DataView {
 				if(!dRes.error) {
 					//jLayer = (DataHandler) dRes.obj;
 					Log.i(MixView.TAG,"Adding Markers");
-					dataHandler.addMarkers(((DataHandler) dRes.obj).getMarkerList());
+					dataHandler.addMarkers(dRes.getMarkers());
 				}
 			}
 			if(dm.isDone()) {

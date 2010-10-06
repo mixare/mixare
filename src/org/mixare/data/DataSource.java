@@ -6,6 +6,8 @@ package org.mixare.data;
 
 import org.mixare.MixListView;
 
+import android.graphics.Color;
+
 /**
  * @author hannes
  *
@@ -16,7 +18,14 @@ public class DataSource {
 	 * 
 	 */
 	
-	public enum DATASOURCE { WIKIPEDIA,  BUZZ, TWITTER, OSM, OWNURL}
+	
+	// Datasource and dataformat are not the same. datasource is where the data comes from
+	// and dataformat is how the data is formatted. 
+	// this is necessary for example when you have multiple datasources with the same
+	// dataformat
+	public enum DATASOURCE { WIKIPEDIA, BUZZ, TWITTER, OSM, OWNURL};
+	public enum DATAFORMAT { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE};
+	
 
 	/** default URL */
 	private static final String WIKI_BASE_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
@@ -31,6 +40,19 @@ public class DataSource {
 
 	public DataSource() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public static DATAFORMAT dataFormatFromDataSource(DATASOURCE ds) {
+		DATAFORMAT ret;
+		switch (ds) {
+			case WIKIPEDIA: ret=DATAFORMAT.WIKIPEDIA; break;
+			case BUZZ: ret=DATAFORMAT.BUZZ; break;
+			case TWITTER: ret=DATAFORMAT.TWITTER; break;
+			case OSM: ret=DATAFORMAT.OSM; break;
+			case OWNURL: ret=DATAFORMAT.MIXARE; break;
+			default: ret=DATAFORMAT.MIXARE; break;
+		}
+		return ret;
 	}
 	
 	public static String createRequestURL(DATASOURCE source, double lat, double lon, double alt, float radius,String locale) {
@@ -64,9 +86,25 @@ public class DataSource {
 			break;
 			
 			case OWNURL:
-				ret = MixListView.customizedURL + "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt);
+				ret = MixListView.customizedURL +  
+				"?latitude=" + Double.toString(lat) + 
+				"&longitude=" + Double.toString(lon) + 
+				"&altitude=" + Double.toString(alt) +
+				"&radius=" + Double.toString(radius);
 			break;
 			
+		}
+		return ret;
+	}
+	
+	public static int getColor(DATASOURCE datasource) {
+		int ret;
+		switch(datasource) {
+			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
+			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
+			case OSM:		ret=Color.rgb(255, 168, 0); break;
+			case WIKIPEDIA:	ret=Color.RED; break;
+			default:		ret=Color.WHITE; break;
 		}
 		return ret;
 	}

@@ -1,9 +1,10 @@
 package org.mixare.data;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.mixare.Marker;
 import org.mixare.MixView;
@@ -17,19 +18,19 @@ import android.util.Log;
  * DataHandler is also the Factory for new Marker objects.
  */
 public class DataHandler {
-
-	private List<Marker> markerList = new ArrayList<Marker>();
 	
-	public void createMarker(String title, double latitude, double longitude, double elevation, String link, DataSource.DATASOURCE datasource) {
-		String URL = null;
-		if (link != null && link.length() > 0)
-			URL = "webpage:" + URLDecoder.decode(link);
-		Marker ma = new Marker(title, latitude, longitude, elevation, URL, datasource);
-		markerList.add(ma);
-	}
+	private List<Marker> markerList = new ArrayList<Marker>();
+	//private Set<Marker> markerList = new HashSet<Marker>();
 	
 	public void addMarkers(List<Marker> markers) {
-		markerList.addAll(markers);
+
+		Log.d(MixView.TAG, "Marker before: "+markerList.size());
+		for(Marker ma:markers) {
+			if(!markerList.contains(ma))
+				markerList.add(ma);
+		}
+		//markerList.addAll(markers);
+		
 		Log.d(MixView.TAG, "Marker count: "+markerList.size());
 	}
 	

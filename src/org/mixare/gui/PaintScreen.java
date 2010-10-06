@@ -18,9 +18,11 @@
  */
 package org.mixare.gui;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 
 public class PaintScreen {
 	Canvas canvas;
@@ -80,6 +82,20 @@ public class PaintScreen {
 
 	public void paintRect(float x, float y, float width, float height) {
 		canvas.drawRect(x, y, x + width, y + height, paint);
+	}
+	
+	public void paintBitmap(Bitmap bitmap, float left, float top) {
+		canvas.drawBitmap(bitmap, left, top, paint);
+	}
+	
+	public void paintPath(Path path,float x, float y, float width, float height, float rotation, float scale) {
+		canvas.save();
+		canvas.translate(x + width / 2, y + height / 2);
+		canvas.rotate(rotation);
+		canvas.scale(scale, scale);
+		canvas.translate(-(width / 2), -(height / 2));
+		canvas.drawPath(path, paint);
+		canvas.restore();
 	}
 
 	public void paintCircle(float x, float y, float radius) {

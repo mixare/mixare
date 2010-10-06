@@ -21,6 +21,7 @@ package org.mixare;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
+import org.mixare.data.DataSource.DATAFORMAT;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -82,9 +84,10 @@ public class DownloadManager implements Runnable {
 					state = CONNECTED;
 					currJobId = jobId;
 
-					result = processRequest(request);
 
 					synchronized (this) {
+						result = processRequest(request);
+						
 						todoList.remove(jobId);
 						doneList.put(jobId, result);
 						proceed = false;
@@ -139,14 +142,14 @@ public class DownloadManager implements Runnable {
 				// try loading JSON DATA
 				try {
 
-					Log.d(MixView.TAG, "try to load JSON data");
+					Log.v(MixView.TAG, "try to load JSON data");
 
 					JSONObject root = new JSONObject(tmp);
 
-					Log.i(MixView.TAG, "loading JSON data");				
+					Log.d(MixView.TAG, "loading JSON data");				
 
-					layer.load(root);
-					result.obj = layer;
+					List<Marker> markers = layer.load(root,request.format);
+					result.setMarkers(markers);
 
 					result.format = request.format;
 					result.error = false;
@@ -155,12 +158,12 @@ public class DownloadManager implements Runnable {
 				}
 				catch (JSONException e) {
 
-					Log.d(MixView.TAG, "no JSON data");
-					Log.d(MixView.TAG, "try to load XML data");
+					Log.v(MixView.TAG, "no JSON data");
+					Log.v(MixView.TAG, "try to load XML data");
 
 					try {
 						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-						//Document doc = builder.parse(is);
+						//Document doc = builder.parse(is);d
 						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
 
 						//Document doc = builder.parse(is);
@@ -168,9 +171,10 @@ public class DownloadManager implements Runnable {
 						XMLHandler xml = new XMLHandler();
 
 						Log.i(MixView.TAG, "loading XML data");	
-						xml.load(doc);
+						
 
-						result.obj = xml;
+						List<Marker> markers = xml.load(doc);
+						result.setMarkers(markers);
 
 						result.format = request.format;
 						result.error = false;
@@ -184,7 +188,6 @@ public class DownloadManager implements Runnable {
 			}
 		}
 		catch (Exception ex) {
-			result.obj = null;
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
@@ -254,16 +257,25 @@ public class DownloadManager implements Runnable {
 }
 
 class DownloadRequest {
-	int format;
+
+	public DATAFORMAT format;
 	String url;
 	String params;
 }
 
 class DownloadResult {
-	int format;
-	Object obj;
+	public DATAFORMAT format;
+	List<Marker> markers;
 
 	boolean error;
 	String errorMsg;
 	DownloadRequest errorRequest;
+	
+	public List<Marker> getMarkers() {
+		return markers;
+	}
+	public void setMarkers(List<Marker> markers) {
+		this.markers = markers;
+	}
+	
 }

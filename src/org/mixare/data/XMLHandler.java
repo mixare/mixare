@@ -1,7 +1,12 @@
 
 package org.mixare.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mixare.Marker;
 import org.mixare.MixView;
+import org.mixare.NavigationMarker;
 import org.mixare.reality.PhysicalPlace;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -17,8 +22,9 @@ import android.util.Log;
  */
 public class XMLHandler extends DataHandler {
 
-	private void processOSM(Element root) {
+	private List<Marker> processOSM(Element root) {
 
+    	List<Marker> markers = new ArrayList<Marker>();
         NodeList nodes = root.getElementsByTagName("node");
         
         for (int i =0; i< nodes.getLength(); i++) {
@@ -35,21 +41,26 @@ public class XMLHandler extends DataHandler {
 	                	double lat = Double.valueOf(att.getNamedItem("lat").getNodeValue());
 	                	double lon = Double.valueOf(att.getNamedItem("lon").getNodeValue());
 	        			
-	                	Log.d(MixView.TAG,"OSM Node: "+name+" lat "+lat+" lon "+lon+"\n");
+	                	Log.v(MixView.TAG,"OSM Node: "+name+" lat "+lat+" lon "+lon+"\n");
 
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
 	                	
-	                	createMarker(name, lat, lon, 0, 
-	                			"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(),
-	                			DataSource.DATASOURCE.OSM);
-	        			
+	                	Marker ma = new NavigationMarker(
+	        				name, 
+	        				lat, 
+	        				lon, 
+	        				0, 
+	        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
+	        				DataSource.DATASOURCE.OSM);
+	        			markers.add(ma);
 	                	//skip to next node
 	        			continue;
 	        		}
         		}
         	}
         }
+        return markers;
 	}
 	
 	public static String getOSMBoundingBox(double lat, double lon, double radius) {
@@ -64,12 +75,13 @@ public class XMLHandler extends DataHandler {
 		//return "[bbox=16.365,48.193,16.374,48.199]";
 	}
 	
-	public void load(Document doc) {
+	public List<Marker> load(Document doc) {
         Element root = doc.getDocumentElement();
         
         // If the root tag is called "osm" we got an 
         // openstreetmap .osm xml document
         if ("osm".equals(root.getTagName()))
-        	processOSM(root);
+        	return processOSM(root);
+        return null;
 	}
 }
