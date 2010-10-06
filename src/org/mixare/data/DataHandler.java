@@ -20,7 +20,6 @@ import android.util.Log;
 public class DataHandler {
 	
 	private List<Marker> markerList = new ArrayList<Marker>();
-	//private Set<Marker> markerList = new HashSet<Marker>();
 	
 	public void addMarkers(List<Marker> markers) {
 
@@ -29,7 +28,6 @@ public class DataHandler {
 			if(!markerList.contains(ma))
 				markerList.add(ma);
 		}
-		//markerList.addAll(markers);
 		
 		Log.d(MixView.TAG, "Marker count: "+markerList.size());
 	}
