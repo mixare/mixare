@@ -33,22 +33,24 @@ public class TextObj implements ScreenObj {
 	float lineHeight;
 	float maxLineWidth;
 	float pad;
-	int borderColor, bgColor, textColor;
+	int borderColor, bgColor, textColor, textShadowColor;
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
 			PaintScreen dw) {
 		this(txtInit, fontSizeInit, maxWidth, Color.rgb(255, 255, 255), Color
-				.rgb(0, 0, 0), Color.rgb(255, 255, 255),
+				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.rgb(32, 32, 32),
 				dw.getTextAsc() / 2, dw);
 	}
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
-			int borderColor, int bgColor, int textColor, float pad,
+			int borderColor, int bgColor, int textColor, int textShadowColor, float pad,
 			PaintScreen dw) {
-		this.pad = pad;
-		this.bgColor = bgColor;
+		
 		this.borderColor = borderColor;
+		this.bgColor = bgColor;
 		this.textColor = textColor;
+		this.textShadowColor = textShadowColor;
+		this.pad = pad;
 
 		try {
 			prepTxt(txtInit, fontSizeInit, maxWidth, dw);
@@ -124,12 +126,25 @@ public class TextObj implements ScreenObj {
 		dw.setColor(borderColor);
 		dw.paintRect(0, 0, width, height);
 
+		
+		
 		dw.setFill(true);
 		dw.setColor(textColor);
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
 
+			// text shadow to increase contrast
+			dw.setColor(textShadowColor);
+			dw.paintText(pad+2, pad + lineHeight * i + dw.getTextAsc()+2, line);
+			dw.paintText(pad+2, pad + lineHeight * i + dw.getTextAsc()-2, line);
+			dw.paintText(pad-2, pad + lineHeight * i + dw.getTextAsc()+2, line);
+			dw.paintText(pad-2, pad + lineHeight * i + dw.getTextAsc()-2, line);
+			
+			// actual text
+			dw.setColor(textColor);
 			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
+			
+			
 		}
 	}
 

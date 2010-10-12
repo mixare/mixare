@@ -29,7 +29,6 @@ import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
-import android.graphics.Color;
 import android.location.Location;
 
 abstract public class Marker implements Comparable<Marker> {
@@ -74,7 +73,7 @@ abstract public class Marker implements Comparable<Marker> {
 			URL = "webpage:" + URLDecoder.decode(link);
 		this.datasource = datasource;
 		
-		this.ID=datasource+title+mGeoLoc.toString();
+		this.ID=datasource+"##"+title; //mGeoLoc.toString();
 	}
 	
 	public String getTitle(){

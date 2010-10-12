@@ -6,9 +6,7 @@ package org.mixare;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
-import org.mixare.gui.TextObj;
 
-import android.graphics.Color;
 import android.graphics.Path;
 import android.location.Location;
 
