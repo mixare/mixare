@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
@@ -83,7 +84,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private Thread downloadThread;
 
 	private float RTmp[] = new float[9];
-	private float R[] = new float[9];
+	private float Rot[] = new float[9];
 	private float I[] = new float[9];
 	private float grav[] = new float[3];
 	private float mag[] = new float[3];
@@ -208,8 +209,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
+		DataSource.createIcons(getResources());
+		
 		try {
+
 			handleIntent(getIntent());
 
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -282,7 +286,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			if(mixContext.isActualLocation()==false){
 				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
-
+			
 		} catch (Exception ex) {
 			doError(ex);
 		}
@@ -711,10 +715,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
-			SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, R);
+			SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
 
-			tempR.set(R[0], R[1], R[2], R[3], R[4], R[5], R[6], R[7],
-					R[8]);
+			tempR.set(Rot[0], Rot[1], Rot[2], Rot[3], Rot[4], Rot[5], Rot[6], Rot[7],
+					Rot[8]);
 
 			finalR.toIdentity();
 			finalR.prod(m4);

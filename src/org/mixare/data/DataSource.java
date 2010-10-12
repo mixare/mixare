@@ -5,7 +5,11 @@
 package org.mixare.data;
 
 import org.mixare.MixListView;
+import org.mixare.R;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
 /**
@@ -13,11 +17,6 @@ import android.graphics.Color;
  *
  */
 public class DataSource {
-
-	/**
-	 * 
-	 */
-	
 	
 	// Datasource and dataformat are not the same. datasource is where the data comes from
 	// and dataformat is how the data is formatted. 
@@ -38,8 +37,25 @@ public class DataSource {
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries
 
+	public static Bitmap twitterIcon;
+	public static Bitmap buzzIcon;	
+	
 	public DataSource() {
-		// TODO Auto-generated constructor stub
+		
+	}
+	
+	public static void createIcons(Resources res) {
+		twitterIcon=BitmapFactory.decodeResource(res, R.drawable.twitter);
+		buzzIcon=BitmapFactory.decodeResource(res, R.drawable.buzz);
+	}
+	
+	public static Bitmap getBitmap(DATASOURCE ds) {
+		Bitmap bitmap=null;
+		switch (ds) {
+			case TWITTER: bitmap=twitterIcon; break;
+			case BUZZ: bitmap=buzzIcon; break;
+		}
+		return bitmap;
 	}
 	
 	public static DATAFORMAT dataFormatFromDataSource(DATASOURCE ds) {

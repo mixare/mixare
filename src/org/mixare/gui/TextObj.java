@@ -21,7 +21,10 @@ package org.mixare.gui;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 
+import org.mixare.MixView;
+
 import android.graphics.Color;
+import android.util.Log;
 
 public class TextObj implements ScreenObj {
 	String txt;
