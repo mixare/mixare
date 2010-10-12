@@ -20,11 +20,14 @@ package org.mixare.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.Marker;
+import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.POIMarker;
 import org.mixare.SocialMarker;
@@ -96,19 +99,49 @@ public class Json extends DataHandler {
 
 	public Marker processTwitterJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
 		Marker ma = null;
-		if (jo.has("geo")&& !jo.isNull("geo")) {
-			Log.v(MixView.TAG, "processing Twitter JSON object");
-			JSONObject geo = jo.getJSONObject("geo");
-			JSONArray coordinates = geo.getJSONArray("coordinates");
-			String user=jo.getString("from_user");
-			String url="http://twitter.com/"+user;
+		if (jo.has("geo")) {
+			Double lat=null, lon=null;
 			
-			ma = new SocialMarker(
-					user+": "+jo.getString("text"), 
-					Double.parseDouble(coordinates.getString(0)), 
-					Double.parseDouble(coordinates.getString(1)), 
-					0, url, 
-					DataSource.DATASOURCE.TWITTER);
+			if(!jo.isNull("geo")) {
+				JSONObject geo = jo.getJSONObject("geo");
+				JSONArray coordinates = geo.getJSONArray("coordinates");
+				lat=Double.parseDouble(coordinates.getString(0));
+				lon=Double.parseDouble(coordinates.getString(1));
+			}
+			else if(jo.has("location")) {
+
+				// Regex pattern to match location information 
+				// from the location setting, like:
+				// iPhone: 12.34,56.78
+				// ÜT: 12.34,56.78
+				// 12.34,56.78
+				
+				Pattern pattern = Pattern.compile("\\D*([0-9.]+),\\s?([0-9.]+)");
+				Matcher matcher = pattern.matcher(jo.getString("location"));
+
+				if(matcher.find()){
+					lat=Double.parseDouble(matcher.group(1));
+					lon=Double.parseDouble(matcher.group(2));
+				}					
+			}
+			else if(jo.has("location")&&Pattern.matches("ÜT: [0-9.]+,[0-9.]+",jo.getString("location"))) {
+
+				String[] coords = (jo.getString("location").split(" ")[1]).split(",");
+				lat=Double.parseDouble(coords[0]);
+				lon=Double.parseDouble(coords[1]);
+			}
+			if(lat!=null) {
+				Log.v(MixView.TAG, "processing Twitter JSON object");
+				String user=jo.getString("from_user");
+				String url="http://twitter.com/"+user;
+				
+				ma = new SocialMarker(
+						user+": "+jo.getString("text"), 
+						lat, 
+						lon, 
+						0, url, 
+						DataSource.DATASOURCE.TWITTER);
+			}
 		}
 		return ma;
 	}

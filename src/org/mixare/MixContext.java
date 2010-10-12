@@ -259,7 +259,7 @@ public class MixContext extends ContextWrapper {
 		htmlEntities.put("&euro;", "\u20a0");
 	}
 
-	public String unescapeHTML(String source, int start) {
+	public static String unescapeHTML(String source, int start) {
 		int i, j;
 
 		i = source.indexOf("&", start);
