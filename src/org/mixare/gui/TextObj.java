@@ -21,10 +21,9 @@ package org.mixare.gui;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 
-import org.mixare.MixView;
-
 import android.graphics.Color;
-import android.util.Log;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 
 public class TextObj implements ScreenObj {
 	String txt;
@@ -41,7 +40,7 @@ public class TextObj implements ScreenObj {
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
 			PaintScreen dw) {
 		this(txtInit, fontSizeInit, maxWidth, Color.rgb(255, 255, 255), Color
-				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.rgb(32, 32, 32),
+				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.argb(64, 0, 0, 0),
 				dw.getTextAsc() / 2, dw);
 	}
 
@@ -130,23 +129,22 @@ public class TextObj implements ScreenObj {
 		dw.paintRect(0, 0, width, height);
 
 		
-		
-		dw.setFill(true);
-		dw.setColor(textColor);
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
-
-			// text shadow to increase contrast
-			dw.setColor(textShadowColor);
-			dw.paintText(pad+2, pad + lineHeight * i + dw.getTextAsc()+2, line);
-			dw.paintText(pad+2, pad + lineHeight * i + dw.getTextAsc()-2, line);
-			dw.paintText(pad-2, pad + lineHeight * i + dw.getTextAsc()+2, line);
-			dw.paintText(pad-2, pad + lineHeight * i + dw.getTextAsc()-2, line);
+			
+			// stroke
+/* 			dw.setFill(false);
+			dw.setStrokeWidth(4);
+		    dw.setColor(textShadowColor);
+			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
+*/
 			
 			// actual text
+
+			dw.setFill(true);
+			dw.setStrokeWidth(0);
 			dw.setColor(textColor);
 			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
-			
 			
 		}
 	}

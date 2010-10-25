@@ -209,10 +209,13 @@ public class DownloadManager implements Runnable {
 	}
 
 	public synchronized String submitJob(DownloadRequest job) {
-		String jobId = "ID_" + (id++);
-		todoList.put(jobId, job);
-		Log.i(MixView.TAG,"Submitted Job with "+jobId+", format: " +job.format+", params: "+job.params+", url: "+job.url);
-		return jobId;
+		if(job!=null) {
+			String jobId = "ID_" + (id++);
+			todoList.put(jobId, job);
+			Log.i(MixView.TAG,"Submitted Job with "+jobId+", format: " +job.format+", params: "+job.params+", url: "+job.url);
+			return jobId;
+		}
+		return null;
 	}
 
 	public synchronized boolean isReqComplete(String jobId) {

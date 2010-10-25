@@ -124,12 +124,6 @@ public class Json extends DataHandler {
 					lon=Double.parseDouble(matcher.group(2));
 				}					
 			}
-			else if(jo.has("location")&&Pattern.matches("ÜT: [0-9.]+,[0-9.]+",jo.getString("location"))) {
-
-				String[] coords = (jo.getString("location").split(" ")[1]).split(",");
-				lat=Double.parseDouble(coords[0]);
-				lon=Double.parseDouble(coords[1]);
-			}
 			if(lat!=null) {
 				Log.v(MixView.TAG, "processing Twitter JSON object");
 				String user=jo.getString("from_user");
@@ -149,12 +143,12 @@ public class Json extends DataHandler {
 	public Marker processMixareJSONObject(JSONObject jo) throws JSONException {
 
 		Marker ma = null;
-		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") && jo.has("has_detail_page")) {
+		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
 	
 			Log.v(MixView.TAG, "processing Mixare JSON object");
 			String link=null;
 	
-			if(jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
+			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
 				link=jo.getString("webpage");
 			
 			ma = new POIMarker(

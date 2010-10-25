@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
@@ -64,6 +65,7 @@ public class MixContext extends ContextWrapper {
 	DownloadManager downloadManager;
 
 	Location curLoc;
+	Location locationAtLastDownload;
 	Matrix rotationM = new Matrix();
 
 	float declination = 0f;
@@ -161,27 +163,27 @@ public class MixContext extends ContextWrapper {
 	public InputStream getHttpGETInputStream(String urlStr)
 	throws Exception {
 		InputStream is = null;
-		HttpURLConnection conn = null;
+		URLConnection conn = null;
 		if (urlStr.startsWith("content://"))
 			return getContentInputStream(urlStr, null);
 
 		try {
 			URL url = new URL(urlStr);
-			conn = (HttpURLConnection) url.openConnection();
+			conn =  url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
-			
+
 			is = conn.getInputStream();
 			
 			return is;
 		} catch (Exception ex) {
-			//MixListView.setDataSource("Wikipedia");
 			try {
 				is.close();
 			} catch (Exception ignore) {			
 			}
 			try {
-				conn.disconnect();
+				if(conn instanceof HttpURLConnection)
+					((HttpURLConnection)conn).disconnect();
 			} catch (Exception ignore) {			
 			}
 			
@@ -460,4 +462,13 @@ public class MixContext extends ContextWrapper {
 		}
 		return ret;
 	}
+
+	public Location getLocationAtLastDownload() {
+		return locationAtLastDownload;
+	}
+
+	public void setLocationAtLastDownload(Location locationAtLastDownload) {
+		this.locationAtLastDownload = locationAtLastDownload;
+	}
+	
 }

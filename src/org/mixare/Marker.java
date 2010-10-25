@@ -19,6 +19,7 @@
 package org.mixare;
 
 import java.net.URLDecoder;
+import java.text.DecimalFormat;
 
 import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
@@ -37,9 +38,11 @@ abstract public class Marker implements Comparable<Marker> {
 	protected String title;
 	private String URL;
 	protected PhysicalPlace mGeoLoc;
+	// distance from user to mGeoLoc in meters
 	private double distance;
 	// From which datasource does this marker originate
 	protected DataSource.DATASOURCE datasource;
+	private boolean active;
 
 	// Draw properties
 	protected boolean isVisible;
@@ -67,6 +70,7 @@ abstract public class Marker implements Comparable<Marker> {
 	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource.DATASOURCE datasource) {
 		super();
 
+		this.active = false;
 		this.title = title;
 		this.mGeoLoc = new PhysicalPlace(latitude,longitude,altitude);
 		if (link != null && link.length() > 0)
@@ -150,7 +154,7 @@ abstract public class Marker implements Comparable<Marker> {
 		}
 	}
 
-	public void update(Location curGPSFix, long time) {
+	public void update(Location curGPSFix) {
 		// An elevation of 0.0 probably means that the elevation of the
 		// POI is not known and should be set to the users GPS height
 		// Note: this could be improved with calls to 
@@ -215,10 +219,21 @@ abstract public class Marker implements Comparable<Marker> {
 		//TODO: grandezza cerchi e trasparenza
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
-		if (textBlock == null) {
-			textBlock = new TextObj(title, Math.round(maxHeight / 2f) + 1,
-					160, dw);
+		//TODO: change textblock only when distance changes
+		String textStr="";
+
+		double d = distance;
+		DecimalFormat df = new DecimalFormat("@#");
+		if(d<1000.0) {
+			textStr = title + " ("+ df.format(d) + "m)";			
 		}
+		else {
+			d=d/1000.0;
+			textStr = title + " (" + df.format(d) + "km)";
+		}
+		
+		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1,
+				250, dw);
 
 		if (isVisible) {
 			
@@ -277,6 +292,15 @@ abstract public class Marker implements Comparable<Marker> {
 		return this.ID.equals(((Marker) marker).getID());
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	abstract public int getMaxObjects();
  
 }
 

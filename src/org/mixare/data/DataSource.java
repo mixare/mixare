@@ -32,13 +32,14 @@ public class DataSource {
 	private static final String BUZZ_BASE_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
 	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
 	// eg. only railway stations:
-	private static final String OSM_BASE_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
+	//private static final String OSM_BASE_URL =          "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
+	private static final String OSM_BASE_URL = "http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
 	//all objects that have names: 
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries
 
 	public static Bitmap twitterIcon;
-	public static Bitmap buzzIcon;	
+	public static Bitmap buzzIcon;
 	
 	public DataSource() {
 		
@@ -82,20 +83,20 @@ public class DataSource {
 				"&radius="+ radius +
 				"&maxRows=50" +
 				"&lang=" + locale; 
-				break;
+			break;
 			
 			case BUZZ: 
 				ret= BUZZ_BASE_URL + 
 				"&lat=" + lat+
 				"&lon=" + lon + 
 				"&radius="+ radius*1000;
-				break;
+			break;
 			
 			case TWITTER: 
 				ret = TWITTER_BASE_URL +
 				"?geocode=" + lat + "%2C" + lon + "%2C" + 
-				Math.max(radius, 1.0) + "km" ; 
-				break;
+				Math.max(radius, 1.0) + "km" ;				
+			break;
 				
 			case OSM: 
 				ret = OSM_BASE_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);

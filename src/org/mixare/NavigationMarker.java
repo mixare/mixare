@@ -16,7 +16,7 @@ import android.location.Location;
  */
 public class NavigationMarker extends Marker {
 	
-	public static final int MAX_OBJECTS=20;
+	public static final int MAX_OBJECTS=10;
 
 	public NavigationMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DATASOURCE datasource) {
@@ -25,9 +25,9 @@ public class NavigationMarker extends Marker {
 	}
 
 	@Override
-	public void update(Location curGPSFix, long time) {
+	public void update(Location curGPSFix) {
 	
-		super.update(curGPSFix, time);
+		super.update(curGPSFix);
 		
 		// we want the navigation markers to be on the lower part of
 		// your surrounding sphere so we set the height component of 
@@ -64,5 +64,10 @@ public class NavigationMarker extends Marker {
 			arrow.close();
 			dw.paintPath(arrow,cMarker.x,cMarker.y,radius*2,radius*2,currentAngle+90,1);			
 		}
+	}
+
+	@Override
+	public int getMaxObjects() {
+		return MAX_OBJECTS;
 	}
 }

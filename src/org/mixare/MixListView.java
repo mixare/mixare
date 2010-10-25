@@ -137,13 +137,15 @@ public class MixListView extends ListActivity {
 			/*add all marker items to a title and a URL Vector*/
 			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = jLayer.getMarker(i);
-				listViewMenu.add(ma.getTitle());
-				/*the website for the corresponding title*/
-				if (ma.getURL()!=null)
-					selectedItemURL.add(ma.getURL());
-				/*if no website is available for a specific title*/
-				else
-					selectedItemURL.add("");
+				if(ma.isActive()) {
+					listViewMenu.add(ma.getTitle());
+					/*the website for the corresponding title*/
+					if (ma.getURL()!=null)
+						selectedItemURL.add(ma.getURL());
+					/*if no website is available for a specific title*/
+					else
+						selectedItemURL.add("");
+				}
 			}
 
 			if (dataView.isFrozen()) {

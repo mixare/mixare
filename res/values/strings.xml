@@ -77,4 +77,7 @@
 	
 	<string name="search_active_1">Search on data source</string>
 	<string name="search_active_2">. Touch to terminate search</string>
+	<string name="download_error">Error while downloading</string>
+	<string name="download_received">Received data from</string>
+	
 </resources>

@@ -38,6 +38,7 @@ import org.mixare.render.Camera;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
+import android.widget.Toast;
 
 
 /**
@@ -133,7 +134,6 @@ public class DataView {
 	private float addX = 0, addY = 0;
 
 
-	public static final int MAX_OBJECTS = 30;
 	/**
 	 * Constructor
 	 */
@@ -211,7 +211,7 @@ public class DataView {
 		request.format=dataformat;
 		request.url=url;
 		mixContext.getDownloader().submitJob(request);
-		state.nextLStatus = MixState.PROCESSING;			
+		state.nextLStatus = MixState.PROCESSING;
 	}
 
 	public void draw(PaintScreen dw) {
@@ -222,9 +222,7 @@ public class DataView {
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-			
-			dataHandler.clearMarkerList();
-			
+						
 			if (mixContext.getStartUrl().length() > 0){
 				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE);
 				isLauncherStarted = true;
@@ -236,9 +234,15 @@ public class DataView {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-					if(mixContext.isDataSourceSelected(source))
+					
+					if(mixContext.isDataSourceSelected(source)) {
 						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source));
+
+						// Debug notification
+						// Toast.makeText(mixContext, "Downloading from "+ source, Toast.LENGTH_SHORT).show();
+					}
 				}
+				
 			}
 			
 			// if no datasources are activated
@@ -258,11 +262,19 @@ public class DataView {
 				if (dRes.error && retry < 3) {
 					retry++;
 					mixContext.getDownloader().submitJob(dRes.errorRequest);
+					// Notification
+					Toast.makeText(mixContext,mixContext.getResources().getString(R.string.download_error) +" "+ dRes.errorRequest.url, Toast.LENGTH_SHORT).show();
+					
 				}
+				
 				if(!dRes.error) {
 					//jLayer = (DataHandler) dRes.obj;
 					Log.i(MixView.TAG,"Adding Markers");
 					dataHandler.addMarkers(dRes.getMarkers());
+					dataHandler.onLocationChanged(curFix);
+					// Notification
+					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.format, Toast.LENGTH_SHORT).show();
+
 				}
 			}
 			if(dm.isDone()) {
@@ -271,18 +283,22 @@ public class DataView {
 			}
 		}
 
-		dataHandler.updateDistances(mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude());
+		dataHandler.updateActivationStatus(mixContext);
 		
 		// Update markers
-		for (int i = 0; i < Math.min(dataHandler.getMarkerCount(),MAX_OBJECTS); i++) {
-		//for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
+		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
 			Marker ma = dataHandler.getMarker(i);
-			if (ma.getDistance() / 1000f < radius) {
-				if (!frozen) 
-					ma.update(curFix, System.currentTimeMillis());
+			//if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma instanceof NavigationMarker || ma instanceof SocialMarker)) {
+			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
+				
+				// To increase performance don't recalculate position vector
+				// for every marker on every draw call, instead do this only 
+				// after onLocationChanged and after downloading new marker
+				//if (!frozen) 
+				//	ma.update(curFix);
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
-			} 
+			}  
 		}
 
 		// Draw Radar

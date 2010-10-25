@@ -59,7 +59,7 @@ public class RadarPoints implements ScreenObj {
 			float x = pm.getLocationVector().x / scale;
 			float y = pm.getLocationVector().z / scale;
 
-			if (x * x + y * y < RADIUS * RADIUS) {
+			if (pm.isActive() && (x * x + y * y < RADIUS * RADIUS)) {
 				dw.setFill(true);
 				
 				dw.setColor(DataSource.getColor(pm.getDatasource()));

@@ -17,7 +17,7 @@ import android.location.Location;
  */
 public class SocialMarker extends Marker {
 	
-	public static final int MAX_OBJECTS=20;
+	public static final int MAX_OBJECTS=15;
 
 	public SocialMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DATASOURCE datasource) {
@@ -25,9 +25,9 @@ public class SocialMarker extends Marker {
 	}
 
 	@Override
-	public void update(Location curGPSFix, long time) {
+	public void update(Location curGPSFix) {
 
-		super.update(curGPSFix, time);
+		super.update(curGPSFix);
 		
 		// we want the social markers to be on the upper part of
 		// your surrounding sphere so we set the height component of 
@@ -53,6 +53,11 @@ public class SocialMarker extends Marker {
 				dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);				
 			}
 		}
+	}
+
+	@Override
+	public int getMaxObjects() {
+		return MAX_OBJECTS;
 	}
 
 }

@@ -434,23 +434,32 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				//				hardFix.setLatitude(0);
 				//				hardFix.setLongitude(0);
 
-/*				hardFix.setLatitude(46.480302);
+				hardFix.setLatitude(46.480302);
 				hardFix.setLongitude(11.296005);
 				hardFix.setAltitude(300);
-*/
+
 				/*New York*/
 				//				hardFix.setLatitude(40.731510);
 				//				hardFix.setLongitude(-73.991547);
 				
 				// TU Wien
-				hardFix.setLatitude(48.196349);
-				hardFix.setLongitude(16.368653);
-				hardFix.setAltitude(0);
+//				hardFix.setLatitude(48.196349);
+//				hardFix.setLongitude(16.368653);
+//				hardFix.setAltitude(0);
 
 				try {
-					mixContext.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
+					Location gps=locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+					Location network=locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+					if(gps!=null)
+						mixContext.curLoc = gps;
+					else if (network!=null)
+						mixContext.curLoc = network;
+					else
+						mixContext.curLoc = hardFix;
+					
 				} catch (Exception ex2) {
-					mixContext.curLoc = new Location(hardFix);
+					ex2.printStackTrace();
+					mixContext.curLoc = hardFix;
 				}
 
 				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
@@ -811,6 +820,14 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (mixContext.curLoc) {
 					mixContext.curLoc = location;
+					dataView.getDataHandler().onLocationChanged(location);
+					// If we have moved more than radius/2 meter away from the 
+					// location where the last download occured we should start 
+					// a fresh download
+					if(location.distanceTo(mixContext.getLocationAtLastDownload())>(dataView.getRadius()/2))  {
+						dataView.doStart();
+						mixContext.setLocationAtLastDownload(location);
+					}
 				}
 				isGpsEnabled = true;
 			}
@@ -820,6 +837,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE) {
+			Toast.makeText(mixContext, "Compass data unreliable. Please recalibrate compass.", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	@Override

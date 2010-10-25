@@ -2,12 +2,15 @@ package org.mixare.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 
 import org.mixare.Marker;
+import org.mixare.MixContext;
 import org.mixare.MixView;
+import org.mixare.NavigationMarker;
+import org.mixare.POIMarker;
+import org.mixare.SocialMarker;
 
 import android.location.Location;
 import android.util.Log;
@@ -19,11 +22,12 @@ import android.util.Log;
  */
 public class DataHandler {
 	
+	// complete marker list
 	private List<Marker> markerList = new ArrayList<Marker>();
 	
 	public void addMarkers(List<Marker> markers) {
 
-		Log.d(MixView.TAG, "Marker before: "+markerList.size());
+		Log.v(MixView.TAG, "Marker before: "+markerList.size());
 		for(Marker ma:markers) {
 			if(!markerList.contains(ma))
 				markerList.add(ma);
@@ -36,19 +40,38 @@ public class DataHandler {
 		Collections.sort(markerList); 
 	}
 	
-	public void updateDistances(double lat, double lon) {
+	public void updateDistances(Location location) {
 		for(Marker ma: markerList) {
 			float[] dist=new float[3];
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), lat, lon, dist);
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
 			ma.setDistance(dist[0]);
 		}
+	}
+	
+	public void updateActivationStatus(MixContext mixContext) {
+		
+		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
+				
+		for(Marker ma: markerList) {
+
+			Class mClass=ma.getClass();
+			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
+			
+			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
+			boolean dataSourceSelected = mixContext.isDataSourceSelected(ma.getDatasource());
+			
+			ma.setActive((belowMax && dataSourceSelected));
+		}
+	}
+		
+	public void onLocationChanged(Location location) {
+		for(Marker ma: markerList) {
+			ma.update(location);
+		}
+		updateDistances(location);
 		sortMarkerList();
 	}
 	
-	public void clearMarkerList() {
-		markerList.clear();
-	}
-
 	/**
 	 * @deprecated Nobody should get direct access to the list
 	 */

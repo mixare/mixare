@@ -96,7 +96,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		controller = mapView.getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
 		controller.setCenter(startPoint);
-		controller.setZoom(14);
+		controller.setZoom(15);
 	}
 
 	public void createOverlay(){
@@ -105,12 +105,15 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
 		MixOverlay mixOverlay = new MixOverlay(this, drawable);
 
-		for (int i = 0; i < markerList.size(); i++) {
-			GeoPoint point = new GeoPoint((int)(markerList.get(i).getLatitude()*1E6), (int)(markerList.get(i).getLongitude()*1E6));
-			item = new OverlayItem(point, "", "");
-			mixOverlay.addOverlay(item);
-			mapOverlays.add(mixOverlay);
+		for(Marker marker:markerList) {
+			if(marker.isActive()) {
+				GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
+				item = new OverlayItem(point, "", "");
+				mixOverlay.addOverlay(item);
+			}
 		}
+		//Solved issue 39: only one overlay with all marker instead of one overlay for each marker
+		mapOverlays.add(mixOverlay);
 
 		MixOverlay myOverlay;
 		drawable = this.getResources().getDrawable(R.drawable.loc_icon);

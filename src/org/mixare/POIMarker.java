@@ -11,7 +11,7 @@ import android.location.Location;
  */
 public class POIMarker extends Marker {
 	
-	public static final int MAX_OBJECTS=30;
+	public static final int MAX_OBJECTS=20;
 
 	public POIMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DATASOURCE datasource) {
@@ -20,8 +20,13 @@ public class POIMarker extends Marker {
 	}
 
 	@Override
-	public void update(Location curGPSFix, long time) {
-		super.update(curGPSFix, time);
+	public void update(Location curGPSFix) {
+		super.update(curGPSFix);
+	}
+
+	@Override
+	public int getMaxObjects() {
+		return MAX_OBJECTS;
 	}
 
 }
