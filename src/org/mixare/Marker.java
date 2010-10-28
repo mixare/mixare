@@ -31,6 +31,7 @@ import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
 import android.location.Location;
+import android.util.Log;
 
 abstract public class Marker implements Comparable<Marker> {
 
@@ -211,7 +212,12 @@ abstract public class Marker implements Comparable<Marker> {
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
 			dw.setColor(DataSource.getColor(datasource));
-			dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
+			
+			//draw circle with radius depending on distance
+			//0.44 is approx. vertical fov in radians 
+			double angle = 2.0*Math.atan2(20,distance);
+			double radius = angle/0.44 * maxHeight;
+			dw.paintCircle(cMarker.x, cMarker.y, (float)radius);
 		}
 	}
 	

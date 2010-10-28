@@ -36,6 +36,7 @@ public class NavigationMarker extends Marker {
 		locationVector.y+=-1000;
 	}
 
+	@Override
 	public void draw(PaintScreen dw) {
 		drawArrow(dw);
 		drawTextBlock(dw);

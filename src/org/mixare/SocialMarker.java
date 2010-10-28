@@ -33,9 +33,10 @@ public class SocialMarker extends Marker {
 		// your surrounding sphere so we set the height component of 
 		// the position vector 300m above the user
 		
-		locationVector.y+=300;
+		locationVector.y+=500;
 	}
 
+	@Override
 	public void draw(PaintScreen dw) {
 
 		drawTextBlock(dw);

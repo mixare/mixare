@@ -445,7 +445,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				// TU Wien
 //				hardFix.setLatitude(48.196349);
 //				hardFix.setLongitude(16.368653);
-//				hardFix.setAltitude(0);
+//				hardFix.setAltitude(180);
 
 				try {
 					Location gps=locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -461,6 +461,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 					ex2.printStackTrace();
 					mixContext.curLoc = hardFix;
 				}
+				
+				mixContext.setLocationAtLastDownload(mixContext.curLoc);
 
 				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
 						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
@@ -817,17 +819,25 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
+			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (mixContext.curLoc) {
 					mixContext.curLoc = location;
-					dataView.getDataHandler().onLocationChanged(location);
-					// If we have moved more than radius/2 meter away from the 
-					// location where the last download occured we should start 
-					// a fresh download
-					if(location.distanceTo(mixContext.getLocationAtLastDownload())>(dataView.getRadius()/2))  {
+				}
+				dataView.getDataHandler().onLocationChanged(location);
+				// If we have moved more than radius/3 km away from the 
+				// location where the last download occured we should start 
+				// a fresh download
+				Location lastLoc=mixContext.getLocationAtLastDownload();
+				if(lastLoc==null)
+					mixContext.setLocationAtLastDownload(location);
+				else {
+					float threshold = dataView.getRadius()*1000f/3f;
+					Log.v(TAG,"Location Change: "+" threshold "+threshold+" distanceto "+location.distanceTo(lastLoc));
+					if(location.distanceTo(lastLoc)>threshold)  {
+						Log.d(TAG,"Restarting download due to location change");
 						dataView.doStart();
-						mixContext.setLocationAtLastDownload(location);
-					}
+					}	
 				}
 				isGpsEnabled = true;
 			}

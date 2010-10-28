@@ -100,13 +100,17 @@ public class MixContext extends ContextWrapper {
 			}
 			if (lastFix != null){
 				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix.getLongitude()).hashCode();
-			}
-			Date dt = new Date();
-			long actualTime= dt.getTime();
-			long lastFixTime = lastFix.getTime();
-			long timeDifference = actualTime-lastFixTime;
 
-			actualLocation = timeDifference <= 1200000;	//20 min --- 300000 milliseconds = 5 min			
+				long actualTime= new Date().getTime();
+				long lastFixTime = lastFix.getTime();
+				long timeDifference = actualTime-lastFixTime;
+
+				actualLocation = timeDifference <= 1200000;	//20 min --- 300000 milliseconds = 5 min
+			}
+			else
+				actualLocation = false;
+			
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

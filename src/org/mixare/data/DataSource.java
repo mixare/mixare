@@ -23,17 +23,18 @@ public class DataSource {
 	// this is necessary for example when you have multiple datasources with the same
 	// dataformat
 	public enum DATASOURCE { WIKIPEDIA, BUZZ, TWITTER, OSM, OWNURL};
-	public enum DATAFORMAT { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE};
-	
+	public enum DATAFORMAT { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE};	
 
 	/** default URL */
 	private static final String WIKI_BASE_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
+	//private static final String WIKI_BASE_URL =	"file:///sdcard/download/data.json";
 	private static final String TWITTER_BASE_URL = "http://search.twitter.com/search.json";
 	private static final String BUZZ_BASE_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
 	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
 	// eg. only railway stations:
-	//private static final String OSM_BASE_URL =          "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	private static final String OSM_BASE_URL = "http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
+	//private static final String OSM_BASE_URL =	"http://www.informationfreeway.org/api/0.6/node[railway=station]";
+	//private static final String OSM_BASE_URL =	"http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
+	private static final String OSM_BASE_URL =		"http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
 	//all objects that have names: 
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries

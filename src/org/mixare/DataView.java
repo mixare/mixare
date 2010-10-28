@@ -179,6 +179,7 @@ public class DataView {
 
 	public void doStart() {
 		state.nextLStatus = MixState.NOT_STARTED;
+		mixContext.setLocationAtLastDownload(curFix);
 	}
 
 	public boolean isInited() {
@@ -283,10 +284,10 @@ public class DataView {
 			}
 		}
 
-		dataHandler.updateActivationStatus(mixContext);
 		
 		// Update markers
-		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
+		dataHandler.updateActivationStatus(mixContext);
+		for (int i = dataHandler.getMarkerCount()-1; i >= 0; i--) {
 			Marker ma = dataHandler.getMarker(i);
 			//if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma instanceof NavigationMarker || ma instanceof SocialMarker)) {
 			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
