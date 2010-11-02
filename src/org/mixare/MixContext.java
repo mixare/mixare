@@ -27,17 +27,21 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.mixare.data.DataSource;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -51,7 +55,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-public class MixContext {
+public class MixContext extends ContextWrapper {
 
 	public MixView mixView;
 	Context ctx;
@@ -61,6 +65,7 @@ public class MixContext {
 	DownloadManager downloadManager;
 
 	Location curLoc;
+	Location locationAtLastDownload;
 	Matrix rotationM = new Matrix();
 
 	float declination = 0f;
@@ -68,9 +73,19 @@ public class MixContext {
 
 	LocationManager locationMgr;
 	
+	private HashMap<DataSource.DATASOURCE,Boolean> selectedDataSources=new HashMap<DataSource.DATASOURCE,Boolean>();
+	
 	public MixContext(Context appCtx) {
+	
+		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
+
+		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+			// fill the selectedDataSources HashMap with saved settings
+			selectedDataSources.put(source, settings.getBoolean(source.toString(), false));
+		}
 
 		rotationM.toIdentity();
 
@@ -85,13 +100,17 @@ public class MixContext {
 			}
 			if (lastFix != null){
 				locationHash = ("HASH_" + lastFix.getLatitude() + "_" + lastFix.getLongitude()).hashCode();
-			}
-			Date dt = new Date();
-			long actualTime= dt.getTime();
-			long lastFixTime = lastFix.getTime();
-			long timeDifference = actualTime-lastFixTime;
 
-			actualLocation = timeDifference <= 1200000;	//20 min --- 300000 milliseconds = 5 min			
+				long actualTime= new Date().getTime();
+				long lastFixTime = lastFix.getTime();
+				long timeDifference = actualTime-lastFixTime;
+
+				actualLocation = timeDifference <= 1200000;	//20 min --- 300000 milliseconds = 5 min
+			}
+			else
+				actualLocation = false;
+			
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -148,27 +167,27 @@ public class MixContext {
 	public InputStream getHttpGETInputStream(String urlStr)
 	throws Exception {
 		InputStream is = null;
-		HttpURLConnection conn = null;
+		URLConnection conn = null;
 		if (urlStr.startsWith("content://"))
 			return getContentInputStream(urlStr, null);
 
 		try {
 			URL url = new URL(urlStr);
-			conn = (HttpURLConnection) url.openConnection();
+			conn =  url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
-			
+
 			is = conn.getInputStream();
 			
 			return is;
 		} catch (Exception ex) {
-			//MixListView.setDataSource("Wikipedia");
 			try {
 				is.close();
 			} catch (Exception ignore) {			
 			}
 			try {
-				conn.disconnect();
+				if(conn instanceof HttpURLConnection)
+					((HttpURLConnection)conn).disconnect();
 			} catch (Exception ignore) {			
 			}
 			
@@ -246,7 +265,7 @@ public class MixContext {
 		htmlEntities.put("&euro;", "\u20a0");
 	}
 
-	public String unescapeHTML(String source, int start) {
+	public static String unescapeHTML(String source, int start) {
 		int i, j;
 
 		i = source.indexOf("&", start);
@@ -415,4 +434,45 @@ public class MixContext {
 		webview.loadUrl(url);
 	}
 
+
+
+	public void setDataSource(DataSource.DATASOURCE source, Boolean selection){
+		selectedDataSources.put(source,selection);
+		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean(source.toString(), selection);
+		editor.commit();
+	}
+               
+	public Boolean isDataSourceSelected(DataSource.DATASOURCE source) {
+		return selectedDataSources.get(source);
+	}
+	
+	public void toogleDataSource(DataSource.DATASOURCE source) {
+		setDataSource(source, !selectedDataSources.get(source));
+	}
+	
+	public String getDataSourcesStringList() {
+		String ret="";
+		boolean first=true;
+		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+			if(isDataSourceSelected(source)) {
+				if(!first) {
+					ret+=", ";
+				}	
+				ret+=source.toString();
+				first=false;
+			}	
+		}
+		return ret;
+	}
+
+	public Location getLocationAtLastDownload() {
+		return locationAtLastDownload;
+	}
+
+	public void setLocationAtLastDownload(Location locationAtLastDownload) {
+		this.locationAtLastDownload = locationAtLastDownload;
+	}
+	
 }

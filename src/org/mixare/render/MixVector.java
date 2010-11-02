@@ -101,6 +101,10 @@ public class MixVector {
 	public float length() {
 		return (float) Math.sqrt(x * x + y * y + z * z);
 	}
+	
+	public float length2D() {
+		return (float) Math.sqrt(x * x + z * z);
+	}
 
 	public void norm() {
 		divide(length());

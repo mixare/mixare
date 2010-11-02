@@ -35,17 +35,17 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
 
-	private static ArrayList<Marker> markerList;
+	private static List<Marker> markerList;
 	private static DataView dataView;
 	private static GeoPoint startPoint;
 
-	private MixContext ctx;
+	private MixContext mixContext;
 	private MapView mapView;
 
 	static MixMap map;
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
-	public static ArrayList<Marker> originalMarkerList;
+	public static List<Marker> originalMarkerList;
 
 
 	@Override
@@ -57,7 +57,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataView = MixView.dataView;
-		ctx = dataView.getContext();
+		mixContext = dataView.getContext();
 		setMarkerList(dataView.getDataHandler().getMarkerList());
 		map = this;
 
@@ -77,7 +77,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -87,7 +87,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void setStartPoint() {
-		Location location = ctx.getCurrentLocation();
+		Location location = mixContext.getCurrentLocation();
 		MapController controller;
 
 		double latitude = location.getLatitude()*1E6;
@@ -96,7 +96,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		controller = mapView.getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
 		controller.setCenter(startPoint);
-		controller.setZoom(14);
+		controller.setZoom(15);
 	}
 
 	public void createOverlay(){
@@ -105,12 +105,15 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
 		MixOverlay mixOverlay = new MixOverlay(this, drawable);
 
-		for (int i = 0; i < markerList.size(); i++) {
-			GeoPoint point = new GeoPoint((int)(markerList.get(i).getLatitude()*1E6), (int)(markerList.get(i).getLongitude()*1E6));
-			item = new OverlayItem(point, "", "");
-			mixOverlay.addOverlay(item);
-			mapOverlays.add(mixOverlay);
+		for(Marker marker:markerList) {
+			if(marker.isActive()) {
+				GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
+				item = new OverlayItem(point, "", "");
+				mixOverlay.addOverlay(item);
+			}
 		}
+		//Solved issue 39: only one overlay with all marker instead of one overlay for each marker
+		mapOverlays.add(mixOverlay);
 
 		MixOverlay myOverlay;
 		drawable = this.getResources().getDrawable(R.drawable.loc_icon);
@@ -185,7 +188,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 //		return markerList;
 //	}
 
-	public void setMarkerList(ArrayList<Marker> maList){
+	public void setMarkerList(List<Marker> maList){
 		markerList = maList;
 	}
 

@@ -21,6 +21,7 @@ package org.mixare.gui;
 import org.mixare.DataView;
 import org.mixare.Marker;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 
 import android.graphics.Color;
 
@@ -52,14 +53,16 @@ public class RadarPoints implements ScreenObj {
 		float scale = range / RADIUS;
 
 		DataHandler jLayer = view.getDataHandler();
+
 		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 			Marker pm = jLayer.getMarker(i);
 			float x = pm.getLocationVector().x / scale;
 			float y = pm.getLocationVector().z / scale;
 
-			if (x * x + y * y < RADIUS * RADIUS) {
+			if (pm.isActive() && (x * x + y * y < RADIUS * RADIUS)) {
 				dw.setFill(true);
-				dw.setColor(Color.rgb(255, 255, 255));
+				
+				dw.setColor(DataSource.getColor(pm.getDatasource()));
 				dw.paintRect(x + RADIUS - 1, y + RADIUS - 1, 2, 2);
 			}
 		}

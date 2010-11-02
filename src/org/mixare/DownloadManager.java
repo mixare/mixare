@@ -21,6 +21,7 @@ package org.mixare;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
+import org.mixare.data.DataSource.DATAFORMAT;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -125,8 +127,10 @@ public class DownloadManager implements Runnable {
 
 	private DownloadResult processRequest(DownloadRequest request) {
 		DownloadResult result = new DownloadResult();
+		//assume an error until everything is fine
+		result.error = true;
 		try {
-			if(ctx.getHttpGETInputStream(request.url)!=null){
+			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.url)!=null){
 
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
@@ -137,14 +141,14 @@ public class DownloadManager implements Runnable {
 				// try loading JSON DATA
 				try {
 
-					Log.d(MixView.TAG, "try to load JSON data");
+					Log.v(MixView.TAG, "try to load JSON data");
 
 					JSONObject root = new JSONObject(tmp);
 
-					Log.i(MixView.TAG, "loading JSON data");				
+					Log.d(MixView.TAG, "loading JSON data");				
 
-					layer.load(root);
-					result.obj = layer;
+					List<Marker> markers = layer.load(root,request.format);
+					result.setMarkers(markers);
 
 					result.format = request.format;
 					result.error = false;
@@ -153,33 +157,36 @@ public class DownloadManager implements Runnable {
 				}
 				catch (JSONException e) {
 
-					Log.d(MixView.TAG, "no JSON data");
-					Log.d(MixView.TAG, "try to load XML data");
+					Log.v(MixView.TAG, "no JSON data");
+					Log.v(MixView.TAG, "try to load XML data");
 
-					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-					//Document doc = builder.parse(is);
-					Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+					try {
+						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+						//Document doc = builder.parse(is);d
+						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
 
-					//Document doc = builder.parse(is);
+						//Document doc = builder.parse(is);
 
-					XMLHandler xml = new XMLHandler();
+						XMLHandler xml = new XMLHandler();
 
-					Log.i(MixView.TAG, "loading XML data");	
-					xml.load(doc);
+						Log.i(MixView.TAG, "loading XML data");	
+						
 
-					result.obj = xml;
+						List<Marker> markers = xml.load(doc);
+						result.setMarkers(markers);
 
-					result.format = request.format;
-					result.error = false;
-					result.errorMsg = null;				
+						result.format = request.format;
+						result.error = false;
+						result.errorMsg = null;
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}				
 				}
 				ctx.returnHttpInputStream(is);
 				is = null;
 			}
 		}
 		catch (Exception ex) {
-			result.obj = null;
-			result.error = true;
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
@@ -202,10 +209,13 @@ public class DownloadManager implements Runnable {
 	}
 
 	public synchronized String submitJob(DownloadRequest job) {
-		String jobId = "ID_" + (id++);
-		todoList.put(jobId, job);
-
-		return jobId;
+		if(job!=null) {
+			String jobId = "ID_" + (id++);
+			todoList.put(jobId, job);
+			Log.i(MixView.TAG,"Submitted Job with "+jobId+", format: " +job.format+", params: "+job.params+", url: "+job.url);
+			return jobId;
+		}
+		return null;
 	}
 
 	public synchronized boolean isReqComplete(String jobId) {
@@ -233,20 +243,41 @@ public class DownloadManager implements Runnable {
 	public void stop() {
 		stop = true;
 	}
-
+	
+	public synchronized DownloadResult getNextResult() {
+		if(!doneList.isEmpty()) {
+			String nextId=doneList.keySet().iterator().next();
+			DownloadResult result = doneList.get(nextId);
+			doneList.remove(nextId);
+			return result;
+		}
+		return null;
+	}
+	public Boolean isDone() {
+		return todoList.isEmpty();
+	}
 }
 
 class DownloadRequest {
-	int format;
+
+	public DATAFORMAT format;
 	String url;
 	String params;
 }
 
 class DownloadResult {
-	int format;
-	Object obj;
+	public DATAFORMAT format;
+	List<Marker> markers;
 
 	boolean error;
 	String errorMsg;
 	DownloadRequest errorRequest;
+	
+	public List<Marker> getMarkers() {
+		return markers;
+	}
+	public void setMarkers(List<Marker> markers) {
+		this.markers = markers;
+	}
+	
 }

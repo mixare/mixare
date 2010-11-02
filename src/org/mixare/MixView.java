@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
@@ -83,7 +84,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private Thread downloadThread;
 
 	private float RTmp[] = new float[9];
-	private float R[] = new float[9];
+	private float Rot[] = new float[9];
 	private float I[] = new float[9];
 	private float grav[] = new float[3];
 	private float mag[] = new float[3];
@@ -111,7 +112,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	private String zoomLevel;
 	private int zoomProgress;
-
+	
 	private TextView searchNotificationTxt;
 
 	//TAG for logging
@@ -208,8 +209,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
+		DataSource.createIcons(getResources());
+		
 		try {
+
 			handleIntent(getIntent());
 
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -231,7 +235,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);			
-
+			
 			FrameLayout frameLayout = new FrameLayout(this);
 
 			frameLayout.setMinimumWidth(3000);
@@ -282,7 +286,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			if(mixContext.isActualLocation()==false){
 				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
-
+			
 		} catch (Exception ex) {
 			doError(ex);
 		}
@@ -432,17 +436,33 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 				hardFix.setLatitude(46.480302);
 				hardFix.setLongitude(11.296005);
+				hardFix.setAltitude(300);
 
 				/*New York*/
 				//				hardFix.setLatitude(40.731510);
 				//				hardFix.setLongitude(-73.991547);
-				hardFix.setAltitude(300);
+				
+				// TU Wien
+//				hardFix.setLatitude(48.196349);
+//				hardFix.setLongitude(16.368653);
+//				hardFix.setAltitude(180);
 
 				try {
-					mixContext.curLoc = new Location(locationMgr.getLastKnownLocation(bestP));
+					Location gps=locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+					Location network=locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+					if(gps!=null)
+						mixContext.curLoc = gps;
+					else if (network!=null)
+						mixContext.curLoc = network;
+					else
+						mixContext.curLoc = hardFix;
+					
 				} catch (Exception ex2) {
-					mixContext.curLoc = new Location(hardFix);
+					ex2.printStackTrace();
+					mixContext.curLoc = hardFix;
 				}
+				
+				mixContext.setLocationAtLastDownload(mixContext.curLoc);
 
 				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
 						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
@@ -484,7 +504,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ MixListView.getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));;
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList()+ getString(DataView.SEARCH_ACTIVE_2));;
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -626,10 +646,12 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 		/*Twitter Json file not available for radius <1km 
 		 *smallest radius is set to 1km*/
-		if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
+		//should be taken care when downloading from twitter, because multiple 
+		//datasource can be selected
+	/*	if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
 			myout++;
 		}
-
+*/
 		return myout;
 	}
 
@@ -647,7 +669,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		downloadThread.start();
 
 	};
-
+	
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 		Toast t;
 
@@ -704,10 +726,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
-			SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, R);
+			SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
 
-			tempR.set(R[0], R[1], R[2], R[3], R[4], R[5], R[6], R[7],
-					R[8]);
+			tempR.set(Rot[0], Rot[1], Rot[2], Rot[3], Rot[4], Rot[5], Rot[6], Rot[7],
+					Rot[8]);
 
 			finalR.toIdentity();
 			finalR.prod(m4);
@@ -797,9 +819,25 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	public void onLocationChanged(Location location) {
 		try {
 			killOnError();
+			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 				synchronized (mixContext.curLoc) {
 					mixContext.curLoc = location;
+				}
+				dataView.getDataHandler().onLocationChanged(location);
+				// If we have moved more than radius/3 km away from the 
+				// location where the last download occured we should start 
+				// a fresh download
+				Location lastLoc=mixContext.getLocationAtLastDownload();
+				if(lastLoc==null)
+					mixContext.setLocationAtLastDownload(location);
+				else {
+					float threshold = dataView.getRadius()*1000f/3f;
+					Log.v(TAG,"Location Change: "+" threshold "+threshold+" distanceto "+location.distanceTo(lastLoc));
+					if(location.distanceTo(lastLoc)>threshold)  {
+						Log.d(TAG,"Restarting download due to location change");
+						dataView.doStart();
+					}	
 				}
 				isGpsEnabled = true;
 			}
@@ -809,6 +847,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE) {
+			Toast.makeText(mixContext, "Compass data unreliable. Please recalibrate compass.", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	@Override
@@ -1003,9 +1044,9 @@ class AugmentedView extends View {
 				String startKM, endKM;
 				endKM = "80km";
 				startKM = "0km";
-				if(MixListView.getDataSource().equals("Twitter")){
+				/*if(MixListView.getDataSource().equals("Twitter")){
 					startKM = "1km";
-				}
+				}*/
 				canvas.drawText(startKM, canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
 				canvas.drawText(endKM, canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
 

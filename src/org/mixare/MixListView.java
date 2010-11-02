@@ -19,9 +19,11 @@
 package org.mixare;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource.DATASOURCE;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -44,6 +46,8 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -58,17 +62,18 @@ public class MixListView extends ListActivity {
 	private Vector<String> selectedItemURL;
 	private Vector<String> dataSourceMenu;
 	private Vector<String> dataSourceDescription;
-	//	private static MixContext mixCtx = null;
+	private Vector<Boolean> dataSourceChecked;
+	private MixContext mixContext;
 	private DataView dataView;
-	private static String selectedDataSource = "Wikipedia";
+	//private static String selectedDataSource = "Wikipedia";
 	/*to check which data source is active*/
 	//	private int clickedDataSourceItem = 0;
 	private ListItemAdapter adapter;
 	public static String customizedURL="http://mixare.org/geotest.php";
 	private static Context ctx;
 	private static String searchQuery = "";
-	public static ArrayList<Marker> searchResultMarkers;
-	public static ArrayList<Marker> originalMarkerList;
+	public static List<Marker> searchResultMarkers;
+	public static List<Marker> originalMarkerList;
 
 	public Vector<String> getDataSourceMenu() {
 		return dataSourceMenu;
@@ -78,15 +83,22 @@ public class MixListView extends ListActivity {
 		return dataSourceDescription;
 	}
 
+	public Vector<Boolean> getDataSourceChecked() {
+		return dataSourceChecked;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//		mixCtx = MixView.ctx;
 		dataView = MixView.dataView;	
 		ctx = this;
+		mixContext = dataView.getContext();
 
 		switch(list){
 		case 1:
+			
+			//TODO: this needs some cleanup
 			dataSourceMenu = new Vector<String>();
 			dataSourceMenu.add("Wikipedia");
 			dataSourceMenu.add("Twitter");
@@ -100,9 +112,16 @@ public class MixListView extends ListActivity {
 			dataSourceDescription.add("");
 			dataSourceDescription.add("(OpenStreetMap)");
 			dataSourceDescription.add("example: http://mixare.org/geotest.php");
+			
+			dataSourceChecked = new Vector<Boolean>();
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.WIKIPEDIA));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.TWITTER));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.BUZZ));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OSM));
+			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OWNURL));
 
 			adapter = new ListItemAdapter(this);
-			adapter.colorSource(getDataSource());
+			//adapter.colorSource(getDataSource());
 			getListView().setTextFilterEnabled(true);
 
 			setListAdapter(adapter);
@@ -118,20 +137,22 @@ public class MixListView extends ListActivity {
 			/*add all marker items to a title and a URL Vector*/
 			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = jLayer.getMarker(i);
-				listViewMenu.add(ma.getTitle());
-				/*the website for the corresponding title*/
-				if (ma.getURL()!=null)
-					selectedItemURL.add(ma.getURL());
-				/*if no website is available for a specific title*/
-				else
-					selectedItemURL.add("");
+				if(ma.isActive()) {
+					listViewMenu.add(ma.getTitle());
+					/*the website for the corresponding title*/
+					if (ma.getURL()!=null)
+						selectedItemURL.add(ma.getURL());
+					/*if no website is available for a specific title*/
+					else
+						selectedItemURL.add("");
+				}
 			}
 
 			if (dataView.isFrozen()) {
 
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ getDataSource()+ getString(DataView.SEARCH_ACTIVE_2));
+				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
@@ -209,7 +230,9 @@ public class MixListView extends ListActivity {
 		switch(list){
 		/*Data Sources*/  
 		case 1:
-			clickOnDataSource(position);		
+			//clickOnDataSource(position);	
+			CheckBox cb = (CheckBox) v.findViewById(R.id.list_checkbox);
+			cb.toggle();
 			break;
 
 			/*List View*/
@@ -300,32 +323,27 @@ public class MixListView extends ListActivity {
 		switch(position){
 		/*WIKIPEDIA*/
 		case 0:
-			setDataSource("Wikipedia");
-			finish();
+			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
 			break;
 
 			/*TWITTER*/
 		case 1:		
-			setDataSource("Twitter");
-			finish();
+			mixContext.toogleDataSource(DATASOURCE.TWITTER);
 			break;
 
 			/*BUZZ*/
 		case 2:
-			setDataSource("Buzz");
-			finish();
+			mixContext.toogleDataSource(DATASOURCE.BUZZ);
 			break;
 
 			/*OSM*/
 		case 3:
-			setDataSource("OpenStreetMap");
-			finish();
+			mixContext.toogleDataSource(DATASOURCE.OSM);
 			break;
 
 			/*Own URL*/
 		case 4:
-			setDataSource("OwnURL");
-			finish();
+			mixContext.toogleDataSource(DATASOURCE.OWNURL);
 			break;
 		}
 	}
@@ -378,13 +396,13 @@ public class MixListView extends ListActivity {
 		startActivityForResult(intent2, 20);
 	}
 
-	public void setDataSource(String source){
+	/*public void setDataSource(String source){
 		selectedDataSource = source;
 	}
 
 	public static String getDataSource(){
 		return selectedDataSource;
-	}
+	}*/
 
 	public static void setList(int l){
 		list = l;
@@ -427,14 +445,15 @@ class ListItemAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.text = (TextView) convertView.findViewById(R.id.list_text);
 			holder.description = (TextView) convertView.findViewById(R.id.description_text);
-
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.list_checkbox);
+			holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+			
 			convertView.setTag(holder);
 		}
 		else{
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.icon = (ImageView) convertView.findViewById(R.id.icon);
 
 		holder.icon.setPadding(20, 8, 20, 8);
 		holder.icon.setClickable(true);        
@@ -453,8 +472,18 @@ class ListItemAdapter extends BaseAdapter {
 		if(position!=4){
 			holder.icon.setVisibility(View.INVISIBLE);
 		}
+		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
 
+		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+					mixListView.clickOnDataSource(position);
+			}
+			
+		});
+		
 		holder.text.setPadding(20, 8, 0, 0);
 		holder.description.setPadding(20, 40, 0, 0);
 
@@ -483,6 +512,7 @@ class ListItemAdapter extends BaseAdapter {
 			bgcolors[i]=0;
 			textcolors[i]=Color.WHITE;
 		}
+		
 		if (source.equals("Wikipedia"))
 			changeColor(0, Color.WHITE, Color.DKGRAY);
 		else if (source.equals("Twitter"))
@@ -513,6 +543,7 @@ class ListItemAdapter extends BaseAdapter {
 	private class ViewHolder {
 		TextView text;
 		TextView description;
+		CheckBox checkbox;
 		ImageView icon;
 	}
 }

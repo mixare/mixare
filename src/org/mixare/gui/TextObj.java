@@ -22,6 +22,8 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 
 public class TextObj implements ScreenObj {
 	String txt;
@@ -33,22 +35,24 @@ public class TextObj implements ScreenObj {
 	float lineHeight;
 	float maxLineWidth;
 	float pad;
-	int borderColor, bgColor, textColor;
+	int borderColor, bgColor, textColor, textShadowColor;
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
 			PaintScreen dw) {
 		this(txtInit, fontSizeInit, maxWidth, Color.rgb(255, 255, 255), Color
-				.rgb(0, 0, 0), Color.rgb(255, 255, 255),
+				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.argb(64, 0, 0, 0),
 				dw.getTextAsc() / 2, dw);
 	}
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
-			int borderColor, int bgColor, int textColor, float pad,
+			int borderColor, int bgColor, int textColor, int textShadowColor, float pad,
 			PaintScreen dw) {
-		this.pad = pad;
-		this.bgColor = bgColor;
+		
 		this.borderColor = borderColor;
+		this.bgColor = bgColor;
 		this.textColor = textColor;
+		this.textShadowColor = textShadowColor;
+		this.pad = pad;
 
 		try {
 			prepTxt(txtInit, fontSizeInit, maxWidth, dw);
@@ -124,12 +128,24 @@ public class TextObj implements ScreenObj {
 		dw.setColor(borderColor);
 		dw.paintRect(0, 0, width, height);
 
-		dw.setFill(true);
-		dw.setColor(textColor);
+		
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
-
+			
+			// stroke
+/* 			dw.setFill(false);
+			dw.setStrokeWidth(4);
+		    dw.setColor(textShadowColor);
 			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
+*/
+			
+			// actual text
+
+			dw.setFill(true);
+			dw.setStrokeWidth(0);
+			dw.setColor(textColor);
+			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
+			
 		}
 	}
 

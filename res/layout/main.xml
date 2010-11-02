@@ -25,13 +25,20 @@
         android:text="no changes"
         android:layout_alignParentLeft="true"/>
         
+            <CheckBox android:id="@+id/list_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:layout_gravity="right"
+		android:focusable="false"   />
+		
     <ImageView android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-		android:layout_gravity="right"  
 		android:src="@drawable/icon_edit"
-		android:layout_alignParentRight="true"
+		android:layout_toLeftOf="@+id/list_checkbox"
         />
+
         
 </RelativeLayout>
 

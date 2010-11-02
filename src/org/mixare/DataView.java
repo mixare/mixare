@@ -25,11 +25,11 @@ import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.XMLHandler;
+import org.mixare.data.DataSource;
+import org.mixare.data.DataSource.DATAFORMAT;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -38,6 +38,7 @@ import org.mixare.render.Camera;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
+import android.widget.Toast;
 
 
 /**
@@ -66,22 +67,9 @@ public class DataView {
 	/** how many times to re-attempt download */
 	private int retry;
 
-	/** default URL */
-	private static final String WIKI_HOME_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
-	private static final String TWITTER_HOME_URL = "http://search.twitter.com/search.json";
-	private static final String BUZZ_HOME_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
-
-	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
-	// eg. only railway stations:
-	private static final String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	// all objects that have names: 
-	//caution! produces hugh amount of data (megabytes), only use with very small radii
-	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
-
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
 	private float radius = 20;
-	private DownloadResult dRes;
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
 	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
@@ -145,6 +133,7 @@ public class DataView {
 	private float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
 
+
 	/**
 	 * Constructor
 	 */
@@ -190,6 +179,7 @@ public class DataView {
 
 	public void doStart() {
 		state.nextLStatus = MixState.NOT_STARTED;
+		mixContext.setLocationAtLastDownload(curFix);
 	}
 
 	public boolean isInited() {
@@ -216,6 +206,14 @@ public class DataView {
 		frozen = false;
 		isInit = true;
 	}
+	
+	public void requestData(String url,DATAFORMAT dataformat) {
+		DownloadRequest request = new DownloadRequest();
+		request.format=dataformat;
+		request.url=url;
+		mixContext.getDownloader().submitJob(request);
+		state.nextLStatus = MixState.PROCESSING;
+	}
 
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
@@ -225,65 +223,83 @@ public class DataView {
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-
-			DownloadRequest request = new DownloadRequest();
-
+						
 			if (mixContext.getStartUrl().length() > 0){
-				request.url = mixContext.getStartUrl();
+				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE);
 				isLauncherStarted = true;
 			}
 			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
+			
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				String dataSource = MixListView.getDataSource();
-				if ("Wikipedia".equals(dataSource))
-					request.url = WIKI_HOME_URL + "?lat="+lat+"&lng=" + lon + "&radius="+ radius +"&maxRows=50&lang=" + Locale.getDefault().getLanguage();
-				else if("Twitter".equals(dataSource))
-					request.url = TWITTER_HOME_URL +"?geocode="+lat + "%2C" + lon+"%2C" + radius + "km" ;
-				else if("Buzz".equals(dataSource))  
-					request.url = BUZZ_HOME_URL + "&lat="+lat+"&lon=" + lon + "&radius="+ radius*1000;
-					//https://www.googleapis.com/buzz/v1/activities/search?alt=json&lat=46.47122383117541&lon=11.260278224944742&radius=20000
-				else if("OpenStreetMap".equals(dataSource))
-					request.url = OSM_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
-				else if("OwnURL".equals(dataSource))
-					request.url = MixListView.customizedURL+ "?"+ "latitude=" + Double.toString(lat) + "&longitude=" + Double.toString(lon) + "&altitude=" + Double.toString(alt) + "&radius=" + Double.toString(radius);
+				
+				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
+					
+					if(mixContext.isDataSourceSelected(source)) {
+						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source));
+
+						// Debug notification
+						// Toast.makeText(mixContext, "Downloading from "+ source, Toast.LENGTH_SHORT).show();
+					}
+				}
+				
 			}
-			Log.i(MixView.TAG,request.url);
-			state.downloadId = mixContext.getDownloader().submitJob(request);
+			
+			// if no datasources are activated
+			if(state.nextLStatus==MixState.NOT_STARTED) 
+				state.nextLStatus=MixState.DONE;
+			
+			//TODO:
+			//state.downloadId = mixContext.getDownloader().submitJob(request);
 
-			state.nextLStatus = MixState.PROCESSING;
-
+		
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			if (mixContext.getDownloader().isReqComplete(state.downloadId)) {
-				dRes = mixContext.getDownloader().getReqResult(state.downloadId);
-
+			DownloadManager dm=mixContext.getDownloader();
+			DownloadResult dRes;
+			
+			while((dRes=dm.getNextResult())!=null)
+			{
 				if (dRes.error && retry < 3) {
 					retry++;
-					state.nextLStatus = MixState.NOT_STARTED;
-				} else {
-					retry = 0;
-					state.nextLStatus = MixState.DONE;
-					dataHandler = (DataHandler) dRes.obj;
+					mixContext.getDownloader().submitJob(dRes.errorRequest);
+					// Notification
+					Toast.makeText(mixContext,mixContext.getResources().getString(R.string.download_error) +" "+ dRes.errorRequest.url, Toast.LENGTH_SHORT).show();
+					
+				}
+				
+				if(!dRes.error) {
+					//jLayer = (DataHandler) dRes.obj;
+					Log.i(MixView.TAG,"Adding Markers");
+					dataHandler.addMarkers(dRes.getMarkers());
+					dataHandler.onLocationChanged(curFix);
+					// Notification
+					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.format, Toast.LENGTH_SHORT).show();
 
-					//Sort markers by cMarker.z
-					Collections.sort(dataHandler.getMarkerList(), MarkersOrder.getInstance());
-				}	
+				}
+			}
+			if(dm.isDone()) {
+				retry=0;
+				state.nextLStatus = MixState.DONE;
 			}
 		}
 
+		
 		// Update markers
-		for (int i = 0; i < dataHandler.getMarkerCount(); i++) {
+		dataHandler.updateActivationStatus(mixContext);
+		for (int i = dataHandler.getMarkerCount()-1; i >= 0; i--) {
 			Marker ma = dataHandler.getMarker(i);
-			float[] dist = new float[1];
-			dist[0] = 0;
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), mixContext.getCurrentLocation().getLatitude(), mixContext.getCurrentLocation().getLongitude(), dist);
-			if (dist[0] / 1000f < radius) {
-				if (!frozen) 
-					ma.update(curFix, System.currentTimeMillis());
+			//if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma instanceof NavigationMarker || ma instanceof SocialMarker)) {
+			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
+				
+				// To increase performance don't recalculate position vector
+				// for every marker on every draw call, instead do this only 
+				// after onLocationChanged and after downloading new marker
+				//if (!frozen) 
+				//	ma.update(curFix);
 				ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
-			}
+			}  
 		}
 
 		// Draw Radar
@@ -326,6 +342,7 @@ public class DataView {
 				case UIEvent.CLICK:	handleClickEvent((ClickEvent) evt);	break;
 			}
 		}
+		state.nextLStatus = MixState.PROCESSING;				
 	}
 
 	private void handleKeyEvent(KeyEvent evt) {

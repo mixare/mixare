@@ -1,9 +1,19 @@
 package org.mixare.data;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
 
 import org.mixare.Marker;
+import org.mixare.MixContext;
+import org.mixare.MixView;
+import org.mixare.NavigationMarker;
+import org.mixare.POIMarker;
+import org.mixare.SocialMarker;
+
+import android.location.Location;
+import android.util.Log;
 
 /**
  * DataHandler is the model which provides the Marker Objects.
@@ -11,31 +21,68 @@ import org.mixare.Marker;
  * DataHandler is also the Factory for new Marker objects.
  */
 public class DataHandler {
+	
+	// complete marker list
+	private List<Marker> markerList = new ArrayList<Marker>();
+	
+	public void addMarkers(List<Marker> markers) {
 
-	private static final int MAX_OBJECTS = 50;
-	private ArrayList<Marker> markerList = new ArrayList<Marker>();
-
-	public void createMarker(String title, double latitude, double longitude, double elevation, String link) {
-		if (markerList.size() < MAX_OBJECTS) {
-			String URL = null;
-			if (link != null && link.length() > 0)
-				URL = "webpage:" + URLDecoder.decode(link);
-			Marker ma = new Marker(title, latitude, longitude, elevation, URL);
-			markerList.add(ma);
+		Log.v(MixView.TAG, "Marker before: "+markerList.size());
+		for(Marker ma:markers) {
+			if(!markerList.contains(ma))
+				markerList.add(ma);
 		}
+		
+		Log.d(MixView.TAG, "Marker count: "+markerList.size());
+	}
+	
+	public void sortMarkerList() {
+		Collections.sort(markerList); 
+	}
+	
+	public void updateDistances(Location location) {
+		for(Marker ma: markerList) {
+			float[] dist=new float[3];
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
+			ma.setDistance(dist[0]);
+		}
+	}
+	
+	public void updateActivationStatus(MixContext mixContext) {
+		
+		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
+				
+		for(Marker ma: markerList) {
+
+			Class mClass=ma.getClass();
+			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
+			
+			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
+			boolean dataSourceSelected = mixContext.isDataSourceSelected(ma.getDatasource());
+			
+			ma.setActive((belowMax && dataSourceSelected));
+		}
+	}
+		
+	public void onLocationChanged(Location location) {
+		for(Marker ma: markerList) {
+			ma.update(location);
+		}
+		updateDistances(location);
+		sortMarkerList();
 	}
 	
 	/**
 	 * @deprecated Nobody should get direct access to the list
 	 */
-	public ArrayList getMarkerList() {
+	public List getMarkerList() {
 		return markerList;
 	}
 	
 	/**
 	 * @deprecated Nobody should get direct access to the list
 	 */
-	public void setMarkerList(ArrayList markerList) {
+	public void setMarkerList(List markerList) {
 		this.markerList = markerList;
 	}
 

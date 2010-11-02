@@ -18,60 +18,69 @@
  */
 package org.mixare;
 
-import java.util.Comparator;
+import java.net.URLDecoder;
+import java.text.DecimalFormat;
 
+import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
-import org.mixare.gui.ScreenObj;
 import org.mixare.gui.ScreenLine;
+import org.mixare.gui.ScreenObj;
 import org.mixare.gui.TextObj;
 import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
-import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
 
-public class Marker {
+abstract public class Marker implements Comparable<Marker> {
 
-	private String title;
+	private String ID;
+	protected String title;
 	private String URL;
-	private PhysicalPlace mGeoLoc;
+	protected PhysicalPlace mGeoLoc;
+	// distance from user to mGeoLoc in meters
+	private double distance;
+	// From which datasource does this marker originate
+	protected DataSource.DATASOURCE datasource;
+	private boolean active;
 
 	// Draw properties
-	private boolean isVisible;
+	protected boolean isVisible;
 //	private boolean isLookingAt;
 //	private boolean isNear;
 //	private float deltaCenter;
-	MixVector cMarker = new MixVector();
-	private MixVector signMarker = new MixVector();
+	public MixVector cMarker = new MixVector();
+	protected MixVector signMarker = new MixVector();
 //	private MixVector oMarker = new MixVector();
 	
-	private static final int COLOR_DEFAULT = Color.rgb(255, 0, 0);
-
 	// Temp properties
 	private MixVector tmpa = new MixVector();
 	private MixVector tmpb = new MixVector();
 	private MixVector tmpc = new MixVector();
 	
-	private MixVector locationVector = new MixVector();
+	protected MixVector locationVector = new MixVector();
 	private MixVector origin = new MixVector(0, 0, 0);
 	private MixVector upV = new MixVector(0, 1, 0);
 	private ScreenLine pPt = new ScreenLine();
 
-	private Label txtLab = new Label();
-	private TextObj textBlock;
+	protected Label txtLab = new Label();
+	protected TextObj textBlock;
 	
-	public Marker(String title, double latitude, double longitude, double altitude, String URL) {
+	
+	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource.DATASOURCE datasource) {
 		super();
 
+		this.active = false;
 		this.title = title;
-		this.mGeoLoc = new PhysicalPlace();
-		this.mGeoLoc.setLatitude(latitude);
-		this.mGeoLoc.setLongitude(longitude);
-		this.mGeoLoc.setAltitude(altitude);
-		this.URL = URL;
+		this.mGeoLoc = new PhysicalPlace(latitude,longitude,altitude);
+		if (link != null && link.length() > 0)
+			URL = "webpage:" + URLDecoder.decode(link);
+		this.datasource = datasource;
+		
+		this.ID=datasource+"##"+title; //mGeoLoc.toString();
 	}
-
+	
 	public String getTitle(){
 		return title;
 	}
@@ -96,6 +105,16 @@ public class Marker {
 		return locationVector;
 	}
 	
+	
+	
+	public DataSource.DATASOURCE getDatasource() {
+		return datasource;
+	}
+
+	public void setDatasource(DataSource.DATASOURCE datasource) {
+		this.datasource = datasource;
+	}
+
 	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
 		tmpa.set(originalPoint); //1
 		tmpc.set(upV); 
@@ -136,7 +155,16 @@ public class Marker {
 		}
 	}
 
-	public void update(Location curGPSFix, long time) {
+	public void update(Location curGPSFix) {
+		// An elevation of 0.0 probably means that the elevation of the
+		// POI is not known and should be set to the users GPS height
+		// Note: this could be improved with calls to 
+		// http://www.geonames.org/export/web-services.html#astergdem 
+		// to estimate the correct height with DEM models like SRTM, AGDEM or GTOPO30
+		if(mGeoLoc.getAltitude()==0.0)
+			mGeoLoc.setAltitude(curGPSFix.getAltitude());
+		 
+		// compute the relative position vector from user position to POI location
 		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, locationVector);
 	}
 
@@ -171,32 +199,51 @@ public class Marker {
 			return false;
 		}
 	}
-
+	
 	public void draw(PaintScreen dw) {
+		drawCircle(dw);
+		drawTextBlock(dw);
+	}
 
+	public void drawCircle(PaintScreen dw) {
+
+		if (isVisible) {
+			float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
+			dw.setStrokeWidth(maxHeight / 10f);
+			dw.setFill(false);
+			dw.setColor(DataSource.getColor(datasource));
+			
+			//draw circle with radius depending on distance
+			//0.44 is approx. vertical fov in radians 
+			double angle = 2.0*Math.atan2(20,distance);
+			double radius = angle/0.44 * maxHeight;
+			dw.paintCircle(cMarker.x, cMarker.y, (float)radius);
+		}
+	}
+	
+	public void drawTextBlock(PaintScreen dw) {
 		//TODO: grandezza cerchi e trasparenza
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
-		if (textBlock == null) {
-			textBlock = new TextObj(title, Math.round(maxHeight / 2f) + 1,
-					160, dw);
+		//TODO: change textblock only when distance changes
+		String textStr="";
+
+		double d = distance;
+		DecimalFormat df = new DecimalFormat("@#");
+		if(d<1000.0) {
+			textStr = title + " ("+ df.format(d) + "m)";			
 		}
+		else {
+			d=d/1000.0;
+			textStr = title + " (" + df.format(d) + "km)";
+		}
+		
+		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1,
+				250, dw);
 
 		if (isVisible) {
-			//default color
-			dw.setColor(COLOR_DEFAULT);
-			String dataSource = MixListView.getDataSource();
-			if ("Wikipedia".equals(dataSource))
-				dw.setColor(Color.rgb(255, 0, 0));
-			else if ("Buzz".equals(dataSource))
-				dw.setColor(Color.rgb(4, 228, 20));
-			else if ("Twitter".equals(dataSource))
-				dw.setColor(Color.rgb(50, 204, 255));
-			else if ("OpenStreetMap".equals(dataSource))
-				dw.setColor(Color.rgb(255, 168, 0));
-			dw.setStrokeWidth(maxHeight / 10f);
-			dw.setFill(false);
-			dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
+			
+			dw.setColor(DataSource.getColor(datasource));
 
 			float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y, signMarker.x, signMarker.y);
 
@@ -207,6 +254,7 @@ public class Marker {
 			dw.paintObj(txtLab, signMarker.x - txtLab.getWidth()
 					/ 2, signMarker.y + maxHeight, currentAngle + 90, 1);
 		}
+
 	}
 
 	public boolean fClick(float x, float y, MixContext ctx, MixState state) {
@@ -217,6 +265,49 @@ public class Marker {
 		}
 		return evtHandled;
 	}
+
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+	
+
+	public String getID() {
+		return ID;
+	}
+
+	public void setID(String iD) {
+		ID = iD;
+	}
+
+	@Override
+	public int compareTo(Marker another) {
+
+		Marker leftPm = this;
+		Marker rightPm = another;
+
+		return Double.compare(leftPm.getDistance(), rightPm.getDistance());
+
+	}
+
+	@Override
+	public boolean equals (Object marker) {
+		return this.ID.equals(((Marker) marker).getID());
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	abstract public int getMaxObjects();
+ 
 }
 
 
@@ -255,32 +346,5 @@ class Label implements ScreenObj {
 
 	public float getHeight() {
 		return height;
-	}
-}
-
-
-/**
- * Compares the markers. The closer they are the higher in the stack.
- * @author daniele
- */
-class MarkersOrder implements Comparator<Object> {
-
-	private static MarkersOrder instance;	// singleton
-	
-	public static MarkersOrder getInstance() {
-		if (instance == null)
-			instance = new MarkersOrder();
-		return instance;
-	}
-	
-	/** Private, use getInstance() */
-	private MarkersOrder() {
-	}
-
-	public int compare(Object left, Object right) {
-		Marker leftPm = (Marker) left;
-		Marker rightPm = (Marker) right;
-
-		return Float.compare(leftPm.cMarker.z, rightPm.cMarker.z);
 	}
 }
