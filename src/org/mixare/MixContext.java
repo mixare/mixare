@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.mixare.data.DataSource;
+import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
@@ -82,10 +83,17 @@ public class MixContext extends ContextWrapper {
 		this.ctx = appCtx.getApplicationContext();
 
 		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		boolean atLeastOneDatasourceSelected=false;
+		
 		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
 			// fill the selectedDataSources HashMap with saved settings
 			selectedDataSources.put(source, settings.getBoolean(source.toString(), false));
+			if(selectedDataSources.get(source))
+				atLeastOneDatasourceSelected=true;
 		}
+		// select Wikipedia if nothing was previously selected  
+		if(!atLeastOneDatasourceSelected)
+			setDataSource(DATASOURCE.WIKIPEDIA, true);
 
 		rotationM.toIdentity();
 
