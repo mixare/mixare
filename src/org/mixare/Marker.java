@@ -40,7 +40,7 @@ abstract public class Marker implements Comparable<Marker> {
 	private String URL;
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
-	private double distance;
+	protected double distance;
 	// From which datasource does this marker originate
 	protected DataSource.DATASOURCE datasource;
 	private boolean active;
