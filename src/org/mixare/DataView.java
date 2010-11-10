@@ -23,6 +23,7 @@ import static android.view.KeyEvent.KEYCODE_DPAD_DOWN;
 import static android.view.KeyEvent.KEYCODE_DPAD_LEFT;
 import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
+import static android.view.KeyEvent.KEYCODE_DPAD_CENTER;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -297,7 +298,8 @@ public class DataView {
 				// after onLocationChanged and after downloading new marker
 				//if (!frozen) 
 				//	ma.update(curFix);
-				ma.calcPaint(cam, addX, addY);
+				if(!frozen) 
+					ma.calcPaint(cam, addX, addY);
 				ma.draw(dw);
 			}  
 		}
@@ -353,6 +355,7 @@ public class DataView {
 			case KEYCODE_DPAD_RIGHT:	addX += CONST;		break;
 			case KEYCODE_DPAD_DOWN:		addY += CONST;		break;
 			case KEYCODE_DPAD_UP:		addY -= CONST;		break;
+			case KEYCODE_DPAD_CENTER:	frozen = !frozen;		break;
 			case KEYCODE_CAMERA:		frozen = !frozen;	break;	// freeze the overlay with the camera button
 		}
 	}
