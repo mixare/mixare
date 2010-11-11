@@ -272,10 +272,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				editor.putBoolean("firstAccess", true);
 				editor.commit();
 			} 
-
-			if(mixContext.isActualLocation()==false){
-				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-			}	
 			
 		} catch (Exception ex) {
 			doError(ex);
@@ -330,17 +326,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			try {
 				sensorMgr.unregisterListener(this, sensorGrav);
-			} catch (Exception ignore) {
-			}
-			try {
 				sensorMgr.unregisterListener(this, sensorMag);
-			} catch (Exception ignore) {
-			}
-			sensorMgr = null;
+				sensorMgr = null;
 
-			mixContext.unregisterLocationManager();
-			
-			try {
+				mixContext.unregisterLocationManager();
 				mixContext.downloadManager.stop();
 			} catch (Exception ignore) {
 			}
@@ -523,7 +512,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			break;
 			/*GPS Information*/
 		case 6:
-			Location currentGPSInfo = mixContext.getCurrentGPSInfo();
+			Location currentGPSInfo = mixContext.getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
 					getString(DataView.GPS_LONGITUDE) + currentGPSInfo.getLongitude() + "\n" +

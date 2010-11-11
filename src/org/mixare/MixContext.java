@@ -57,6 +57,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public class MixContext extends ContextWrapper {
 
@@ -70,14 +71,13 @@ public class MixContext extends ContextWrapper {
 
 	DownloadManager downloadManager;
 
-	Location curLoc;
-	private boolean isGpsEnabled;
-	Location locationAtLastDownload;
 	Matrix rotationM = new Matrix();
-
 	float declination = 0f;
-	private boolean actualLocation=false;
+	
+	//Location related
 	private LocationManager lm;
+	Location curLoc;
+	Location locationAtLastDownload;
 	
 	private HashMap<DataSource.DATASOURCE,Boolean> selectedDataSources=new HashMap<DataSource.DATASOURCE,Boolean>();
 	
@@ -101,6 +101,7 @@ public class MixContext extends ContextWrapper {
 		//try to use the coarse provider first to get a rough position
 		c.setAccuracy(Criteria.ACCURACY_COARSE);
 		String coarseProvider = lm.getBestProvider(c, true);
+		lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
 		
 		//need to be precise
 		c.setAccuracy(Criteria.ACCURACY_FINE);				
@@ -108,14 +109,7 @@ public class MixContext extends ContextWrapper {
 		//as well as during normal program usage
 		//NB: using "true" as second parameters means we get the provider only if it's enabled
 		String fineProvider = lm.getBestProvider(c, true);
-
-		//frequency and minimum distance for update
-		//this values will only be used after there's a good GPS fix
-		//see back-off pattern discussion 
-		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		//thanks Reto Meier for his presentation at gddde 2010
-		long lFreq = 60000;	//60 seconds
-		float lDist = 20;		//20 meters
+		lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
 
 		//fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
@@ -134,10 +128,14 @@ public class MixContext extends ContextWrapper {
 //		hardFix.setLongitude(16.368653);
 //		hardFix.setAltitude(180);
 
+		//frequency and minimum distance for update
+		//this values will only be used after there's a good GPS fix
+		//see back-off pattern discussion 
+		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
+		//thanks Reto Meier for his presentation at gddde 2010
+		long lFreq = 60000;	//60 seconds
+		float lDist = 50;		//20 meters
 		lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
-		lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
-		lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
-
 
 		try {
 			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
@@ -156,6 +154,9 @@ public class MixContext extends ContextWrapper {
 		
 		setLocationAtLastDownload(curLoc);
 
+//TODO fix logic
+		Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+	
 	}
 	
 	public void unregisterLocationManager() {
@@ -166,29 +167,9 @@ public class MixContext extends ContextWrapper {
 			lm = null;
 		}
 	}
-	
-	public Location getCurrentGPSInfo() {
-		return curLoc != null ? curLoc : lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-	}
-
-	public boolean isGpsEnabled() {
-		return isGpsEnabled;
-	}
-
-	public boolean isActualLocation(){
-		return actualLocation;
-	}
 
 	public DownloadManager getDownloader() {
 		return downloadManager;
-	}
-	
-	public void setLocationManager(LocationManager locationMgr){
-		this.lm = locationMgr;
-	}
-	
-	public LocationManager getLocationManager(){
-		return lm;
 	}
 
 	public String getStartUrl() {
@@ -529,10 +510,10 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onLocationChanged(Location location) {
-			Log.d(TAG, "bounce");
-			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
+			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
+			Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			
-			if (location.getAccuracy() < 20) {
+			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
 				lm.removeUpdates(lbounce);			
 			}
@@ -558,22 +539,16 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onLocationChanged(Location location) {
-			Log.d(TAG, "coarse");
-			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			
+			Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
+			Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			lm.removeUpdates(lcoarse);
 		}
 
 		@Override
-		public void onProviderDisabled(String arg0) {
-			Log.d(TAG, "coarse disabled");
-		}
+		public void onProviderDisabled(String arg0) {}
 
 		@Override
-		public void onProviderEnabled(String arg0) {
-			Log.d(TAG, "coarse enabled");
-
-		}
+		public void onProviderEnabled(String arg0) {}
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
@@ -581,45 +556,24 @@ public class MixContext extends ContextWrapper {
 	};
 
 	private LocationListener lnormal = new LocationListener() {
-		public void onProviderDisabled(String provider) {
-			isGpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		}
+		public void onProviderDisabled(String provider) {}
 
-		public void onProviderEnabled(String provider) {
-			isGpsEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		}
+		public void onProviderEnabled(String provider) {}
 
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-
-		}
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
 
 		public void onLocationChanged(Location location) {
-			Log.d(TAG, "normal");
-			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			
+			Log.d(TAG, "normal Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
+			Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			try {
 				Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-				if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
 					synchronized (curLoc) {
 						curLoc = location;
 					}
-					//dataView.getDataHandler().onLocationChanged(location);
-					// If we have moved more than radius/3 km away from the 
-					// location where the last download occured we should start 
-					// a fresh download
+					mixView.repaint();
 					Location lastLoc=getLocationAtLastDownload();
 					if(lastLoc==null)
 						setLocationAtLastDownload(location);
-					else {
-						//float threshold = dataView.getRadius()*1000f/3f;
-						//Log.v(TAG,"Location Change: "+" threshold "+threshold+" distanceto "+location.distanceTo(lastLoc));
-						//if(location.distanceTo(lastLoc)>threshold)  {
-						//	Log.d(TAG,"Restarting download due to location change");
-						//	mixView.repaint();
-						//}	
-					}
-					isGpsEnabled = true;
-				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
