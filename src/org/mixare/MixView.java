@@ -863,6 +863,14 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 }
 
+/**
+ * @author daniele
+ *
+ */
+/**
+ * @author daniele
+ *
+ */
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 	MixView app;
 	SurfaceHolder holder;
@@ -935,44 +943,49 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		try {
 			Camera.Parameters parameters = camera.getParameters();
 			try {
 				List<Camera.Size> supportedSizes = null;
+				//On older devices (<1.6) the following will fail
+				//the camera will work nevertheless
 				supportedSizes = Compatibility.getSupportedPreviewSizes(parameters);
 
-				Iterator<Camera.Size> itr = supportedSizes.iterator(); 
+				//preview form factor
+				float ff = (float)w/h;
+
+				//holder for the best form factor and size
+				float bff = 0;
+				int bestw = 0;
+				int besth = 0;
+				Iterator<Camera.Size> itr = supportedSizes.iterator();
+				
+				//we look for the best preview size, it has to be the closest to the
+				//screen form factor, and be less wide than the screen itself
+				//the latter requirement is because the HTC Hero with update 2.1 will
+				//report camera preview sizes larger than the screen, and it will fail
+				//to initialize the camera
+				//other devices could work with previews larger than the screen though
 				while(itr.hasNext()) {
-					Camera.Size element = itr.next(); 
-					element.width -= w;
-					element.height -= h;
+					Camera.Size element = itr.next();
+					//current form factor
+					float cff = (float)element.width/element.height;
+					//check if the current element is a candidate to replace the best match so far
+					//current form factor should be closer to the bff
+					//preview width should be less than screen width
+					//preview width should be more than current bestw
+					//this combination will ensure that the highest resolution will win
+					if ((ff-cff <= ff-bff) && (element.width <= w) && (element.width >= bestw)) {
+						bff=cff;
+						bestw = element.width;
+						besth = element.height;
+					}
+
 				} 
+				parameters.setPreviewSize(bestw, besth);
 
-				//				Collections.sort(supportedSizes, new ResolutionsOrder());
-				//TODO improve algorithm
-				int preferredSizeIndex=0;
-				int checkWidth =0;
-				int bestDistance = Integer.MAX_VALUE;
-				for (int i = 0; i < supportedSizes.size()-1; i++) {		
-					if(supportedSizes.get(i).width==0){
-						preferredSizeIndex = i;
-					}
-					else{						
-						if(supportedSizes.get(i).width <0)
-							checkWidth =(supportedSizes.get(i).width)*(-1);
-						else 
-							checkWidth = supportedSizes.get(i).width;
-
-						if(checkWidth < bestDistance){
-							bestDistance = checkWidth;
-							preferredSizeIndex = i;
-						}
-					}
-				}
-
-				parameters.setPreviewSize(w + supportedSizes.get(preferredSizeIndex).width, h + supportedSizes.get(preferredSizeIndex).height);
-				//parameters.setPreviewSize(w + supportedSizes.get(supportedSizes.size()-1).width, h + supportedSizes.get(supportedSizes.size()-1).height);
 			} catch (Exception ex) {
 				parameters.setPreviewSize(480 , 320);
 			}
@@ -984,13 +997,6 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 }
-
-//class ResolutionsOrder implements java.util.Comparator<Camera.Size> {
-//	public int compare(Camera.Size left, Camera.Size right) {
-//
-//		return Float.compare(left.width + left.height, right.width + right.height);
-//	}
-//}
 
 class AugmentedView extends View {
 	MixView app;
