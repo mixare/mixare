@@ -31,9 +31,12 @@ public class SocialMarker extends Marker {
 		
 		// we want the social markers to be on the upper part of
 		// your surrounding sphere so we set the height component of 
-		// the position vector 300m above the user
+		// the position vector to radius/2 (in meter) 
+
+		locationVector.y+=MixView.dataView.getRadius()*500f;
+		//locationVector.y+=500;		 
+		//locationVector.y+=distance;
 		
-		locationVector.y+=500;
 	}
 
 	@Override

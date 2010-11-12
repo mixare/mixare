@@ -40,7 +40,7 @@ abstract public class Marker implements Comparable<Marker> {
 	private String URL;
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
-	private double distance;
+	protected double distance;
 	// From which datasource does this marker originate
 	protected DataSource.DATASOURCE datasource;
 	private boolean active;
@@ -53,11 +53,6 @@ abstract public class Marker implements Comparable<Marker> {
 	public MixVector cMarker = new MixVector();
 	protected MixVector signMarker = new MixVector();
 //	private MixVector oMarker = new MixVector();
-	
-	// Temp properties
-	private MixVector tmpa = new MixVector();
-	private MixVector tmpb = new MixVector();
-	private MixVector tmpc = new MixVector();
 	
 	protected MixVector locationVector = new MixVector();
 	private MixVector origin = new MixVector(0, 0, 0);
@@ -116,8 +111,10 @@ abstract public class Marker implements Comparable<Marker> {
 	}
 
 	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
-		tmpa.set(originalPoint); //1
-		tmpc.set(upV); 
+
+		// Temp properties
+		MixVector tmpa = new MixVector(originalPoint);
+		MixVector tmpc = new MixVector(upV);
 		tmpa.add(locationVector); //3 
 		tmpc.add(locationVector); //3
 		tmpa.sub(viewCam.lco); //4
@@ -125,6 +122,7 @@ abstract public class Marker implements Comparable<Marker> {
 		tmpa.prod(viewCam.transform); //5
 		tmpc.prod(viewCam.transform); //5
 
+		MixVector tmpb = new MixVector();
 		viewCam.projectPoint(tmpa, tmpb, addX, addY); //6
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
@@ -208,15 +206,18 @@ abstract public class Marker implements Comparable<Marker> {
 	public void drawCircle(PaintScreen dw) {
 
 		if (isVisible) {
-			float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
-			dw.setStrokeWidth(maxHeight / 10f);
+			//float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
+			float maxHeight = dw.getHeight();
+			dw.setStrokeWidth(maxHeight / 100f);
 			dw.setFill(false);
 			dw.setColor(DataSource.getColor(datasource));
 			
 			//draw circle with radius depending on distance
 			//0.44 is approx. vertical fov in radians 
-			double angle = 2.0*Math.atan2(20,distance);
-			double radius = angle/0.44 * maxHeight;
+			double angle = 2.0*Math.atan2(10,distance);
+			double radius = Math.max(Math.min(angle/0.44 * maxHeight, maxHeight),maxHeight/25f);
+			//double radius = angle/0.44d * (double)maxHeight;
+			
 			dw.paintCircle(cMarker.x, cMarker.y, (float)radius);
 		}
 	}

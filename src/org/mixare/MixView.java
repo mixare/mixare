@@ -824,7 +824,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				synchronized (mixContext.curLoc) {
 					mixContext.curLoc = location;
 				}
-				dataView.getDataHandler().onLocationChanged(location);
+				if(!dataView.isFrozen())
+					dataView.getDataHandler().onLocationChanged(location);
 				// If we have moved more than radius/3 km away from the 
 				// location where the last download occured we should start 
 				// a fresh download
