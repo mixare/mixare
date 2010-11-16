@@ -1,7 +1,6 @@
 package org.mixare;
 
 import org.mixare.data.DataSource.DATASOURCE;
-import org.mixare.reality.PhysicalPlace;
 
 import android.location.Location;
 
