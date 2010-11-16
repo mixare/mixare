@@ -27,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.Marker;
-import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.POIMarker;
 import org.mixare.SocialMarker;
