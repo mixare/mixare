@@ -8,7 +8,6 @@ import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 
 /**
@@ -27,16 +26,17 @@ public class SocialMarker extends Marker {
 	@Override
 	public void update(Location curGPSFix) {
 
-		super.update(curGPSFix);
+		//0.35 radians ~= 20 degree
+		//0.85 radians ~= 45 degree
+		//minAltitude = sin(0.35)
+		//maxAltitude = sin(0.85)
 		
 		// we want the social markers to be on the upper part of
-		// your surrounding sphere so we set the height component of 
-		// the position vector to radius/2 (in meter) 
+		// your surrounding sphere 
+		double altitude = curGPSFix.getAltitude()+Math.sin(0.35)*distance+Math.sin(0.4)*(distance/(MixView.dataView.getRadius()*1000f/distance));
+		mGeoLoc.setAltitude(altitude);
+		super.update(curGPSFix);
 
-		locationVector.y+=MixView.dataView.getRadius()*500f;
-		//locationVector.y+=500;		 
-		//locationVector.y+=distance;
-		
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class SocialMarker extends Marker {
 				dw.setStrokeWidth(maxHeight / 10f);
 				dw.setFill(false);
 				dw.setColor(DataSource.getColor(datasource));
-				dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);				
+				dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
 			}
 		}
 	}
