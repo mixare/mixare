@@ -66,10 +66,10 @@ public class DataHandler {
 		
 	public void onLocationChanged(Location location) {
 		updateDistances(location);
+		sortMarkerList();
 		for(Marker ma: markerList) {
 			ma.update(location);
 		}
-		sortMarkerList();
 	}
 	
 	/**
