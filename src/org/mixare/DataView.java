@@ -228,9 +228,10 @@ public class DataView {
 			if (mixContext.getStartUrl().length() > 0){
 				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE);
 				isLauncherStarted = true;
+				if (!mixContext.isDataSourceSelected(DataSource.DATASOURCE.OWNURL)) {
+					mixContext.toogleDataSource(DataSource.DATASOURCE.OWNURL);
+				}
 			}
-			//http://www.suedtirolerland.it/api/map/getARData/?client[lat]=46.4786481&client[lng]=11.29534&client[rad]=100&lang_id=1&project_id=15&showTypes=52&key=287235f7ca18ef2afb719bc616288353
-			
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
