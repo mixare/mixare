@@ -173,11 +173,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	public void setErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(DataView.CONNECITON_ERROR_DIALOG_TEXT));
+		builder.setMessage(getString(DataView.CONNECTION_ERROR_DIALOG_TEXT));
 		builder.setCancelable(false);
 
 		/*Retry*/
-		builder.setPositiveButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				fError=false;
 				//TODO improve
@@ -190,14 +190,14 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			}
 		});
 		/*Open settings*/
-		builder.setNeutralButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
+		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
 				startActivityForResult(intent1, 42);
 			}
 		});
 		/*Close application*/
-		builder.setNegativeButton(DataView.CONNECITON_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				System.exit(0);
 			}
@@ -284,7 +284,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			} 
 
 			if(mixContext.isActualLocation()==false){
-				Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+				Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 			}	
 			
 		} catch (Exception ex) {

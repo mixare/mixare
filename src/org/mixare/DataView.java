@@ -84,14 +84,14 @@ public class DataView {
 	public static final int MENU_ITEM_6 = R.string.menu_item_6;
 	public static final int MENU_ITEM_7 = R.string.menu_item_7;
 
-	public static final int CONNECITON_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
-	public static final int CONNECITON_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
-	public static final int CONNECITON_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
-	public static final int CONNECITON_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
+	public static final int CONNECTION_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
+	public static final int CONNECTION_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
+	public static final int CONNECTION_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
+	public static final int CONNECTION_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
 	
-	public static final int CONNECITON_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
-	public static final int CONNECITON_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
-	public static final int CONNECITON_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
+	public static final int CONNECTION_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
+	public static final int CONNECTION_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
+	public static final int CONNECTION_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
 
 	/*if in the listview option for a specific title no website is provided*/
 	public static final int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
