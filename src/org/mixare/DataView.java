@@ -366,7 +366,9 @@ public class DataView {
 
 		// Handle event
 		if (state.nextLStatus == MixState.DONE) {
-			for (int i = dataHandler.getMarkerCount() - 1; i >= 0 && !evtHandled; i--) {
+			//the following will traverse the markers in ascending order (by distance) the first marker that 
+			//matches triggers the event.
+			for (int i = 0 ; i <= dataHandler.getMarkerCount() && !evtHandled; i++) {
 				Marker pm = dataHandler.getMarker(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, mixContext, state);
