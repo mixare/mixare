@@ -178,7 +178,11 @@ abstract public class Marker implements Comparable<Marker> {
 	private boolean isClickValid(float x, float y) {
 		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 				signMarker.x, signMarker.y);
-
+		//if the marker is not active (i.e. not shown in AR view) we don't have to check it for clicks
+		if (!isActive())
+			return false;
+		
+		//TODO adapt the following to the variable radius!
 		pPt.x = x - signMarker.x;
 		pPt.y = y - signMarker.y;
 		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
