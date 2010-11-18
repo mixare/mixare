@@ -308,6 +308,9 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 
 	public MixOverlay(MixMap mixMap, Drawable marker){
 		super (boundCenterBottom(marker));
+		//need to call populate here. See
+		//http://code.google.com/p/android/issues/detail?id=2035
+		populate();
 		this.mixMap = mixMap;
 	}
 
