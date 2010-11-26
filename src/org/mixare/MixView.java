@@ -956,6 +956,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 
 				//preview form factor
 				float ff = (float)w/h;
+				Log.d("Mixare", "Screen res: w:"+ w + " h:" + h + " aspect ratio:" + ff);
 
 				//holder for the best form factor and size
 				float bff = 0;
@@ -978,13 +979,14 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					//preview width should be less than screen width
 					//preview width should be more than current bestw
 					//this combination will ensure that the highest resolution will win
+					Log.d("Mixare", "Candidate camera element: w:"+ element.width + " h:" + element.height + " aspect ratio:" + cff);
 					if ((ff-cff <= ff-bff) && (element.width <= w) && (element.width >= bestw)) {
 						bff=cff;
 						bestw = element.width;
 						besth = element.height;
 					}
-
 				} 
+				Log.d("Mixare", "Chosen camera element: w:"+ bestw + " h:" + besth + " aspect ratio:" + bff);
 				parameters.setPreviewSize(bestw, besth);
 
 			} catch (Exception ex) {
