@@ -987,7 +987,9 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					}
 				} 
 				Log.d("Mixare", "Chosen camera element: w:"+ bestw + " h:" + besth + " aspect ratio:" + bff);
-				parameters.setPreviewSize(bestw, besth);
+				//parameters.setPreviewSize(bestw, besth);
+				//Don't use the real candidate as it crashes the samsung phones
+				parameters.setPreviewSize(480, 320);
 
 			} catch (Exception ex) {
 				parameters.setPreviewSize(480 , 320);
