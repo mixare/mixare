@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.mixare.data.DataSource.DATAFORMAT;
+import org.mixare.data.DataSource.DATASOURCE;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -151,6 +152,7 @@ public class DownloadManager implements Runnable {
 					result.setMarkers(markers);
 
 					result.format = request.format;
+					result.source = request.source;
 					result.error = false;
 					result.errorMsg = null;
 
@@ -261,12 +263,14 @@ public class DownloadManager implements Runnable {
 class DownloadRequest {
 
 	public DATAFORMAT format;
+	public DATASOURCE source;
 	String url;
 	String params;
 }
 
 class DownloadResult {
 	public DATAFORMAT format;
+	public DATASOURCE source;
 	List<Marker> markers;
 
 	boolean error;

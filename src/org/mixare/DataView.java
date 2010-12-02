@@ -31,6 +31,7 @@ import java.util.Locale;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSource.DATAFORMAT;
+import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -208,9 +209,10 @@ public class DataView {
 		isInit = true;
 	}
 	
-	public void requestData(String url,DATAFORMAT dataformat) {
+	public void requestData(String url,DATAFORMAT dataformat, DATASOURCE datasource) {
 		DownloadRequest request = new DownloadRequest();
 		request.format=dataformat;
+		request.source=datasource;
 		request.url=url;
 		mixContext.getDownloader().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
@@ -226,7 +228,7 @@ public class DataView {
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 						
 			if (mixContext.getStartUrl().length() > 0){
-				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE);
+				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE,DATASOURCE.OWNURL);
 				isLauncherStarted = true;
 				if (!mixContext.isDataSourceSelected(DataSource.DATASOURCE.OWNURL)) {
 					mixContext.toogleDataSource(DataSource.DATASOURCE.OWNURL);
@@ -239,7 +241,7 @@ public class DataView {
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
 					
 					if(mixContext.isDataSourceSelected(source)) {
-						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source));
+						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source),source);
 
 						// Debug notification
 						// Toast.makeText(mixContext, "Downloading from "+ source, Toast.LENGTH_SHORT).show();
@@ -276,7 +278,7 @@ public class DataView {
 					dataHandler.addMarkers(dRes.getMarkers());
 					dataHandler.onLocationChanged(curFix);
 					// Notification
-					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.format, Toast.LENGTH_SHORT).show();
+					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source, Toast.LENGTH_SHORT).show();
 
 				}
 			}
