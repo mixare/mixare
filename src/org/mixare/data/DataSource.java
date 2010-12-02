@@ -42,7 +42,7 @@ public class DataSource {
 
 	/** default URL */
 	private static final String WIKI_BASE_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
-	//private static final String WIKI_BASE_URL =	"file:///sdcard/download/data.json";
+	//private static final String WIKI_BASE_URL =	"file:///sdcard/wiki.json";
 	private static final String TWITTER_BASE_URL = "http://search.twitter.com/search.json";
 	private static final String BUZZ_BASE_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
 	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
@@ -93,7 +93,31 @@ public class DataSource {
 		switch(source) {
 		
 			case WIKIPEDIA: 
-				ret= WIKI_BASE_URL + 
+				ret= WIKI_BASE_URL;
+			break;
+			
+			case BUZZ: 
+				ret= BUZZ_BASE_URL;
+			break;
+			
+			case TWITTER: 
+				ret = TWITTER_BASE_URL;			
+			break;
+				
+			case OSM: 
+				ret = OSM_BASE_URL;
+			break;
+			
+			case OWNURL:
+				ret = MixListView.customizedURL;
+			break;
+			
+		}
+		if (!ret.startsWith("file://")) {
+			switch(source) {
+			
+			case WIKIPEDIA: 
+				ret+=
 				"?lat=" + lat +
 				"&lng=" + lon + 
 				"&radius="+ radius +
@@ -102,31 +126,34 @@ public class DataSource {
 			break;
 			
 			case BUZZ: 
-				ret= BUZZ_BASE_URL + 
+				ret+= 
 				"&lat=" + lat+
 				"&lon=" + lon + 
 				"&radius="+ radius*1000;
 			break;
 			
 			case TWITTER: 
-				ret = TWITTER_BASE_URL +
+				ret+=
 				"?geocode=" + lat + "%2C" + lon + "%2C" + 
 				Math.max(radius, 1.0) + "km" ;				
 			break;
 				
 			case OSM: 
-				ret = OSM_BASE_URL + XMLHandler.getOSMBoundingBox(lat, lon, radius);
+				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
 			
 			case OWNURL:
-				ret = MixListView.customizedURL +  
+				ret+=
 				"?latitude=" + Double.toString(lat) + 
 				"&longitude=" + Double.toString(lon) + 
 				"&altitude=" + Double.toString(alt) +
 				"&radius=" + Double.toString(radius);
 			break;
 			
+			}
+			
 		}
+		
 		return ret;
 	}
 	

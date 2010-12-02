@@ -20,6 +20,7 @@ package org.mixare;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -176,6 +177,10 @@ public class MixContext extends ContextWrapper {
 	throws Exception {
 		InputStream is = null;
 		URLConnection conn = null;
+
+		if (urlStr.startsWith("file://"))			
+			return new FileInputStream(urlStr.replace("file://", ""));
+
 		if (urlStr.startsWith("content://"))
 			return getContentInputStream(urlStr, null);
 
