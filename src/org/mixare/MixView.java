@@ -987,10 +987,14 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 					}
 				} 
 				Log.d("Mixare", "Chosen camera element: w:"+ bestw + " h:" + besth + " aspect ratio:" + bff);
-				//parameters.setPreviewSize(bestw, besth);
-				//Don't use the real candidate as it crashes the samsung phones
-				parameters.setPreviewSize(480, 320);
-
+				//Some Samsung phones will end up with bestw and besth = 0 because their minimum preview size is bigger then the screen size.
+				//In this case, we use the default values: 480x320
+				if ((bestw == 0) || (besth == 0)){
+					Log.d("Mixare", "Using default camera parameters!");
+					bestw = 480;
+					besth = 320;
+				}
+				parameters.setPreviewSize(bestw, besth);
 			} catch (Exception ex) {
 				parameters.setPreviewSize(480 , 320);
 			}
