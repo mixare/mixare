@@ -164,7 +164,7 @@ public class MixContext extends ContextWrapper {
 		setLocationAtLastDownload(curLoc);
 
 //TODO fix logic
-		Toast.makeText( this, getString(DataView.CONNECITON_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+		Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 	
 	}
 	
