@@ -26,6 +26,7 @@
 				  <category android:name="android.intent.category.BROWSABLE" />
 				  <data android:scheme="http" android:mimeType="application/mixare-json"/>
 				  <data android:scheme="content" android:mimeType="application/mixare-json"/>
+				  <data android:scheme="file" android:mimeType="application/mixare-json"/>
             </intent-filter>
             
             <intent-filter>
