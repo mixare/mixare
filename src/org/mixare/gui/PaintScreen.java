@@ -102,7 +102,8 @@ public class PaintScreen {
 		canvas.drawCircle(x, y, radius, paint);
 	}
 
-	public void paintText(float x, float y, String text) {
+	public void paintText(float x, float y, String text, boolean underline) {
+		paint.setUnderlineText(underline);
 		canvas.drawText(text, x, y, paint);
 	}
 

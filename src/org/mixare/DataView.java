@@ -391,7 +391,7 @@ public class DataView {
 			dw.setFill(false);
 			dw.paintRect(x - w / 2, y - h / 2, w, h);
 		}
-		dw.paintText(padw + x - w / 2, padh + dw.getTextAsc() + y - h / 2, txt);
+		dw.paintText(padw + x - w / 2, padh + dw.getTextAsc() + y - h / 2, txt, false);
 	}
 
 

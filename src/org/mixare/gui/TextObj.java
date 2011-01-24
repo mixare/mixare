@@ -36,23 +36,25 @@ public class TextObj implements ScreenObj {
 	float maxLineWidth;
 	float pad;
 	int borderColor, bgColor, textColor, textShadowColor;
+	boolean underline;
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
-			PaintScreen dw) {
+			PaintScreen dw, boolean underline) {
 		this(txtInit, fontSizeInit, maxWidth, Color.rgb(255, 255, 255), Color
 				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.argb(64, 0, 0, 0),
-				dw.getTextAsc() / 2, dw);
+				dw.getTextAsc() / 2, dw, underline);
 	}
 
 	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
 			int borderColor, int bgColor, int textColor, int textShadowColor, float pad,
-			PaintScreen dw) {
+			PaintScreen dw, boolean underline) {
 		
 		this.borderColor = borderColor;
 		this.bgColor = bgColor;
 		this.textColor = textColor;
 		this.textShadowColor = textShadowColor;
 		this.pad = pad;
+		this.underline = underline;
 
 		try {
 			prepTxt(txtInit, fontSizeInit, maxWidth, dw);
@@ -144,7 +146,7 @@ public class TextObj implements ScreenObj {
 			dw.setFill(true);
 			dw.setStrokeWidth(0);
 			dw.setColor(textColor);
-			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
+			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line, underline);
 			
 		}
 	}
