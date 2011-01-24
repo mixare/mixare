@@ -109,6 +109,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private WakeLock mWakeLock;
 
 	private boolean fError;
+	
+	private int compassErrorDisplayed = 0;
 
 	private String zoomLevel;
 	private int zoomProgress;
@@ -848,8 +850,11 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE) {
-			Toast.makeText(mixContext, "Compass data unreliable. Please recalibrate compass.", Toast.LENGTH_LONG).show();
+		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE && compassErrorDisplayed == 0) {
+			for(int i = 0; i <2; i++) {
+				Toast.makeText(mixContext, "Compass data unreliable. Please recalibrate compass.", Toast.LENGTH_LONG).show();
+			}
+			compassErrorDisplayed++;
 		}
 	}
 
