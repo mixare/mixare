@@ -37,6 +37,7 @@ abstract public class Marker implements Comparable<Marker> {
 
 	private String ID;
 	protected String title;
+	private boolean underline = false;
 	private String URL;
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
@@ -69,8 +70,10 @@ abstract public class Marker implements Comparable<Marker> {
 		this.active = false;
 		this.title = title;
 		this.mGeoLoc = new PhysicalPlace(latitude,longitude,altitude);
-		if (link != null && link.length() > 0)
+		if (link != null && link.length() > 0) {
 			URL = "webpage:" + URLDecoder.decode(link);
+			this.underline = true;
+		}
 		this.datasource = datasource;
 		
 		this.ID=datasource+"##"+title; //mGeoLoc.toString();
@@ -244,7 +247,7 @@ abstract public class Marker implements Comparable<Marker> {
 		}
 		
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1,
-				250, dw);
+				250, dw, underline);
 
 		if (isVisible) {
 			

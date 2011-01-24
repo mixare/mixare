@@ -34,6 +34,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -58,7 +60,7 @@ public class MixListView extends ListActivity {
 
 	private static int list;
 
-	private Vector<String> listViewMenu;
+	private Vector<SpannableString> listViewMenu;
 	private Vector<String> selectedItemURL;
 	private Vector<String> dataSourceMenu;
 	private Vector<String> dataSourceDescription;
@@ -72,6 +74,7 @@ public class MixListView extends ListActivity {
 	public static String customizedURL="http://mixare.org/geotest.php";
 	private static Context ctx;
 	private static String searchQuery = "";
+	private static SpannableString underlinedTitle;
 	public static List<Marker> searchResultMarkers;
 	public static List<Marker> originalMarkerList;
 
@@ -129,7 +132,7 @@ public class MixListView extends ListActivity {
 
 		case 2:
 			selectedItemURL = new Vector<String>();
-			listViewMenu = new Vector<String>();
+			listViewMenu = new Vector<SpannableString>();
 			DataHandler jLayer = dataView.getDataHandler();
 			if (dataView.isFrozen() && jLayer.getMarkerCount() > 0){
 				selectedItemURL.add("search");
@@ -138,7 +141,14 @@ public class MixListView extends ListActivity {
 			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = jLayer.getMarker(i);
 				if(ma.isActive()) {
-					listViewMenu.add(ma.getTitle());
+					if (ma.getURL()!=null) {
+						/* Underline the title if website is available*/
+							underlinedTitle = new SpannableString(ma.getTitle());
+							underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
+							listViewMenu.add(underlinedTitle);
+						} else {
+							listViewMenu.add(new SpannableString(ma.getTitle()));
+						}
 					/*the website for the corresponding title*/
 					if (ma.getURL()!=null)
 						selectedItemURL.add(ma.getURL());
@@ -163,7 +173,7 @@ public class MixListView extends ListActivity {
 
 			}
 
-			setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listViewMenu));
+			setListAdapter(new ArrayAdapter<SpannableString>(this, android.R.layout.simple_list_item_1,listViewMenu));
 			getListView().setTextFilterEnabled(true);
 			break;
 
@@ -195,13 +205,13 @@ public class MixListView extends ListActivity {
 		setSearchQuery(query);
 
 		selectedItemURL = new Vector<String>();
-		listViewMenu = new Vector<String>();
+		listViewMenu = new Vector<SpannableString>();
 		for(int i = 0; i < jLayer.getMarkerCount();i++){
 			Marker ma = jLayer.getMarker(i);
 
 			if (ma.getTitle().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
 				searchResultMarkers.add(ma);
-				listViewMenu.add(ma.getTitle());
+				listViewMenu.add(new SpannableString(ma.getTitle()));
 				/*the website for the corresponding title*/
 				if (ma.getURL() != null)
 					selectedItemURL.add(ma.getURL());
