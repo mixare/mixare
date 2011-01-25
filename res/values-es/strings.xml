@@ -41,7 +41,7 @@
 	<string name="menu_item_7">Licencia</string>
 	
 	
-	<string name="connection_error_dialog">Lo sentimos, un error de conección a ocurrido! \nPor favor chequea si estas conectado a Internet.</string>
+	<string name="connection_error_dialog">Ha ocurrido un error de conexión! \nPor favor chequea si estas conectado a Internet.</string>
 	<string name="connection_error_dialog_button1">Repetir</string>
 	<string name="connection_error_dialog_button2">Abrir opciones</string>
 	<string name="connection_error_dialog_button3">Cerrar la app</string>
