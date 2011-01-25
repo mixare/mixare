@@ -135,7 +135,6 @@ public class DownloadManager implements Runnable {
 
 				is = ctx.getHttpGETInputStream(request.url);
 				String tmp = ctx.getHttpInputString(is);
-				//String ss = ctx.unescapeHTML(tmp, 0);
 
 				Json layer = new Json();
 
