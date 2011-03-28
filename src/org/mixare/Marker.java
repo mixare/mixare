@@ -30,6 +30,7 @@ import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 
@@ -37,7 +38,7 @@ abstract public class Marker implements Comparable<Marker> {
 
 	private String ID;
 	protected String title;
-	private boolean underline = false;
+	protected boolean underline = false;
 	private String URL;
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
@@ -63,8 +64,10 @@ abstract public class Marker implements Comparable<Marker> {
 	protected Label txtLab = new Label();
 	protected TextObj textBlock;
 	
+	private String OSMUrlMarker = "";
+	private int OSMUrlID=0;
 	
-	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource.DATASOURCE datasource) {
+	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource.DATASOURCE datasource,String iOSMurl, int iOSMUrlID) {
 		super();
 
 		this.active = false;
@@ -77,6 +80,15 @@ abstract public class Marker implements Comparable<Marker> {
 		this.datasource = datasource;
 		
 		this.ID=datasource+"##"+title; //mGeoLoc.toString();
+		// the details of OSM url
+		if (iOSMurl != null && iOSMurl.length() > 0) {
+			this.OSMUrlMarker = iOSMurl;
+		}
+		OSMUrlID = iOSMUrlID;
+	}
+	
+	public String getOSMOriUrl() {
+		return this.OSMUrlMarker;
 	}
 	
 	public String getTitle(){
@@ -316,6 +328,30 @@ abstract public class Marker implements Comparable<Marker> {
 
 	abstract public int getMaxObjects();
  
+	abstract public int getOsmUrlMaxObject();
+
+	public int getOSMUrlId() {
+		return OSMUrlID;
+	}
+
+	//to get colour of marker for each OSM url
+	public int getColour() {
+		switch (this.OSMUrlID) {
+		case 0:
+			return Color.rgb(153, 255, 204);//green
+		case 1:
+			return Color.rgb(255, 153, 204);//pink
+		case 2:
+			return Color.rgb(255, 255, 51);//yellow
+		case 3:
+			return Color.rgb(255, 0, 204);//magenta
+		case 4:
+			return Color.rgb(153, 102, 51);//brown
+		default:
+			return Color.rgb(255, 168, 0);//orange
+		}
+	}
+	
 }
 
 

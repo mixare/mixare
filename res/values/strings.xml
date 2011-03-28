@@ -80,4 +80,9 @@
 	<string name="download_error">Error while downloading</string>
 	<string name="download_received">Received data from</string>
 	
+	<string name="add_osm_menu">Add OpenStreetMap URL</string>
+	<string name="insert_osm_url">Insert OpenStreetMap URL</string>
+	<string name="osm_max_object_menu">Set max POI per URL</string>
+	<string name="set_osm_max_object">Maximum POIs per URL</string>
+	
 </resources>

@@ -25,6 +25,7 @@ import java.util.List;
 import org.mixare.Marker;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
+import org.mixare.POIMarker;
 import org.mixare.reality.PhysicalPlace;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +41,7 @@ import android.util.Log;
  */
 public class XMLHandler extends DataHandler {
 
-	private List<Marker> processOSM(Element root) {
+	private List<Marker> processOSM(Element root, String OSMOriUrl, int OSMOriID) {
 
     	List<Marker> markers = new ArrayList<Marker>();
         NodeList nodes = root.getElementsByTagName("node");
@@ -64,13 +65,21 @@ public class XMLHandler extends DataHandler {
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
 	                	
-	                	Marker ma = new NavigationMarker(
+	                	/*Marker ma = new NavigationMarker(
 	        				name, 
 	        				lat, 
 	        				lon, 
 	        				0, 
 	        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
-	        				DataSource.DATASOURCE.OSM);
+	        				DataSource.DATASOURCE.OSM);*/
+	                	//Change to use POIMarker instead of NavigationMarker
+	                	Marker ma = new POIMarker(
+		        				name, 
+		        				lat, 
+		        				lon, 
+		        				0, 
+		        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
+		        				DataSource.DATASOURCE.OSM,OSMOriUrl,OSMOriID);               	 
 	        			markers.add(ma);
 	                	//skip to next node
 	        			continue;
@@ -93,13 +102,14 @@ public class XMLHandler extends DataHandler {
 		//return "[bbox=16.365,48.193,16.374,48.199]";
 	}
 	
-	public List<Marker> load(Document doc) {
+	public List<Marker> load(Document doc,String OSMOriUrl, int OSMOriID) {
         Element root = doc.getDocumentElement();
         
         // If the root tag is called "osm" we got an 
         // openstreetmap .osm xml document
         if ("osm".equals(root.getTagName()))
-        	return processOSM(root);
+        	return processOSM(root,OSMOriUrl,OSMOriID);
         return null;
 	}
+	
 }

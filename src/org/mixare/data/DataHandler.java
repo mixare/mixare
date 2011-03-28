@@ -68,18 +68,34 @@ public class DataHandler {
 	}
 	
 	public void updateActivationStatus(MixContext mixContext) {
-		
+			
 		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
-				
-		for(Marker ma: markerList) {
+		Hashtable<String, Integer> url = new Hashtable<String, Integer>();
+		//update for marker 
+		for (Marker ma : markerList) {
 
-			Class mClass=ma.getClass();
-			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
+			Class mClass = ma.getClass();
+			map.put(mClass, (map.get(mClass) != null) ? map.get(mClass) + 1 : 1);
+			
+			//additional for OSM marker
+			String strURL=ma.getOSMOriUrl();
+			url.put(strURL, (url.get(strURL) != null) ? url.get(strURL) + 1 : 1);
+			boolean belowURLMax = (url.get(strURL)<=ma.getOsmUrlMaxObject());
 			
 			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
-			boolean dataSourceSelected = mixContext.isDataSourceSelected(ma.getDatasource());
+			boolean dataSourceSelected = mixContext.isDataSourceSelected(ma
+					.getDatasource());
 			
-			ma.setActive((belowMax && dataSourceSelected));
+			/*Log.d("DataHandler","DataHandler " + ma.getOSMOriUrl());
+			Log.d("DataHandler", "DataHandler " + mixContext
+						.isOSMUrlSelected(strURL));*/
+			
+			if (ma.getDatasource().equals(DataSource.DATASOURCE.OSM)) {
+				ma.setActive((belowURLMax  && dataSourceSelected && mixContext
+						.isOSMUrlSelected(strURL)));
+			} else {
+				ma.setActive((belowMax && dataSourceSelected));
+			}
 		}
 	}
 		

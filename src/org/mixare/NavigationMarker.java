@@ -35,8 +35,8 @@ public class NavigationMarker extends Marker {
 	public static final int MAX_OBJECTS=10;
 
 	public NavigationMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DATASOURCE datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, DATASOURCE datasource , String iOSMurl, int iOSMUrlID) {
+		super(title, latitude, longitude, altitude, URL, datasource,iOSMurl,iOSMUrlID);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -87,5 +87,10 @@ public class NavigationMarker extends Marker {
 	@Override
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
+	}
+	
+	@Override
+	public int getOsmUrlMaxObject(){
+		return 0;
 	}
 }

@@ -93,7 +93,7 @@ public class Json extends DataHandler {
 					Double.valueOf(jo.getString("geocode").split(" ")[1]), 
 					0, 
 					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), 
-					DataSource.DATASOURCE.BUZZ);
+					DataSource.DATASOURCE.BUZZ,"",0);
 		}
 		return ma;
 	}
@@ -135,7 +135,7 @@ public class Json extends DataHandler {
 						lat, 
 						lon, 
 						0, url, 
-						DataSource.DATASOURCE.TWITTER);
+						DataSource.DATASOURCE.TWITTER,"",0);
 			}
 		}
 		return ma;
@@ -159,7 +159,7 @@ public class Json extends DataHandler {
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					link, 
-					DataSource.DATASOURCE.OWNURL);
+					DataSource.DATASOURCE.OWNURL,"",0);
 		}
 		return ma;
 	}
@@ -177,7 +177,7 @@ public class Json extends DataHandler {
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					"http://"+jo.getString("wikipediaUrl"), 
-					DataSource.DATASOURCE.WIKIPEDIA);
+					DataSource.DATASOURCE.WIKIPEDIA,"",0);
 		}
 		return ma;
 	}

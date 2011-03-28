@@ -49,7 +49,7 @@ public class DataSource {
 	// eg. only railway stations:
 	//private static final String OSM_BASE_URL =	"http://www.informationfreeway.org/api/0.6/node[railway=station]";
 	//private static final String OSM_BASE_URL =	"http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	private static final String OSM_BASE_URL =		"http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
+	//private static final String OSM_BASE_URL =		"http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
 	//all objects that have names: 
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries
@@ -104,9 +104,9 @@ public class DataSource {
 				ret = TWITTER_BASE_URL;			
 			break;
 				
-			case OSM: 
+			/*case OSM: 
 				ret = OSM_BASE_URL;
-			break;
+			break;*/
 			
 			case OWNURL:
 				ret = MixListView.customizedURL;
@@ -138,9 +138,9 @@ public class DataSource {
 				Math.max(radius, 1.0) + "km" ;				
 			break;
 				
-			case OSM: 
+			/*case OSM: 
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
-			break;
+			break;*/
 			
 			case OWNURL:
 				ret+=
@@ -157,12 +157,26 @@ public class DataSource {
 		return ret;
 	}
 	
+	public static String createRequestOSMURL(String sourceURL, double lat,
+			double lon, double alt, float radius, String locale) {
+
+		String ret = sourceURL;
+
+		if (!ret.startsWith("file://")) {
+			ret += XMLHandler.getOSMBoundingBox(lat, lon, radius);
+		}
+
+		return ret;
+	}
+	
+	
+	
 	public static int getColor(DATASOURCE datasource) {
 		int ret;
 		switch(datasource) {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
-			case OSM:		ret=Color.rgb(255, 168, 0); break;
+			//case OSM:		ret=Color.rgb(255, 168, 0); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
 			default:		ret=Color.WHITE; break;
 		}

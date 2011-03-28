@@ -158,4 +158,10 @@ public class TextObj implements ScreenObj {
 	public float getHeight() {
 		return height;
 	}
+	public void setBorderColor(int c){
+		this.borderColor=c;
+	}
+	public void setBgColor(int c){
+		this.bgColor=c;
+	}
 }
