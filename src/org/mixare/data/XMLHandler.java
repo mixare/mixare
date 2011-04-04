@@ -64,15 +64,7 @@ public class XMLHandler extends DataHandler {
 
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
-	                	
-	                	/*Marker ma = new NavigationMarker(
-	        				name, 
-	        				lat, 
-	        				lon, 
-	        				0, 
-	        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
-	        				DataSource.DATASOURCE.OSM);*/
-	                	//Change to use POIMarker instead of NavigationMarker
+	                	//use POIMarker instead of NavigationMarker
 	                	Marker ma = new POIMarker(
 		        				name, 
 		        				lat, 

@@ -62,7 +62,7 @@ public class RadarPoints implements ScreenObj {
 			if (pm.isActive() && (x * x + y * y < RADIUS * RADIUS)) {
 				dw.setFill(true);
 				
-				// if the marker is OSM type
+				// For OpenStreetMap the color is changing based on the URL
 				if (pm.getDatasource().equals(DataSource.DATASOURCE.OSM)) {
 					dw.setColor(pm.getColour());
 				} else {

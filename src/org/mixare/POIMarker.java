@@ -32,11 +32,11 @@ import android.location.Location;
 
 /**
  * @author hannes
- *
+ * 
  */
 public class POIMarker extends Marker {
-	
-	public static final int MAX_OBJECTS=20;
+
+	public static final int MAX_OBJECTS = 20;
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 
 	public POIMarker(String title, double latitude, double longitude,
@@ -65,8 +65,6 @@ public class POIMarker extends Marker {
 	@Override
 	public void drawCircle(PaintScreen dw) {
 		if (isVisible) {
-
-			// float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 			float maxHeight = dw.getHeight();
 			dw.setStrokeWidth(maxHeight / 100f);
 			dw.setFill(false);
@@ -83,7 +81,6 @@ public class POIMarker extends Marker {
 			double radius = Math.max(
 					Math.min(angle / 0.44 * maxHeight, maxHeight),
 					maxHeight / 25f);
-			// double radius = angle/0.44d * (double)maxHeight;
 
 			/*
 			 * distance 100 is the threshold to convert from circle to another
@@ -119,10 +116,8 @@ public class POIMarker extends Marker {
 		if (isVisible) {
 			// based on the distance set the colour
 			if (distance < 100.0) {
-				// 6.104
 				textBlock.setBgColor(Color.argb(128, 52, 52, 52));
 				textBlock.setBorderColor(Color.rgb(255, 104, 91));
-
 			} else {
 				textBlock.setBgColor(Color.argb(128, 0, 0, 0));
 				textBlock.setBorderColor(Color.rgb(255, 255, 255));
@@ -141,7 +136,7 @@ public class POIMarker extends Marker {
 	}
 
 	public void otherShape(PaintScreen dw) {
-		// this is to draw triangle shape
+		// This is to draw new shape, triangle
 		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 				signMarker.x, signMarker.y);
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;

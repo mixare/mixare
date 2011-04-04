@@ -79,8 +79,9 @@ abstract public class Marker implements Comparable<Marker> {
 		}
 		this.datasource = datasource;
 		
-		this.ID=datasource+"##"+title; //mGeoLoc.toString();
-		// the details of OSM url
+		this.ID=datasource+"##"+title;
+		
+		// OpenStreetMap URL
 		if (iOSMurl != null && iOSMurl.length() > 0) {
 			this.OSMUrlMarker = iOSMurl;
 		}
@@ -334,7 +335,7 @@ abstract public class Marker implements Comparable<Marker> {
 		return OSMUrlID;
 	}
 
-	//to get colour of marker for each OSM url
+	//get Colour for OpenStreetMap based on the URL number
 	public int getColour() {
 		switch (this.OSMUrlID) {
 		case 0:

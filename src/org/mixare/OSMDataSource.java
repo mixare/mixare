@@ -29,7 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 /*
- * List user OpenStreetMap URL, add, delete the URL*/
+ * Lists user OpenStreetMap URL, add, delete the URL*/
 
 public class OSMDataSource extends ListActivity {
 
@@ -42,34 +42,19 @@ public class OSMDataSource extends ListActivity {
 
 	/** Called when the activity is first created. */
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
-		
-		
-		
 		SharedPreferences settings = getSharedPreferences(
 				OSMDataSource.SHARED_PREFS, 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-		
-		
-		/*
-		 * editor.clear(); editor.commit();
-		 */
-		//if nothing inside the Shared preference
-		/*if (settings.getAll().isEmpty()) {
-			editor.putString("URLStr0",
-					"http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]");
-			editor.putBoolean("URLBool0", true);
-			editor.commit();
-		}*/
 		int size = settings.getAll().size();
-		//copy the value from shared preference to adapter
+		// copy the value from shared preference to adapter
 		osmAdapter = new MyOSMAdapter();
 		for (int i = 0; i < (size / 2); i++) {
 			String s = settings.getString("URLStr" + i, "");
 			Boolean b = settings.getBoolean("URLBool" + i, false);
-			osmAdapter.addItem(new osmURL(s, b));// to hold the string
+			osmAdapter.addItem(new osmURL(s, b));
 		}
 		setListAdapter(osmAdapter);
 		ListView lv = getListView();
@@ -128,9 +113,7 @@ public class OSMDataSource extends ListActivity {
 				holder.textView = (TextView) convertView
 						.findViewById(R.id.text);
 				holder.checkbox = (CheckBox) convertView.findViewById(R.id.cb);
-				holder.checkbox.setTag(position); // setting listener for
-													// checkbox in a row
-				//  set listeners for any object we get here
+				holder.checkbox.setTag(position);
 				holder.checkbox.setOnCheckedChangeListener(this);
 				convertView.setTag(holder);
 			} else {
@@ -146,7 +129,6 @@ public class OSMDataSource extends ListActivity {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
-			// TODO Auto-generated method stub
 			int position = (Integer) buttonView.getTag();
 			if (isChecked) {
 				buttonView.setChecked(true);
@@ -158,12 +140,11 @@ public class OSMDataSource extends ListActivity {
 
 		@Override
 		public Object getItem(int position) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}
 
-	//class to hold URL and it's status
+	// class to hold URL and it's status (selected or not)
 	public class osmURL {
 		private String mName;
 		private boolean mStatus;
@@ -197,7 +178,6 @@ public class OSMDataSource extends ListActivity {
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case ADD_MENU:
 			AlertDialog.Builder osmAlert = new AlertDialog.Builder(this);
@@ -225,7 +205,7 @@ public class OSMDataSource extends ListActivity {
 			osmAlert.show();
 
 			break;
-		case SET_MAX_OBJECT://id 1
+		case SET_MAX_OBJECT:
 			AlertDialog.Builder maxObjectAlert = new AlertDialog.Builder(this);
 			maxObjectAlert.setTitle(R.string.set_osm_max_object);
 
@@ -242,7 +222,6 @@ public class OSMDataSource extends ListActivity {
 							Editable value = maxObject.getText();
 							String inputStr = "" + value;
 							editMaxObject(Integer.parseInt(inputStr));
-
 
 						}
 					});
@@ -263,7 +242,6 @@ public class OSMDataSource extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
 		m1 = menu.add(0, ADD_MENU, 0, R.string.add_osm_menu);
 		menu.add(1, SET_MAX_OBJECT, 1, R.string.osm_max_object_menu);
 		return super.onCreateOptionsMenu(menu);
@@ -277,27 +255,26 @@ public class OSMDataSource extends ListActivity {
 	}
 
 	public void deleteURL(int id) {
-		osmAdapter.deleteItem(id);// remove from baseadapter
+		osmAdapter.deleteItem(id);
 		setListAdapter(osmAdapter);
 	}
 
 	public void editURL(int id, String finalUrl) {
-		osmAdapter.updateItemName(id, finalUrl); //update from base adapter
+		osmAdapter.updateItemName(id, finalUrl); 
 		setListAdapter(osmAdapter);
 	}
 
-	public void editMaxObject(int newVal){
+	public void editMaxObject(int newVal) {
 		SharedPreferences mixViewSetting = getSharedPreferences(
 				MixView.PREFS_NAME, 0);
 		SharedPreferences.Editor mixVieweditor = mixViewSetting.edit();
 		mixVieweditor.putInt("osmMaxObject", newVal);
 		mixVieweditor.commit();
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
-		// TODO Auto-generated method stub
 		AdapterView.AdapterContextMenuInfo info;
 		try {
 			info = (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -307,15 +284,14 @@ public class OSMDataSource extends ListActivity {
 		}
 		long id = getListAdapter().getItemId(info.position);
 		int base = Menu.FIRST;
-		menu.add(base, base, base, "Edit"); //1
-		menu.add(base, base + 1, base + 1, "Copy");//2
-		menu.add(base, base + 2, base + 2, "Delete");//3
+		menu.add(base, base, base, "Edit"); 
+		menu.add(base, base + 1, base + 1, "Copy");
+		menu.add(base, base + 2, base + 2, "Delete");
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		AdapterView.AdapterContextMenuInfo info;
 		try {
 			info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -352,11 +328,9 @@ public class OSMDataSource extends ListActivity {
 			alert.show();
 
 			break;
-		case 2: 
-			//get the string value
-			String strVal=osmAdapter.getItemName((int) idOfMenu);
-			//get the system clipboard
-			ClipboardManager clipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+		case 2:
+			String strVal = osmAdapter.getItemName((int) idOfMenu);
+			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 			clipboard.setText(strVal);
 			break;
 		case 3:
@@ -368,23 +342,18 @@ public class OSMDataSource extends ListActivity {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		SharedPreferences settings = getSharedPreferences(
 				OSMDataSource.SHARED_PREFS, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.clear();
-		// COMMIT CHANGES IN THE SHARED PREFERENCE
+		//every URL in Adapter 
+		//put the URL link and status inside the Shared Preference
 		for (int k = 0; k < osmAdapter.getCount(); k++) {
-			editor.putString("URLStr" + k, osmAdapter.getItemName(k));// the URL
-			editor.putBoolean("URLBool" + k, osmAdapter.getItemStatus(k));// the
-																			// Boolean
-																			// status
+			editor.putString("URLStr" + k, osmAdapter.getItemName(k));
+			editor.putBoolean("URLBool" + k, osmAdapter.getItemStatus(k));
 		}
 		editor.commit();
 	}
-
-	
-
 
 }

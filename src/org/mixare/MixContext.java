@@ -450,17 +450,20 @@ public class MixContext extends ContextWrapper {
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
+	
+	
+	/*get the OpenStreetMap URL list from Shared Preference*/
 	public LinkedHashMap <String, Boolean> getOSMURLList() {
-		// HashMap<String, Boolean> OSMSources=new HashMap<String,Boolean>();
 		SharedPreferences settings = getSharedPreferences(
 				OSMDataSource.SHARED_PREFS, 0);
-		
 		int size = settings.getAll().size();
-		OSMSources.clear();//clear the Hashmap before get the newest URL
+		//clear the Hashmap before get the newest URL
+		//to prevent duplicate data
+		OSMSources.clear();
 		for (int i = 0; i < (size / 2); i++) {
 			String s = settings.getString("URLStr" + i, "");
 			Boolean b = settings.getBoolean("URLBool" + i, false);
-			OSMSources.put(s, b);// hold string and boolean value
+			OSMSources.put(s, b);
 		}
 		return OSMSources;
 	}

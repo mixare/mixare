@@ -126,6 +126,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
+	public static final String OSM_DEFAULT_URL="http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]";
 	public static  int osmMaxObject=5;
 	public boolean isGpsEnabled() {
 		return isGpsEnabled;
@@ -295,9 +296,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				editor.putInt("osmMaxObject",5);
 				editor.commit();
 				
-				// this is to set one URL in the OSM Shared preference
-				osmEditor.putString("URLStr0",
-						"http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]");
+				// this is to set one URL in the OSM Shared preference 
+				osmEditor.putString("URLStr0", OSM_DEFAULT_URL);
 				osmEditor.putBoolean("URLBool0", true);
 				
 				osmEditor.commit();

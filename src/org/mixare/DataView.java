@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.mixare.data.DataHandler;
@@ -246,29 +247,26 @@ public class DataView {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-					
+					/*when datasource is OpenStreetMap
+					 * iterate the URL list and for selected URL send data request 
+					 * */
 					if (mixContext.isDataSourceSelected(source)) {
 						if (source.toString().equals("OSM")) {
-							// Get a set of the entries
-							Set set = mixContext.getOSMURLList().entrySet();
-							// Get an iterator
-							Iterator i = set.iterator();
+
 							int id = 0;
-							while (i.hasNext()) {
-								Map.Entry me = (Map.Entry) i.next();
-								Log.d("DataView", "DataVIew "
-										+ me.getKey().toString());
-								if ((Boolean) me.getValue()) {
+							for (Entry<String, Boolean> entry : mixContext
+									.getOSMURLList().entrySet()) {
+								String key = entry.getKey();
+								Boolean value = entry.getValue();
+								if (value) {
 									requestData(
-											DataSource.createRequestOSMURL(
-													(String) me.getKey(),
+											DataSource.createRequestOSMURL(key,
 													lat, lon, alt, radius,
 													Locale.getDefault()
 															.getLanguage()),
 											DataSource
 													.dataFormatFromDataSource(source),
-											source, me.getKey().toString(),
-											id);
+											source, key, id);
 								}
 								++id;
 							}
@@ -283,9 +281,6 @@ public class DataView {
 											.dataFormatFromDataSource(source),
 									source, "", 0);
 						}
-						// Debug notification
-						// Toast.makeText(mixContext, "Downloading from "+
-						// source, Toast.LENGTH_SHORT).show();
 					}
 				}
 				
@@ -309,9 +304,7 @@ public class DataView {
 					retry++;
 					mixContext.getDownloader().submitJob(dRes.errorRequest);
 					// Notification
-					//Toast.makeText(mixContext,mixContext.getResources().getString(R.string.download_error) +" "+ dRes.errorRequest.url, Toast.LENGTH_SHORT).show();
-					Toast.makeText(mixContext, dRes.errorMsg,
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}
 				
 				if(!dRes.error) {

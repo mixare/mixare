@@ -104,10 +104,6 @@ public class DataSource {
 				ret = TWITTER_BASE_URL;			
 			break;
 				
-			/*case OSM: 
-				ret = OSM_BASE_URL;
-			break;*/
-			
 			case OWNURL:
 				ret = MixListView.customizedURL;
 			break;
@@ -137,10 +133,6 @@ public class DataSource {
 				"?geocode=" + lat + "%2C" + lon + "%2C" + 
 				Math.max(radius, 1.0) + "km" ;				
 			break;
-				
-			/*case OSM: 
-				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
-			break;*/
 			
 			case OWNURL:
 				ret+=
@@ -176,7 +168,6 @@ public class DataSource {
 		switch(datasource) {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
-			//case OSM:		ret=Color.rgb(255, 168, 0); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
 			default:		ret=Color.WHITE; break;
 		}

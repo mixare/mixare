@@ -37,7 +37,6 @@ public class NavigationMarker extends Marker {
 	public NavigationMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DATASOURCE datasource , String iOSMurl, int iOSMUrlID) {
 		super(title, latitude, longitude, altitude, URL, datasource,iOSMurl,iOSMUrlID);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
