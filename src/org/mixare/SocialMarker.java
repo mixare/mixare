@@ -35,8 +35,8 @@ public class SocialMarker extends Marker {
 	public static final int MAX_OBJECTS=15;
 
 	public SocialMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DATASOURCE datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, DATASOURCE datasource , String iOSMurl, int iOSMUrlID) {
+		super(title, latitude, longitude, altitude, URL, datasource,iOSMurl,iOSMUrlID);
 	}
 
 	@Override
@@ -79,5 +79,8 @@ public class SocialMarker extends Marker {
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
 	}
-
+	@Override
+	public int getOsmUrlMaxObject(){
+		return 0;
+	}
 }

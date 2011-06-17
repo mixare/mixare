@@ -131,6 +131,8 @@ public class DownloadManager implements Runnable {
 		//assume an error until everything is fine
 		result.error = true;
 		try {
+			String strOSMOriUrl = request.OSMOriUrl;
+			int intOSMOriID = request.OSMOriID;
 			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.url)!=null){
 
 				is = ctx.getHttpGETInputStream(request.url);
@@ -173,10 +175,13 @@ public class DownloadManager implements Runnable {
 						Log.i(MixView.TAG, "loading XML data");	
 						
 
-						List<Marker> markers = xml.load(doc);
+						List<Marker> markers = xml.load(doc, strOSMOriUrl,
+								intOSMOriID);
+						
 						result.setMarkers(markers);
 
 						result.format = request.format;
+						result.source = request.source;
 						result.error = false;
 						result.errorMsg = null;
 					} catch (Exception e1) {
@@ -213,7 +218,10 @@ public class DownloadManager implements Runnable {
 		if(job!=null) {
 			String jobId = "ID_" + (id++);
 			todoList.put(jobId, job);
-			Log.i(MixView.TAG,"Submitted Job with "+jobId+", format: " +job.format+", params: "+job.params+", url: "+job.url);
+			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", format: "
+					+ job.format + ", params: " + job.params + ", url: "
+					+ job.url + ", OSMOriginalURL  " + job.OSMOriUrl + "||"
+					+ job.OSMOriID);
 			return jobId;
 		}
 		return null;
@@ -265,6 +273,9 @@ class DownloadRequest {
 	public DATASOURCE source;
 	String url;
 	String params;
+	String OSMOriUrl; 
+	int OSMOriID;
+
 }
 
 class DownloadResult {
@@ -273,9 +284,10 @@ class DownloadResult {
 	List<Marker> markers;
 
 	boolean error;
-	String errorMsg;
+	String errorMsg="";
 	DownloadRequest errorRequest;
-	
+
+
 	public List<Marker> getMarkers() {
 		return markers;
 	}

@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 //adding support for https connections
@@ -87,6 +88,7 @@ public class MixContext extends ContextWrapper {
 	LocationManager locationMgr;
 	
 	private HashMap<DataSource.DATASOURCE,Boolean> selectedDataSources=new HashMap<DataSource.DATASOURCE,Boolean>();
+	private LinkedHashMap <String, Boolean> OSMSources=new LinkedHashMap <String,Boolean>();
 	
 	public MixContext(Context appCtx) {
 	
@@ -449,4 +451,24 @@ public class MixContext extends ContextWrapper {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
 	
+	
+	/*get the OpenStreetMap URL list from Shared Preference*/
+	public LinkedHashMap <String, Boolean> getOSMURLList() {
+		SharedPreferences settings = getSharedPreferences(
+				OSMDataSource.SHARED_PREFS, 0);
+		int size = settings.getAll().size();
+		//clear the Hashmap before get the newest URL
+		//to prevent duplicate data
+		OSMSources.clear();
+		for (int i = 0; i < (size / 2); i++) {
+			String s = settings.getString("URLStr" + i, "");
+			Boolean b = settings.getBoolean("URLBool" + i, false);
+			OSMSources.put(s, b);
+		}
+		return OSMSources;
+	}
+	
+	public Boolean isOSMUrlSelected(String iKey){
+		return OSMSources.get(iKey)!=null ?OSMSources.get(iKey):false;
+	}
 }
