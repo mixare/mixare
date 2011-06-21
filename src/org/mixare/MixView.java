@@ -18,6 +18,11 @@
  */
 package org.mixare;
 
+/**
+ * This class is the main application which uses the other classes for different
+ * functionalities. It also handles the main sensor events, touch events and location events.
+ */
+
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
 import java.util.ArrayList;

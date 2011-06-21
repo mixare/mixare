@@ -18,6 +18,13 @@
  */
 package org.mixare.render;
 
+/**
+ * The Matrix class represents a 3x3 matrix which can store decimal numbers.
+ * Several modification can be done with a stored matrix. (for example inverting
+ * or adding another matrix)
+ * 
+ */
+
 public class Matrix {
 	public float a1, a2, a3;
 	public float b1, b2, b3;

@@ -18,6 +18,11 @@
  */
 package org.mixare.gui;
 
+/**
+ * The class stores a point of a two-dimensional coordinate system.
+ * (values of the x and y axis)
+ */
+
 public class ScreenLine {
 	public float x, y;
 

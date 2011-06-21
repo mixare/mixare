@@ -19,6 +19,12 @@
 
 package org.mixare;
 
+/**
+ * The SocialMarker class represents a marker, which contains data from
+ * sources like twitter etc. Social markers are above the normal ones and
+ * show a small logo of the source.
+ */
+
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;

@@ -37,6 +37,10 @@ import org.xml.sax.InputSource;
 
 import android.util.Log;
 
+/**
+ * This class establishes a connection and downloads the data for
+ * each entry in its todo list one after another.
+ */
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;

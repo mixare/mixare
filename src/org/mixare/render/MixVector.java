@@ -19,8 +19,14 @@
 package org.mixare.render;
 
 /**
+ * This class holds information of a point in a three-dimensional coordinate
+ * system. It holds the values for the x-, y- and z-axis, which can be modified
+ * through several methods. (for example adding and subtracting points) The
+ * distance from the origin of the coordinate system to the point represents the
+ * vector. The application uses vectors to describe distances on the map.
+ * 
  * @author daniele
- *
+ * 
  */
 public class MixVector {
 	public float x;

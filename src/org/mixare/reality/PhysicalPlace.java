@@ -22,8 +22,16 @@ import org.mixare.render.MixVector;
 
 import android.location.Location;
 
+/**
+ * The class stores the geographical information (latitude, longitude and altitude)
+ * and represents a Place on the map. It also calculates the destination using
+ * the theory of the great-circle-distance. Further it is able to convert the distances
+ * between locations into vectors and vice versa.
+ * 
+ */
+
 public class PhysicalPlace {
-	
+
 	double latitude;
 	double longitude;
 	double altitude;
@@ -81,15 +89,15 @@ public class PhysicalPlace {
 	public void setAltitude(double altitude) {
 		this.altitude = altitude;
 	}
-	
+
 	public static void calcDestination(double lat1Deg, double lon1Deg,
 			double bear, double d, PhysicalPlace dest) {
 		/** see http://en.wikipedia.org/wiki/Great-circle_distance */
-		
+
 		double brng = Math.toRadians(bear);
 		double lat1 = Math.toRadians(lat1Deg);
 		double lon1 = Math.toRadians(lon1Deg);
-		double R = 6371.0 * 1000.0; 
+		double R = 6371.0 * 1000.0;
 
 		double lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R)
 				+ Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng));
@@ -101,15 +109,14 @@ public class PhysicalPlace {
 		dest.setLongitude(Math.toDegrees(lon2));
 	}
 
-	public static void convLocToVec(Location org, PhysicalPlace gp,
-			MixVector v) {
+	public static void convLocToVec(Location org, PhysicalPlace gp, MixVector v) {
 		float[] z = new float[1];
 		z[0] = 0;
-		Location.distanceBetween(org.getLatitude(), org.getLongitude(), gp
-				.getLatitude(), org.getLongitude(), z);
+		Location.distanceBetween(org.getLatitude(), org.getLongitude(),
+				gp.getLatitude(), org.getLongitude(), z);
 		float[] x = new float[1];
-		Location.distanceBetween(org.getLatitude(), org.getLongitude(), org
-				.getLatitude(), gp.getLongitude(), x);
+		Location.distanceBetween(org.getLatitude(), org.getLongitude(),
+				org.getLatitude(), gp.getLongitude(), x);
 		double y = gp.getAltitude() - org.getAltitude();
 		if (org.getLatitude() < gp.getLatitude())
 			z[0] *= -1;
@@ -128,10 +135,10 @@ public class PhysicalPlace {
 
 		PhysicalPlace tmp1Loc = new PhysicalPlace();
 		PhysicalPlace tmp2Loc = new PhysicalPlace();
-		PhysicalPlace.calcDestination(org.getLatitude(), org.getLongitude(), brngNS,
-				Math.abs(v.z), tmp1Loc);
-		PhysicalPlace.calcDestination(tmp1Loc.getLatitude(), tmp1Loc.getLongitude(),
-				brngEW, Math.abs(v.x), tmp2Loc);
+		PhysicalPlace.calcDestination(org.getLatitude(), org.getLongitude(),
+				brngNS, Math.abs(v.z), tmp1Loc);
+		PhysicalPlace.calcDestination(tmp1Loc.getLatitude(),
+				tmp1Loc.getLongitude(), brngEW, Math.abs(v.x), tmp2Loc);
 
 		gp.setLatitude(tmp2Loc.getLatitude());
 		gp.setLongitude(tmp2Loc.getLongitude());

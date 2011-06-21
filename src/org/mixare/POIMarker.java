@@ -24,6 +24,8 @@ import org.mixare.data.DataSource.DATASOURCE;
 import android.location.Location;
 
 /**
+ * Represents a marker
+ * 
  * @author hannes
  *
  */

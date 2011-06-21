@@ -24,6 +24,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 
+/**
+ * This class has the ability to set up the main view and it paints objects on the screen
+ */
+
 public class PaintScreen {
 	Canvas canvas;
 	int width, height;

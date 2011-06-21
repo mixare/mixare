@@ -18,6 +18,12 @@
  */
 package org.mixare.data;
 
+/**
+ * This class can compose a list of markers. The markers are
+ * made by other methods in the class, which take information
+ * from multiple sources.
+ */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,104 +44,112 @@ import android.util.Log;
 
 public class Json extends DataHandler {
 
-	public static final int MAX_JSON_OBJECTS=1000;
-	
+	public static final int MAX_JSON_OBJECTS = 1000;
+
 	public List<Marker> load(JSONObject root, DATAFORMAT dataformat) {
 		JSONObject jo = null;
 		JSONArray dataArray = null;
-    	List<Marker> markers=new ArrayList<Marker>();
+		List<Marker> markers = new ArrayList<Marker>();
 
 		try {
 			// Twitter & own schema
-			if(root.has("results"))
+			if (root.has("results"))
 				dataArray = root.getJSONArray("results");
 			// Wikipedia
 			else if (root.has("geonames"))
 				dataArray = root.getJSONArray("geonames");
 			// Google Buzz
-			else if (root.has("data") && root.getJSONObject("data").has("items"))
+			else if (root.has("data")
+					&& root.getJSONObject("data").has("items"))
 				dataArray = root.getJSONObject("data").getJSONArray("items");
 			if (dataArray != null) {
 
-				Log.i(MixView.TAG, "processing "+dataformat+" JSON Data Array");
+				Log.i(MixView.TAG, "processing " + dataformat
+						+ " JSON Data Array");
 				int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
 
-				for (int i = 0; i < top; i++) {					
-					
+				for (int i = 0; i < top; i++) {
+
 					jo = dataArray.getJSONObject(i);
 					Marker ma = null;
-					switch(dataformat) {
-						case MIXARE: ma = processMixareJSONObject(jo); break;
-						case BUZZ: ma = processBuzzJSONObject(jo); break;
-						case TWITTER: ma = processTwitterJSONObject(jo); break;
-						case WIKIPEDIA: ma = processWikipediaJSONObject(jo); break;
-						default: ma = processMixareJSONObject(jo); break;
+					switch (dataformat) {
+					case MIXARE:
+						ma = processMixareJSONObject(jo);
+						break;
+					case BUZZ:
+						ma = processBuzzJSONObject(jo);
+						break;
+					case TWITTER:
+						ma = processTwitterJSONObject(jo);
+						break;
+					case WIKIPEDIA:
+						ma = processWikipediaJSONObject(jo);
+						break;
+					default:
+						ma = processMixareJSONObject(jo);
+						break;
 					}
-					if(ma!=null)
+					if (ma != null)
 						markers.add(ma);
 				}
 			}
-		}
-		catch (JSONException e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return markers;
 	}
-	
-	public Marker processBuzzJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
+
+	public Marker processBuzzJSONObject(JSONObject jo)
+			throws NumberFormatException, JSONException {
 		Marker ma = null;
 		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
 			Log.v(MixView.TAG, "processing Google Buzz JSON object");
 
-			ma = new SocialMarker(
-					jo.getString("title"), 
-					Double.valueOf(jo.getString("geocode").split(" ")[0]), 
-					Double.valueOf(jo.getString("geocode").split(" ")[1]), 
-					0, 
-					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), 
+			ma = new SocialMarker(jo.getString("title"), Double.valueOf(jo
+					.getString("geocode").split(" ")[0]), Double.valueOf(jo
+					.getString("geocode").split(" ")[1]), 0, jo
+					.getJSONObject("links").getJSONArray("alternate")
+					.getJSONObject(0).getString("href"),
 					DataSource.DATASOURCE.BUZZ);
 		}
 		return ma;
 	}
 
-	public Marker processTwitterJSONObject(JSONObject jo) throws NumberFormatException, JSONException {
+	public Marker processTwitterJSONObject(JSONObject jo)
+			throws NumberFormatException, JSONException {
 		Marker ma = null;
 		if (jo.has("geo")) {
-			Double lat=null, lon=null;
-			
-			if(!jo.isNull("geo")) {
+			Double lat = null, lon = null;
+
+			if (!jo.isNull("geo")) {
 				JSONObject geo = jo.getJSONObject("geo");
 				JSONArray coordinates = geo.getJSONArray("coordinates");
-				lat=Double.parseDouble(coordinates.getString(0));
-				lon=Double.parseDouble(coordinates.getString(1));
-			}
-			else if(jo.has("location")) {
+				lat = Double.parseDouble(coordinates.getString(0));
+				lon = Double.parseDouble(coordinates.getString(1));
+			} else if (jo.has("location")) {
 
-				// Regex pattern to match location information 
+				// Regex pattern to match location information
 				// from the location setting, like:
 				// iPhone: 12.34,56.78
 				// ÜT: 12.34,56.78
 				// 12.34,56.78
-				
-				Pattern pattern = Pattern.compile("\\D*([0-9.]+),\\s?([0-9.]+)");
+
+				Pattern pattern = Pattern
+						.compile("\\D*([0-9.]+),\\s?([0-9.]+)");
 				Matcher matcher = pattern.matcher(jo.getString("location"));
 
-				if(matcher.find()){
-					lat=Double.parseDouble(matcher.group(1));
-					lon=Double.parseDouble(matcher.group(2));
-				}					
+				if (matcher.find()) {
+					lat = Double.parseDouble(matcher.group(1));
+					lon = Double.parseDouble(matcher.group(2));
+				}
 			}
-			if(lat!=null) {
+			if (lat != null) {
 				Log.v(MixView.TAG, "processing Twitter JSON object");
-				String user=jo.getString("from_user");
-				String url="http://twitter.com/"+user;
-				
-				ma = new SocialMarker(
-						user+": "+jo.getString("text"), 
-						lat, 
-						lon, 
-						0, url, 
-						DataSource.DATASOURCE.TWITTER);
+				String user = jo.getString("from_user");
+				String url = "http://twitter.com/" + user;
+
+				ma = new SocialMarker(user + ": " + jo.getString("text"), lat,
+						lon, 0, url, DataSource.DATASOURCE.TWITTER);
 			}
 		}
 		return ma;
@@ -144,44 +158,42 @@ public class Json extends DataHandler {
 	public Marker processMixareJSONObject(JSONObject jo) throws JSONException {
 
 		Marker ma = null;
-		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") ) {
-	
+		if (jo.has("title") && jo.has("lat") && jo.has("lng")
+				&& jo.has("elevation")) {
+
 			Log.v(MixView.TAG, "processing Mixare JSON object");
-			String link=null;
-	
-			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
-				link=jo.getString("webpage");
-			
-			
-			ma = new POIMarker(
-					unescapeHTML(jo.getString("title"), 0), 
-					jo.getDouble("lat"), 
-					jo.getDouble("lng"), 
-					jo.getDouble("elevation"), 
-					link, 
+			String link = null;
+
+			if (jo.has("has_detail_page") && jo.getInt("has_detail_page") != 0
+					&& jo.has("webpage"))
+				link = jo.getString("webpage");
+
+			ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
+					jo.getDouble("lat"), jo.getDouble("lng"),
+					jo.getDouble("elevation"), link,
 					DataSource.DATASOURCE.OWNURL);
 		}
 		return ma;
 	}
 
-	public Marker processWikipediaJSONObject(JSONObject jo) throws JSONException {
+	public Marker processWikipediaJSONObject(JSONObject jo)
+			throws JSONException {
 
 		Marker ma = null;
-		if (jo.has("title") && jo.has("lat") && jo.has("lng") && jo.has("elevation") && jo.has("wikipediaUrl")) {
+		if (jo.has("title") && jo.has("lat") && jo.has("lng")
+				&& jo.has("elevation") && jo.has("wikipediaUrl")) {
 
 			Log.v(MixView.TAG, "processing Wikipedia JSON object");
-	
-			ma = new POIMarker(
-					unescapeHTML(jo.getString("title"), 0), 
-					jo.getDouble("lat"), 
-					jo.getDouble("lng"), 
-					jo.getDouble("elevation"), 
-					"http://"+jo.getString("wikipediaUrl"), 
+
+			ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
+					jo.getDouble("lat"), jo.getDouble("lng"),
+					jo.getDouble("elevation"), "http://"
+							+ jo.getString("wikipediaUrl"),
 					DataSource.DATASOURCE.WIKIPEDIA);
 		}
 		return ma;
 	}
-	
+
 	private static HashMap<String, String> htmlEntities;
 	static {
 		htmlEntities = new HashMap<String, String>();
@@ -241,8 +253,8 @@ public class Json extends DataHandler {
 				String value = (String) htmlEntities.get(entityToLookFor);
 				if (value != null) {
 					source = new StringBuffer().append(source.substring(0, i))
-					.append(value).append(source.substring(j + 1))
-					.toString();
+							.append(value).append(source.substring(j + 1))
+							.toString();
 					return unescapeHTML(source, i + 1); // recursive call
 				}
 			}

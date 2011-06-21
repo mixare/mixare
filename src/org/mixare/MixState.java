@@ -21,6 +21,9 @@ package org.mixare;
 import org.mixare.render.Matrix;
 import org.mixare.render.MixVector;
 
+/**
+ * This class calculates the bearing and pitch out of the angles
+ */
 public class MixState {
 
 	public static int NOT_STARTED = 0; 

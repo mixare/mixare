@@ -56,6 +56,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * This class holds vectors with informaction about sources, their description
+ * and whether they have been selected.
+ */
 public class MixListView extends ListActivity {
 
 	private static int list;
@@ -280,7 +284,6 @@ public class MixListView extends ListActivity {
 
 	public static void createContextMenu(ImageView icon) {
 		icon.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {				
-			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 				int index=0;
 				switch(ListItemAdapter.itemPosition){
@@ -427,6 +430,10 @@ public class MixListView extends ListActivity {
 	}
 }
 
+/**
+ * The ListItemAdapter is can store properties of list items, like background or
+ * text color
+ */
 class ListItemAdapter extends BaseAdapter {
 
 	private MixListView mixListView;

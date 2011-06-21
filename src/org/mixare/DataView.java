@@ -19,6 +19,7 @@
 package org.mixare;
 
 import static android.view.KeyEvent.KEYCODE_CAMERA;
+
 import static android.view.KeyEvent.KEYCODE_DPAD_DOWN;
 import static android.view.KeyEvent.KEYCODE_DPAD_LEFT;
 import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
@@ -44,6 +45,9 @@ import android.widget.Toast;
 
 
 /**
+ * This class is able to update the markers and the radar.
+ * It also handles some user events
+ * 
  * @author daniele
  *
  */

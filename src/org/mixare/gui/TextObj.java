@@ -25,6 +25,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
+/**
+ *  This class stores the properties of the displayed text and uses the
+ *  PaintScreen class to actually draw the text.
+ */
 public class TextObj implements ScreenObj {
 	String txt;
 	float fontSize;

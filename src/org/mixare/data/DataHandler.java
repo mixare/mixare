@@ -35,7 +35,7 @@ import android.location.Location;
 import android.util.Log;
 
 /**
- * DataHandler is the model which provides the Marker Objects.
+ * DataHandler is the model which provides the Marker Objects with its data.
  * 
  * DataHandler is also the Factory for new Marker objects.
  */

@@ -28,8 +28,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
 /**
+ * The DataSource class is able to create the URL where the information about a
+ * place can be found.
+ * 
  * @author hannes
- *
+ * 
  */
 public class DataSource {
 	

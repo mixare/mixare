@@ -27,6 +27,9 @@ import android.graphics.Path;
 import android.location.Location;
 
 /**
+ * 
+ * A NavigationMarker is a marker which is displayed as an arrow.
+ * 
  * @author hannes
  *
  */

@@ -68,6 +68,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+/**
+ * Cares about location management and about
+ * the data (source, inputstream)
+ */
 public class MixContext extends ContextWrapper {
 
 	public MixView mixView;

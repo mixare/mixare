@@ -31,7 +31,13 @@ import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
 import android.location.Location;
-import android.util.Log;
+
+/**
+ * The class represents a marker and contains its information.
+ * It draws the marker itself and the corresponding label.
+ * All markers are specific markers like SocialMarkers or
+ * NavigationMarkers, since this class is abstract
+ */
 
 abstract public class Marker implements Comparable<Marker> {
 
@@ -291,7 +297,6 @@ abstract public class Marker implements Comparable<Marker> {
 		ID = iD;
 	}
 
-	@Override
 	public int compareTo(Marker another) {
 
 		Marker leftPm = this;

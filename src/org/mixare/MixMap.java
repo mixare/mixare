@@ -49,6 +49,10 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+/**
+ * This class creates the map view and its overlay. It also adds an overlay with
+ * the markers to the map.
+ */
 public class MixMap extends MapActivity implements OnTouchListener{
 
 	private static List<Overlay> mapOverlays;
