@@ -28,7 +28,8 @@ import android.location.Location;
 
 /**
  * 
- * A NavigationMarker is a marker which is displayed as an arrow.
+ * A NavigationMarker is displayed as an arrow at the bottom of the screen.
+ * It indicates directions using the OpenStreetMap as datasource.
  * 
  * @author hannes
  *

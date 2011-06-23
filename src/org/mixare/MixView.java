@@ -20,7 +20,10 @@ package org.mixare;
 
 /**
  * This class is the main application which uses the other classes for different
- * functionalities. It also handles the main sensor events, touch events and location events.
+ * functionalities.
+ * It sets up the camera screen and the augmented screen which is in front of the
+ * camera screen.
+ * It also handles the main sensor events, touch events and location events.
  */
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;

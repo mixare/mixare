@@ -19,7 +19,7 @@
 package org.mixare.gui;
 
 /**
- * Objects displayed on the screen are restricted to have a paint method and
+ * Objects displayed on the screen are forced to have a paint method and
  * getters for the width and height. Therefore they must implement this
  * interface.
  */

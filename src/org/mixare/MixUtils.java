@@ -19,7 +19,7 @@
 package org.mixare;
 
 /**
- * This class has the ability to calculate the angle of a line between two
+ * This class has the ability to calculate the declination of a line between two
  * points. It is able to check if a point is in a given rectangle and it also can
  * make a String out of a given distance-value which contains number and unit.
  */

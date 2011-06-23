@@ -24,10 +24,12 @@ import org.mixare.data.DataSource.DATASOURCE;
 import android.location.Location;
 
 /**
- * Represents a marker
+ * This markers represent the points of interest.
+ * On the screen they appear as circles, since this
+ * class inherits the draw method of the Marker.
  * 
  * @author hannes
- *
+ * 
  */
 public class POIMarker extends Marker {
 	

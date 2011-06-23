@@ -18,12 +18,6 @@
  */
 package org.mixare.data;
 
-/**
- * This class can compose a list of markers. The markers are
- * made by other methods in the class, which take information
- * from multiple sources.
- */
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +35,11 @@ import org.mixare.SocialMarker;
 import org.mixare.data.DataSource.DATAFORMAT;
 
 import android.util.Log;
-
+/**
+ * This class can compose a list of markers. The markers are
+ * made by other methods in the class, which take information
+ * from multiple sources.
+ */
 public class Json extends DataHandler {
 
 	public static final int MAX_JSON_OBJECTS = 1000;
