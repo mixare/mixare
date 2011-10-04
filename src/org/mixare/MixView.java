@@ -55,10 +55,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -80,7 +77,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MixView extends Activity implements SensorEventListener,LocationListener, OnTouchListener{
+public class MixView extends Activity implements SensorEventListener, OnTouchListener{
 
 	private CameraSurface camScreen;
 	private AugmentedView augScreen;
@@ -100,8 +97,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	private SensorManager sensorMgr;
 	private List<Sensor> sensors;
 	private Sensor sensorGrav, sensorMag;
-	private LocationManager locationMgr;
-	private boolean isGpsEnabled;
 
 	private int rHistIdx = 0;
 	private Matrix tempR = new Matrix();
@@ -135,10 +130,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
 
-	public boolean isGpsEnabled() {
-		return isGpsEnabled;
-	}
-	
+
 	public boolean isZoombarVisible() {
 		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
 	}
@@ -229,8 +221,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
-			locationMgr=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
-			locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
 
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -292,10 +282,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 				editor.putBoolean("firstAccess", true);
 				editor.commit();
 			} 
-
-			if(mixContext.isActualLocation()==false){
-				Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-			}	
 			
 		} catch (Exception ex) {
 			doError(ex);
@@ -350,21 +336,10 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 
 			try {
 				sensorMgr.unregisterListener(this, sensorGrav);
-			} catch (Exception ignore) {
-			}
-			try {
 				sensorMgr.unregisterListener(this, sensorMag);
-			} catch (Exception ignore) {
-			}
-			sensorMgr = null;
+				sensorMgr = null;
 
-			try {
-				locationMgr.removeUpdates(this);
-			} catch (Exception ignore) {
-			}
-			locationMgr = null;
-
-			try {
+				mixContext.unregisterLocationManager();
 				mixContext.downloadManager.stop();
 			} catch (Exception ignore) {
 			}
@@ -427,52 +402,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			sensorMgr.registerListener(this, sensorMag, SENSOR_DELAY_GAME);
 
 			try {
-				Criteria c = new Criteria();
-
-				c.setAccuracy(Criteria.ACCURACY_FINE);
-				//c.setBearingRequired(true);
-
-				locationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-				locationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,10, this);
-
-				String bestP = locationMgr.getBestProvider(c, true);
-				isGpsEnabled = locationMgr.isProviderEnabled(bestP);
-
-				/*defaulting to our place*/
-				Location hardFix = new Location("reverseGeocoded");
-
-				//				hardFix.setLatitude(0);
-				//				hardFix.setLongitude(0);
-
-				hardFix.setLatitude(46.480302);
-				hardFix.setLongitude(11.296005);
-				hardFix.setAltitude(300);
-
-				/*New York*/
-				//				hardFix.setLatitude(40.731510);
-				//				hardFix.setLongitude(-73.991547);
-				
-				// TU Wien
-//				hardFix.setLatitude(48.196349);
-//				hardFix.setLongitude(16.368653);
-//				hardFix.setAltitude(180);
-
-				try {
-					Location gps=locationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-					Location network=locationMgr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-					if(gps!=null)
-						mixContext.curLoc = gps;
-					else if (network!=null)
-						mixContext.curLoc = network;
-					else
-						mixContext.curLoc = hardFix;
-					
-				} catch (Exception ex2) {
-					ex2.printStackTrace();
-					mixContext.curLoc = hardFix;
-				}
-				
-				mixContext.setLocationAtLastDownload(mixContext.curLoc);
 
 				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
 						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
@@ -497,11 +426,9 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 					sensorMgr.unregisterListener(this, sensorMag);
 					sensorMgr = null;
 				}
-				if (locationMgr != null) {
-					locationMgr.removeUpdates(this);
-					locationMgr = null;
-				}
+
 				if (mixContext != null) {
+					mixContext.unregisterLocationManager();
 					if (mixContext.downloadManager != null)
 						mixContext.downloadManager.stop();
 				}
@@ -595,7 +522,7 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 			break;
 			/*GPS Information*/
 		case 6:
-			Location currentGPSInfo = mixContext.getCurrentGPSInfo();
+			Location currentGPSInfo = mixContext.getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
 					getString(DataView.GPS_LONGITUDE) + currentGPSInfo.getLongitude() + "\n" +
@@ -814,49 +741,6 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		}
 	}
 
-	public void onProviderDisabled(String provider) {
-		isGpsEnabled = locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
-	}
-
-	public void onProviderEnabled(String provider) {
-		isGpsEnabled = locationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
-	}
-
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-
-	}
-
-	public void onLocationChanged(Location location) {
-		try {
-			killOnError();
-			Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
-				synchronized (mixContext.curLoc) {
-					mixContext.curLoc = location;
-				}
-				if(!dataView.isFrozen())
-					dataView.getDataHandler().onLocationChanged(location);
-				// If we have moved more than radius/3 km away from the 
-				// location where the last download occured we should start 
-				// a fresh download
-				Location lastLoc=mixContext.getLocationAtLastDownload();
-				if(lastLoc==null)
-					mixContext.setLocationAtLastDownload(location);
-				else {
-					float threshold = dataView.getRadius()*1000f/3f;
-					Log.v(TAG,"Location Change: "+" threshold "+threshold+" distanceto "+location.distanceTo(lastLoc));
-					if(location.distanceTo(lastLoc)>threshold)  {
-						Log.d(TAG,"Restarting download due to location change");
-						dataView.doStart();
-					}	
-				}
-				isGpsEnabled = true;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE && compassErrorDisplayed == 0) {
 			for(int i = 0; i <2; i++) {
@@ -875,6 +759,8 @@ public class MixView extends Activity implements SensorEventListener,LocationLis
 		}
 		return false;
 	}
+	
+
 }
 
 /**

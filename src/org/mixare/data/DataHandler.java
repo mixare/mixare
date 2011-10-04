@@ -27,9 +27,6 @@ import java.util.List;
 import org.mixare.Marker;
 import org.mixare.MixContext;
 import org.mixare.MixView;
-import org.mixare.NavigationMarker;
-import org.mixare.POIMarker;
-import org.mixare.SocialMarker;
 
 import android.location.Location;
 import android.util.Log;
