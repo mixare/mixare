@@ -46,6 +46,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -61,6 +62,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,6 +72,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -386,13 +389,18 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			double angleX, angleY;
 
-			angleX = Math.toRadians(-90);
+			//fix for android 3.x issue where marker are floating the vertically
+			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+	        int marker_orientation = display.getRotation() * -90;
+			
+	        //display text from left to right and keep it horizontal
+			angleX = Math.toRadians(marker_orientation);
 			m1.set(1f, 0f, 0f, 0f, (float) Math.cos(angleX), (float) -Math
 					.sin(angleX), 0f, (float) Math.sin(angleX), (float) Math
 					.cos(angleX));
 
-			angleX = Math.toRadians(-90);
-			angleY = Math.toRadians(-90);
+			angleX = Math.toRadians(marker_orientation);
+			angleY = Math.toRadians(marker_orientation);
 			m2.set(1f, 0f, 0f, 0f, (float) Math.cos(angleX), (float) -Math
 					.sin(angleX), 0f, (float) Math.sin(angleX), (float) Math
 					.cos(angleX));
