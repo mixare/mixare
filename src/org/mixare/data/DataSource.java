@@ -52,7 +52,7 @@ public class DataSource {
 	// eg. only railway stations:
 	//private static final String OSM_BASE_URL =	"http://www.informationfreeway.org/api/0.6/node[railway=station]";
 	//private static final String OSM_BASE_URL =	"http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	private static final String OSM_BASE_URL =		"http://osmxapi.hypercube.telascience.org/api/0.6/node[railway=station]";
+	private static final String OSM_BASE_URL =		"http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]";
 	//all objects that have names: 
 	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
 	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries
