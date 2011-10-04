@@ -60,6 +60,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -193,6 +194,11 @@ public class MixContext extends ContextWrapper {
 		InputStream is = null;
 		URLConnection conn = null;
 
+	    // HTTP connection reuse which was buggy pre-froyo
+	    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+	        System.setProperty("http.keepAlive", "false");
+	    }
+	    
 		if (urlStr.startsWith("file://"))			
 			return new FileInputStream(urlStr.replace("file://", ""));
 
