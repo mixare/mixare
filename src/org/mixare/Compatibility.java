@@ -34,7 +34,7 @@ import android.hardware.Camera;
 public class Compatibility {
 	private static Method mParameters_getSupportedPreviewSizes;
 
-	static {
+	static {  
 		initCompatibility();
 	};
 

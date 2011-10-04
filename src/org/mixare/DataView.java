@@ -27,7 +27,11 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 import static android.view.KeyEvent.KEYCODE_DPAD_CENTER;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
@@ -213,13 +217,17 @@ public class DataView {
 		isInit = true;
 	}
 	
-	public void requestData(String url,DATAFORMAT dataformat, DATASOURCE datasource) {
+	public void requestData(String url,DATAFORMAT dataformat, DATASOURCE datasource, String iOSMOriUrl, int iOSMOriID) {
 		DownloadRequest request = new DownloadRequest();
-		request.format=dataformat;
-		request.source=datasource;
-		request.url=url;
+		request.format = dataformat;
+		request.source = datasource;
+		request.url = url;
+		request.OSMOriID=iOSMOriID;
+		request.OSMOriUrl=iOSMOriUrl;
+		
 		mixContext.getDownloader().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
+		
 	}
 
 	public void draw(PaintScreen dw) {
@@ -232,7 +240,7 @@ public class DataView {
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 						
 			if (mixContext.getStartUrl().length() > 0){
-				requestData(mixContext.getStartUrl(),DATAFORMAT.MIXARE,DATASOURCE.OWNURL);
+				requestData(mixContext.getStartUrl(), DATAFORMAT.MIXARE, DATASOURCE.OWNURL, "", 0);
 				isLauncherStarted = true;
 				if (!mixContext.isDataSourceSelected(DataSource.DATASOURCE.OWNURL)) {
 					mixContext.toogleDataSource(DataSource.DATASOURCE.OWNURL);
@@ -243,12 +251,40 @@ public class DataView {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
 				
 				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-					
-					if(mixContext.isDataSourceSelected(source)) {
-						requestData(DataSource.createRequestURL(source,lat,lon,alt,radius,Locale.getDefault().getLanguage()),DataSource.dataFormatFromDataSource(source),source);
+					/*when datasource is OpenStreetMap
+					 * iterate the URL list and for selected URL send data request 
+					 * */
+					if (mixContext.isDataSourceSelected(source)) {
+						if (source.toString().equals("OSM")) {
 
-						// Debug notification
-						// Toast.makeText(mixContext, "Downloading from "+ source, Toast.LENGTH_SHORT).show();
+							int id = 0;
+							for (Entry<String, Boolean> entry : mixContext
+									.getOSMURLList().entrySet()) {
+								String key = entry.getKey();
+								Boolean value = entry.getValue();
+								if (value) {
+									requestData(
+											DataSource.createRequestOSMURL(key,
+													lat, lon, alt, radius,
+													Locale.getDefault()
+															.getLanguage()),
+											DataSource
+													.dataFormatFromDataSource(source),
+											source, key, id);
+								}
+								++id;
+							}
+
+						} else {
+							requestData(
+									DataSource.createRequestURL(source,
+											lat, lon, alt, radius, Locale
+													.getDefault()
+													.getLanguage()),
+									DataSource
+											.dataFormatFromDataSource(source),
+									source, "", 0);
+						}
 					}
 				}
 				
@@ -272,8 +308,7 @@ public class DataView {
 					retry++;
 					mixContext.getDownloader().submitJob(dRes.errorRequest);
 					// Notification
-					Toast.makeText(mixContext,mixContext.getResources().getString(R.string.download_error) +" "+ dRes.errorRequest.url, Toast.LENGTH_SHORT).show();
-					
+					Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}
 				
 				if(!dRes.error) {

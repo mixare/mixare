@@ -103,12 +103,13 @@ public class Json extends DataHandler {
 		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
 			Log.v(MixView.TAG, "processing Google Buzz JSON object");
 
-			ma = new SocialMarker(jo.getString("title"), Double.valueOf(jo
-					.getString("geocode").split(" ")[0]), Double.valueOf(jo
-					.getString("geocode").split(" ")[1]), 0, jo
-					.getJSONObject("links").getJSONArray("alternate")
-					.getJSONObject(0).getString("href"),
-					DataSource.DATASOURCE.BUZZ);
+			ma = new SocialMarker(
+					jo.getString("title"), 
+					Double.valueOf(jo.getString("geocode").split(" ")[0]), 
+					Double.valueOf(jo.getString("geocode").split(" ")[1]), 
+					0, 
+					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), 
+					DataSource.DATASOURCE.BUZZ,"",0);
 		}
 		return ma;
 	}
@@ -143,11 +144,15 @@ public class Json extends DataHandler {
 			}
 			if (lat != null) {
 				Log.v(MixView.TAG, "processing Twitter JSON object");
-				String user = jo.getString("from_user");
-				String url = "http://twitter.com/" + user;
-
-				ma = new SocialMarker(user + ": " + jo.getString("text"), lat,
-						lon, 0, url, DataSource.DATASOURCE.TWITTER);
+				String user=jo.getString("from_user");
+				String url="http://twitter.com/"+user;
+				
+				ma = new SocialMarker(
+						user+": "+jo.getString("text"), 
+						lat, 
+						lon, 
+						0, url, 
+						DataSource.DATASOURCE.TWITTER,"",0);
 			}
 		}
 		return ma;
@@ -160,16 +165,19 @@ public class Json extends DataHandler {
 				&& jo.has("elevation")) {
 
 			Log.v(MixView.TAG, "processing Mixare JSON object");
-			String link = null;
-
-			if (jo.has("has_detail_page") && jo.getInt("has_detail_page") != 0
-					&& jo.has("webpage"))
-				link = jo.getString("webpage");
-
-			ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
-					jo.getDouble("lat"), jo.getDouble("lng"),
-					jo.getDouble("elevation"), link,
-					DataSource.DATASOURCE.OWNURL);
+			String link=null;
+	
+			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
+				link=jo.getString("webpage");
+			
+			
+			ma = new POIMarker(
+					unescapeHTML(jo.getString("title"), 0), 
+					jo.getDouble("lat"), 
+					jo.getDouble("lng"), 
+					jo.getDouble("elevation"), 
+					link, 
+					DataSource.DATASOURCE.OWNURL,"",0);
 		}
 		return ma;
 	}
@@ -182,12 +190,14 @@ public class Json extends DataHandler {
 				&& jo.has("elevation") && jo.has("wikipediaUrl")) {
 
 			Log.v(MixView.TAG, "processing Wikipedia JSON object");
-
-			ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
-					jo.getDouble("lat"), jo.getDouble("lng"),
-					jo.getDouble("elevation"), "http://"
-							+ jo.getString("wikipediaUrl"),
-					DataSource.DATASOURCE.WIKIPEDIA);
+	
+			ma = new POIMarker(
+					unescapeHTML(jo.getString("title"), 0), 
+					jo.getDouble("lat"), 
+					jo.getDouble("lng"), 
+					jo.getDouble("elevation"), 
+					"http://"+jo.getString("wikipediaUrl"), 
+					DataSource.DATASOURCE.WIKIPEDIA,"",0);
 		}
 		return ma;
 	}

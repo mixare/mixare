@@ -369,7 +369,7 @@ public class MixListView extends ListActivity {
 		/*define menu items*/
 		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
 		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
-
+		MenuItem item3 = menu.add(base, base+2, base+2, "OpenStreetMap URL List");
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
@@ -389,6 +389,11 @@ public class MixListView extends ListActivity {
 		case 2:
 			finish();
 			break;
+		case 3:
+			Intent osm = new Intent(this, OSMDataSource.class);
+			startActivity(osm);
+			break;
+		
 		}
 		return true;
 	}
@@ -399,6 +404,8 @@ public class MixListView extends ListActivity {
 		case 1: 
 			break;
 		case 2: 
+			break;
+		case 3:
 			break;
 		}
 		return false;

@@ -129,8 +129,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
-
-
+	public static final String OSM_DEFAULT_URL="http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]";
+	public static  int osmMaxObject=5;
+	
 	public boolean isZoombarVisible() {
 		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
 	}
@@ -229,6 +230,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
 
+			/*
+			 * Get the preference file PREFS_NAME stored in the internal memory
+			 * of the phone to set the OSM URL
+			 */
+			SharedPreferences osmSetting = getSharedPreferences(
+					OSMDataSource.SHARED_PREFS, 0);
+			SharedPreferences.Editor osmEditor = osmSetting.edit();
+			
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
@@ -280,7 +289,16 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				alert1.setTitle(getString(DataView.LICENSE_TITLE));
 				alert1.show();
 				editor.putBoolean("firstAccess", true);
+				
+				//value for maximum POI for each selected OSM URL to be active by default is 5
+				editor.putInt("osmMaxObject",5);
 				editor.commit();
+				
+				// this is to set one URL in the OSM Shared preference 
+				osmEditor.putString("URLStr0", OSM_DEFAULT_URL);
+				osmEditor.putBoolean("URLBool0", true);
+				
+				osmEditor.commit();
 			} 
 			
 		} catch (Exception ex) {
@@ -360,6 +378,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			this.mWakeLock.acquire();
 
 			killOnError();
+			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+			osmMaxObject = settings.getInt("osmMaxObject", 5);
 			mixContext.mixView = this;
 			dataView.doStart();
 			dataView.clearEvents();
