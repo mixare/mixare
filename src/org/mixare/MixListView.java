@@ -41,7 +41,6 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -69,7 +68,10 @@ public class MixListView extends ListActivity {
 	private Vector<String> dataSourceMenu;
 	private Vector<String> dataSourceDescription;
 	private Vector<Boolean> dataSourceChecked;
+	private Vector<Integer> dataSourceIcon;
+	
 	private MixContext mixContext;
+
 	private DataView dataView;
 	//private static String selectedDataSource = "Wikipedia";
 	/*to check which data source is active*/
@@ -93,7 +95,9 @@ public class MixListView extends ListActivity {
 	public Vector<Boolean> getDataSourceChecked() {
 		return dataSourceChecked;
 	}
-
+	public Vector<Integer> getDataSourceIcon() {
+		return dataSourceIcon;
+	}
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -127,6 +131,13 @@ public class MixListView extends ListActivity {
 			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OSM));
 			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OWNURL));
 
+			dataSourceIcon = new Vector<Integer>();
+			dataSourceIcon.add(R.drawable.wikipedia);
+			dataSourceIcon.add(R.drawable.twitter);
+			dataSourceIcon.add(R.drawable.buzz);
+			dataSourceIcon.add(R.drawable.osm);
+			dataSourceIcon.add(R.drawable.ic_launcher);
+			
 			adapter = new ListItemAdapter(this);
 			//adapter.colorSource(getDataSource());
 			getListView().setTextFilterEnabled(true);
@@ -451,8 +462,6 @@ class ListItemAdapter extends BaseAdapter {
 	private int[] textcolors = new int[] {Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE,Color.WHITE};
 	private int[] descriptioncolors = new int[] {Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY,Color.GRAY};
 
-	public static boolean icon_clicked = false;
-
 	public static int itemPosition =0;
 
 	public ListItemAdapter(MixListView mixListView) {
@@ -470,7 +479,7 @@ class ListItemAdapter extends BaseAdapter {
 			holder.text = (TextView) convertView.findViewById(R.id.list_text);
 			holder.description = (TextView) convertView.findViewById(R.id.description_text);
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.list_checkbox);
-			holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+			holder.datasource_icon = (ImageView) convertView.findViewById(R.id.datasource_icon);
 			
 			convertView.setTag(holder);
 		}
@@ -478,24 +487,7 @@ class ListItemAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-
-		holder.icon.setPadding(20, 8, 20, 8);
-		holder.icon.setClickable(true);        
-
-		holder.icon.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				icon_clicked = true;
-				itemPosition = position;
-
-				return false;
-			}
-		});
-		MixListView.createContextMenu(holder.icon);
-
-		if(position!=4){
-			holder.icon.setVisibility(View.INVISIBLE);
-		}
+		holder.datasource_icon.setImageResource(mixListView.getDataSourceIcon().get(position));
 		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
 
 		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -568,6 +560,6 @@ class ListItemAdapter extends BaseAdapter {
 		TextView text;
 		TextView description;
 		CheckBox checkbox;
-		ImageView icon;
+		ImageView datasource_icon;
 	}
 }

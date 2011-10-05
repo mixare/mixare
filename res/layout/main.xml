@@ -1,44 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout 
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/row_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-  
-  <TextView android:id="@+id/list_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="textview"
-        android:textColor="#ffffff"
-        android:layout_gravity="top" 
-        android:textSize="22sp" 
-        android:layout_alignParentLeft="true"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/row_layout" android:orientation="vertical"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:gravity="fill_vertical">
 
- <TextView android:id="@+id/description_text"
-        android:layout_width="260dip"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-        android:layout_gravity="bottom" 
-        android:textSize="11sp" 
-        android:text="no changes"
-        android:layout_alignParentLeft="true"/>
-        
-            <CheckBox android:id="@+id/list_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:layout_gravity="right"
-		android:focusable="false"   />
-		
-    <ImageView android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-		android:src="@drawable/icon_edit"
-		android:layout_toLeftOf="@+id/list_checkbox"
-        />
+	<ImageView android:id="@+id/datasource_icon"
+		android:layout_height="wrap_content" android:layout_width="40dp"
+		android:layout_marginLeft="5dp" android:layout_alignParentLeft="true"
+		android:layout_centerVertical="true">
+	</ImageView>
 
-        
+	<TextView android:id="@+id/list_text" android:layout_height="wrap_content"
+		android:text="textview" android:textColor="#ffffff"
+		android:layout_gravity="top" android:textSize="22sp"
+		android:layout_alignParentLeft="false" android:layout_width="wrap_content"
+		android:layout_toRightOf="@+id/datasource_icon" />
+
+	<TextView android:id="@+id/description_text"
+		android:layout_width="260dip" android:layout_height="wrap_content"
+		android:textColor="#ffffff" android:layout_gravity="bottom"
+		android:textSize="11sp" android:text="no changes"
+		android:layout_toRightOf="@+id/datasource_icon" />
+
+
+	<CheckBox android:id="@+id/list_checkbox"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" android:layout_gravity="right"
+		android:focusable="false" />
+
+
+
 </RelativeLayout>
 
