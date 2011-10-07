@@ -57,8 +57,10 @@
 	        <meta-data android:name="android.app.searchable"
                    	android:resource="@xml/searchable"/>
 		</activity>
+		 <activity android:name="OSMDataSource" />
 </application>
 
 <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 
+<supports-screens android:anyDensity="true" android:smallScreens="true" android:normalScreens="true" android:largeScreens="true"></supports-screens>
 </manifest> 
