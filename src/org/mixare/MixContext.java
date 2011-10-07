@@ -128,7 +128,11 @@ public class MixContext extends ContextWrapper {
 		//try to use the coarse provider first to get a rough position
 		c.setAccuracy(Criteria.ACCURACY_COARSE);
 		String coarseProvider = lm.getBestProvider(c, true);
-		lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
+		try {
+			lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
+		} catch (Exception e) {
+			Log.d(TAG, "Could not initialize the coarse provider");
+		}
 		
 		//need to be precise
 		c.setAccuracy(Criteria.ACCURACY_FINE);				
@@ -136,8 +140,12 @@ public class MixContext extends ContextWrapper {
 		//as well as during normal program usage
 		//NB: using "true" as second parameters means we get the provider only if it's enabled
 		String fineProvider = lm.getBestProvider(c, true);
-		lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
-
+		try {
+			lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
+		} catch (Exception e) {
+			Log.d(TAG, "Could not initialize the bounce provider");
+		}
+		
 		//fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
 
@@ -162,8 +170,13 @@ public class MixContext extends ContextWrapper {
 		//thanks Reto Meier for his presentation at gddde 2010
 		long lFreq = 60000;	//60 seconds
 		float lDist = 50;		//20 meters
-		lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
-
+		try {
+			lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
+		} catch (Exception e) {
+			Log.d(TAG, "Could not initialize the normal provider");
+			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+		}
+		
 		try {
 			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
 			Location lastCoarsePos=lm.getLastKnownLocation(coarseProvider);
@@ -175,14 +188,15 @@ public class MixContext extends ContextWrapper {
 				curLoc = hardFix;
 			
 		} catch (Exception ex2) {
-			ex2.printStackTrace();
+			//ex2.printStackTrace();
 			curLoc = hardFix;
+			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 		}
 		
 		setLocationAtLastDownload(curLoc);
 
 //TODO fix logic
-		Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+
 	
 	}
 	
