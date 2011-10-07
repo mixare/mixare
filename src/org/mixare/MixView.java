@@ -115,26 +115,26 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private WakeLock mWakeLock;
 
 	private boolean fError;
-	
+
 	private int compassErrorDisplayed = 0;
 
 	private String zoomLevel;
 	private int zoomProgress;
-	
+
 	private TextView searchNotificationTxt;
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
 
 	/*Vectors to store the titles and URLs got from Json for the alternative list view */
-//	private Vector<String> listDataVector;
-//	private Vector<String> listURL;
+	//	private Vector<String> listDataVector;
+	//	private Vector<String> listURL;
 
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
 	public static final String OSM_DEFAULT_URL="http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]";
 	public static  int osmMaxObject=5;
-	
+
 	public boolean isZoombarVisible() {
 		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
 	}
@@ -142,11 +142,11 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public String getZoomLevel() {
 		return zoomLevel;
 	}
-	
+
 	public int getZoomProgress() {
 		return zoomProgress;
 	}
-	
+
 	public void doError(Exception ex1) {
 		if (!fError) {
 			fError = true;
@@ -215,9 +215,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		DataSource.createIcons(getResources());
-		
+
 		try {
 
 			handleIntent(getIntent());
@@ -240,14 +240,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			SharedPreferences osmSetting = getSharedPreferences(
 					OSMDataSource.SHARED_PREFS, 0);
 			SharedPreferences.Editor osmEditor = osmSetting.edit();
-			
+
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);			
-			
+
 			FrameLayout frameLayout = new FrameLayout(this);
 
 			frameLayout.setMinimumWidth(3000);
@@ -292,18 +292,18 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				alert1.setTitle(getString(DataView.LICENSE_TITLE));
 				alert1.show();
 				editor.putBoolean("firstAccess", true);
-				
+
 				//value for maximum POI for each selected OSM URL to be active by default is 5
 				editor.putInt("osmMaxObject",5);
 				editor.commit();
-				
+
 				// this is to set one URL in the OSM Shared preference 
 				osmEditor.putString("URLStr0", OSM_DEFAULT_URL);
 				osmEditor.putBoolean("URLBool0", true);
-				
+
 				osmEditor.commit();
 			} 
-			
+
 		} catch (Exception ex) {
 			doError(ex);
 		}
@@ -389,25 +389,34 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			double angleX, angleY;
 
-			//fix for android 3.x issue where marker are floating the vertically
+			int marker_orientation = -90;
 			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-	        int marker_orientation = display.getRotation() * -90;
 			
-	        //display text from left to right and keep it horizontal
+			//display text from left to right and keep it horizontal
 			angleX = Math.toRadians(marker_orientation);
-			m1.set(1f, 0f, 0f, 0f, (float) Math.cos(angleX), (float) -Math
-					.sin(angleX), 0f, (float) Math.sin(angleX), (float) Math
-					.cos(angleX));
-
+			m1.set(	1f,	0f, 						0f, 
+					0f,	(float) Math.cos(angleX),	(float) -Math.sin(angleX),
+					0f,	(float) Math.sin(angleX),	(float) Math.cos(angleX)
+			);
 			angleX = Math.toRadians(marker_orientation);
 			angleY = Math.toRadians(marker_orientation);
-			m2.set(1f, 0f, 0f, 0f, (float) Math.cos(angleX), (float) -Math
-					.sin(angleX), 0f, (float) Math.sin(angleX), (float) Math
-					.cos(angleX));
-			m3.set((float) Math.cos(angleY), 0f, (float) Math.sin(angleY),
-					0f, 1f, 0f, (float) -Math.sin(angleY), 0f, (float) Math
-					.cos(angleY));
-
+			if (display.getRotation() == 1) {
+				m2.set(	1f,	0f,							0f,
+						0f,	(float) Math.cos(angleX),	(float) -Math.sin(angleX),
+						0f,	(float) Math.sin(angleX),	(float) Math.cos(angleX));
+				m3.set(	(float) Math.cos(angleY),	0f,	(float) Math.sin(angleY),
+						0f,							1f,	0f,
+						(float) -Math.sin(angleY),	0f,	(float) Math.cos(angleY));
+			} else {
+				m2.set(	(float) Math.cos(angleX),	0f,	(float) Math.sin(angleX),
+						0f,							1f,	0f,
+						(float) -Math.sin(angleX),	0f, (float) Math.cos(angleX));
+				m3.set(	1f,	0f,							0f, 
+						0f,	(float) Math.cos(angleY),	(float) -Math.sin(angleY),
+						0f,	(float) Math.sin(angleY),	(float) Math.cos(angleY));
+				
+			}
+			
 			m4.toIdentity();
 
 			for (int i = 0; i < histR.length; i++) {
@@ -586,7 +595,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 		return true;
 	}
-	
+
 	public float calcZoomLevel(){
 
 		int myZoomLevel = myZoomBar.getProgress();
@@ -613,10 +622,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		 *smallest radius is set to 1km*/
 		//should be taken care when downloading from twitter, because multiple 
 		//datasource can be selected
-	/*	if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
+		/*	if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
 			myout++;
 		}
-*/
+		 */
 		return myout;
 	}
 
@@ -634,7 +643,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		downloadThread.start();
 
 	};
-	
+
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 		Toast t;
 
@@ -651,7 +660,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-//			zoomChanging= true;
+			//			zoomChanging= true;
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
@@ -661,7 +670,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			editor.putInt("zoomLevel", myZoomBar.getProgress());
 			editor.commit();
 			myZoomBar.setVisibility(View.INVISIBLE);
-//			zoomChanging= false;
+			//			zoomChanging= false;
 
 			myZoomBar.getProgress();
 
@@ -674,8 +683,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-			//			killOnError();
-
+			
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 				grav[0] = evt.values[0];
 				grav[1] = evt.values[1];
@@ -691,8 +699,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
-			SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
-
+			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			if (display.getRotation() == 1) {
+				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
+			} else {
+				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z, Rot);
+			}
 			tempR.set(Rot[0], Rot[1], Rot[2], Rot[3], Rot[4], Rot[5], Rot[6], Rot[7],
 					Rot[8]);
 
@@ -787,7 +799,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 		return false;
 	}
-	
+
 
 }
 
@@ -871,7 +883,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	
+
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		try {
 			Camera.Parameters parameters = camera.getParameters();
@@ -890,7 +902,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 				int bestw = 0;
 				int besth = 0;
 				Iterator<Camera.Size> itr = supportedSizes.iterator();
-				
+
 				//we look for the best preview size, it has to be the closest to the
 				//screen form factor, and be less wide than the screen itself
 				//the latter requirement is because the HTC Hero with update 2.1 will
