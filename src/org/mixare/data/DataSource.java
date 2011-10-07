@@ -116,12 +116,14 @@ public class DataSource {
 			switch(source) {
 			
 			case WIKIPEDIA: 
+				float geoNamesRadius = radius > 20 ? 20 : radius; //Free service limited to 20km
 				ret+=
 				"?lat=" + lat +
 				"&lng=" + lon + 
-				"&radius="+ radius +
+				"&radius="+ geoNamesRadius +
 				"&maxRows=50" +
-				"&lang=" + locale; 
+				"&lang=" + locale+
+				"&username=mixare"; 
 			break;
 			
 			case BUZZ: 
