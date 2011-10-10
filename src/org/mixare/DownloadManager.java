@@ -28,10 +28,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mixare.data.DataSource;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
-import org.mixare.data.DataSource.DATAFORMAT;
-import org.mixare.data.DataSource.DATASOURCE;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -135,11 +134,9 @@ public class DownloadManager implements Runnable {
 		//assume an error until everything is fine
 		result.error = true;
 		try {
-			String strOSMOriUrl = request.OSMOriUrl;
-			int intOSMOriID = request.OSMOriID;
-			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.url)!=null){
+			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.source.getUrl())!=null){
 
-				is = ctx.getHttpGETInputStream(request.url);
+				is = ctx.getHttpGETInputStream(request.source.getUrl() + request.params);
 				String tmp = ctx.getHttpInputString(is);
 
 				Json layer = new Json();
@@ -151,12 +148,11 @@ public class DownloadManager implements Runnable {
 
 					JSONObject root = new JSONObject(tmp);
 
-					Log.d(MixView.TAG, "loading JSON data");				
+					Log.d(MixView.TAG, "loading JSON data");
 
-					List<Marker> markers = layer.load(root,request.format);
+					List<Marker> markers = layer.load(root,request.source);
 					result.setMarkers(markers);
 
-					result.format = request.format;
 					result.source = request.source;
 					result.error = false;
 					result.errorMsg = null;
@@ -179,12 +175,10 @@ public class DownloadManager implements Runnable {
 						Log.i(MixView.TAG, "loading XML data");	
 						
 
-						List<Marker> markers = xml.load(doc, strOSMOriUrl,
-								intOSMOriID);
+						List<Marker> markers = xml.load(doc, request.source);
 						
 						result.setMarkers(markers);
 
-						result.format = request.format;
 						result.source = request.source;
 						result.error = false;
 						result.errorMsg = null;
@@ -220,12 +214,25 @@ public class DownloadManager implements Runnable {
 
 	public synchronized String submitJob(DownloadRequest job) {
 		if(job!=null) {
-			String jobId = "ID_" + (id++);
+			String jobId = "";
+			//ensure that we only have one download per each datasource
+			String currDSname = job.source.getName();
+			boolean found = false;
+			if (!todoList.isEmpty()){
+			for (String k: todoList.keySet()) {
+				if (currDSname.equals(todoList.get(k).source.getName())) {
+					found = true;
+					jobId = k;
+				}
+			}
+			}
+			if (!found) {
+			jobId = "ID_" + (id++);
 			todoList.put(jobId, job);
-			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", format: "
-					+ job.format + ", params: " + job.params + ", url: "
-					+ job.url + ", OSMOriginalURL  " + job.OSMOriUrl + "||"
-					+ job.OSMOriID);
+			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
+					+ job.source.getType() + ", params: " + job.params + ", url: "
+					+ job.source.getUrl());
+			}
 			return jobId;
 		}
 		return null;
@@ -273,18 +280,14 @@ public class DownloadManager implements Runnable {
 
 class DownloadRequest {
 
-	public DATAFORMAT format;
-	public DATASOURCE source;
-	String url;
+	public DataSource source;
 	String params;
-	String OSMOriUrl; 
-	int OSMOriID;
 
 }
 
 class DownloadResult {
-	public DATAFORMAT format;
-	public DATASOURCE source;
+	public DataSource source;
+	String params;
 	List<Marker> markers;
 
 	boolean error;

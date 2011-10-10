@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.DataSource.DATASOURCE;
+import org.mixare.data.DataSource;
+import org.mixare.data.DataSourceList;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -109,34 +110,7 @@ public class MixListView extends ListActivity {
 		switch(list){
 		case 1:
 			
-			//TODO: this needs some cleanup
-			dataSourceMenu = new Vector<String>();
-			dataSourceMenu.add("Wikipedia");
-			dataSourceMenu.add("Twitter");
-			dataSourceMenu.add("Buzz");
-			dataSourceMenu.add(getString(DataView.SOURCE_OPENSTREETMAP));
-			dataSourceMenu.add("Own URL");
 
-			dataSourceDescription = new Vector<String>();
-			dataSourceDescription.add("");
-			dataSourceDescription.add("");
-			dataSourceDescription.add("");
-			dataSourceDescription.add("(OpenStreetMap)");
-			dataSourceDescription.add("example: http://mixare.org/geotest.php");
-			
-			dataSourceChecked = new Vector<Boolean>();
-			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.WIKIPEDIA));
-			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.TWITTER));
-			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.BUZZ));
-			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OSM));
-			dataSourceChecked.add(mixContext.isDataSourceSelected(DATASOURCE.OWNURL));
-
-			dataSourceIcon = new Vector<Integer>();
-			dataSourceIcon.add(R.drawable.wikipedia);
-			dataSourceIcon.add(R.drawable.twitter);
-			dataSourceIcon.add(R.drawable.buzz);
-			dataSourceIcon.add(R.drawable.osm);
-			dataSourceIcon.add(R.drawable.ic_launcher);
 			
 			adapter = new ListItemAdapter(this);
 			//adapter.colorSource(getDataSource());
@@ -177,7 +151,7 @@ public class MixListView extends ListActivity {
 
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
+				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
@@ -342,34 +316,34 @@ public class MixListView extends ListActivity {
 	}
 
 	public void clickOnDataSource(int position){
-		if(dataView.isFrozen())
-			dataView.setFrozen(false);
-		switch(position){
-		/*WIKIPEDIA*/
-		case 0:
-			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
-			break;
-
-			/*TWITTER*/
-		case 1:		
-			mixContext.toogleDataSource(DATASOURCE.TWITTER);
-			break;
-
-			/*BUZZ*/
-		case 2:
-			mixContext.toogleDataSource(DATASOURCE.BUZZ);
-			break;
-
-			/*OSM*/
-		case 3:
-			mixContext.toogleDataSource(DATASOURCE.OSM);
-			break;
-
-			/*Own URL*/
-		case 4:
-			mixContext.toogleDataSource(DATASOURCE.OWNURL);
-			break;
-		}
+//		if(dataView.isFrozen())
+//			dataView.setFrozen(false);
+//		switch(position){
+//		/*WIKIPEDIA*/
+//		case 0:
+//			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
+//			break;
+//
+//			/*TWITTER*/
+//		case 1:		
+//			mixContext.toogleDataSource(DATASOURCE.TWITTER);
+//			break;
+//
+//			/*BUZZ*/
+//		case 2:
+//			mixContext.toogleDataSource(DATASOURCE.BUZZ);
+//			break;
+//
+//			/*OSM*/
+//		case 3:
+//			mixContext.toogleDataSource(DATASOURCE.OSM);
+//			break;
+//
+//			/*Own URL*/
+//		case 4:
+//			mixContext.toogleDataSource(DATASOURCE.OWNURL);
+//			break;
+//		}
 	}
 
 
@@ -380,7 +354,7 @@ public class MixListView extends ListActivity {
 		/*define menu items*/
 		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
 		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
-		MenuItem item3 = menu.add(base, base+2, base+2, "OpenStreetMap URL List");
+		MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
@@ -401,8 +375,8 @@ public class MixListView extends ListActivity {
 			finish();
 			break;
 		case 3:
-			Intent osm = new Intent(this, OSMDataSource.class);
-			startActivity(osm);
+			Intent addDataSource = new Intent(this, DataSource.class);
+			startActivity(addDataSource);
 			break;
 		
 		}

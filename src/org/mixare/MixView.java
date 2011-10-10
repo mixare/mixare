@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
-import org.mixare.data.DataSource;
+import org.mixare.data.DataSourceList;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
@@ -46,7 +46,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -126,14 +125,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	//TAG for logging
 	public static final String TAG = "Mixare";
 
-	/*Vectors to store the titles and URLs got from Json for the alternative list view */
-	//	private Vector<String> listDataVector;
-	//	private Vector<String> listURL;
-
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
-	public static final String OSM_DEFAULT_URL="http://geometa.hsr.ch/xapi/api/0.6/node[indoor=yes]";
-	public static  int osmMaxObject=5;
 
 	public boolean isZoombarVisible() {
 		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
@@ -191,7 +184,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 					repaint();	       		
 				}
 				catch(Exception ex){
-					doError(ex);
+					//Don't call doError, it will be a recursive call.
+					//doError(ex);
 				}
 			}
 		});
@@ -216,9 +210,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		DataSource.createIcons(getResources());
-
 		try {
+
+
 
 			handleIntent(getIntent());
 
@@ -233,14 +227,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
 
-			/*
-			 * Get the preference file PREFS_NAME stored in the internal memory
-			 * of the phone to set the OSM URL
-			 */
-			SharedPreferences osmSetting = getSharedPreferences(
-					OSMDataSource.SHARED_PREFS, 0);
-			SharedPreferences.Editor osmEditor = osmSetting.edit();
-
+			SharedPreferences DataSourceSettings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+			
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
@@ -267,10 +255,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			if (!isInited) {
 				mixContext = new MixContext(this);
-
 				mixContext.downloadManager = new DownloadManager(mixContext);
-
-
 				dWindow = new PaintScreen();
 				dataView = new DataView(mixContext);
 
@@ -297,11 +282,15 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				editor.putInt("osmMaxObject",5);
 				editor.commit();
 
-				// this is to set one URL in the OSM Shared preference 
-				osmEditor.putString("URLStr0", OSM_DEFAULT_URL);
-				osmEditor.putBoolean("URLBool0", true);
+				//add the default datasources to the preferences file
+				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
+				dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
+				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
+				dataSourceEditor.putString("DataSource2", "Buzz|https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20|1|0|true");
+				dataSourceEditor.putString("DataSource3", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
+				dataSourceEditor.putString("DataSource4", "Own URL|http://mixare.org/geotest.php|4|0|false");
+				dataSourceEditor.commit();
 
-				osmEditor.commit();
 			} 
 
 		} catch (Exception ex) {
@@ -382,11 +371,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			killOnError();
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			osmMaxObject = settings.getInt("osmMaxObject", 5);
 			mixContext.mixView = this;
 			dataView.doStart();
 			dataView.clearEvents();
 
+
+			mixContext.refreshDataSources();
+			
 			double angleX, angleY;
 
 			int marker_orientation = -90;
@@ -478,7 +469,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(dWindow.getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ mixContext.getDataSourcesStringList()+ getString(DataView.SEARCH_ACTIVE_2));;
+			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList()+ getString(DataView.SEARCH_ACTIVE_2));;
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -522,7 +513,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		case 1:		
 			if(!dataView.isLauncherStarted()){
 				MixListView.setList(1);
-				Intent intent = new Intent(MixView.this, MixListView.class); 
+				Intent intent = new Intent(MixView.this, DataSourceList.class); 
 				startActivityForResult(intent, 40);
 			}
 			else{
@@ -618,14 +609,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
 
-		/*Twitter Json file not available for radius <1km 
-		 *smallest radius is set to 1km*/
-		//should be taken care when downloading from twitter, because multiple 
-		//datasource can be selected
-		/*	if ("Twitter".equals(MixListView.getDataSource()) && myZoomBar.getProgress() < 100) {
-			myout++;
-		}
-		 */
+
 		return myout;
 	}
 
@@ -803,10 +787,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 }
 
-/**
- * @author daniele
- *
- */
 /**
  * @author daniele
  *

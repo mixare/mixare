@@ -29,23 +29,20 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Random;
 
-//adding support for https connections
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
 
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSource.DATASOURCE;
+import org.mixare.data.DataSourceList;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
@@ -98,28 +95,48 @@ public class MixContext extends ContextWrapper {
 	Location curLoc;
 	Location locationAtLastDownload;
 	
-	private HashMap<DataSource.DATASOURCE,Boolean> selectedDataSources=new HashMap<DataSource.DATASOURCE,Boolean>();
-	private LinkedHashMap <String, Boolean> OSMSources=new LinkedHashMap <String,Boolean>();
+	private ArrayList<DataSource> allDataSources=new ArrayList<DataSource>();
+
 	
+	public ArrayList<DataSource> getAllDataSources() {
+		return this.allDataSources;
+	}
+	
+	public void setAllDataSourcesforLauncher(DataSource datasource) {
+		this.allDataSources.clear();
+		this.allDataSources.add(datasource);
+	}
+	
+	public void refreshDataSources() {
+		this.allDataSources.clear();
+		SharedPreferences settings = getSharedPreferences(
+				DataSourceList.SHARED_PREFS, 0);
+		int size = settings.getAll().size();
+		// copy the value from shared preference to adapter
+		for (int i = 0; i < size; i++) {
+			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+			this.allDataSources.add(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
+		}
+	}
 	public MixContext(Context appCtx) {
 	
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
 
-		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
+		refreshDataSources();
+		
 		boolean atLeastOneDatasourceSelected=false;
 		
-		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-			// fill the selectedDataSources HashMap with saved settings
-			selectedDataSources.put(source, settings.getBoolean(source.toString(), false));
-			if(selectedDataSources.get(source))
+		for(DataSource ds: this.allDataSources) {
+			if(ds.getEnabled())
 				atLeastOneDatasourceSelected=true;
 		}
 		// select Wikipedia if nothing was previously selected  
 		if(!atLeastOneDatasourceSelected)
-			setDataSource(DATASOURCE.WIKIPEDIA, true);
-
+			//TODO>: start intent data source select
+		
+		
 		rotationM.toIdentity();
 		
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -464,40 +481,6 @@ public class MixContext extends ContextWrapper {
 		webview.loadUrl(url);
 	}
 
-
-
-	public void setDataSource(DataSource.DATASOURCE source, Boolean selection){
-		selectedDataSources.put(source,selection);
-		SharedPreferences settings = getSharedPreferences(MixView.PREFS_NAME, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putBoolean(source.toString(), selection);
-		editor.commit();
-	}
-               
-	public Boolean isDataSourceSelected(DataSource.DATASOURCE source) {
-		return selectedDataSources.get(source);
-	}
-	
-	public void toogleDataSource(DataSource.DATASOURCE source) {
-		setDataSource(source, !selectedDataSources.get(source));
-	}
-	
-	
-	public String getDataSourcesStringList() {
-		String ret="";
-		boolean first=true;
-		for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-			if(isDataSourceSelected(source)) {
-				if(!first) {
-					ret+=", ";
-				}	
-				ret+=source.toString();
-				first=false;
-			}	
-		}
-		return ret;
-	}
-
 	public Location getLocationAtLastDownload() {
 		return locationAtLastDownload;
 	}
@@ -511,7 +494,9 @@ public class MixContext extends ContextWrapper {
 		@Override
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+
+			downloadManager.purgeLists();
 			
 			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
@@ -540,8 +525,9 @@ public class MixContext extends ContextWrapper {
 		@Override
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+			//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			lm.removeUpdates(lcoarse);
+			downloadManager.purgeLists();
 		}
 
 		@Override
@@ -564,8 +550,10 @@ public class MixContext extends ContextWrapper {
 
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "normal Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+			//Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			try {
+
+				downloadManager.purgeLists();
 				Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 					synchronized (curLoc) {
 						curLoc = location;
@@ -582,24 +570,15 @@ public class MixContext extends ContextWrapper {
 	};
 
 	
-
-	/*get the OpenStreetMap URL list from Shared Preference*/
-	public LinkedHashMap <String, Boolean> getOSMURLList() {
-		SharedPreferences settings = getSharedPreferences(
-				OSMDataSource.SHARED_PREFS, 0);
-		int size = settings.getAll().size();
-		//clear the Hashmap before get the newest URL
-		//to prevent duplicate data
-		OSMSources.clear();
-		for (int i = 0; i < (size / 2); i++) {
-			String s = settings.getString("URLStr" + i, "");
-			Boolean b = settings.getBoolean("URLBool" + i, false);
-			OSMSources.put(s, b);
-		}
-		return OSMSources;
-	}
-	
-	public Boolean isOSMUrlSelected(String iKey){
-		return OSMSources.get(iKey)!=null ?OSMSources.get(iKey):false;
-	}
+//
+//	public DataSourceAdapter getDataSourceList() {
+//		SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+//		int size = settings.getAll().size();
+//		dataSourceAdapter = DataSourceList.dataSourceAdapter;
+//		for (int i = 0; i < size; i++) {
+//			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+//			dataSourceAdapter.addItem(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
+//		}
+//		return dataSourceAdapter;
+//	}
 }

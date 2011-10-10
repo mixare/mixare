@@ -19,24 +19,18 @@
 package org.mixare;
 
 import static android.view.KeyEvent.KEYCODE_CAMERA;
-
+import static android.view.KeyEvent.KEYCODE_DPAD_CENTER;
 import static android.view.KeyEvent.KEYCODE_DPAD_DOWN;
 import static android.view.KeyEvent.KEYCODE_DPAD_LEFT;
 import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
-import static android.view.KeyEvent.KEYCODE_DPAD_CENTER;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSource.DATAFORMAT;
-import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -59,7 +53,6 @@ public class DataView {
 
 	/**current context */
 	private MixContext mixContext;
-
 	/** is the view Inited? */
 	private boolean isInit;
 	
@@ -217,19 +210,25 @@ public class DataView {
 		isInit = true;
 	}
 	
-	public void requestData(String url,DATAFORMAT dataformat, DATASOURCE datasource, String iOSMOriUrl, int iOSMOriID) {
+	public void requestData(String url) {
 		DownloadRequest request = new DownloadRequest();
-		request.format = dataformat;
-		request.source = datasource;
-		request.url = url;
-		request.OSMOriID=iOSMOriID;
-		request.OSMOriUrl=iOSMOriUrl;
-		
+		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
+		request.params = "";
+		mixContext.setAllDataSourcesforLauncher(request.source);
 		mixContext.getDownloader().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
 
+	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
+		DownloadRequest request = new DownloadRequest();
+		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
+		request.source = datasource;
+		
+		mixContext.getDownloader().submitJob(request);
+		state.nextLStatus = MixState.PROCESSING;
+		
+	}
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
 		curFix = mixContext.getCurrentLocation();
@@ -240,54 +239,21 @@ public class DataView {
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 						
 			if (mixContext.getStartUrl().length() > 0){
-				requestData(mixContext.getStartUrl(), DATAFORMAT.MIXARE, DATASOURCE.OWNURL, "", 0);
+				requestData(mixContext.getStartUrl());
 				isLauncherStarted = true;
-				if (!mixContext.isDataSourceSelected(DataSource.DATASOURCE.OWNURL)) {
-					mixContext.toogleDataSource(DataSource.DATASOURCE.OWNURL);
-				}
 			}
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				
-				for(DataSource.DATASOURCE source: DataSource.DATASOURCE.values()) {
-					/*when datasource is OpenStreetMap
+				ArrayList<DataSource> allDataSources = mixContext.getAllDataSources();
+				for(DataSource ds: allDataSources) {
+					/*when type is OpenStreetMap
 					 * iterate the URL list and for selected URL send data request 
 					 * */
-					if (mixContext.isDataSourceSelected(source)) {
-						if (source.toString().equals("OSM")) {
-
-							int id = 0;
-							for (Entry<String, Boolean> entry : mixContext
-									.getOSMURLList().entrySet()) {
-								String key = entry.getKey();
-								Boolean value = entry.getValue();
-								if (value) {
-									requestData(
-											DataSource.createRequestOSMURL(key,
-													lat, lon, alt, radius,
-													Locale.getDefault()
-															.getLanguage()),
-											DataSource
-													.dataFormatFromDataSource(source),
-											source, key, id);
-								}
-								++id;
-							}
-
-						} else {
-							requestData(
-									DataSource.createRequestURL(source,
-											lat, lon, alt, radius, Locale
-													.getDefault()
-													.getLanguage()),
-									DataSource
-											.dataFormatFromDataSource(source),
-									source, "", 0);
-						}
+					if (ds.getEnabled()) {
+						requestData(ds,lat, lon, alt, radius, Locale.getDefault().getLanguage());
 					}
 				}
-				
 			}
 			
 			// if no datasources are activated
@@ -308,7 +274,7 @@ public class DataView {
 					retry++;
 					mixContext.getDownloader().submitJob(dRes.errorRequest);
 					// Notification
-					Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
+					//Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}
 				
 				if(!dRes.error) {
@@ -317,7 +283,7 @@ public class DataView {
 					dataHandler.addMarkers(dRes.getMarkers());
 					dataHandler.onLocationChanged(curFix);
 					// Notification
-					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source, Toast.LENGTH_SHORT).show();
+					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
 
 				}
 			}

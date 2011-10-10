@@ -20,10 +20,10 @@
 package org.mixare;
 
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 
 /**
@@ -39,8 +39,8 @@ public class SocialMarker extends Marker {
 	public static final int MAX_OBJECTS=15;
 
 	public SocialMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DATASOURCE datasource , String iOSMurl, int iOSMUrlID) {
-		super(title, latitude, longitude, altitude, URL, datasource,iOSMurl,iOSMUrlID);
+			double altitude, String URL, DataSource datasource) {
+		super(title, latitude, longitude, altitude, URL, datasource);
 	}
 
 	@Override
@@ -66,16 +66,16 @@ public class SocialMarker extends Marker {
 
 		if (isVisible) {
 			float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
-			Bitmap bitmap = DataSource.getBitmap(datasource);
-			if(bitmap!=null) {
-				dw.paintBitmap(bitmap, cMarker.x - maxHeight/1.5f, cMarker.y - maxHeight/1.5f);				
-			}
-			else {
+			//Bitmap bitmap = BitmapFactory.decodeResource(MixContext.getResources(), DataSource.getDataSourceIcon());
+//			if(bitmap!=null) {
+//				dw.paintBitmap(bitmap, cMarker.x - maxHeight/1.5f, cMarker.y - maxHeight/1.5f);
+//			}
+//			else {
 				dw.setStrokeWidth(maxHeight / 10f);
 				dw.setFill(false);
-				dw.setColor(DataSource.getColor(datasource));
+				//dw.setColor(DataSource.getColor(type));
 				dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
-			}
+			//}
 		}
 	}
 
@@ -83,8 +83,5 @@ public class SocialMarker extends Marker {
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
 	}
-	@Override
-	public int getOsmUrlMaxObject(){
-		return 0;
-	}
+	
 }

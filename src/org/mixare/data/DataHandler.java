@@ -38,7 +38,7 @@ import android.util.Log;
  */
 public class DataHandler {
 	
-	
+	// complete marker list
 	private List<Marker> markerList = new ArrayList<Marker>();
 	
 	public void addMarkers(List<Marker> markers) {
@@ -65,34 +65,18 @@ public class DataHandler {
 	}
 	
 	public void updateActivationStatus(MixContext mixContext) {
-			
+		
 		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
-		Hashtable<String, Integer> url = new Hashtable<String, Integer>();
-		 
-		for (Marker ma : markerList) {
+				
+		for(Marker ma: markerList) {
 
-			Class mClass = ma.getClass();
-			map.put(mClass, (map.get(mClass) != null) ? map.get(mClass) + 1 : 1);
-			
-			//for OpenStreetMap marker count the POIs per URL
-			String strURL=ma.getOSMOriUrl();
-			url.put(strURL, (url.get(strURL) != null) ? url.get(strURL) + 1 : 1);
-			boolean belowURLMax = (url.get(strURL)<=ma.getOsmUrlMaxObject());
+			Class mClass=ma.getClass();
+			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
 			
 			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
-			boolean dataSourceSelected = mixContext.isDataSourceSelected(ma
-					.getDatasource());
+			//boolean dataSourceSelected = mixContext.isDataSourceSelected(ma.getDatasource());
 			
-			//OpenStreetMap market set active based on 3 criterias
-			//1.OpenStreetMap selected
-			//2.The URL is selected
-			//3.The marker is below the max number of POIs per URL
-			if (ma.getDatasource().equals(DataSource.DATASOURCE.OSM)) {
-				ma.setActive((belowURLMax  && dataSourceSelected && mixContext
-						.isOSMUrlSelected(strURL)));
-			} else {
-				ma.setActive((belowMax && dataSourceSelected));
-			}
+			ma.setActive((belowMax));
 		}
 	}
 		

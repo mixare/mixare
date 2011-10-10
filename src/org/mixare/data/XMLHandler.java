@@ -41,7 +41,7 @@ import android.util.Log;
  */
 public class XMLHandler extends DataHandler {
 
-	private List<Marker> processOSM(Element root, String OSMOriUrl, int OSMOriID) {
+	private List<Marker> processOSM(Element root, DataSource datasource) {
 
     	List<Marker> markers = new ArrayList<Marker>();
         NodeList nodes = root.getElementsByTagName("node");
@@ -64,15 +64,26 @@ public class XMLHandler extends DataHandler {
 
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
-	                	//use POIMarker instead of NavigationMarker
-	                	Marker ma = new POIMarker(
-		        				name, 
-		        				lat, 
-		        				lon, 
-		        				0, 
-		        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
-		        				DataSource.DATASOURCE.OSM,OSMOriUrl,OSMOriID);               	 
-	        			markers.add(ma);
+	                	if(datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
+	                		Marker ma = new POIMarker(
+	                				name, 
+	                				lat, 
+	                				lon, 
+	                				0, 
+	                				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
+	                				datasource);
+		        			markers.add(ma);
+	                	} else {
+		                	Marker ma = new NavigationMarker(
+			        				name, 
+			        				lat, 
+			        				lon, 
+			        				0, 
+			        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
+			        				datasource);
+		        			markers.add(ma);
+	                	}
+
 	                	//skip to next node
 	        			continue;
 	        		}
@@ -94,13 +105,13 @@ public class XMLHandler extends DataHandler {
 		//return "[bbox=16.365,48.193,16.374,48.199]";
 	}
 	
-	public List<Marker> load(Document doc,String OSMOriUrl, int OSMOriID) {
+	public List<Marker> load(Document doc, DataSource datasource) {
         Element root = doc.getDocumentElement();
         
         // If the root tag is called "osm" we got an 
         // openstreetmap .osm xml document
         if ("osm".equals(root.getTagName()))
-        	return processOSM(root,OSMOriUrl,OSMOriID);
+        	return processOSM(root, datasource);
         return null;
 	}
 	

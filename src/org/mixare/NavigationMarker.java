@@ -20,7 +20,6 @@
 package org.mixare;
 
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSource.DATASOURCE;
 import org.mixare.gui.PaintScreen;
 
 import android.graphics.Path;
@@ -29,7 +28,7 @@ import android.location.Location;
 /**
  * 
  * A NavigationMarker is displayed as an arrow at the bottom of the screen.
- * It indicates directions using the OpenStreetMap as datasource.
+ * It indicates directions using the OpenStreetMap as type.
  * 
  * @author hannes
  *
@@ -39,8 +38,8 @@ public class NavigationMarker extends Marker {
 	public static final int MAX_OBJECTS=10;
 
 	public NavigationMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DATASOURCE datasource , String iOSMurl, int iOSMUrlID) {
-		super(title, latitude, longitude, altitude, URL, datasource,iOSMurl,iOSMUrlID);
+			double altitude, String URL, DataSource datasource) {
+		super(title, latitude, longitude, altitude, URL, datasource);
 	}
 
 	@Override
@@ -67,7 +66,7 @@ public class NavigationMarker extends Marker {
 			float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y, signMarker.x, signMarker.y);
 			float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
-			dw.setColor(DataSource.getColor(datasource));
+			//dw.setColor(DataSource.getColor(type));
 			dw.setStrokeWidth(maxHeight / 10f);
 			dw.setFill(false);
 			
@@ -92,8 +91,4 @@ public class NavigationMarker extends Marker {
 		return MAX_OBJECTS;
 	}
 	
-	@Override
-	public int getOsmUrlMaxObject(){
-		return 0;
-	}
 }

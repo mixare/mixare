@@ -12,7 +12,12 @@
     <string name="W">W</string>
     <string name="NW">NW</string>
     
-
+    <string name="OSM">Openstreetmap</string>
+    <string name="MIXARE">Mixare</string>
+    
+    <string name="CIRCLE_MARKER">Circles</string>
+    <string name="NAVIGATION_MARKER">Arrows</string>
+    
     <string name="empty_list">Sorry, \nThere is no location information \navailable within this radius.\nPlease try to search in a wider range.</string>
 	<string name="option_not_available">Sorry, We are working on it... \nThis option will be available soon!</string>
 	
@@ -35,6 +40,10 @@
 	<string name="menu_item_6">Info</string>
 	<string name="menu_item_7">License</string>
 	
+	<string name="cancel">Cancel</string>
+	
+	<string name="data_source_edit_err">This data source cannot be edited.</string>
+	<string name="data_source_delete_err">This data source cannot be deleted.</string>
 	
 	<string name="connection_error_dialog">Sorry, a connection Error occured! \nPlease check if you are connected to the Internet.</string>
 	<string name="connection_error_dialog_button1">Retry</string>
@@ -50,7 +59,7 @@
 	
 	<string name="license_title">License</string>
 	<string name="close_button">Close</string>
-	<string name="general_info_title">Gerneral Information</string>
+	<string name="general_info_title">General Information</string>
 	
 	<string name="general_info_text">GPS info: </string>
 	<string name="longitude">Longitude: </string>
@@ -67,6 +76,7 @@
 	
 	<string name="map_current_location_click">Your current location</string>
 	
+	<string name="data_source_add">Add data source</string>
 	<string name="data_source_change_wikipedia">Changed to Wikipedia as data source</string>
 	<string name="data_source_change_twitter">Changed to Twitter as data source</string>
 	<string name="data_source_change_buzz">Changed to Google Buzz as data source</string>

@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ScrollView01"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:scrollbars="vertical">
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/row_layout" android:orientation="vertical"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
@@ -17,25 +11,27 @@
 	</ImageView>
 
 	<TextView android:id="@+id/list_text" android:layout_height="wrap_content"
-		android:text="textview" android:textColor="#ffffff"
+		android:text="text" android:textColor="#ffffff"
 		android:layout_gravity="top" android:textSize="22sp"
+		android:paddingLeft="20dp" android:paddingTop="8dp"
 		android:layout_alignParentLeft="false" android:layout_width="wrap_content"
 		android:layout_toRightOf="@+id/datasource_icon" />
 
 	<TextView android:id="@+id/description_text"
 		android:layout_width="260dip" android:layout_height="wrap_content"
-		android:textColor="#ffffff" android:layout_gravity="bottom"
-		android:textSize="11sp" android:text="no changes"
+		android:textColor="#cccccc" android:layout_gravity="bottom"
+		android:paddingLeft="20dp" android:paddingTop="40dp"
+		android:textSize="11sp" android:text=""
 		android:layout_toRightOf="@+id/datasource_icon" />
 
 
 	<CheckBox android:id="@+id/list_checkbox"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_alignParentRight="true" android:layout_gravity="right"
+		android:layout_marginRight="10dp"
 		android:focusable="false" />
 
 
 
 </RelativeLayout>
-</ScrollView>
 

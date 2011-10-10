@@ -49,8 +49,8 @@ abstract public class Marker implements Comparable<Marker> {
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
 	protected double distance;
-	// From which datasource does this marker originate
-	protected DataSource.DATASOURCE datasource;
+	// From which type does this marker originate
+	protected DataSource datasource;
 	private boolean active;
 
 	// Draw properties
@@ -70,10 +70,7 @@ abstract public class Marker implements Comparable<Marker> {
 	protected Label txtLab = new Label();
 	protected TextObj textBlock;
 	
-	private String OSMUrlMarker = "";
-	private int OSMUrlID=0;
-	
-	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource.DATASOURCE datasource,String iOSMurl, int iOSMUrlID) {
+	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSource datasource) {
 		super();
 
 		this.active = false;
@@ -85,18 +82,10 @@ abstract public class Marker implements Comparable<Marker> {
 		}
 		this.datasource = datasource;
 		
-		this.ID=datasource+"##"+title;
+		this.ID=datasource.getTypeId()+"##"+title;
 		
-		// OpenStreetMap URL
-		if (iOSMurl != null && iOSMurl.length() > 0) {
-			this.OSMUrlMarker = iOSMurl;
-		}
-		OSMUrlID = iOSMUrlID;
 	}
 	
-	public String getOSMOriUrl() {
-		return this.OSMUrlMarker;
-	}
 	
 	public String getTitle(){
 		return title;
@@ -121,17 +110,6 @@ abstract public class Marker implements Comparable<Marker> {
 	public MixVector getLocationVector() {
 		return locationVector;
 	}
-	
-	
-	
-	public DataSource.DATASOURCE getDatasource() {
-		return datasource;
-	}
-
-	public void setDatasource(DataSource.DATASOURCE datasource) {
-		this.datasource = datasource;
-	}
-
 	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
 
 		// Temp properties
@@ -236,7 +214,7 @@ abstract public class Marker implements Comparable<Marker> {
 			float maxHeight = dw.getHeight();
 			dw.setStrokeWidth(maxHeight / 100f);
 			dw.setFill(false);
-			dw.setColor(DataSource.getColor(datasource));
+			//dw.setColor(DataSource.getColor(type));
 			
 			//draw circle with radius depending on distance
 			//0.44 is approx. vertical fov in radians 
@@ -270,7 +248,7 @@ abstract public class Marker implements Comparable<Marker> {
 
 		if (isVisible) {
 			
-			dw.setColor(DataSource.getColor(datasource));
+			//dw.setColor(DataSource.getColor(type));
 
 			float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y, signMarker.x, signMarker.y);
 
@@ -333,30 +311,13 @@ abstract public class Marker implements Comparable<Marker> {
 	}
 
 	abstract public int getMaxObjects();
- 
-	abstract public int getOsmUrlMaxObject();
-
-	public int getOSMUrlId() {
-		return OSMUrlID;
-	}
+	
 
 	//get Colour for OpenStreetMap based on the URL number
 	public int getColour() {
-		switch (this.OSMUrlID) {
-		case 0:
-			return Color.rgb(153, 255, 204);//green
-		case 1:
-			return Color.rgb(255, 153, 204);//pink
-		case 2:
-			return Color.rgb(255, 255, 51);//yellow
-		case 3:
-			return Color.rgb(255, 0, 204);//magenta
-		case 4:
-			return Color.rgb(153, 102, 51);//brown
-		default:
-			return Color.rgb(255, 168, 0);//orange
-		}
+		return this.datasource.getColor();
 	}
+
 	
 }
 

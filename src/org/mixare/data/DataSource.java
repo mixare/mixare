@@ -19,13 +19,20 @@
 
 package org.mixare.data;
 
-import org.mixare.MixListView;
 import org.mixare.R;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 /**
  * The DataSource class is able to create the URL where the information about a
@@ -34,86 +41,132 @@ import android.graphics.Color;
  * @author hannes
  * 
  */
-public class DataSource {
+public class DataSource extends Activity {
 	
-	// Datasource and dataformat are not the same. datasource is where the data comes from
-	// and dataformat is how the data is formatted. 
-	// this is necessary for example when you have multiple datasources with the same
-	// dataformat
-	public enum DATASOURCE { WIKIPEDIA, BUZZ, TWITTER, OSM, OWNURL};
-	public enum DATAFORMAT { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE};	
+	
+	private String name;
+	private String url;
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE };
+	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER };
+	private boolean enabled;
+	private TYPE type;
+	private DISPLAY display;
+	
 
-	/** default URL */
-	private static final String WIKI_BASE_URL = "http://ws.geonames.org/findNearbyWikipediaJSON";
-	//private static final String WIKI_BASE_URL =	"file:///sdcard/wiki.json";
-	private static final String TWITTER_BASE_URL = "http://search.twitter.com/search.json";
-	private static final String BUZZ_BASE_URL = "https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20";
-	// OpenStreetMap API see http://wiki.openstreetmap.org/wiki/Xapi
-	// eg. only railway stations:
-	//private static final String OSM_BASE_URL =	"http://www.informationfreeway.org/api/0.6/node[railway=station]";
-	//private static final String OSM_BASE_URL =	"http://xapi.openstreetmap.org/api/0.6/node[railway=station]";
-	//private static final String OSM_BASE_URL =		"http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]";
-	//all objects that have names: 
-	//String OSM_URL = "http://xapi.openstreetmap.org/api/0.6/node[name=*]"; 
-	//caution! produces hugh amount of data (megabytes), only use with very small radii or specific queries
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.datasourcedetails);
+		final EditText nameField = (EditText) findViewById(R.id.name);
+		final EditText urlField = (EditText) findViewById(R.id.url);
+		final Spinner typeSpinner = (Spinner) findViewById(R.id.type);
+		final Spinner displaySpinner = (Spinner) findViewById(R.id.displaytype);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			if (extras.containsKey("DataSourceId")) {
+				SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+				String fields[] = settings.getString("DataSource" + extras.getInt("DataSourceId"), "").split("\\|", -1);
+				nameField.setText(fields[0], TextView.BufferType.EDITABLE);
+				urlField.setText(fields[1], TextView.BufferType.EDITABLE);
+				typeSpinner.setSelection(Integer.parseInt(fields[2])-3);
+				displaySpinner.setSelection(Integer.parseInt(fields[3]));
+			}
+		}
 
-	public static Bitmap twitterIcon;
-	public static Bitmap buzzIcon;
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			final EditText nameField = (EditText) findViewById(R.id.name);
+			String name = nameField.getText().toString();
+			final EditText urlField = (EditText) findViewById(R.id.url);
+			String url = urlField.getText().toString();
+			final Spinner typeSpinner = (Spinner) findViewById(R.id.type);
+			int typeId = (int) typeSpinner.getItemIdAtPosition(typeSpinner.getSelectedItemPosition());
+			final Spinner displaySpinner = (Spinner) findViewById(R.id.displaytype);
+			int displayId = (int) displaySpinner.getItemIdAtPosition(displaySpinner.getSelectedItemPosition());
+
+			//TODO: fix the weird hack for type!
+			DataSource newDS = new DataSource(name, url, typeId+3, displayId, true);
+
+			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+			SharedPreferences.Editor editor = settings.edit();
+			int index = settings.getAll().size();
+			Bundle extras = getIntent().getExtras();
+			if (extras != null) {
+				if (extras.containsKey("DataSourceId")) {
+					index = extras.getInt("DataSourceId");
+				}
+			}
+			editor.putString("DataSource"+index, newDS.serialize());
+			editor.commit();
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	protected void onPause() {
+
+		super.onPause();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		int base = Menu.FIRST;
+		menu.add(base, base, base, R.string.cancel);
+		return super.onCreateOptionsMenu(menu);
+
+	}
+	
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item){
+		switch(item.getItemId()){
+		case Menu.FIRST:
+			finish();
+			break;
+		}
+		return super.onMenuItemSelected(featureId, item);
+	}
 	
 	public DataSource() {
 		
 	}
 	
-	public static void createIcons(Resources res) {
-		twitterIcon=BitmapFactory.decodeResource(res, R.drawable.twitter);
-		buzzIcon=BitmapFactory.decodeResource(res, R.drawable.buzz);
+	public DataSource(String name, String url, TYPE type, DISPLAY display, boolean enabled) {
+		this.name = name;
+		this.url = url;
+		this.type = type;
+		this.display = display;
+		this.enabled = enabled;
+		Log.d("mixare", "New Datasource!" + name +" "+url+" "+type+" "+display+" "+ enabled);
 	}
 	
-	public static Bitmap getBitmap(DATASOURCE ds) {
-		Bitmap bitmap=null;
-		switch (ds) {
-			case TWITTER: bitmap=twitterIcon; break;
-			case BUZZ: bitmap=buzzIcon; break;
-		}
-		return bitmap;
+	public DataSource(String name, String url, int typeInt, int displayInt, boolean enabled) {
+		TYPE typeEnum = TYPE.values()[typeInt];
+		DISPLAY displayEnum = DISPLAY.values()[displayInt];
+		this.name = name;
+		this.url = url;
+		this.type = typeEnum;
+		this.display = displayEnum;
+		this.enabled = enabled;
 	}
-	
-	public static DATAFORMAT dataFormatFromDataSource(DATASOURCE ds) {
-		DATAFORMAT ret;
-		switch (ds) {
-			case WIKIPEDIA: ret=DATAFORMAT.WIKIPEDIA; break;
-			case BUZZ: ret=DATAFORMAT.BUZZ; break;
-			case TWITTER: ret=DATAFORMAT.TWITTER; break;
-			case OSM: ret=DATAFORMAT.OSM; break;
-			case OWNURL: ret=DATAFORMAT.MIXARE; break;
-			default: ret=DATAFORMAT.MIXARE; break;
-		}
-		return ret;
+	public DataSource(String name, String url, String typeString, String displayString, String enabledString) {
+		TYPE typeEnum = TYPE.values()[Integer.parseInt(typeString)];
+		DISPLAY displayEnum = DISPLAY.values()[Integer.parseInt(displayString)];
+		Boolean enabledBool = Boolean.parseBoolean(enabledString);
+		this.name = name;
+		this.url = url;
+		this.type = typeEnum;
+		this.display = displayEnum;
+		this.enabled = enabledBool;
 	}
-	
-	public static String createRequestURL(DATASOURCE source, double lat, double lon, double alt, float radius,String locale) {
+
+	public String createRequestParams(double lat, double lon, double alt, float radius,String locale) {
 		String ret="";
-		switch(source) {
-		
-			case WIKIPEDIA: 
-				ret= WIKI_BASE_URL;
-			break;
-			
-			case BUZZ: 
-				ret= BUZZ_BASE_URL;
-			break;
-			
-			case TWITTER: 
-				ret = TWITTER_BASE_URL;			
-			break;
-				
-			case OWNURL:
-				ret = MixListView.customizedURL;
-			break;
-			
-		}
 		if (!ret.startsWith("file://")) {
-			switch(source) {
+			switch(this.type) {
 			
 			case WIKIPEDIA: 
 				float geoNamesRadius = radius > 20 ? 20 : radius; //Free service limited to 20km
@@ -139,7 +192,7 @@ public class DataSource {
 				Math.max(radius, 1.0) + "km" ;				
 			break;
 			
-			case OWNURL:
+			case MIXARE:
 				ret+=
 				"?latitude=" + Double.toString(lat) + 
 				"&longitude=" + Double.toString(lon) + 
@@ -147,6 +200,9 @@ public class DataSource {
 				"&radius=" + Double.toString(radius);
 			break;
 			
+			case OSM: 
+				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
+			break;
 			}
 			
 		}
@@ -154,23 +210,9 @@ public class DataSource {
 		return ret;
 	}
 	
-	public static String createRequestOSMURL(String sourceURL, double lat,
-			double lon, double alt, float radius, String locale) {
-
-		String ret = sourceURL;
-
-		if (!ret.startsWith("file://")) {
-			ret += XMLHandler.getOSMBoundingBox(lat, lon, radius);
-		}
-
-		return ret;
-	}
-	
-	
-	
-	public static int getColor(DATASOURCE datasource) {
+	public int getColor() {
 		int ret;
-		switch(datasource) {
+		switch(this.type) {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
@@ -179,4 +221,65 @@ public class DataSource {
 		return ret;
 	}
 
+	public int getDataSourceIcon() {
+		int ret;
+		switch(this.type) {
+			case BUZZ:		
+				ret=R.drawable.buzz; 
+				break;
+			case TWITTER:	
+				ret=R.drawable.twitter; 
+				break;
+			case OSM:		
+				ret=R.drawable.osm;
+				break;
+			case WIKIPEDIA:	
+				ret=R.drawable.wikipedia; 
+				break;
+			default:		
+				ret=R.drawable.ic_launcher; 
+				break;
+		}
+		return ret;
+	}
+	
+	public int getDisplayId() {
+		return this.display.ordinal();
+	}
+	
+	public int getTypeId() {
+		return this.type.ordinal();
+	}
+	
+	public DISPLAY getDisplay() {
+		return this.display;
+	}
+	
+	public TYPE getType() {
+		return this.type;
+	}
+	
+	public boolean getEnabled() {
+		return this.enabled;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getUrl() {
+		return this.url;
+	}
+	
+	public String serialize() {
+		return this.getName() + "|"
+		+ this.getUrl() + "|"
+		+ this.getTypeId() + "|"
+		+ this.getDisplayId() + "|"
+		+ this.getEnabled();
+	}
+	public void setEnabled(boolean isChecked) {
+		this.enabled = isChecked;
+	}
+	
 }

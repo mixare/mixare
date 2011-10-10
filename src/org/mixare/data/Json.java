@@ -30,9 +30,9 @@ import org.json.JSONObject;
 import org.mixare.Marker;
 import org.mixare.MixContext;
 import org.mixare.MixView;
+import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
 import org.mixare.SocialMarker;
-import org.mixare.data.DataSource.DATAFORMAT;
 
 import android.util.Log;
 /**
@@ -44,7 +44,7 @@ public class Json extends DataHandler {
 
 	public static final int MAX_JSON_OBJECTS = 1000;
 
-	public List<Marker> load(JSONObject root, DATAFORMAT dataformat) {
+	public List<Marker> load(JSONObject root, DataSource datasource) {
 		JSONObject jo = null;
 		JSONArray dataArray = null;
 		List<Marker> markers = new ArrayList<Marker>();
@@ -62,7 +62,7 @@ public class Json extends DataHandler {
 				dataArray = root.getJSONObject("data").getJSONArray("items");
 			if (dataArray != null) {
 
-				Log.i(MixView.TAG, "processing " + dataformat
+				Log.i(MixView.TAG, "processing " + datasource.getType()
 						+ " JSON Data Array");
 				int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
 
@@ -70,21 +70,19 @@ public class Json extends DataHandler {
 
 					jo = dataArray.getJSONObject(i);
 					Marker ma = null;
-					switch (dataformat) {
-					case MIXARE:
-						ma = processMixareJSONObject(jo);
-						break;
+					switch (datasource.getType()) {
 					case BUZZ:
-						ma = processBuzzJSONObject(jo);
+						ma = processBuzzJSONObject(jo, datasource);
 						break;
 					case TWITTER:
-						ma = processTwitterJSONObject(jo);
+						ma = processTwitterJSONObject(jo, datasource);
 						break;
 					case WIKIPEDIA:
-						ma = processWikipediaJSONObject(jo);
+						ma = processWikipediaJSONObject(jo, datasource);
 						break;
-					default:
-						ma = processMixareJSONObject(jo);
+					case MIXARE:
+						default:
+						ma = processMixareJSONObject(jo, datasource);
 						break;
 					}
 					if (ma != null)
@@ -97,7 +95,7 @@ public class Json extends DataHandler {
 		return markers;
 	}
 
-	public Marker processBuzzJSONObject(JSONObject jo)
+	public Marker processBuzzJSONObject(JSONObject jo, DataSource datasource)
 			throws NumberFormatException, JSONException {
 		Marker ma = null;
 		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
@@ -108,13 +106,12 @@ public class Json extends DataHandler {
 					Double.valueOf(jo.getString("geocode").split(" ")[0]), 
 					Double.valueOf(jo.getString("geocode").split(" ")[1]), 
 					0, 
-					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), 
-					DataSource.DATASOURCE.BUZZ,"",0);
+					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), datasource);
 		}
 		return ma;
 	}
 
-	public Marker processTwitterJSONObject(JSONObject jo)
+	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
 			throws NumberFormatException, JSONException {
 		Marker ma = null;
 		if (jo.has("geo")) {
@@ -152,13 +149,13 @@ public class Json extends DataHandler {
 						lat, 
 						lon, 
 						0, url, 
-						DataSource.DATASOURCE.TWITTER,"",0);
+						datasource);
 			}
 		}
 		return ma;
 	}
 
-	public Marker processMixareJSONObject(JSONObject jo) throws JSONException {
+	public Marker processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
 
 		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
@@ -170,19 +167,28 @@ public class Json extends DataHandler {
 			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
 				link=jo.getString("webpage");
 			
-			
+        	if(datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
 			ma = new POIMarker(
 					unescapeHTML(jo.getString("title"), 0), 
 					jo.getDouble("lat"), 
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					link, 
-					DataSource.DATASOURCE.OWNURL,"",0);
+					datasource);
+        	} else {
+            	ma = new NavigationMarker(
+            			unescapeHTML(jo.getString("title"), 0), 
+        				jo.getDouble("lat"), 
+        				jo.getDouble("lng"), 
+        				0, 
+        				link, 
+        				datasource);
+        	}
 		}
 		return ma;
 	}
 
-	public Marker processWikipediaJSONObject(JSONObject jo)
+	public Marker processWikipediaJSONObject(JSONObject jo, DataSource datasource)
 			throws JSONException {
 
 		Marker ma = null;
@@ -197,7 +203,7 @@ public class Json extends DataHandler {
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					"http://"+jo.getString("wikipediaUrl"), 
-					DataSource.DATASOURCE.WIKIPEDIA,"",0);
+					datasource);
 		}
 		return ma;
 	}
