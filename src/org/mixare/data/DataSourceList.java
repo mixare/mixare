@@ -150,6 +150,10 @@ public class DataSourceList extends ListActivity {
 		}
 
 		public void deleteItem(final int id) {
+			if(mDataSource.get(id).getEnabled()) {
+				mDataSource.get(id).setEnabled(false);
+				notifyDataSetChanged();
+			}
 			mDataSource.remove(id);
 			notifyDataSetChanged();
 		}
