@@ -243,8 +243,8 @@ public class DataSourceList extends ListActivity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		menu.add(MENU_EDIT_ID, MENU_EDIT_ID, MENU_EDIT_ID, "Edit"); 
-		menu.add(MENU_DELETE_ID, MENU_DELETE_ID, MENU_DELETE_ID, "Delete");
+		menu.add(MENU_EDIT_ID, MENU_EDIT_ID, MENU_EDIT_ID, R.string.data_source_edit); 
+		menu.add(MENU_DELETE_ID, MENU_DELETE_ID, MENU_DELETE_ID, R.string.data_source_delete);
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
 
