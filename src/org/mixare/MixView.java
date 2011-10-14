@@ -509,7 +509,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		/*Data sources*/
 		case 1:		
 			if(!dataView.isLauncherStarted()){
-				MixListView.setList(1);
 				Intent intent = new Intent(MixView.this, DataSourceList.class); 
 				startActivityForResult(intent, 40);
 			}
@@ -519,8 +518,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			break;
 			/*List view*/
 		case 2:
-
-			MixListView.setList(2);
 			/*if the list of titles to show in alternative list view is not empty*/
 			if (dataView.getDataHandler().getMarkerCount() > 0) {
 				Intent intent1 = new Intent(MixView.this, MixListView.class); 
