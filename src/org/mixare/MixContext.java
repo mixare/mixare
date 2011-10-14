@@ -534,10 +534,14 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onLocationChanged(Location location) {
-			Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
-			lm.removeUpdates(lcoarse);
-			downloadManager.purgeLists();
+			try {
+				Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
+				//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+				lm.removeUpdates(lcoarse);
+				downloadManager.purgeLists();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 
 		@Override
@@ -578,17 +582,4 @@ public class MixContext extends ContextWrapper {
 		}
 
 	};
-
-	
-//
-//	public DataSourceAdapter getDataSourceList() {
-//		SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-//		int size = settings.getAll().size();
-//		dataSourceAdapter = DataSourceList.dataSourceAdapter;
-//		for (int i = 0; i < size; i++) {
-//			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
-//			dataSourceAdapter.addItem(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
-//		}
-//		return dataSourceAdapter;
-//	}
 }
