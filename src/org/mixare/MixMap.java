@@ -197,7 +197,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void createListView(){
-		MixListView.setList(2);
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
 			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
 			startActivityForResult(intent1, 42);
