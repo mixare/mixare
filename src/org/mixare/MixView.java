@@ -38,6 +38,7 @@ import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
+import org.mixare.reality.LowPassFilter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -100,10 +101,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private List<Sensor> sensors;
 	private Sensor sensorGrav, sensorMag;
 
-	private int rHistIdx = 0;
 	private Matrix tempR = new Matrix();
 	private Matrix finalR = new Matrix();
-	private Matrix smoothR = new Matrix();
 	private Matrix histR[] = new Matrix[60];
 	private Matrix m1 = new Matrix();
 	private Matrix m2 = new Matrix();
@@ -121,6 +120,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private int zoomProgress;
 
 	private TextView searchNotificationTxt;
+  /* low pass filter object for accelerometer */
+  LowPassFilter lpf_acc;
+  /* low pass filter object for magnet */
+  LowPassFilter lpf_mgnt;
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
@@ -213,6 +216,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		try {
 
 
+      /* initializing the low pass filter objects */
+      lpf_acc = new LowPassFilter();
+      lpf_mgnt = new LowPassFilter();
 
 			handleIntent(getIntent());
 
@@ -344,15 +350,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		try {
 			this.mWakeLock.release();
 
-			try {
-				sensorMgr.unregisterListener(this, sensorGrav);
-				sensorMgr.unregisterListener(this, sensorMag);
-				sensorMgr = null;
-
-				mixContext.unregisterLocationManager();
-				mixContext.downloadManager.stop();
-			} catch (Exception ignore) {
-			}
+      unregisterListners();
 
 			if (fError) {
 				finish();
@@ -449,23 +447,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			downloadThread.start();
 		} catch (Exception ex) {
 			doError(ex);
-			try {
-				if (sensorMgr != null) {
-					sensorMgr.unregisterListener(this, sensorGrav);
-					sensorMgr.unregisterListener(this, sensorMag);
-					sensorMgr = null;
-				}
-
-				if (mixContext != null) {
-					mixContext.unregisterLocationManager();
-					if (mixContext.downloadManager != null)
-						mixContext.downloadManager.stop();
-				}
-			} catch (Exception ignore) {
-			}
+      unregisterListners();
 		}
 
-		Log.d("-------------------------------------------","resume");
 		if (dataView.isFrozen() && searchNotificationTxt == null){
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(dWindow.getWidth());
@@ -662,36 +646,30 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			t.cancel();
 			setZoomLevel();
 		}
-
 	};
-
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-			
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-				grav[0] = evt.values[0];
-				grav[1] = evt.values[1];
-				grav[2] = evt.values[2];
-
+        /* filtering the accelerometer values */
+				grav = lpf_acc.filter(evt.values, grav);
 				augScreen.postInvalidate();
-			} else if (evt.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-				mag[0] = evt.values[0];
-				mag[1] = evt.values[1];
-				mag[2] = evt.values[2];
 
+			} else if (evt.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+        /* filtering the magnetic field values */
+				mag = lpf_mgnt.filter(evt.values, mag);
 				augScreen.postInvalidate();
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
 			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			if (display.getRotation() == 1) {
+
+			if (display.getRotation() == 1)
 				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
-			} else {
+			else
 				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z, Rot);
-			}
-			tempR.set(Rot[0], Rot[1], Rot[2], Rot[3], Rot[4], Rot[5], Rot[6], Rot[7],
-					Rot[8]);
+
+			tempR.set(Rot[0], Rot[1], Rot[2], Rot[3], Rot[4], Rot[5], Rot[6], Rot[7], Rot[8]);
 
 			finalR.toIdentity();
 			finalR.prod(m4);
@@ -701,22 +679,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			finalR.prod(m2);
 			finalR.invert(); 
 
-			histR[rHistIdx].set(finalR);
-			rHistIdx++;
-			if (rHistIdx >= histR.length)
-				rHistIdx = 0;
-
-			smoothR.set(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f);
-			for (int i = 0; i < histR.length; i++) {
-				smoothR.add(histR[i]);
-			}
-			smoothR.mult(1 / (float) histR.length);
-
 			synchronized (mixContext.rotationM) {
-				mixContext.rotationM.set(smoothR);
+				mixContext.rotationM.set(finalR);
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+
+		} catch (Exception e) {
+			Log.e(TAG, e.getStackTrace().toString());
 		}
 	}
 
@@ -785,7 +753,30 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return false;
 	}
 
+  /**
+  * Function intended to unregister listners in case of pausing
+  * the application (avoids battery drain).
+  */
+  private void unregisterListners() {
+    try {
+      /* disabling sensor manager */
+      if(sensorMgr != null) {
+        sensorMgr.unregisterListener(this, sensorGrav);
+        sensorMgr.unregisterListener(this, sensorMag);
+        sensorMgr = null;
+      }
 
+      /* disabling mix context */
+      if(mixContext != null) {
+        mixContext.unregisterLocationManager();
+
+        if(mixContext.downloadManager != null)
+          mixContext.downloadManager.stop();
+      }
+    } catch (Exception ignore) {
+      /* Exception igonred */
+		}
+  }
 }
 
 /**
