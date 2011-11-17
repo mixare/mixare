@@ -68,7 +68,6 @@
 	
 	<string name="data_source_change_wikipedia">Vengono mostrati dati da Wikipedia</string>
 	<string name="data_source_change_twitter">Vengono mostrati dati da Twitter</string>
-	<string name="data_source_change_buzz">Vengono mostrati dati da Google Buzz</string>
 	<string name="data_source_change_osm">Vengono mostrati dati da OpenStreetMap</string>
 	
 	<string name="search_failed_notification">Nessun risultato di ricerca</string>

@@ -67,7 +67,6 @@
 	
 	<string name="data_source_change_wikipedia">Changé pour les données Wikipedia</string>
 	<string name="data_source_change_twitter">Changé pour les données Twitter</string>
-	<string name="data_source_change_buzz">Changé pour les données Google Buzz</string>
 	<string name="data_source_change_osm">Changé pour les données OpenStreetMap</string>
 		
 </resources>

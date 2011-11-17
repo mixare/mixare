@@ -56,10 +56,7 @@ public class Json extends DataHandler {
 			// Wikipedia
 			else if (root.has("geonames"))
 				dataArray = root.getJSONArray("geonames");
-			// Google Buzz
-			else if (root.has("data")
-					&& root.getJSONObject("data").has("items"))
-				dataArray = root.getJSONObject("data").getJSONArray("items");
+
 			if (dataArray != null) {
 
 				Log.i(MixView.TAG, "processing " + datasource.getType()
@@ -71,9 +68,6 @@ public class Json extends DataHandler {
 					jo = dataArray.getJSONObject(i);
 					Marker ma = null;
 					switch (datasource.getType()) {
-					case BUZZ:
-						ma = processBuzzJSONObject(jo, datasource);
-						break;
 					case TWITTER:
 						ma = processTwitterJSONObject(jo, datasource);
 						break;
@@ -93,22 +87,6 @@ public class Json extends DataHandler {
 			e.printStackTrace();
 		}
 		return markers;
-	}
-
-	public Marker processBuzzJSONObject(JSONObject jo, DataSource datasource)
-			throws NumberFormatException, JSONException {
-		Marker ma = null;
-		if (jo.has("title") && jo.has("geocode") && jo.has("links")) {
-			Log.v(MixView.TAG, "processing Google Buzz JSON object");
-
-			ma = new SocialMarker(
-					jo.getString("title"), 
-					Double.valueOf(jo.getString("geocode").split(" ")[0]), 
-					Double.valueOf(jo.getString("geocode").split(" ")[1]), 
-					0, 
-					jo.getJSONObject("links").getJSONArray("alternate").getJSONObject(0).getString("href"), datasource);
-		}
-		return ma;
 	}
 
 	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
