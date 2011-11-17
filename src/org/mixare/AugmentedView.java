@@ -18,6 +18,10 @@
  */
 package org.mixare;
 
+import java.util.ArrayList;
+
+import org.mixare.gui.ButtonTypes;
+import org.mixare.gui.DialogButton;
 import org.mixare.utils.ErrorUtility;
 
 import android.content.Context;
@@ -40,15 +44,7 @@ class AugmentedView extends View {
 
 	public AugmentedView(Context context) {
 		super(context);
-
-		try {
-			app = (MixView) context;
-
-			//app.killOnError();
-
-		} catch (Exception e) {
-			ErrorUtility.handleError(TAG, e, true);
-		}
+	  app = (MixView)context;
 	}
 
 	@Override
@@ -100,7 +96,26 @@ class AugmentedView extends View {
 
 			MixView.dataView.draw(MixView.dWindow);
 		} catch (Exception e) {
-			ErrorUtility.handleError(TAG, e, true);
+      /* define buttons */
+      ArrayList<DialogButton> btns = new ArrayList<DialogButton>();
+      btns.add(new DialogButton(ButtonTypes.POSITIVE,
+        app.getString(DataView.CONNECTION_ERROR_DIALOG_BUTTON1),
+        app.new RetryClick()));
+
+      btns.add(new DialogButton(ButtonTypes.NEUTRAL,
+        app.getString(DataView.CONNECTION_ERROR_DIALOG_BUTTON2),
+        app.new OpenSettingsClick()));
+
+      btns.add(new DialogButton(ButtonTypes.NEGATIVE,
+        app.getString(DataView.CONNECTION_ERROR_DIALOG_BUTTON3),
+        app.new CloseClick()));
+
+      /* generate the error (log and visualization) */
+      ErrorUtility.handleError(TAG,
+                               "Error",
+                               app.getString(DataView.CONNECTION_ERROR_DIALOG_TEXT),
+                               app,
+                               btns);
 		}
 	}
 }

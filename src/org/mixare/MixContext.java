@@ -115,12 +115,12 @@ public class MixContext extends ContextWrapper {
 			SharedPreferences.Editor dataSourceEditor = settings.edit();
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-			dataSourceEditor.putString("DataSource2", "Buzz|https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20|1|0|true");
-			dataSourceEditor.putString("DataSource3", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource4", "Own URL|http://mixare.org/geotest.php|4|0|false");
+			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
+			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
 			dataSourceEditor.commit();
 			size = settings.getAll().size();
 		}
+
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
 			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
@@ -262,7 +262,9 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
-	public String openURL(String urlStr, String params)	throws Exception {
+	public String openURL(String urlStr, String params)
+    throws Exception {
+
 		InputStream is = null;
 		URLConnection conn = null;
 
@@ -300,12 +302,16 @@ public class MixContext extends ContextWrapper {
 			conn.setConnectTimeout(10000);
 			String contentType = conn.getHeaderField("Content-Type");
 			String charset = "UTF-8";
-			for (String param : contentType.replace(" ", "").split(";")) {
-				if (param.startsWith("charset=")) {
-					charset = param.split("=", 2)[1];
-					break;
-				}
-			}
+
+      if(contentType != null) {
+        for (String param : contentType.replace(" ", "").split(";")) {
+          if (param.startsWith("charset=")) {
+            charset = param.split("=", 2)[1];
+            break;
+          }
+        }
+      }
+
 			is = conn.getInputStream();
 			return parseInputString(is, charset);
 

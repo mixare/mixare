@@ -18,6 +18,11 @@
  */
 package org.mixare.utils;
 
+import java.util.ArrayList;
+import org.mixare.gui.DialogButton;
+
+import android.app.AlertDialog;
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -27,65 +32,167 @@ import android.util.Log;
 * @author Armando Miraglia &lt;arma&#64;lamortenera.it&gt;
 */
 public class ErrorUtility {
+  /* Tag of the class for logging purpose */
+  private static final String TAG = "ErrorUtility";
+
+  /* Different error levels */
+  public enum ErrorType {
+    DEBUG, INFO, ERROR
+  }
+
   /**
   * The constructor is set private because the class is not intended
   * to be instantiated.
   */
   private ErrorUtility() { /* private: not exposed for usage */ }
 
-  public static void handleErrorDebug(String tag, Exception e, boolean isShown) {
-    if(e != null) {
+  public static void handleErrorDebug(String tag,
+                                      Exception e) {
 
-      /* if(isShown) setErrorDialog(e); */
-      Log.d(tag, e.getStackTrace().toString());
-    }
+    performErrorHandling(ErrorType.DEBUG,
+                         tag,
+                         null,
+                         e.getMessage(),
+                         null,
+                         null);
+  }
+
+  public static void handleErrorDebug(String tag,
+                                      String title,
+                                      Exception e,
+                                      Context ctx,
+                                      ArrayList<DialogButton> btns) {
+
+    performErrorHandling(ErrorType.DEBUG,
+                         tag,
+                         title,
+                         e.getMessage(),
+                         ctx,
+                         btns);
+  }
+
+  public static void handleErrorDebug(String tag,
+                                      String title,
+                                      String msg,
+                                      Context ctx,
+                                      ArrayList<DialogButton> btns) {
+
+    performErrorHandling(ErrorType.DEBUG, tag, title, msg, ctx, btns);
   }
 
   /**
   * This method takes care to handle the exception so that it is
   * correctly logged and also shown to the user, if needed.
   */
-  public static void handleError(String tag, Exception e, boolean isShown) {
-    if(e != null) {
+  public static void handleError(String tag,
+                                 Exception e) {
 
-      /* if(isShown) setErrorDialog(e); */
-      Log.e(tag, e.getStackTrace().toString());
-    }
+    performErrorHandling(ErrorType.ERROR,
+                         tag,
+                         null,
+                         e.getMessage(),
+                         null,
+                         null);
   }
 
-//	private static void setErrorDialog() {
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setMessage(getString(DataView.CONNECTION_ERROR_DIALOG_TEXT));
-//		builder.setCancelable(false);
-//
-//		/*Retry*/
-//		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
-//			public void onClick(DialogInterface dialog, int id) {
-//				fError=false;
-//				//TODO improve
-//				try {
-//					repaint();	       		
-//				}
-//				catch(Exception ex){
-//					//Don't call doError, it will be a recursive call.
-//					//doError(ex);
-//				}
-//			}
-//		});
-//		/*Open settings*/
-//		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
-//			public void onClick(DialogInterface dialog, int id) {
-//				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
-//				startActivityForResult(intent1, 42);
-//			}
-//		});
-//		/*Close application*/
-//		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
-//			public void onClick(DialogInterface dialog, int id) {
-//				System.exit(0);
-//			}
-//		});
-//		AlertDialog alert = builder.create();
-//		alert.show();
-//	}
+  /**
+  * This method takes care to handle the exception so that it is
+  * correctly logged and also shown to the user, if needed.
+  */
+  public static void handleError(String tag,
+                                 String title,
+                                 Exception e,
+                                 Context ctx,
+                                 ArrayList<DialogButton> btns) {
+
+    e.printStackTrace();
+    performErrorHandling(ErrorType.ERROR,
+                         tag,
+                         title,
+                         e.getMessage(),
+                         ctx,
+                         btns);
+  }
+
+  /**
+  * This method takes care to handle the exception so that it is
+  * correctly logged and also shown to the user, if needed.
+  */
+  public static void handleError(String tag,
+                                 String title,
+                                 String msg,
+                                 Context ctx,
+                                 ArrayList<DialogButton> btns) {
+
+    performErrorHandling(ErrorType.ERROR, tag, title, msg, ctx, btns);
+  }
+
+  /**
+  * Function actual performing the different type of error handling.
+  */
+  private static void performErrorHandling(ErrorType type,
+                                           String tag,
+                                           String title,
+                                           String msg,
+                                           Context ctx,
+                                           ArrayList<DialogButton> btns) {
+
+    switch(type) {
+      case DEBUG:
+        Log.d(tag, msg);
+        break;
+      case ERROR:
+        Log.e(tag, msg);
+        break;
+      case INFO:
+        Log.i(tag, msg);
+        break;
+    }
+
+    if(ctx != null && title != null && btns != null )
+      setErrorDialog(ctx, title, msg, btns);
+    else
+      Log.d(TAG, "Error dialog has been not shown.");
+  }
+
+  /**
+  * This function is intended as alert builder for informing the device
+  * user of the error detected.
+  *
+  * @author Armando Miraglia &lt;arma&#64;lamortenera.it&gt;
+  * @param  ctx     context where the exception needs to be shown
+  * @param  title   title of the dialog box
+  * @param  msg     message that needs to be showd
+  * @param  btns    list of buttons that have to be inserted in the box
+  */
+	private static void setErrorDialog(Context ctx,
+                                     String title,
+                                     String msg,
+                                     ArrayList<DialogButton> btns) {
+    DialogButton btn;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(title);
+		builder.setMessage(msg);
+		builder.setCancelable(false);
+
+    /* set provided buttons on the dialog */
+    for(int i=0; i<btns.size(); ++i) {
+      btn = btns.get(i);
+      switch(btn.getType()) {
+        case POSITIVE:
+		      builder.setPositiveButton(btn.getTitle(), btn.getOCL());
+          break;
+        case NEUTRAL:
+		      builder.setNeutralButton(btn.getTitle(), btn.getOCL());
+          break;
+        case NEGATIVE:
+		      builder.setNegativeButton(btn.getTitle(), btn.getOCL());
+          break;
+      }
+    }
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 }

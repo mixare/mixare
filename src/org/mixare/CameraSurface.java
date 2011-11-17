@@ -35,7 +35,7 @@ class CameraSurface extends SurfaceView
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 		} catch (Exception e) {
-			ErrorUtility.handleError(TAG, e, false);
+			ErrorUtility.handleError(TAG, e);
 		}
 	}
 
@@ -124,7 +124,7 @@ class CameraSurface extends SurfaceView
 			camera.setParameters(parameters);
 			camera.startPreview();
 		} catch (Exception e) {
-			ErrorUtility.handleError(TAG, e, false);
+			ErrorUtility.handleError(TAG, e);
 		}
 	}
 }

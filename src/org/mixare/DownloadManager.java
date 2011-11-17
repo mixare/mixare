@@ -44,6 +44,7 @@ public class DownloadManager extends AsyncTask<DownloadRequest, Integer, Downloa
 
 	MixContext ctx;
 	MixView mview;
+  private static final String TAG = "DownloadManager";
 
 	public DownloadManager(MixContext ctx) {
 		this.ctx = ctx;
@@ -63,7 +64,7 @@ public class DownloadManager extends AsyncTask<DownloadRequest, Integer, Downloa
 			// try loading JSON DATA
 			try {
 
-				Log.v(MixView.TAG, "try to load JSON data");
+				Log.v(TAG, "try to load JSON data");
 				JSONObject root = new JSONObject(tmp);
 				List<Marker> markers = layer.load(root,request.source);
 				result.setMarkers(markers);
@@ -73,8 +74,8 @@ public class DownloadManager extends AsyncTask<DownloadRequest, Integer, Downloa
 			}
 			catch (JSONException e) {
 
-				Log.v(MixView.TAG, "no JSON data");
-				Log.v(MixView.TAG, "try to load XML data");
+				Log.v(TAG, "no JSON data");
+				Log.v(TAG, "try to load XML data");
 
 				try {
 					DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -85,7 +86,7 @@ public class DownloadManager extends AsyncTask<DownloadRequest, Integer, Downloa
 
 					XMLHandler xml = new XMLHandler();
 
-					Log.i(MixView.TAG, "loading XML data");	
+					Log.i(TAG, "loading XML data");	
 
 
 					List<Marker> markers = xml.load(doc, request.source);

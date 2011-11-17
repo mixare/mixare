@@ -116,7 +116,6 @@ public class DataView {
 
 	public static final int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
 	public static final int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
-	public static final int DATA_SOURCE_CHANGE_BUZZ = R.string.data_source_change_buzz;
 	public static final int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
 	public static final int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
 	public static final int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;

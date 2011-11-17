@@ -18,8 +18,6 @@
  */
 package org.mixare.reality;
 
-import android.util.Log;
-
 /**
 * This class is intended to provie a filter for normalizing sensors' data.
 * E.g. accelerometer, magnetic field, etc... The idea has been taken from
@@ -31,7 +29,7 @@ import android.util.Log;
 */
 public class LowPassFilter {
   /* TAG info */
-  private static final String TAG = "LowPassFilter";
+  //private static final String TAG = "LowPassFilter";
 
   /* alpha default value */
   private static final float ALPHA_STEADY       = 0.01f;
@@ -72,7 +70,6 @@ public class LowPassFilter {
     for(int i=0; i<evt.length; i++)
       prev_evt[i] = prev_evt[i] + alpha * (evt[i] - prev_evt[i]);
 
-    Log.d(TAG, "Adjusting the sensor's value. Alpha value: " + alpha);
     return prev_evt;
   }
 
