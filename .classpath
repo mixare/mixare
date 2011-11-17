@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+  <classpathentry kind="lib" path="/opt/android-sdk/platforms/android-9/android.jar"/>
+  <classpathentry kind="lib" path="/opt/android-sdk/addon_google_apis_google_inc_9/libs/maps.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

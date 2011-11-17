@@ -24,8 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,7 +78,7 @@ public class MixContext extends ContextWrapper {
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
-	
+
 	public MixView mixView;
 	Context ctx;
 	boolean isURLvalid = true;
@@ -89,24 +88,24 @@ public class MixContext extends ContextWrapper {
 
 	Matrix rotationM = new Matrix();
 	float declination = 0f;
-	
+
 	//Location related
 	private LocationManager lm;
 	Location curLoc;
 	Location locationAtLastDownload;
-	
+
 	private ArrayList<DataSource> allDataSources=new ArrayList<DataSource>();
 
-	
+
 	public ArrayList<DataSource> getAllDataSources() {
 		return this.allDataSources;
 	}
-	
+
 	public void setAllDataSourcesforLauncher(DataSource datasource) {
 		this.allDataSources.clear();
 		this.allDataSources.add(datasource);
 	}
-	
+
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 		SharedPreferences settings = getSharedPreferences(
@@ -121,6 +120,7 @@ public class MixContext extends ContextWrapper {
 			dataSourceEditor.commit();
 			size = settings.getAll().size();
 		}
+
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
 			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
@@ -128,28 +128,33 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 	public MixContext(Context appCtx) {
-	
+
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
 
 		refreshDataSources();
-		
+
 		boolean atLeastOneDatasourceSelected=false;
-		
+
 		for(DataSource ds: this.allDataSources) {
 			if(ds.getEnabled())
 				atLeastOneDatasourceSelected=true;
 		}
 		// select Wikipedia if nothing was previously selected  
-		if(!atLeastOneDatasourceSelected)
+		if(!atLeastOneDatasourceSelected) {
 			//TODO>: start intent data source select
-		
-		
+		}
+
+		// HTTP connection reuse which was buggy pre-froyo
+		if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+			System.setProperty("http.keepAlive", "false");
+		}
+
 		rotationM.toIdentity();
-		
+
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
+
 		Criteria c = new Criteria();
 		//try to use the coarse provider first to get a rough position
 		c.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -159,7 +164,7 @@ public class MixContext extends ContextWrapper {
 		} catch (Exception e) {
 			Log.d(TAG, "Could not initialize the coarse provider");
 		}
-		
+
 		//need to be precise
 		c.setAccuracy(Criteria.ACCURACY_FINE);				
 		//fineProvider will be used for the initial phase (requesting fast updates)
@@ -171,7 +176,7 @@ public class MixContext extends ContextWrapper {
 		} catch (Exception e) {
 			Log.d(TAG, "Could not initialize the bounce provider");
 		}
-		
+
 		//fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
 
@@ -181,13 +186,13 @@ public class MixContext extends ContextWrapper {
 		hardFix.setAltitude(300);
 
 		/*New York*/
-//		hardFix.setLatitude(40.731510);
-//		hardFix.setLongitude(-73.991547);
-		
+		//		hardFix.setLatitude(40.731510);
+		//		hardFix.setLongitude(-73.991547);
+
 		// TU Wien
-//		hardFix.setLatitude(48.196349);
-//		hardFix.setLongitude(16.368653);
-//		hardFix.setAltitude(180);
+		//		hardFix.setLatitude(48.196349);
+		//		hardFix.setLongitude(16.368653);
+		//		hardFix.setAltitude(180);
 
 		//frequency and minimum distance for update
 		//this values will only be used after there's a good GPS fix
@@ -202,7 +207,7 @@ public class MixContext extends ContextWrapper {
 			Log.d(TAG, "Could not initialize the normal provider");
 			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 		}
-		
+
 		try {
 			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
 			Location lastCoarsePos=lm.getLastKnownLocation(coarseProvider);
@@ -212,20 +217,16 @@ public class MixContext extends ContextWrapper {
 				curLoc = lastCoarsePos;
 			else
 				curLoc = hardFix;
-			
+
 		} catch (Exception ex2) {
 			//ex2.printStackTrace();
 			curLoc = hardFix;
 			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
 		}
-		
+
 		setLocationAtLastDownload(curLoc);
-
-//TODO fix logic
-
-	
 	}
-	
+
 	public void unregisterLocationManager() {
 		if (lm != null) {
 			lm.removeUpdates(lnormal);
@@ -261,49 +262,59 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
-	public InputStream getHttpGETInputStream(String urlStr)
-	throws Exception {
+	public String openURL(String urlStr, String params)
+    throws Exception {
+
 		InputStream is = null;
 		URLConnection conn = null;
 
-	    // HTTP connection reuse which was buggy pre-froyo
-	    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
-	        System.setProperty("http.keepAlive", "false");
-	    }
-	    
-		if (urlStr.startsWith("file://"))			
-			return new FileInputStream(urlStr.replace("file://", ""));
-
-		if (urlStr.startsWith("content://"))
-			return getContentInputStream(urlStr, null);
+		if (urlStr.startsWith("file://")){
+			is = new FileInputStream(urlStr.replace("file://", ""));
+			return parseInputString(is, null);
+		}
+		if (urlStr.startsWith("content://")) {		
+			is = getContentInputStream(urlStr, null);
+			return parseInputString(is, null);
+		}
 
 		if (urlStr.startsWith("https://")) {
 			HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
-    			public boolean verify(String hostname, SSLSession session) {
-    				return true;
-    			}});
-		SSLContext context = SSLContext.getInstance("TLS");
-		context.init(null, new X509TrustManager[]{new X509TrustManager(){
-			public void checkClientTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {}
-			public void checkServerTrusted(X509Certificate[] chain,
-					String authType) throws CertificateException {}
-			public X509Certificate[] getAcceptedIssuers() {
-				return new X509Certificate[0];
-			}}}, new SecureRandom());
-		HttpsURLConnection.setDefaultSSLSocketFactory(
-				context.getSocketFactory());
+				public boolean verify(String hostname, SSLSession session) {
+					return true;
+				}});
+			SSLContext context = SSLContext.getInstance("TLS");
+			context.init(null, new X509TrustManager[]{new X509TrustManager(){
+				public void checkClientTrusted(X509Certificate[] chain,
+						String authType) throws CertificateException {}
+				public void checkServerTrusted(X509Certificate[] chain,
+						String authType) throws CertificateException {}
+				public X509Certificate[] getAcceptedIssuers() {
+					return new X509Certificate[0];
+				}}}, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(
+					context.getSocketFactory());
 		}
-		
+
 		try {
-			URL url = new URL(urlStr);
+			URL url = new URL(urlStr+params);
 			conn =  url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
+			String contentType = conn.getHeaderField("Content-Type");
+			String charset = "UTF-8";
+
+      if(contentType != null) {
+        for (String param : contentType.replace(" ", "").split(";")) {
+          if (param.startsWith("charset=")) {
+            charset = param.split("=", 2)[1];
+            break;
+          }
+        }
+      }
 
 			is = conn.getInputStream();
-			
-			return is;
+			return parseInputString(is, charset);
+
 		} catch (Exception ex) {
 			try {
 				is.close();
@@ -314,20 +325,20 @@ public class MixContext extends ContextWrapper {
 					((HttpURLConnection)conn).disconnect();
 			} catch (Exception ignore) {			
 			}
-			
+
 			throw ex;				
 
 		}
 	}
 
-	public String getHttpInputString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+	private String parseInputString(InputStream is, String charset) throws UnsupportedEncodingException {	
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is, charset), 8 * 1024);
 		StringBuilder sb = new StringBuilder();
 
 		try {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+				sb.append(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -339,58 +350,6 @@ public class MixContext extends ContextWrapper {
 			}
 		}
 		return sb.toString();
-	}
-
-	public InputStream getHttpPOSTInputStream(String urlStr,
-			String params) throws Exception {
-		InputStream is = null;
-		OutputStream os = null;
-		HttpURLConnection conn = null;
-
-		if (urlStr.startsWith("content://"))
-			return getContentInputStream(urlStr, params);
-
-		try {
-			URL url = new URL(urlStr);
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setReadTimeout(10000);
-			conn.setConnectTimeout(10000);
-
-			if (params != null) {
-				conn.setDoOutput(true);
-				os = conn.getOutputStream();
-				OutputStreamWriter wr = new OutputStreamWriter(os);
-				wr.write(params);
-				wr.close();
-			}
-
-			is = conn.getInputStream();
-			
-			return is;
-		} catch (Exception ex) {
-
-			try {
-				is.close();
-			} catch (Exception ignore) {			
-
-			}
-			try {
-				os.close();
-			} catch (Exception ignore) {			
-
-			}
-			try {
-				conn.disconnect();
-			} catch (Exception ignore) {
-			}
-
-			if (conn != null && conn.getResponseCode() == 405) {
-				return getHttpGETInputStream(urlStr);
-			} else {		
-
-				throw ex;
-			}
-		}
 	}
 
 	public InputStream getContentInputStream(String urlStr, String params)
@@ -414,7 +373,7 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
-	public void returnHttpInputStream(InputStream is) throws Exception {
+	public void closeHttpInputStream(InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}
@@ -425,7 +384,7 @@ public class MixContext extends ContextWrapper {
 		return mgr.open(name);
 	}
 
-	public void returnResourceInputStream(InputStream is) throws Exception {
+	public void closeResourceInputStream(InputStream is) throws Exception {
 		if (is != null)
 			is.close();
 	}
@@ -437,12 +396,12 @@ public class MixContext extends ContextWrapper {
 
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
+				view.loadUrl(url);
 				return true;
 			}
 
 		});
-				
+
 		Dialog d = new Dialog(mixView) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
@@ -457,21 +416,21 @@ public class MixContext extends ContextWrapper {
 				Gravity.BOTTOM));
 
 		d.show();
-		
+
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
 		// TODO
 		WebView webview = new WebView(context);
-		
+
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
+				view.loadUrl(url);
 				return true;
 			}
 
 		});
-				
+
 		Dialog d = new Dialog(context) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
@@ -486,7 +445,7 @@ public class MixContext extends ContextWrapper {
 				Gravity.BOTTOM));
 
 		d.show();
-		
+
 		webview.loadUrl(url);
 	}
 
@@ -497,16 +456,13 @@ public class MixContext extends ContextWrapper {
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
-	
+
 	private LocationListener lbounce = new LocationListener() {
 
 		@Override
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
-
-			downloadManager.purgeLists();
-			
 			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
 				lm.removeUpdates(lbounce);			
@@ -526,9 +482,9 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
-	
+
 	private LocationListener lcoarse = new LocationListener() {
 
 		@Override
@@ -537,7 +493,6 @@ public class MixContext extends ContextWrapper {
 				Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 				//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 				lm.removeUpdates(lcoarse);
-				downloadManager.purgeLists();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -551,7 +506,7 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
 
 	private LocationListener lnormal = new LocationListener() {
@@ -566,15 +521,14 @@ public class MixContext extends ContextWrapper {
 			//Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			try {
 
-				downloadManager.purgeLists();
 				Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-					synchronized (curLoc) {
-						curLoc = location;
-					}
-					mixView.repaint();
-					Location lastLoc=getLocationAtLastDownload();
-					if(lastLoc==null)
-						setLocationAtLastDownload(location);
+				synchronized (curLoc) {
+					curLoc = location;
+				}
+				mixView.repaint();
+				Location lastLoc=getLocationAtLastDownload();
+				if(lastLoc==null)
+					setLocationAtLastDownload(location);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

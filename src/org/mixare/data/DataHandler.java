@@ -43,11 +43,12 @@ public class DataHandler {
 	
 	public void addMarkers(List<Marker> markers) {
 
-		Log.v(MixView.TAG, "Marker before: "+markerList.size());
-		for(Marker ma:markers) {
-			if(!markerList.contains(ma))
-				markerList.add(ma);
-		}
+		Log.v(MixView.TAG, "Marker before: " + markerList.size());
+    if(markers != null)
+      for(Marker ma: markers) {
+        if(!markerList.contains(ma))
+          markerList.add(ma);
+      }
 		
 		Log.d(MixView.TAG, "Marker count: "+markerList.size());
 	}

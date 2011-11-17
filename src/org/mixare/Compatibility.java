@@ -25,6 +25,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -36,7 +37,12 @@ import android.view.WindowManager;
  *
  */
 public class Compatibility {
+
+	public static final float DEFAULT_VIEW_ANGLE = (float) Math.toRadians(45);
+
 	private static Method mParameters_getSupportedPreviewSizes;
+	private static Method mParameters_getHorizontalViewAngle;
+	private static Method mParameters_getVerticalViewAngle;
 	private static Method mDefaultDisplay_getRotation;
 
 	static {  
@@ -48,6 +54,10 @@ public class Compatibility {
 		try {
 			mParameters_getSupportedPreviewSizes = Camera.Parameters.class.getMethod(
 					"getSupportedPreviewSizes", new Class[] { } );
+			mParameters_getHorizontalViewAngle = Camera.Parameters.class.getMethod(
+					"getHorizontalViewAngle", new Class[] { } );
+			mParameters_getVerticalViewAngle = Camera.Parameters.class.getMethod(
+					"getVerticalViewAngle", new Class[] { } );
 			mDefaultDisplay_getRotation = Display.class.getMethod("getRotation", new Class[] { } );
 
 			/* success, this is a newer device */
@@ -84,14 +94,47 @@ public class Compatibility {
 		return retList;
 	}
 
+	public static float getHorizontalViewAngle() {
+		float hva = DEFAULT_VIEW_ANGLE;
+
+		try {
+			Camera camera = Camera.open();
+			Object retObj = mParameters_getHorizontalViewAngle.invoke(camera);
+			if (retObj != null) {
+				hva = (Float) retObj;
+			}
+
+		} catch (Exception ex) {
+			
+			Log.d("Mixare", "using default hva");
+			//ex.printStackTrace();
+		}
+		return hva;
+	}
+
+	public static float getVerticalViewAngle() {
+		float vva = DEFAULT_VIEW_ANGLE;
+
+		try {
+			Camera camera = Camera.open();
+			Object retObj = mParameters_getVerticalViewAngle.invoke(camera);
+			if (retObj != null) {
+				vva = (Float) retObj;
+			}
+
+		} catch (Exception ex) {
+			//ex.printStackTrace();
+		}
+		return vva;
+	}
 	static public int getRotation(final Activity activity) {
 		int result = 1;
 		try {
-				Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-				Object retObj = mDefaultDisplay_getRotation.invoke(display);
-				if( retObj != null) {
-					result = (Integer) retObj;
-				}
+			Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			Object retObj = mDefaultDisplay_getRotation.invoke(display);
+			if( retObj != null) {
+				result = (Integer) retObj;
+			}
 		} catch (Exception ex) {
 			//ex.printStackTrace();
 		}

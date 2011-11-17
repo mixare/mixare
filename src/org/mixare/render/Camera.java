@@ -26,8 +26,6 @@ package org.mixare.render;
  */
 public class Camera {
 
-	public static final float DEFAULT_VIEW_ANGLE = (float) Math.toRadians(45);
-
 	public int width, height;
 
 	public Matrix transform = new Matrix();

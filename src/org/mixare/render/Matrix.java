@@ -217,6 +217,7 @@ public class Matrix {
 		c3 = (m.c1 * n.a3) + (m.c2 * n.b3) + (m.c3 * n.c3);
 	}
 
+
 	@Override
 	public String toString() {
 		return "[ (" + a1 + "," + a2 + "," + a3 + ") (" + b1 + "," + b2 + ","

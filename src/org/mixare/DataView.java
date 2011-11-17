@@ -66,9 +66,6 @@ public class DataView {
 	
 	/** The view can be "frozen" for debug purposes */
 	private boolean frozen;
-	
-	/** how many times to re-attempt download */
-	private int retry;
 
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
@@ -125,7 +122,7 @@ public class DataView {
 	public static final int SEARCH_ACTIVE_1=R.string.search_active_1;
 	public static final int SEARCH_ACTIVE_2=R.string.search_active_2;
 		
-	private boolean isLauncherStarted;
+	private boolean isStartedByLauncher;
 	
 	private ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
@@ -147,8 +144,8 @@ public class DataView {
 		return mixContext;
 	}
 
-	public boolean isLauncherStarted() {
-		return isLauncherStarted;
+	public boolean isStartedByLauncher() {
+		return isStartedByLauncher;
 	}
 	
 	public boolean isFrozen() {
@@ -194,13 +191,14 @@ public class DataView {
 			height = heightInit;
 
 			cam = new Camera(width, height, true);
-			cam.setViewAngle(Camera.DEFAULT_VIEW_ANGLE);
+			float hva = Compatibility.getHorizontalViewAngle();
+			cam.setViewAngle(hva);
 
 			lrl.set(0, -RadarPoints.RADIUS);
-			lrl.rotate(Camera.DEFAULT_VIEW_ANGLE / 2);
+			lrl.rotate(hva / 2);
 			lrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
 			rrl.set(0, -RadarPoints.RADIUS);
-			rrl.rotate(-Camera.DEFAULT_VIEW_ANGLE / 2);
+			rrl.rotate(-hva / 2);
 			rrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -214,9 +212,8 @@ public class DataView {
 		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
 		request.params = "";
 		mixContext.setAllDataSourcesforLauncher(request.source);
-		mixContext.getDownloader().submitJob(request);
+		new DownloadManager(mixContext).execute(request);
 		state.nextLStatus = MixState.PROCESSING;
-		
 	}
 
 	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
@@ -224,7 +221,7 @@ public class DataView {
 		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
 		request.source = datasource;
 		
-		mixContext.getDownloader().submitJob(request);
+		new DownloadManager(mixContext).execute(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
@@ -239,7 +236,7 @@ public class DataView {
 						
 			if (mixContext.getStartUrl().length() > 0){
 				requestData(mixContext.getStartUrl());
-				isLauncherStarted = true;
+				isStartedByLauncher = true;
 			}
 
 			else {
@@ -264,32 +261,7 @@ public class DataView {
 
 		
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			DownloadManager dm=mixContext.getDownloader();
-			DownloadResult dRes;
-			
-			while((dRes=dm.getNextResult())!=null)
-			{
-				if (dRes.error && retry < 3) {
-					retry++;
-					mixContext.getDownloader().submitJob(dRes.errorRequest);
-					// Notification
-					//Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
-				}
-				
-				if(!dRes.error) {
-					//jLayer = (DataHandler) dRes.obj;
-					Log.i(MixView.TAG,"Adding Markers");
-					dataHandler.addMarkers(dRes.getMarkers());
-					dataHandler.onLocationChanged(curFix);
-					// Notification
-					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
-
-				}
-			}
-			if(dm.isDone()) {
-				retry=0;
-				state.nextLStatus = MixState.DONE;
-			}
+			dataHandler.onLocationChanged(curFix);
 		}
 
 		

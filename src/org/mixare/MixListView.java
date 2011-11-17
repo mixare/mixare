@@ -62,8 +62,6 @@ import android.widget.Toast;
  */
 public class MixListView extends ListActivity {
 
-	private static int list;
-
 	private Vector<SpannableString> listViewMenu;
 	private Vector<String> selectedItemURL;
 	private Vector<String> dataSourceMenu;
@@ -74,11 +72,7 @@ public class MixListView extends ListActivity {
 	private MixContext mixContext;
 
 	private DataView dataView;
-	//private static String selectedDataSource = "Wikipedia";
-	/*to check which data source is active*/
-	//	private int clickedDataSourceItem = 0;
 	private ListItemAdapter adapter;
-	public static String customizedURL="http://mixare.org/geotest.php";
 	private static Context ctx;
 	private static String searchQuery = "";
 	private static SpannableString underlinedTitle;
@@ -107,45 +101,32 @@ public class MixListView extends ListActivity {
 		ctx = this;
 		mixContext = dataView.getContext();
 
-		switch(list){
-		case 1:
-			
-
-			
-			adapter = new ListItemAdapter(this);
-			//adapter.colorSource(getDataSource());
-			getListView().setTextFilterEnabled(true);
-
-			setListAdapter(adapter);
-			break;
-
-		case 2:
-			selectedItemURL = new Vector<String>();
-			listViewMenu = new Vector<SpannableString>();
-			DataHandler jLayer = dataView.getDataHandler();
-			if (dataView.isFrozen() && jLayer.getMarkerCount() > 0){
-				selectedItemURL.add("search");
-			}
-			/*add all marker items to a title and a URL Vector*/
-			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-				Marker ma = jLayer.getMarker(i);
-				if(ma.isActive()) {
-					if (ma.getURL()!=null) {
-						/* Underline the title if website is available*/
-							underlinedTitle = new SpannableString(ma.getTitle());
-							underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
-							listViewMenu.add(underlinedTitle);
-						} else {
-							listViewMenu.add(new SpannableString(ma.getTitle()));
-						}
-					/*the website for the corresponding title*/
-					if (ma.getURL()!=null)
-						selectedItemURL.add(ma.getURL());
-					/*if no website is available for a specific title*/
-					else
-						selectedItemURL.add("");
+		selectedItemURL = new Vector<String>();
+		listViewMenu = new Vector<SpannableString>();
+		DataHandler jLayer = dataView.getDataHandler();
+		if (dataView.isFrozen() && jLayer.getMarkerCount() > 0){
+			selectedItemURL.add("search");
+		}
+		/*add all marker items to a title and a URL Vector*/
+		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
+			Marker ma = jLayer.getMarker(i);
+			if(ma.isActive()) {
+				if (ma.getURL()!=null) {
+					/* Underline the title if website is available*/
+					underlinedTitle = new SpannableString(ma.getTitle());
+					underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
+					listViewMenu.add(underlinedTitle);
+				} else {
+					listViewMenu.add(new SpannableString(ma.getTitle()));
 				}
+				/*the website for the corresponding title*/
+				if (ma.getURL()!=null)
+					selectedItemURL.add(ma.getURL());
+				/*if no website is available for a specific title*/
+				else
+					selectedItemURL.add("");
 			}
+
 
 			if (dataView.isFrozen()) {
 
@@ -215,7 +196,6 @@ public class MixListView extends ListActivity {
 		else {
 			jLayer.setMarkerList(searchResultMarkers);
 			dataView.setFrozen(true);
-			setList(2);
 			finish();
 			Intent intent1 = new Intent(this, MixListView.class); 
 			startActivityForResult(intent1, 42);
@@ -226,20 +206,7 @@ public class MixListView extends ListActivity {
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
-		switch(list){
-		/*Data Sources*/  
-		case 1:
-			//clickOnDataSource(position);	
-			CheckBox cb = (CheckBox) v.findViewById(R.id.list_checkbox);
-			cb.toggle();
-			break;
-
-			/*List View*/
-		case 2:
-			clickOnListView(position);
-			break;
-		}
-
+		clickOnListView(position);
 	}
 
 	public void clickOnListView(int position){
@@ -250,7 +217,6 @@ public class MixListView extends ListActivity {
 		else if("search".equals(selectedURL)){
 			dataView.setFrozen(false);
 			dataView.getDataHandler().setMarkerList(originalMarkerList);
-			setList(2);
 			finish();
 			Intent intent1 = new Intent(this, MixListView.class); 
 			startActivityForResult(intent1, 42);
@@ -267,86 +233,6 @@ public class MixListView extends ListActivity {
 		}
 	}
 
-	public static void createContextMenu(ImageView icon) {
-		icon.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {				
-			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-				int index=0;
-				switch(ListItemAdapter.itemPosition){
-				case 0:
-					menu.setHeaderTitle("Wiki Menu");
-					menu.add(index, index, index, "We are working on it...");			
-					break;
-				case 1:
-					menu.setHeaderTitle("Twitter Menu");
-					menu.add(index, index, index, "We are working on it...");
-					break;
-				case 2:
-					menu.setHeaderTitle("Buzz Menu");
-					menu.add(index, index, index, "We are working on it...");
-					break;
-				case 3:
-					menu.setHeaderTitle("OpenStreetMap Menu");
-					menu.add(index, index, index, "We are working on it...");
-					break;
-				case 4:
-					AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-					alert.setTitle("insert your own URL:");
-
-					final EditText input = new EditText(ctx); 
-					input.setText(customizedURL);
-					alert.setView(input);
-
-					alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {       		
-							Editable value = input.getText();
-							customizedURL = ""+value;
-						}
-					});
-					alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {       		
-							dialog.dismiss();
-						}
-					});
-					alert.show();
-					break;
-				}
-			}
-		});
-
-	}
-
-	public void clickOnDataSource(int position){
-//		if(dataView.isFrozen())
-//			dataView.setFrozen(false);
-//		switch(position){
-//		/*WIKIPEDIA*/
-//		case 0:
-//			mixContext.toogleDataSource(DATASOURCE.WIKIPEDIA);
-//			break;
-//
-//			/*TWITTER*/
-//		case 1:		
-//			mixContext.toogleDataSource(DATASOURCE.TWITTER);
-//			break;
-//
-//			/*BUZZ*/
-//		case 2:
-//			mixContext.toogleDataSource(DATASOURCE.BUZZ);
-//			break;
-//
-//			/*OSM*/
-//		case 3:
-//			mixContext.toogleDataSource(DATASOURCE.OSM);
-//			break;
-//
-//			/*Own URL*/
-//		case 4:
-//			mixContext.toogleDataSource(DATASOURCE.OWNURL);
-//			break;
-//		}
-	}
-
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
@@ -354,7 +240,6 @@ public class MixListView extends ListActivity {
 		/*define menu items*/
 		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
 		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
-		MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
@@ -374,43 +259,13 @@ public class MixListView extends ListActivity {
 		case 2:
 			finish();
 			break;
-		case 3:
-			Intent addDataSource = new Intent(this, DataSource.class);
-			startActivity(addDataSource);
-			break;
-		
 		}
 		return true;
-	}
-
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		switch(item.getItemId()){
-		case 1: 
-			break;
-		case 2: 
-			break;
-		case 3:
-			break;
-		}
-		return false;
 	}
 
 	public void createMixMap(){
 		Intent intent2 = new Intent(MixListView.this, MixMap.class); 
 		startActivityForResult(intent2, 20);
-	}
-
-	/*public void setDataSource(String source){
-		selectedDataSource = source;
-	}
-
-	public static String getDataSource(){
-		return selectedDataSource;
-	}*/
-
-	public static void setList(int l){
-		list = l;
 	}
 
 	public static String getSearchQuery(){
@@ -452,8 +307,6 @@ class ListItemAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			holder.text = (TextView) convertView.findViewById(R.id.list_text);
 			holder.description = (TextView) convertView.findViewById(R.id.description_text);
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.list_checkbox);
-			holder.datasource_icon = (ImageView) convertView.findViewById(R.id.datasource_icon);
 			
 			convertView.setTag(holder);
 		}
@@ -461,18 +314,6 @@ class ListItemAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.datasource_icon.setImageResource(mixListView.getDataSourceIcon().get(position));
-		holder.checkbox.setChecked(mixListView.getDataSourceChecked().get(position));
-
-		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-					mixListView.clickOnDataSource(position);
-			}
-			
-		});
 		
 		holder.text.setPadding(20, 8, 0, 0);
 		holder.description.setPadding(20, 40, 0, 0);
@@ -533,7 +374,5 @@ class ListItemAdapter extends BaseAdapter {
 	private class ViewHolder {
 		TextView text;
 		TextView description;
-		CheckBox checkbox;
-		ImageView datasource_icon;
 	}
 }
