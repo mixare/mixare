@@ -23,6 +23,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 
 /**
  * This class has the ability to set up the main view and it paints objects on the screen
@@ -85,7 +86,9 @@ public class PaintScreen {
 	}
 
 	public void paintRect(float x, float y, float width, float height) {
-		canvas.drawRect(x, y, x + width, y + height, paint);
+		//rounded edges. patch by Ignacio Avellino
+		RectF rect = new RectF(x, y, x + width, y + height);
+		canvas.drawRoundRect(rect, 15F, 15F, paint);
 	}
 	
 	public void paintBitmap(Bitmap bitmap, float left, float top) {
