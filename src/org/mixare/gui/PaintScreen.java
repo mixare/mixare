@@ -86,6 +86,10 @@ public class PaintScreen {
 	}
 
 	public void paintRect(float x, float y, float width, float height) {
+		canvas.drawRect(x, y, x + width, y + height, paint);
+	}
+
+	public void paintRoundedRect(float x, float y, float width, float height) {
 		//rounded edges. patch by Ignacio Avellino
 		RectF rect = new RectF(x, y, x + width, y + height);
 		canvas.drawRoundRect(rect, 15F, 15F, paint);
