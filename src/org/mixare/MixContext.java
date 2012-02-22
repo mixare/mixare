@@ -239,14 +239,21 @@ public class MixContext extends ContextWrapper {
 		return downloadManager;
 	}
 
+	public String getStartExtras() {
+		Intent intent = ((Activity) mixView).getIntent();
+		if (intent.hasExtra("markers")) {
+			return intent.getExtras().getString("markers");
+		} else {
+			return "";
+		}
+	}
 	public String getStartUrl() {
 		Intent intent = ((Activity) mixView).getIntent();
+		String ret = "";
 		if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_VIEW)) { 
-			return intent.getData().toString(); 
-		} 
-		else { 
-			return ""; 
+			ret = intent.getDataString(); 
 		}
+		return ret; 
 	}
 
 	public void getRM(Matrix dest) {

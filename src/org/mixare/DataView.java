@@ -26,11 +26,14 @@ import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
+import org.mixare.data.Json;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
 import org.mixare.gui.ScreenLine;
@@ -219,6 +222,33 @@ public class DataView {
 		
 	}
 
+	public void dataFromExtras(String markerList) {
+		DataSource source = new DataSource("LAUNCHER", "", DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
+		DownloadResult result = new DownloadResult();
+		Json layer = new Json();
+
+		// try loading JSON DATA
+		try {
+			JSONObject root = new JSONObject(markerList);
+			List<Marker> markers = layer.load(root,source);
+			result.setMarkers(markers);
+
+			result.source = source;
+			result.error = false;
+			result.errorMsg = null;
+
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		mixContext.setAllDataSourcesforLauncher(source);
+		dataHandler.addMarkers(result.getMarkers());
+		dataHandler.onLocationChanged(curFix);
+		state.nextLStatus = MixState.DONE;
+		
+	}
+	
 	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
 		DownloadRequest request = new DownloadRequest();
 		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
@@ -236,8 +266,11 @@ public class DataView {
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-						
-			if (mixContext.getStartUrl().length() > 0){
+			
+			if (mixContext.getStartExtras().length() > 0) {
+				dataFromExtras(mixContext.getStartExtras());
+				isLauncherStarted = true;
+			} else if (mixContext.getStartUrl().length() > 0){
 				requestData(mixContext.getStartUrl());
 				isLauncherStarted = true;
 			}
