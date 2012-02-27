@@ -409,21 +409,34 @@ public class MixContext extends ContextWrapper {
 		WebView webview = new WebView(mixView);
 		webview.getSettings().setJavaScriptEnabled(true);
 
-		webview.setWebViewClient(new WebViewClient() {
-			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
-				return true;
-			}
-
-		});
-				
-		Dialog d = new Dialog(mixView) {
+		final Dialog d = new Dialog(mixView) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
 					this.dismiss();
 				return true;
 			}
 		};
+		
+		webview.setWebViewClient(new WebViewClient() {
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				view.loadUrl(url);
+				return true;
+			}
+			
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				// TODO Auto-generated method stub
+				if(url.contains("return")){
+					d.dismiss();
+					mixView.repaint();
+				}
+				else{
+					super.onPageFinished(view, url);
+				}				
+			}
+
+		});
 		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.getWindow().setGravity(Gravity.BOTTOM);
 		d.addContentView(webview, new FrameLayout.LayoutParams(
@@ -431,12 +444,22 @@ public class MixContext extends ContextWrapper {
 				Gravity.BOTTOM));
 
 		d.show();
+		webview.loadUrl(url);
 		
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
 		// TODO
 		WebView webview = new WebView(context);
+		webview.setBackgroundColor(0x99FFFFFF);
+		
+		final Dialog d = new Dialog(context) {
+			public boolean onKeyDown(int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_BACK)
+					this.dismiss();
+				return true;
+			}
+		};
 		
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
@@ -444,15 +467,19 @@ public class MixContext extends ContextWrapper {
 				return true;
 			}
 
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				// TODO Auto-generated method stub
+				if(url.contains("return")){
+					d.dismiss();
+				}
+				else{
+					super.onPageFinished(view, url);
+				}				
+			}
+
 		});
 				
-		Dialog d = new Dialog(context) {
-			public boolean onKeyDown(int keyCode, KeyEvent event) {
-				if (keyCode == KeyEvent.KEYCODE_BACK)
-					this.dismiss();
-				return true;
-			}
-		};
 		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.getWindow().setGravity(Gravity.BOTTOM);
 		d.addContentView(webview, new FrameLayout.LayoutParams(
