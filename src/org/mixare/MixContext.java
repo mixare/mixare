@@ -129,102 +129,75 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 	public MixContext(Context appCtx) {
-	
+
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
 
 		refreshDataSources();
-		
-		boolean atLeastOneDatasourceSelected=false;
-		
-		for(DataSource ds: this.allDataSources) {
-			if(ds.getEnabled())
-				atLeastOneDatasourceSelected=true;
+
+		boolean atLeastOneDatasourceSelected = false;
+
+		for (DataSource ds : this.allDataSources) {
+			if (ds.getEnabled())
+				atLeastOneDatasourceSelected = true;
 		}
-		// select Wikipedia if nothing was previously selected  
-		if(!atLeastOneDatasourceSelected)
-			//TODO>: start intent data source select
-		
-		
-		rotationM.toIdentity();
-		
+
+		if (!atLeastOneDatasourceSelected) {
+			rotationM.toIdentity();
+		}
+
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
-		Criteria c = new Criteria();
-		//try to use the coarse provider first to get a rough position
-		c.setAccuracy(Criteria.ACCURACY_COARSE);
-		String coarseProvider = lm.getBestProvider(c, true);
-		try {
-			lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the coarse provider");
-		}
-		
-		//need to be precise
-		c.setAccuracy(Criteria.ACCURACY_FINE);				
-		//fineProvider will be used for the initial phase (requesting fast updates)
-		//as well as during normal program usage
-		//NB: using "true" as second parameters means we get the provider only if it's enabled
-		String fineProvider = lm.getBestProvider(c, true);
-		try {
-			lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the bounce provider");
-		}
-		
-		//fallback for the case where GPS and network providers are disabled
+
+		// frequency and minimum distance for update
+		// this values will only be used after there's a good GPS fix
+		// see back-off pattern discussion
+		// http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
+		// thanks Reto Meier for his presentation at gddde 2010
+		long freq = 5000; // 5 seconds
+		float dist = 20; // 20 meters
+		requestAllLocationUpdates(freq, dist);
+
+		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
 
-		//Frangart, Eppan, Bozen, Italy
+		// Frangart, Eppan, Bozen, Italy
 		hardFix.setLatitude(46.480302);
 		hardFix.setLongitude(11.296005);
 		hardFix.setAltitude(300);
-
-		/*New York*/
-//		hardFix.setLatitude(40.731510);
-//		hardFix.setLongitude(-73.991547);
-		
-		// TU Wien
-//		hardFix.setLatitude(48.196349);
-//		hardFix.setLongitude(16.368653);
-//		hardFix.setAltitude(180);
-
-		//frequency and minimum distance for update
-		//this values will only be used after there's a good GPS fix
-		//see back-off pattern discussion 
-		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		//thanks Reto Meier for his presentation at gddde 2010
-		long lFreq = 60000;	//60 seconds
-		float lDist = 50;		//20 meters
-		try {
-			lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the normal provider");
-			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-		}
 		
 		try {
-			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
-			Location lastCoarsePos=lm.getLastKnownLocation(coarseProvider);
-			if(lastFinePos!=null)
-				curLoc = lastFinePos;
-			else if (lastCoarsePos!=null)
-				curLoc = lastCoarsePos;
-			else
-				curLoc = hardFix;
-			
+			curLoc = getBestLocation();
 		} catch (Exception ex2) {
-			//ex2.printStackTrace();
+			// ex2.printStackTrace();
 			curLoc = hardFix;
-			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+			Toast.makeText(this,
+					getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
+					Toast.LENGTH_LONG).show();
 		}
-		
+
 		setLocationAtLastDownload(curLoc);
+	}
 
-//TODO fix logic
+	private Location getBestLocation() {
+		float accuracy = 0;
+		Location result = null;
+		for (String provider : lm.getAllProviders()) {
+			Location location = lm.getLastKnownLocation(provider);
+			if (location != null) {
+				if (location.getAccuracy() > accuracy) {
+					accuracy = location.getAccuracy();
+					result = location;
+				}
+			}
+		}
+		return result;
+	}
 
-	
+	private void requestAllLocationUpdates(long freq, float dist) {
+		for (String provider : lm.getAllProviders()) {
+			lm.requestLocationUpdates(provider, freq, dist, lnormal);
+		}
 	}
 	
 	public void unregisterLocationManager() {
