@@ -46,8 +46,8 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE };
-	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER };
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, ARENA };
+	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, IMAGE_MARKER };
 	private boolean enabled;
 	private TYPE type;
 	private DISPLAY display;
@@ -199,6 +199,12 @@ public class DataSource extends Activity {
 				"&altitude=" + Double.toString(alt) +
 				"&radius=" + Double.toString(radius);
 			break;
+
+			case ARENA:
+				ret+=
+				"&lat=" + Double.toString(lat) + 
+				"&lng=" + Double.toString(lon);
+			break;
 			
 			case OSM: 
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
@@ -216,6 +222,7 @@ public class DataSource extends Activity {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
+			case ARENA:		ret=Color.RED; break;
 			default:		ret=Color.WHITE; break;
 		}
 		return ret;
@@ -235,6 +242,9 @@ public class DataSource extends Activity {
 				break;
 			case WIKIPEDIA:	
 				ret=R.drawable.wikipedia; 
+				break;
+			case ARENA:	
+				ret=R.drawable.arena; 
 				break;
 			default:		
 				ret=R.drawable.ic_launcher; 

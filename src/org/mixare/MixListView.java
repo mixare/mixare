@@ -513,6 +513,8 @@ class ListItemAdapter extends BaseAdapter {
 			changeColor(3, Color.WHITE, Color.DKGRAY);
 		else if (source.equals("OwnURL"))
 			changeColor(4, Color.WHITE, Color.DKGRAY);
+		else if (source.equals("ARENA"))
+			changeColor(5, Color.WHITE, Color.DKGRAY);
 	}
 
 	@Override

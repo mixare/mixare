@@ -18,6 +18,10 @@
  */
 package org.mixare.data;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +31,17 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mixare.ImageMarker;
 import org.mixare.Marker;
 import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
+import org.mixare.R;
 import org.mixare.SocialMarker;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 /**
  * This class can compose a list of markers. The markers are
@@ -73,6 +81,9 @@ public class Json extends DataHandler {
 						break;
 					case WIKIPEDIA:
 						ma = processWikipediaJSONObject(jo, datasource);
+						break;
+					case ARENA:
+						ma = processArenaJSONObject(jo, datasource);
 						break;
 					case MIXARE:
 						default:
@@ -133,6 +144,48 @@ public class Json extends DataHandler {
 		return ma;
 	}
 
+	public Marker processArenaJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+		Marker ma = null;
+		if (jo.has("title") && jo.has("lat") && jo.has("lng")
+				&& jo.has("elevation")) {
+
+			Log.v(MixView.TAG, "processing Mixare JSON object");
+			String link=null;
+	
+			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
+				link=jo.getString("webpage");
+				
+			if (datasource.getDisplay() == DataSource.DISPLAY.IMAGE_MARKER) {
+				Bitmap image = null;
+				if (!jo.has("object_type")){
+					ma = new POIMarker(
+							unescapeHTML(jo.getString("title"), 0),
+							jo.getDouble("lat"), jo.getDouble("lng"),
+							jo.getDouble("elevation"), link, datasource);
+					return ma;
+				}
+				else{
+					if (jo.getString("object_type").equals("information")){
+						image = BitmapFactory.decodeResource(MixView.CONTEXT.getResources(),
+								R.drawable.information);
+					}
+					else if(jo.getString("object_type").equals("question")){
+						image = getBitmapFromURL(jo.getString("object_url"));
+					}
+					else if(jo.getString("object_type").equals("image")){
+						image = getBitmapFromURL(jo.getString("object_url"));
+					}
+					ma = new ImageMarker(
+							unescapeHTML(jo.getString("title"), 0),
+							jo.getDouble("lat"), jo.getDouble("lng"),
+							jo.getDouble("elevation"), link, datasource, image);	
+					return ma;
+				}				
+			}
+		}
+		return ma;
+	}
+	
 	public Marker processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
 
 		Marker ma = null;
@@ -165,7 +218,21 @@ public class Json extends DataHandler {
 		}
 		return ma;
 	}
-
+	
+	public static Bitmap getBitmapFromURL(String src) {
+	    try {
+	        URL url = new URL(src);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoInput(true);
+	        connection.connect();
+	        InputStream input = connection.getInputStream();
+	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
+	        return myBitmap;
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}	
 	public Marker processWikipediaJSONObject(JSONObject jo, DataSource datasource)
 			throws JSONException {
 
