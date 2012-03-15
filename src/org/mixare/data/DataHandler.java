@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.mixare.Marker;
+import org.mixare.lib.Marker;
 import org.mixare.MixContext;
 import org.mixare.MixView;
 

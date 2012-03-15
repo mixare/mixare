@@ -43,7 +43,8 @@ import javax.net.ssl.X509TrustManager;
 
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
-import org.mixare.render.Matrix;
+import org.mixare.lib.MixContextInterface;
+import org.mixare.lib.render.Matrix;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -75,7 +76,7 @@ import android.widget.Toast;
  * Cares about location management and about
  * the data (source, inputstream)
  */
-public class MixContext extends ContextWrapper {
+public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	//TAG for logging
 	public static final String TAG = "Mixare";

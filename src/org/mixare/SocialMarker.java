@@ -20,7 +20,8 @@
 package org.mixare;
 
 import org.mixare.data.DataSource;
-import org.mixare.gui.PaintScreen;
+import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.Marker;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

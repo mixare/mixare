@@ -20,6 +20,7 @@
 package org.mixare.data;
 
 import org.mixare.R;
+import org.mixare.lib.data.DataSourceInterface;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -41,7 +42,7 @@ import android.widget.TextView;
  * @author hannes
  * 
  */
-public class DataSource extends Activity {
+public class DataSource extends Activity implements DataSourceInterface{
 	
 	
 	private String name;

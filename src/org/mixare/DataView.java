@@ -31,10 +31,12 @@ import java.util.Map.Entry;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
-import org.mixare.gui.PaintScreen;
+import org.mixare.lib.Marker;
+import org.mixare.lib.MixUtils;
+import org.mixare.lib.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
-import org.mixare.gui.ScreenLine;
-import org.mixare.render.Camera;
+import org.mixare.lib.gui.ScreenLine;
+import org.mixare.lib.render.Camera;
 
 import android.graphics.Color;
 import android.location.Location;

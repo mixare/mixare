@@ -22,11 +22,11 @@ package org.mixare.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mixare.Marker;
+import org.mixare.lib.Marker;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
-import org.mixare.reality.PhysicalPlace;
+import org.mixare.lib.reality.PhysicalPlace;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;

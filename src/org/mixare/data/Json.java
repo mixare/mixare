@@ -32,7 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.ImageMarker;
-import org.mixare.Marker;
+import org.mixare.lib.Marker;
 import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
