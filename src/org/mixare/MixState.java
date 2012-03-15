@@ -49,6 +49,7 @@ public class MixState implements MixStateInterface{
 				this.detailsView = true;
 				ctx.loadMixViewWebPage(webpage);
 			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		} 
 		return true;

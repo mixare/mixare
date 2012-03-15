@@ -40,8 +40,8 @@ public class NavigationMarker extends Marker {
 	public static final int MAX_OBJECTS=10;
 
 	public NavigationMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override

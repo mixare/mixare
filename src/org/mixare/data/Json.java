@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mixare.ImageMarker;
-import org.mixare.lib.Marker;
-import org.mixare.MixContext;
+import org.mixare.lib.MarkerInterface;
+import org.mixare.plugin.PluginLoader;
+import org.mixare.plugin.PluginLoader.PluginNotFoundException;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
@@ -42,6 +42,7 @@ import org.mixare.SocialMarker;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.RemoteException;
 import android.util.Log;
 /**
  * This class can compose a list of markers. The markers are
@@ -52,10 +53,10 @@ public class Json extends DataHandler {
 
 	public static final int MAX_JSON_OBJECTS = 1000;
 
-	public List<Marker> load(JSONObject root, DataSource datasource) {
+	public List<MarkerInterface> load(JSONObject root, DataSource datasource) {
 		JSONObject jo = null;
 		JSONArray dataArray = null;
-		List<Marker> markers = new ArrayList<Marker>();
+		List<MarkerInterface> markers = new ArrayList<MarkerInterface>();
 
 		try {
 			// Twitter & own schema
@@ -74,7 +75,7 @@ public class Json extends DataHandler {
 				for (int i = 0; i < top; i++) {
 
 					jo = dataArray.getJSONObject(i);
-					Marker ma = null;
+					MarkerInterface ma = null;
 					switch (datasource.getType()) {
 					case TWITTER:
 						ma = processTwitterJSONObject(jo, datasource);
@@ -100,9 +101,9 @@ public class Json extends DataHandler {
 		return markers;
 	}
 
-	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
+	public MarkerInterface processTwitterJSONObject(JSONObject jo, DataSource datasource)
 			throws NumberFormatException, JSONException {
-		Marker ma = null;
+		MarkerInterface ma = null;
 		if (jo.has("geo")) {
 			Double lat = null, lon = null;
 
@@ -138,14 +139,14 @@ public class Json extends DataHandler {
 						lat, 
 						lon, 
 						0, url, 
-						datasource);
+						datasource.getTaskId(), datasource.getColor());
 			}
 		}
 		return ma;
 	}
 
-	public Marker processArenaJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
-		Marker ma = null;
+	public MarkerInterface processArenaJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+		MarkerInterface ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation")) {
 
@@ -161,7 +162,8 @@ public class Json extends DataHandler {
 					ma = new POIMarker(
 							unescapeHTML(jo.getString("title"), 0),
 							jo.getDouble("lat"), jo.getDouble("lng"),
-							jo.getDouble("elevation"), link, datasource);
+							jo.getDouble("elevation"), link, 
+							datasource.getTaskId(), datasource.getColor());
 					return ma;
 				}
 				else{
@@ -175,10 +177,17 @@ public class Json extends DataHandler {
 					else if(jo.getString("object_type").equals("image")){
 						image = getBitmapFromURL(jo.getString("object_url"));
 					}
-					ma = new ImageMarker(
-							unescapeHTML(jo.getString("title"), 0),
-							jo.getDouble("lat"), jo.getDouble("lng"),
-							jo.getDouble("elevation"), link, datasource, image);	
+					try {
+						ma = PluginLoader.getMarkerInstance("imagemarker",
+								unescapeHTML(jo.getString("title"), 0),
+								jo.getDouble("lat"), jo.getDouble("lng"),
+								jo.getDouble("elevation"), link, datasource.getTypeId(), datasource.getColor());
+						ma.setImage(image);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					} catch (PluginNotFoundException e) {
+						e.printStackTrace();
+					}
 					return ma;
 				}				
 			}
@@ -186,9 +195,9 @@ public class Json extends DataHandler {
 		return ma;
 	}
 	
-	public Marker processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+	public MarkerInterface processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
 
-		Marker ma = null;
+		MarkerInterface ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation")) {
 
@@ -205,7 +214,7 @@ public class Json extends DataHandler {
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					link, 
-					datasource);
+					datasource.getTaskId(), datasource.getColor());
         	} else {
             	ma = new NavigationMarker(
             			unescapeHTML(jo.getString("title"), 0), 
@@ -213,7 +222,7 @@ public class Json extends DataHandler {
         				jo.getDouble("lng"), 
         				0, 
         				link, 
-        				datasource);
+						datasource.getTaskId(), datasource.getColor());
         	}
 		}
 		return ma;
@@ -233,10 +242,10 @@ public class Json extends DataHandler {
 	        return null;
 	    }
 	}	
-	public Marker processWikipediaJSONObject(JSONObject jo, DataSource datasource)
+	public MarkerInterface processWikipediaJSONObject(JSONObject jo, DataSource datasource)
 			throws JSONException {
 
-		Marker ma = null;
+		MarkerInterface ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation") && jo.has("wikipediaUrl")) {
 
@@ -248,7 +257,7 @@ public class Json extends DataHandler {
 					jo.getDouble("lng"), 
 					jo.getDouble("elevation"), 
 					"http://"+jo.getString("wikipediaUrl"), 
-					datasource);
+					datasource.getTaskId(), datasource.getColor());
 		}
 		return ma;
 	}

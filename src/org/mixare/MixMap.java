@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
-import org.mixare.lib.Marker;
+import org.mixare.lib.MarkerInterface;
 import org.mixare.lib.MixUtils;
 
 import android.app.SearchManager;
@@ -61,7 +61,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
 
-	private static List<Marker> markerList;
+	private static List<MarkerInterface> markerList;
 	private static DataView dataView;
 	private static GeoPoint startPoint;
 
@@ -71,7 +71,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	static MixMap map;
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
-	public static List<Marker> originalMarkerList;
+	public static List<MarkerInterface> originalMarkerList;
 
 
 	@Override
@@ -131,7 +131,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
 		MixOverlay mixOverlay = new MixOverlay(this, drawable);
 
-		for(Marker marker:markerList) {
+		for(MarkerInterface marker:markerList) {
 			if(marker.isActive()) {
 				GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
 				item = new OverlayItem(point, "", "");
@@ -214,7 +214,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 //		return markerList;
 //	}
 
-	public void setMarkerList(List<Marker> maList){
+	public void setMarkerList(List<MarkerInterface> maList){
 		markerList = maList;
 	}
 
@@ -269,10 +269,10 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			originalMarkerList = jLayer.getMarkerList();
 			MixListView.originalMarkerList = jLayer.getMarkerList();
 		}
-		markerList = new ArrayList<Marker>();
+		markerList = new ArrayList<MarkerInterface>();
 
 		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-			Marker ma = jLayer.getMarker(i);
+			MarkerInterface ma = jLayer.getMarker(i);
 
 			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
 				markerList.add(ma);

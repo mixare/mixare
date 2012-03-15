@@ -36,7 +36,7 @@ import java.util.List;
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
-import org.mixare.lib.Marker;
+import org.mixare.lib.MarkerInterface;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.render.Matrix;
 
@@ -321,11 +321,11 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
 
-		ArrayList<Marker> searchResults =new ArrayList<Marker>();
+		ArrayList<MarkerInterface> searchResults =new ArrayList<MarkerInterface>();
 		Log.d("SEARCH-------------------0", ""+query);
 		if (jLayer.getMarkerCount() > 0) {
 			for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-				Marker ma = jLayer.getMarker(i);
+				MarkerInterface ma = jLayer.getMarker(i);
 				if(ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1){
 					searchResults.add(ma);
 					/*the website for the corresponding title*/

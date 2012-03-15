@@ -45,8 +45,8 @@ public class POIMarker extends Marker {
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 
 	public POIMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 
 	}
 

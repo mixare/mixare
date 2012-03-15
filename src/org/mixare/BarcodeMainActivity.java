@@ -3,6 +3,7 @@ package org.mixare;
 import org.mixare.barcode.IntentIntegrator;
 import org.mixare.barcode.IntentResult;
 import org.mixare.data.DataSourceList;
+import org.mixare.plugin.PluginLoader;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -73,6 +74,7 @@ public class BarcodeMainActivity extends Activity {
 			dataSourceEditor.putString("DataSource4", "Arena|"+url+"|5|2|true");
 			dataSourceEditor.commit();
 			startActivity(new Intent(this, MixView.class));
+			PluginLoader.loadMarkerPlugins(this);
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}

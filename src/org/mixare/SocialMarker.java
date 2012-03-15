@@ -40,8 +40,8 @@ public class SocialMarker extends Marker {
 	public static final int MAX_OBJECTS=15;
 
 	public SocialMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override

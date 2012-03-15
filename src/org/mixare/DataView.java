@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
-import org.mixare.lib.Marker;
+import org.mixare.lib.MarkerInterface;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.gui.RadarPoints;
@@ -298,7 +298,7 @@ public class DataView {
 		// Update markers
 		dataHandler.updateActivationStatus(mixContext);
 		for (int i = dataHandler.getMarkerCount()-1; i >= 0; i--) {
-			Marker ma = dataHandler.getMarker(i);
+			MarkerInterface ma = dataHandler.getMarker(i);
 			//if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma instanceof NavigationMarker || ma instanceof SocialMarker)) {
 			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
 				
@@ -377,7 +377,7 @@ public class DataView {
 			//the following will traverse the markers in ascending order (by distance) the first marker that 
 			//matches triggers the event.
 			for (int i = 0 ; i < dataHandler.getMarkerCount() && !evtHandled; i++) {
-				Marker pm = dataHandler.getMarker(i);
+				MarkerInterface pm = dataHandler.getMarker(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, mixContext, state);
 			}

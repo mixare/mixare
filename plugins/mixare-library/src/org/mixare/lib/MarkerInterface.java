@@ -1,6 +1,6 @@
 package org.mixare.lib;
 
-import org.mixare.lib.Marker.Label;
+import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.render.Camera;
@@ -44,6 +44,8 @@ public interface MarkerInterface extends Comparable<MarkerInterface>{
 	void setActive(boolean active);
 
 	int getColour();
+	
+	public void setTxtLab(Label txtLab);
 
 	Label getTxtLab();
 

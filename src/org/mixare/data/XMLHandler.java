@@ -22,7 +22,7 @@ package org.mixare.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mixare.lib.Marker;
+import org.mixare.lib.MarkerInterface;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
@@ -41,9 +41,9 @@ import android.util.Log;
  */
 public class XMLHandler extends DataHandler {
 
-	private List<Marker> processOSM(Element root, DataSource datasource) {
+	private List<MarkerInterface> processOSM(Element root, DataSource datasource) {
 
-    	List<Marker> markers = new ArrayList<Marker>();
+    	List<MarkerInterface> markers = new ArrayList<MarkerInterface>();
         NodeList nodes = root.getElementsByTagName("node");
         
         for (int i =0; i< nodes.getLength(); i++) {
@@ -65,22 +65,22 @@ public class XMLHandler extends DataHandler {
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
 	                	if(datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
-	                		Marker ma = new POIMarker(
+	                		MarkerInterface ma = new POIMarker(
 	                				name, 
 	                				lat, 
 	                				lon, 
 	                				0, 
 	                				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
-	                				datasource);
+	        						datasource.getTaskId(), datasource.getColor());
 		        			markers.add(ma);
 	                	} else {
-		                	Marker ma = new NavigationMarker(
+	                		MarkerInterface ma = new NavigationMarker(
 			        				name, 
 			        				lat, 
 			        				lon, 
 			        				0, 
 			        				"http://www.openstreetmap.org/?node="+att.getNamedItem("id").getNodeValue(), 
-			        				datasource);
+									datasource.getTaskId(), datasource.getColor());
 		        			markers.add(ma);
 	                	}
 
@@ -105,7 +105,7 @@ public class XMLHandler extends DataHandler {
 		//return "[bbox=16.365,48.193,16.374,48.199]";
 	}
 	
-	public List<Marker> load(Document doc, DataSource datasource) {
+	public List<MarkerInterface> load(Document doc, DataSource datasource) {
         Element root = doc.getDocumentElement();
         
         // If the root tag is called "osm" we got an 

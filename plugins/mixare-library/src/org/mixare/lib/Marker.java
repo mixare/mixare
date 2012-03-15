@@ -25,13 +25,16 @@ import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.data.DataSourceInterface;
+import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenObj;
 import org.mixare.lib.gui.TextObj;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
 
 /**
  * The class represents a marker and contains its information.
@@ -40,7 +43,7 @@ import android.location.Location;
  * NavigationMarkers, since this class is abstract
  */
 
-abstract public class Marker implements Comparable<Marker> {
+abstract public class Marker implements MarkerInterface {
 
 	private String ID;
 	protected String title;
@@ -49,8 +52,9 @@ abstract public class Marker implements Comparable<Marker> {
 	protected PhysicalPlace mGeoLoc;
 	// distance from user to mGeoLoc in meters
 	protected double distance;
-	// From which type does this marker originate
-	protected DataSourceInterface datasource;
+	// The marker color
+	private int colour;
+	
 	private boolean active;
 
 	// Draw properties
@@ -70,7 +74,7 @@ abstract public class Marker implements Comparable<Marker> {
 	public Label txtLab = new Label();
 	protected TextObj textBlock;
 
-	public Marker(String title, double latitude, double longitude, double altitude, String link, DataSourceInterface datasource) {
+	public Marker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
 		super();
 
 		this.active = false;
@@ -80,9 +84,9 @@ abstract public class Marker implements Comparable<Marker> {
 			URL = "webpage:" + URLDecoder.decode(link);
 			this.underline = true;
 		}
-		this.datasource = datasource;
+		this.colour = colour;
 
-		this.ID=datasource.getTypeId()+"##"+title;
+		this.ID=type +"##"+title;
 
 	}
 
@@ -130,7 +134,7 @@ abstract public class Marker implements Comparable<Marker> {
 	}
 
 	private void calcV(Camera viewCam) {
-		isVisible = false;
+		isVisible = true;
 //		isLookingAt = false;
 //		deltaCenter = Float.MAX_VALUE;
 
@@ -206,6 +210,11 @@ abstract public class Marker implements Comparable<Marker> {
 		drawCircle(dw);
 		drawTextBlock(dw);
 	}
+	
+	public String[] remoteDraw(){
+		String[] result = {"drawCircle", "drawTextBlock"};
+		return result;
+	}
 
 	public void drawCircle(PaintScreen dw) {
 
@@ -262,13 +271,17 @@ abstract public class Marker implements Comparable<Marker> {
 
 	}
 
-	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state) {
-		boolean evtHandled = false;
-
-		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, URL);
+	public String fClick(float x, float y) {
+		try{
+			boolean evtHandled = false;
+	
+			if (isClickValid(x, y)) {
+				return URL;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		return evtHandled;
+		return null;
 	}
 
 	public double getDistance() {
@@ -312,48 +325,71 @@ abstract public class Marker implements Comparable<Marker> {
 
 	abstract public int getMaxObjects();
 
+	@Override
+	public boolean fClick(float x, float y, MixContextInterface ctx,
+			MixStateInterface state) {
+		boolean evtHandled = false;
+
+		if (isClickValid(x, y)) {
+			evtHandled = state.handleEvent(ctx, getURL());
+		}
+		return evtHandled;
+	}
+
+	@Override
+	public int compareTo(MarkerInterface another) {
+		return this.getID().compareTo(another.getID());
+	}
+
+	public void setImage(Bitmap bitmap){
+	}
+	
+	public Label getTxtLab(){
+		return txtLab;
+	}
+	
+	@Override
+	public void setTxtLab(Label txtLab){
+		this.txtLab = txtLab;
+	}
+
+	@Override
+	public Bitmap getImage() {
+		return null;
+	}
+
+	@Override
+	public MixVector getCMarker() {
+		return cMarker;
+	}
+
+	@Override
+	public MixVector getSignMarker() {
+		return signMarker;
+	}
+
+	@Override
+	public TextObj getTextBlock() {
+		return textBlock;
+	}
+
+	@Override
+	public boolean getUnderline() {
+		return underline;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	@Override
+	public void setTextBlock(TextObj txtBlock) {
+		this.textBlock = txtBlock;
+	}
 
 	//get Colour for OpenStreetMap based on the URL number
 	public int getColour() {
-		return this.datasource.getColor();
+		return colour;
 	}
-
-	public class Label implements ScreenObj {
-		private float x, y;
-		private float width, height;
-		private ScreenObj obj;
-
-		public void prepare(ScreenObj drawObj) {
-			obj = drawObj;
-			float w = obj.getWidth();
-			float h = obj.getHeight();
-
-			x = w / 2;
-			y = 0;
-
-			width = w * 2;
-			height = h * 2;
-		}
-
-		public void paint(PaintScreen dw) {
-			dw.paintObj(obj, x, y, 0, 1);
-		}
-
-		public float getX() {
-			return x;
-		}
-
-		public float getY() {
-			return y;
-		}
-
-		public float getWidth() {
-			return width;
-		}
-
-		public float getHeight() {
-			return height;
-		}
-	}
-
 }

@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.mixare.lib.Marker;
+import org.mixare.lib.MarkerInterface;
 import org.mixare.MixContext;
 import org.mixare.MixView;
 
@@ -39,12 +39,12 @@ import android.util.Log;
 public class DataHandler {
 	
 	// complete marker list
-	private List<Marker> markerList = new ArrayList<Marker>();
+	private List<MarkerInterface> markerList = new ArrayList<MarkerInterface>();
 	
-	public void addMarkers(List<Marker> markers) {
+	public void addMarkers(List<MarkerInterface> markers) {
 
 		Log.v(MixView.TAG, "Marker before: "+markerList.size());
-		for(Marker ma:markers) {
+		for(MarkerInterface ma:markers) {
 			if(!markerList.contains(ma))
 				markerList.add(ma);
 		}
@@ -57,7 +57,7 @@ public class DataHandler {
 	}
 	
 	public void updateDistances(Location location) {
-		for(Marker ma: markerList) {
+		for(MarkerInterface ma: markerList) {
 			float[] dist=new float[3];
 			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
 			ma.setDistance(dist[0]);
@@ -68,7 +68,7 @@ public class DataHandler {
 		
 		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
 				
-		for(Marker ma: markerList) {
+		for(MarkerInterface ma: markerList) {
 
 			Class mClass=ma.getClass();
 			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
@@ -83,7 +83,7 @@ public class DataHandler {
 	public void onLocationChanged(Location location) {
 		updateDistances(location);
 		sortMarkerList();
-		for(Marker ma: markerList) {
+		for(MarkerInterface ma: markerList) {
 			ma.update(location);
 		}
 	}
@@ -106,7 +106,7 @@ public class DataHandler {
 		return markerList.size();
 	}
 	
-	public Marker getMarker(int index) {
+	public MarkerInterface getMarker(int index) {
 		return markerList.get(index);
 	}
 }

@@ -42,6 +42,11 @@ public class ImageMarker extends Marker{
 		this.drawImage(dw);
 		super.drawTextBlock(dw);
 	}
+	
+	public String[] remoteDraw(){
+		String[] result = {"drawImage", "drawTextBlock"};
+		return result;
+	}
 
 	public void drawImage(PaintScreen dw){
 		if (isVisible) {
@@ -49,4 +54,15 @@ public class ImageMarker extends Marker{
 			dw.paintBitmap(image, signMarker.x - (image.getWidth()/2), signMarker.y - (image.getHeight() / 2));
 		}
 	}
+	
+	public void setImage(Bitmap image) {
+		this.image = image;
+	}
+
+	public Bitmap getImage() {
+		return image;
+	}
+
+	
+	
 }
