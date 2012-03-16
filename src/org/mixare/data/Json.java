@@ -183,7 +183,7 @@ public class Json extends DataHandler {
 								jo.getDouble("elevation"), link, datasource.getTypeId(), datasource.getColor());
 						ma.setImage(image);
 					} catch (RemoteException e) {
-						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 					return ma;
 				}				
