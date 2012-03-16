@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.mixare.lib.MarkerInterface;
 import org.mixare.MixContext;
 import org.mixare.MixView;
+import org.mixare.lib.marker.MarkerInterface;
 
 import android.location.Location;
 import android.util.Log;

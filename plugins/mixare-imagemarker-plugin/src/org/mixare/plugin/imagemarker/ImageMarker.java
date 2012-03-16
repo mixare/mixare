@@ -3,7 +3,7 @@
  */
 package org.mixare.plugin.imagemarker;
 
-import org.mixare.lib.Marker;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.gui.PaintScreen;
 
 import android.graphics.Bitmap;
@@ -44,8 +44,7 @@ public class ImageMarker extends Marker{
 	}
 	
 	public String[] remoteDraw(){
-		String[] result = {"drawImage", "drawTextBlock"};
-		return result;
+		return new String[] {"drawImage", "drawTextBlock"};
 	}
 
 	public void drawImage(PaintScreen dw){

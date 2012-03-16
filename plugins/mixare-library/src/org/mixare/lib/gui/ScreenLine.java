@@ -18,8 +18,6 @@
  */
 package org.mixare.lib.gui;
 
-import org.mixare.lib.reality.PhysicalPlace;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 

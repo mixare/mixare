@@ -19,7 +19,7 @@
 package org.mixare.gui;
 
 import org.mixare.DataView;
-import org.mixare.lib.MarkerInterface;
+import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenObj;
 import org.mixare.data.DataHandler;

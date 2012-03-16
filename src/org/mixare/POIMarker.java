@@ -21,11 +21,10 @@ package org.mixare;
 
 import java.text.DecimalFormat;
 
-import org.mixare.data.DataSource;
+import org.mixare.lib.marker.Marker;
+import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.TextObj;
-import org.mixare.lib.Marker;
-import org.mixare.lib.MixUtils;
 
 import android.graphics.Color;
 import android.graphics.Path;

@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mixare.lib.gui.Label;
-import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.TextObj;
-import org.mixare.lib.Marker;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -18,9 +17,9 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 
 public class ImageMarkerService extends Service{
+	
 	static final String PLUGIN_NAME = "imagemarker";
 	static final String CATEGORY_PLUGIN= "mixare.intent.category.MARKER_PLUGIN";
 	private Map<String, Marker> markers = new HashMap<String, Marker>();
@@ -53,10 +52,6 @@ public class ImageMarkerService extends Service{
 			String markerName = "imageMarker-"+count+"-"+marker.getID();
 			markers.put(markerName, marker);
 			return markerName;
-		}
-
-		public Marker getMarker(String markerName) throws RemoteException {
-			return markers.get(markerName);
 		}
 
 		@Override
@@ -199,7 +194,6 @@ public class ImageMarkerService extends Service{
 		@Override
 		public void setTextBlock(String markerName, TextObj txtBlock)
 				throws RemoteException {
-			Log.i("textblock",txtBlock.toString());
 			markers.get(markerName).setTextBlock(txtBlock);
 		}
 

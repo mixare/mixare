@@ -18,10 +18,6 @@
  */
 package org.mixare.lib.render;
 
-import org.mixare.lib.gui.ScreenLine;
-import org.mixare.lib.gui.TextObj;
-import org.mixare.lib.reality.PhysicalPlace;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 

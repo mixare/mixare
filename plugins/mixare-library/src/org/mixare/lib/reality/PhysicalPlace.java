@@ -18,7 +18,6 @@
  */
 package org.mixare.lib.reality;
 
-import org.mixare.lib.Marker;
 import org.mixare.lib.render.MixVector;
 
 import android.location.Location;

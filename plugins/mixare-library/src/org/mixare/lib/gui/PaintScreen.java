@@ -18,8 +18,6 @@
  */
 package org.mixare.lib.gui;
 
-import org.mixare.lib.render.Matrix;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;

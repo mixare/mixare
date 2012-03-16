@@ -22,14 +22,9 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.mixare.lib.reality.PhysicalPlace;
-
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 /**
  *  This class stores the properties of the displayed text and uses the

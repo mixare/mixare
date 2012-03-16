@@ -19,10 +19,9 @@
 
 package org.mixare;
 
-import org.mixare.data.DataSource;
-import org.mixare.lib.gui.PaintScreen;
-import org.mixare.lib.Marker;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.MixUtils;
+import org.mixare.lib.gui.PaintScreen;
 
 import android.graphics.Path;
 import android.location.Location;

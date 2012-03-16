@@ -31,14 +31,13 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mixare.lib.MarkerInterface;
-import org.mixare.plugin.PluginLoader;
-import org.mixare.plugin.PluginLoader.PluginNotFoundException;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
 import org.mixare.R;
 import org.mixare.SocialMarker;
+import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.plugin.PluginLoader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -184,8 +183,6 @@ public class Json extends DataHandler {
 								jo.getDouble("elevation"), link, datasource.getTypeId(), datasource.getColor());
 						ma.setImage(image);
 					} catch (RemoteException e) {
-						e.printStackTrace();
-					} catch (PluginNotFoundException e) {
 						e.printStackTrace();
 					}
 					return ma;

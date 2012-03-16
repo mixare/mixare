@@ -22,7 +22,7 @@ package org.mixare.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mixare.lib.MarkerInterface;
+import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;

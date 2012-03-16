@@ -27,14 +27,13 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map.Entry;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
-import org.mixare.lib.MarkerInterface;
+import org.mixare.gui.RadarPoints;
+import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
-import org.mixare.gui.RadarPoints;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.render.Camera;
 
