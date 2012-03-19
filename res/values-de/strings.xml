@@ -43,7 +43,7 @@
 	<string name="connection_error_dialog_button2">Einstellungen</string>
 	<string name="connection_error_dialog_button3">Verlassen</string>
 	
-	<string name="connection_GPS_dialog_text">Die GPS position kann nicht aktualisiert werden... \nFalls Sie fortfahren möchten kann es sein 
+	<string name="connection_GPS_dialog_text">Die GPS-Position kann nicht aktualisiert werden... \nFalls Sie fortfahren möchten kann es sein 
 		\ndass sich die Informationen nicht am richtigen Platz befinden.</string>
 	<string name="connection_GPS_dialog_button1">Fortfahren</string>
 	<string name="connection_GPS_dialog_button2">Schließen</string>
@@ -54,7 +54,7 @@
 	<string name="close_button">Schließen</string>
 	<string name="general_info_title">Allgemeine Informationen</string>
 	
-	<string name="general_info_text">GPS info: </string>
+	<string name="general_info_text">GPS-Info: </string>
 	<string name="longitude">Längengrad: </string>
 	<string name="latitude">Breitengrad: </string>
 	<string name="altitude">Meereshöhe: </string>
