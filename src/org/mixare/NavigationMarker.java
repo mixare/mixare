@@ -19,7 +19,7 @@
 
 package org.mixare;
 
-import org.mixare.Marker;
+import org.mixare.LocalMarker;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 
@@ -34,7 +34,7 @@ import android.location.Location;
  * @author hannes
  *
  */
-public class NavigationMarker extends Marker {
+public class NavigationMarker extends LocalMarker {
 	
 	public static final int MAX_OBJECTS=10;
 

@@ -28,7 +28,7 @@ import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.TextObj;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
@@ -43,7 +43,7 @@ import android.location.Location;
  * NavigationMarkers, since this class is abstract
  */
 
-abstract public class Marker implements MarkerInterface {
+abstract public class LocalMarker implements Marker {
 
 	private String ID;
 	protected String title;
@@ -74,7 +74,7 @@ abstract public class Marker implements MarkerInterface {
 	public Label txtLab = new Label();
 	protected TextObj textBlock;
 
-	public Marker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
+	public LocalMarker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
 		super();
 
 		this.active = false;
@@ -292,10 +292,10 @@ abstract public class Marker implements MarkerInterface {
 		ID = iD;
 	}
 
-	public int compareTo(MarkerInterface another) {
+	public int compareTo(Marker another) {
 
-		MarkerInterface leftPm = this;
-		MarkerInterface rightPm = another;
+		Marker leftPm = this;
+		Marker rightPm = another;
 
 		return Double.compare(leftPm.getDistance(), rightPm.getDistance());
 
@@ -303,7 +303,7 @@ abstract public class Marker implements MarkerInterface {
 
 	@Override
 	public boolean equals (Object marker) {
-		return this.ID.equals(((Marker) marker).getID());
+		return this.ID.equals(((LocalMarker) marker).getID());
 	}
 
 	public boolean isActive() {

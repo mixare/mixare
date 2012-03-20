@@ -19,7 +19,7 @@
 package org.mixare.gui;
 
 import org.mixare.DataView;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenObj;
 import org.mixare.data.DataHandler;
@@ -56,7 +56,7 @@ public class RadarPoints implements ScreenObj {
 		DataHandler jLayer = view.getDataHandler();
 
 		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-			MarkerInterface pm = jLayer.getMarker(i);
+			Marker pm = jLayer.getMarker(i);
 			float x = pm.getLocationVector().x / scale;
 			float y = pm.getLocationVector().z / scale;
 

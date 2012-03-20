@@ -36,7 +36,7 @@ import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
 import org.mixare.R;
 import org.mixare.SocialMarker;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.plugin.PluginLoader;
 
 import android.graphics.Bitmap;
@@ -52,10 +52,10 @@ public class Json extends DataHandler {
 
 	public static final int MAX_JSON_OBJECTS = 1000;
 
-	public List<MarkerInterface> load(JSONObject root, DataSource datasource) {
+	public List<Marker> load(JSONObject root, DataSource datasource) {
 		JSONObject jo = null;
 		JSONArray dataArray = null;
-		List<MarkerInterface> markers = new ArrayList<MarkerInterface>();
+		List<Marker> markers = new ArrayList<Marker>();
 
 		try {
 			// Twitter & own schema
@@ -74,7 +74,7 @@ public class Json extends DataHandler {
 				for (int i = 0; i < top; i++) {
 
 					jo = dataArray.getJSONObject(i);
-					MarkerInterface ma = null;
+					Marker ma = null;
 					switch (datasource.getType()) {
 					case TWITTER:
 						ma = processTwitterJSONObject(jo, datasource);
@@ -100,9 +100,9 @@ public class Json extends DataHandler {
 		return markers;
 	}
 
-	public MarkerInterface processTwitterJSONObject(JSONObject jo, DataSource datasource)
+	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
 			throws NumberFormatException, JSONException {
-		MarkerInterface ma = null;
+		Marker ma = null;
 		if (jo.has("geo")) {
 			Double lat = null, lon = null;
 
@@ -144,8 +144,8 @@ public class Json extends DataHandler {
 		return ma;
 	}
 
-	public MarkerInterface processArenaJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
-		MarkerInterface ma = null;
+	public Marker processArenaJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation")) {
 
@@ -192,9 +192,9 @@ public class Json extends DataHandler {
 		return ma;
 	}
 	
-	public MarkerInterface processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+	public Marker processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
 
-		MarkerInterface ma = null;
+		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation")) {
 
@@ -239,10 +239,10 @@ public class Json extends DataHandler {
 	        return null;
 	    }
 	}	
-	public MarkerInterface processWikipediaJSONObject(JSONObject jo, DataSource datasource)
+	public Marker processWikipediaJSONObject(JSONObject jo, DataSource datasource)
 			throws JSONException {
 
-		MarkerInterface ma = null;
+		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation") && jo.has("wikipediaUrl")) {
 

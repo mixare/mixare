@@ -1,5 +1,6 @@
 package org.mixare.lib.marker.draw;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,6 +11,11 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * A
+ * @author A.Egal
+ *
+ */
 public abstract class DrawCommand implements Parcelable{
 
 	private String command;
@@ -114,18 +120,18 @@ public abstract class DrawCommand implements Parcelable{
         }
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static DrawCommand buildObject(Parcel in){
-		String command = in.readString();
-		if(command.equals("DrawArrow")){
-			return DrawArrow.initDrawArrow(in);
+		String className = in.readString();
+		String methodName = "init";
+		Class[] args = new Class[1];
+		args[0] = Parcel.class;
+		try {
+			Method m = Class.forName(className).getMethod(methodName, args);
+			return (DrawCommand) m.invoke(null, in);			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		else if(command.equals("DrawImage")){
-			return DrawImage.initDrawImage(in);
-		}
-		else if(command.equals("DrawTextBox")){
-			return DrawTextBox.initDrawTextBox(in);
-		}
-		return null;
 	}	
 	
 }

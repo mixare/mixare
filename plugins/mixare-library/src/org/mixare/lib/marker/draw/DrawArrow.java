@@ -13,11 +13,13 @@ import android.os.Parcel;
  */
 public class DrawArrow extends DrawCommand{
 
+	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawArrow";
+	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_CMARKER = "cMarker";
 	private static String PROPERTY_NAME_SIGNMARKER = "signMarker";
 	
-	static DrawArrow initDrawArrow(Parcel in){
+	public static DrawArrow init(Parcel in){
 		Boolean visible = Boolean.valueOf(in.readString());
 		ParcelableProperty cMarkerHolder = in.readParcelable(ParcelableProperty.class.getClassLoader());
 		ParcelableProperty signMarkerHolder = in.readParcelable(ParcelableProperty.class.getClassLoader());
@@ -25,7 +27,7 @@ public class DrawArrow extends DrawCommand{
 	}
 	
 	public DrawArrow(boolean visible, MixVector cMarker, MixVector signMarker) {
-		super("DrawArrow");
+		super(CLASS_NAME);
 		setProperty(PROPERTY_NAME_VISIBLE, visible);
 		setProperty(PROPERTY_NAME_CMARKER, cMarker);
 		setProperty(PROPERTY_NAME_SIGNMARKER, signMarker);

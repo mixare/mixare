@@ -5,7 +5,8 @@ import android.os.Parcelable;
 
 /**
  * A draw property which contains a parcelable object with its classname so it
- * can be loaded.
+ * can be loaded. This class should be used, when a plugin wants to send a 'unknown' parcelable object to the core
+ * This is needed because the classname of a parcel should be known before the core can convert that into an object.
  * @author A. Egal
  */
 public class ParcelableProperty implements Parcelable {

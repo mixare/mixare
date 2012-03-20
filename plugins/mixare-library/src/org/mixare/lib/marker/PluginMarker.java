@@ -4,8 +4,8 @@ import java.net.URLDecoder;
 
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.Label;
-import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
@@ -15,8 +15,8 @@ import android.graphics.Bitmap;
 import android.location.Location;
 
 /**
- * IN PROGRESS
- * @author abdullahi
+ * A plugin marker that should be extended by marker plugins.
+ * @author A. Egal
  *
  */
 public abstract class PluginMarker{
@@ -41,8 +41,6 @@ public abstract class PluginMarker{
 	protected MixVector locationVector = new MixVector();
 	private MixVector origin = new MixVector(0, 0, 0);
 	private MixVector upV = new MixVector(0, 1, 0);
-
-	private ScreenLine pPt = new ScreenLine();
 	public Label txtLab = new Label();
 	protected TextObj textBlock;
 	
@@ -114,42 +112,8 @@ public abstract class PluginMarker{
 		return isVisible;
 	}
 
-	public String fClick(float x, float y) {
-		try{
-			if (isClickValid(x, y)) {
-				return URL;
-			}
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
-	
-	private boolean isClickValid(float x, float y) {
-		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-				signMarker.x, signMarker.y);
-		//if the marker is not active (i.e. not shown in AR view) we don't have to check it for clicks
-		if (!isActive())
-			return false;
-
-		//TODO adapt the following to the variable radius!
-		pPt.x = x - signMarker.x;
-		pPt.y = y - signMarker.y;
-		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
-		pPt.x += txtLab.getX();
-		pPt.y += txtLab.getY();
-
-		float objX = txtLab.getX() - txtLab.getWidth() / 2;
-		float objY = txtLab.getY() - txtLab.getHeight() / 2;
-		float objW = txtLab.getWidth();
-		float objH = txtLab.getHeight();
-
-		if (pPt.x > objX && pPt.x < objX + objW && pPt.y > objY
-				&& pPt.y < objY + objH) {
-			return true;
-		} else {
-			return false;
-		}
+	public ClickHandler fClick() {
+		return new ClickHandler(URL, active, txtLab, signMarker, cMarker);
 	}
 
 	public abstract int getMaxObjects();

@@ -9,11 +9,13 @@ import android.os.Parcel;
 
 public class DrawImage extends DrawCommand{
 	
+	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawImage";
+	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_SIGNMARKER = "signMarker";
 	private static String PROPERTY_NAME_IMAGE = "image";
 	
-	static DrawImage initDrawImage(Parcel in){
+	public static DrawImage init(Parcel in){
 		Boolean visible = Boolean.valueOf(in.readString());
 		ParcelableProperty signMarkerHolder = in.readParcelable(ParcelableProperty.class.getClassLoader());
 		ParcelableProperty bitmapHolder = in.readParcelable(ParcelableProperty.class.getClassLoader());
@@ -21,7 +23,7 @@ public class DrawImage extends DrawCommand{
 	}
 	
 	public DrawImage(boolean visible,MixVector signMarker, Bitmap image) {
-		super("DrawImage");
+		super(CLASS_NAME);
 		setProperty(PROPERTY_NAME_VISIBLE, visible);
 		setProperty(PROPERTY_NAME_SIGNMARKER, new ParcelableProperty("org.mixare.lib.render.MixVector", signMarker));
 		setProperty(PROPERTY_NAME_IMAGE,  new ParcelableProperty("android.graphics.Bitmap",image));

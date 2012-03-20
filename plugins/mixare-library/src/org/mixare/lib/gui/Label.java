@@ -64,7 +64,6 @@ public class Label implements ScreenObj, Parcelable {
 		dest.writeFloat(y);
 		dest.writeFloat(width);
 		dest.writeFloat(height);	
-		dest.writeParcelable((TextObj)obj, 0);
 	}
 
 	public void readParcel(Parcel in){
@@ -72,7 +71,6 @@ public class Label implements ScreenObj, Parcelable {
 		x = in.readFloat();
 		width = in.readFloat();
 		height = in.readFloat();
-		obj = in.readParcelable(TextObj.class.getClassLoader());
 	}
 
 	@Override

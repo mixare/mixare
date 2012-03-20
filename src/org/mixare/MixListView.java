@@ -25,7 +25,7 @@ import java.util.Vector;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.MixUtils;
 
 import android.app.AlertDialog;
@@ -84,8 +84,8 @@ public class MixListView extends ListActivity {
 	private static Context ctx;
 	private static String searchQuery = "";
 	private static SpannableString underlinedTitle;
-	public static List<MarkerInterface> searchResultMarkers;
-	public static List<MarkerInterface> originalMarkerList;
+	public static List<Marker> searchResultMarkers;
+	public static List<Marker> originalMarkerList;
 
 	public Vector<String> getDataSourceMenu() {
 		return dataSourceMenu;
@@ -130,7 +130,7 @@ public class MixListView extends ListActivity {
 			}
 			/*add all marker items to a title and a URL Vector*/
 			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-				MarkerInterface ma = jLayer.getMarker(i);
+				Marker ma = jLayer.getMarker(i);
 				if(ma.isActive()) {
 					if (ma.getURL()!=null) {
 						/* Underline the title if website is available*/
@@ -191,14 +191,14 @@ public class MixListView extends ListActivity {
 			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
 		originalMarkerList = jLayer.getMarkerList();
-		searchResultMarkers = new ArrayList<MarkerInterface>();
+		searchResultMarkers = new ArrayList<Marker>();
 		Log.d("SEARCH-------------------0", ""+query);
 		setSearchQuery(query);
 
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<SpannableString>();
 		for(int i = 0; i < jLayer.getMarkerCount();i++){
-			MarkerInterface ma = jLayer.getMarker(i);
+			Marker ma = jLayer.getMarker(i);
 
 			if (ma.getTitle().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
 				searchResultMarkers.add(ma);

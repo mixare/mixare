@@ -8,6 +8,7 @@ import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.marker.draw.DrawCommand;
+import org.mixare.lib.marker.draw.ClickHandler;
 /**
  * Android Interface Definition Language for contact between services in different threads,
  * In this case: The IMarkerService connects the mixare core with the markers of the plugins.
@@ -57,7 +58,7 @@ interface IMarkerService {
 
 	int getMaxObjects(String markerName);
 
-	String fClick(String markerName, float x, float y);
+	ClickHandler fClick(String markerName);
 
 	void setImage(String markerName, in Bitmap image);
 

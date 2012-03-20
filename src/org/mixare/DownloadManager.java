@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import org.mixare.data.DataSource;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -151,7 +151,7 @@ public class DownloadManager implements Runnable {
 
 					Log.d(MixView.TAG, "loading JSON data");
 
-					List<MarkerInterface> markers = layer.load(root,request.source);
+					List<Marker> markers = layer.load(root,request.source);
 					result.setMarkers(markers);
 
 					result.source = request.source;
@@ -176,7 +176,7 @@ public class DownloadManager implements Runnable {
 						Log.i(MixView.TAG, "loading XML data");	
 						
 
-						List<MarkerInterface> markers = xml.load(doc, request.source);
+						List<Marker> markers = xml.load(doc, request.source);
 						
 						result.setMarkers(markers);
 
@@ -289,17 +289,17 @@ class DownloadRequest {
 class DownloadResult {
 	public DataSource source;
 	String params;
-	List<MarkerInterface> markers;
+	List<Marker> markers;
 
 	boolean error;
 	String errorMsg="";
 	DownloadRequest errorRequest;
 
 
-	public List<MarkerInterface> getMarkers() {
+	public List<Marker> getMarkers() {
 		return markers;
 	}
-	public void setMarkers(List<MarkerInterface> markers) {
+	public void setMarkers(List<Marker> markers) {
 		this.markers = markers;
 	}
 	

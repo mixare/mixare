@@ -10,7 +10,11 @@ import org.mixare.lib.render.MixVector;
 import android.graphics.Bitmap;
 import android.location.Location;
 
-public interface MarkerInterface extends Comparable<MarkerInterface>{
+/**
+ * The marker interface.
+ * @author A. Egal
+ */
+public interface Marker extends Comparable<Marker>{
 
 	String getTitle();
 

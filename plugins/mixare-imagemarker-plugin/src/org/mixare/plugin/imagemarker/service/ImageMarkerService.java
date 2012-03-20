@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.marker.PluginMarker;
+import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
@@ -151,9 +152,9 @@ public class ImageMarkerService extends Service{
 		}
 
 		@Override
-		public String fClick(String markerName, float x, float y)
+		public ClickHandler fClick(String markerName)
 				throws RemoteException {
-			return markers.get(markerName).fClick(x, y);
+			return markers.get(markerName).fClick();
 		}
 
 		@Override

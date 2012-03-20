@@ -12,6 +12,8 @@ import android.os.Parcel;
 
 public class DrawTextBox extends DrawCommand {
 
+	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawTextBox";	
+	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_DISTANCE = "distance";
 	private static String PROPERTY_NAME_TITLE = "title";
@@ -20,7 +22,7 @@ public class DrawTextBox extends DrawCommand {
 	private static String PROPERTY_NAME_TEXTLAB = "textlab";
 	private static String PROPERTY_NAME_SIGNMARKER = "signmarker";
 	
-	static DrawTextBox initDrawTextBox(Parcel in){
+	public static DrawTextBox init(Parcel in){
 		Boolean visible = Boolean.valueOf(in.readString());
 		Double distance = in.readDouble();
 		String title = in.readString();
@@ -33,7 +35,7 @@ public class DrawTextBox extends DrawCommand {
 	}
 	
 	public DrawTextBox(Boolean visible, Double distance, String title, Boolean underline, TextObj textblock, Label textlab, MixVector signMarker){
-		super("DrawTextBox");
+		super(CLASS_NAME);
 		setProperty(PROPERTY_NAME_VISIBLE, visible);
 		setProperty(PROPERTY_NAME_DISTANCE, distance);
 		setProperty(PROPERTY_NAME_TITLE, title);
@@ -53,6 +55,10 @@ public class DrawTextBox extends DrawCommand {
 		Boolean visible = getBooleanProperty(PROPERTY_NAME_VISIBLE);
 		MixVector signMarker = getMixVectorProperty(PROPERTY_NAME_SIGNMARKER);
 		Label txtlab = (Label)getParcelableProperty(PROPERTY_NAME_TEXTLAB);
+		
+		if(txtlab == null){
+			txtlab = new Label();
+		}
 		
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 

@@ -3,7 +3,7 @@ package org.mixare.plugin;
 import java.util.HashMap;
 import java.util.List;
 
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
 
 import android.content.Context;
@@ -42,7 +42,7 @@ public class PluginLoader {
 		}
 	}
 
-	public static MarkerInterface getMarkerInstance(String markername, String title,
+	public static Marker getMarkerInstance(String markername, String title,
 			double latitude, double longitude, double altitude, String link,
 			int type, int color) throws PluginNotFoundException, RemoteException {
 		IMarkerService iMarkerService = markerServices.get(markername);

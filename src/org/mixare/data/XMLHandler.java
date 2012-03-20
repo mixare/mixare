@@ -22,7 +22,7 @@ package org.mixare.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
@@ -41,9 +41,9 @@ import android.util.Log;
  */
 public class XMLHandler extends DataHandler {
 
-	private List<MarkerInterface> processOSM(Element root, DataSource datasource) {
+	private List<Marker> processOSM(Element root, DataSource datasource) {
 
-    	List<MarkerInterface> markers = new ArrayList<MarkerInterface>();
+    	List<Marker> markers = new ArrayList<Marker>();
         NodeList nodes = root.getElementsByTagName("node");
         
         for (int i =0; i< nodes.getLength(); i++) {
@@ -65,7 +65,7 @@ public class XMLHandler extends DataHandler {
 	                	// This check will be done inside the createMarker method 
 	                	//if(markers.size()<MAX_OBJECTS)
 	                	if(datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
-	                		MarkerInterface ma = new POIMarker(
+	                		Marker ma = new POIMarker(
 	                				name, 
 	                				lat, 
 	                				lon, 
@@ -74,7 +74,7 @@ public class XMLHandler extends DataHandler {
 	        						datasource.getTaskId(), datasource.getColor());
 		        			markers.add(ma);
 	                	} else {
-	                		MarkerInterface ma = new NavigationMarker(
+	                		Marker ma = new NavigationMarker(
 			        				name, 
 			        				lat, 
 			        				lon, 
@@ -105,7 +105,7 @@ public class XMLHandler extends DataHandler {
 		//return "[bbox=16.365,48.193,16.374,48.199]";
 	}
 	
-	public List<MarkerInterface> load(Document doc, DataSource datasource) {
+	public List<Marker> load(Document doc, DataSource datasource) {
         Element root = doc.getDocumentElement();
         
         // If the root tag is called "osm" we got an 

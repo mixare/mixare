@@ -4,8 +4,10 @@ import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
-import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.Marker;
+import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
+import org.mixare.lib.marker.draw.ParcelableProperty;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -15,7 +17,7 @@ import android.location.Location;
 import android.os.RemoteException;
 
 
-public class RemoteMarker implements MarkerInterface{
+public class RemoteMarker implements Marker{
 
 	private String markerName;
 	private IMarkerService iMarkerService;
@@ -60,7 +62,7 @@ public class RemoteMarker implements MarkerInterface{
 			for(DrawCommand drawCommand: drawCommands){
 				drawCommand.draw(dw);
 				if(drawCommand.getProperty("textlab") != null){
-					setTxtLab((Label)drawCommand.getProperty("textObj"));
+					setTxtLab((Label)((ParcelableProperty)drawCommand.getProperty("textlab")).getObject());
 				}
 			}
 		} catch (RemoteException e) {
@@ -160,7 +162,9 @@ public class RemoteMarker implements MarkerInterface{
 	
 	public void setTxtLab(Label txtLab){
 		try{
-			iMarkerService.setTxtLab(markerName, txtLab);
+			if(txtLab != null){
+				iMarkerService.setTxtLab(markerName, txtLab);
+			}
 		} catch (RemoteException e){
 			throw new RuntimeException(e);
 		}
@@ -222,18 +226,15 @@ public class RemoteMarker implements MarkerInterface{
 
 	@Override
 	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state) {
-		String url = fClick(x, y);
-		return state.handleEvent(ctx, url);
-	}
-
-	private String fClick(float x, float y){
+		ClickHandler clickHandler;
 		try {
-			return iMarkerService.fClick(markerName, x, y);
+			clickHandler = iMarkerService.fClick(markerName);
+			return clickHandler.handleClick(x, y, ctx, state);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		}
 	}
-
+	
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof RemoteMarker){
@@ -251,8 +252,8 @@ public class RemoteMarker implements MarkerInterface{
 	}
 
 	@Override
-	public int compareTo(MarkerInterface another) {
-		MarkerInterface rm = (MarkerInterface)another;
+	public int compareTo(Marker another) {
+		Marker rm = (Marker)another;
 		return this.getID().compareTo(rm.getID());
 	}
 
