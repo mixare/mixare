@@ -7,6 +7,7 @@ import org.mixare.lib.render.Camera;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.lib.marker.draw.DrawCommand;
 /**
  * Android Interface Definition Language for contact between services in different threads,
  * In this case: The IMarkerService connects the mixare core with the markers of the plugins.
@@ -38,7 +39,7 @@ interface IMarkerService {
 
 	void calcPaint(String markerName, in Camera viewCam, float addX, float addY);
 
-	String[] remoteDraw(String markerName);
+	DrawCommand[] remoteDraw(String markerName);
 
 	double getDistance(String markerName);
 
@@ -53,10 +54,6 @@ interface IMarkerService {
 	void setActive(String markerName, boolean active);
 
 	int getColour(String markerName);
-	
-	void setTxtLab(String markerName, in Label txtLab);
-
-	Label getTxtLab(String markerName);
 
 	int getMaxObjects(String markerName);
 
@@ -73,9 +70,8 @@ interface IMarkerService {
 	MixVector getSignMarker(String markerName);
 
 	boolean getUnderline(String markerName);
-
-	TextObj getTextBlock(String markerName);
-
-	void setTextBlock(String markerName, in TextObj txtObj);
 	
+	void setTxtLab(String markerName, in Label txtLab);
+	
+	Label getTxtLab(String markerName);
 }

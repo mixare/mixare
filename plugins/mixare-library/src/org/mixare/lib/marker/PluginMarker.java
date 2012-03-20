@@ -1,11 +1,12 @@
 package org.mixare.lib.marker;
 
-import org.mixare.lib.MixContextInterface;
-import org.mixare.lib.MixStateInterface;
+import java.net.URLDecoder;
+
+import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.Label;
-import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
@@ -18,8 +19,8 @@ import android.location.Location;
  * @author abdullahi
  *
  */
-public class PluginMarker implements MarkerInterface {
-
+public abstract class PluginMarker{
+	
 	private String ID;
 	protected String title;
 	protected boolean underline = false;
@@ -42,13 +43,25 @@ public class PluginMarker implements MarkerInterface {
 	private MixVector upV = new MixVector(0, 1, 0);
 
 	private ScreenLine pPt = new ScreenLine();
+	public Label txtLab = new Label();
+	protected TextObj textBlock;
+	
+	public PluginMarker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
+		super();
 
-	@Override
-	public int compareTo(MarkerInterface another) {
-		return this.getID().compareTo(another.getID());
-	}
+		this.active = true;
+		this.title = title;
+		this.mGeoLoc = new PhysicalPlace(latitude,longitude,altitude);
+		if (link != null && link.length() > 0) {
+			URL = "webpage:" + URLDecoder.decode(link);
+			this.underline = true;
+		}
+		this.colour = colour;
 
-	@Override
+		this.ID=type +"##"+title;
+
+	}	
+	
 	public String getURL() {
 		return URL;
 	}
@@ -69,121 +82,100 @@ public class PluginMarker implements MarkerInterface {
 		return locationVector;
 	}
 
-	@Override
 	public double getDistance() {
 		return distance;
 	}
 
-	@Override
 	public void setDistance(double distance) {
 		this.distance = distance;
 	}
 
-	@Override
 	public String getID() {
 		return ID;
 	}
 
-	@Override
 	public void setID(String iD) {
 		this.ID = iD;
-
 	}
 
-	@Override
 	public boolean isActive() {
 		return active;
 	}
 
-	@Override
 	public void setActive(boolean active) {
 		this.active = active;
-
 	}
 
-	@Override
 	public int getColour() {
 		return colour;
 	}
 
-	@Override
 	public boolean isVisible() {
 		return isVisible;
 	}
 
-	@Override
 	public String fClick(float x, float y) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getMaxObjects() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setImage(Bitmap image) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Bitmap getImage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MixVector getCMarker() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public MixVector getSignMarker() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean getUnderline() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public TextObj getTextBlock() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTextBlock(TextObj txtObj) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String getTitle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void draw(PaintScreen dw) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String[] remoteDraw() {
-		// TODO Auto-generated method stub
+		try{
+			if (isClickValid(x, y)) {
+				return URL;
+			}
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
 		return null;
 	}
 	
-	@Override
+	private boolean isClickValid(float x, float y) {
+		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
+				signMarker.x, signMarker.y);
+		//if the marker is not active (i.e. not shown in AR view) we don't have to check it for clicks
+		if (!isActive())
+			return false;
+
+		//TODO adapt the following to the variable radius!
+		pPt.x = x - signMarker.x;
+		pPt.y = y - signMarker.y;
+		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
+		pPt.x += txtLab.getX();
+		pPt.y += txtLab.getY();
+
+		float objX = txtLab.getX() - txtLab.getWidth() / 2;
+		float objY = txtLab.getY() - txtLab.getHeight() / 2;
+		float objW = txtLab.getWidth();
+		float objH = txtLab.getHeight();
+
+		if (pPt.x > objX && pPt.x < objX + objW && pPt.y > objY
+				&& pPt.y < objY + objH) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public abstract int getMaxObjects();
+
+	public abstract void setImage(Bitmap image);
+
+	public abstract Bitmap getImage();
+
+	public MixVector getCMarker() {
+		return cMarker;
+	}
+
+	public MixVector getSignMarker() {
+		return signMarker;
+	}
+
+	public boolean getUnderline() {
+		return underline;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public abstract DrawCommand[] remoteDraw();
+	
 	public void update(Location curGPSFix) {
 		// An elevation of 0.0 probably means that the elevation of the
 		// POI is not known and should be set to the users GPS height
@@ -199,29 +191,47 @@ public class PluginMarker implements MarkerInterface {
 		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, locationVector);
 	}
 
-	@Override
 	public void calcPaint(Camera viewCam, float addX, float addY) {
-		//cCMarker(origin, viewCam, addX, addY);
-		//calcV(viewCam);
-	}
-
-	@Override
-	public boolean fClick(float x, float y, MixContextInterface ctx,
-			MixStateInterface state) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setTxtLab(Label txtLab) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Label getTxtLab() {
-		// TODO Auto-generated method stub
-		return null;
+		cCMarker(origin, viewCam, addX, addY);
+		calcV(viewCam);
 	}
 	
+	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
+		// Temp properties
+		MixVector tmpa = new MixVector(originalPoint);
+		MixVector tmpc = new MixVector(upV);
+		tmpa.add(locationVector); //3 
+		tmpc.add(locationVector); //3
+		tmpa.sub(viewCam.lco); //4
+		tmpc.sub(viewCam.lco); //4
+		tmpa.prod(viewCam.transform); //5
+		tmpc.prod(viewCam.transform); //5
+
+		MixVector tmpb = new MixVector();
+		viewCam.projectPoint(tmpa, tmpb, addX, addY); //6
+		cMarker.set(tmpb); //7
+		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
+		signMarker.set(tmpb); //7
+	}
+
+	private void calcV(Camera viewCam) {
+		isVisible = true;
+		
+		if (cMarker.z < -1f) {
+			isVisible = true;
+
+			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
+					viewCam.width, viewCam.height)) {
+			}
+		}
+	}
+	
+	public void setTxtLab(Label txtLab) {
+		this.txtLab = txtLab;
+	}
+
+	public Label getTxtLab() {
+		return txtLab;
+	}
+
 }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.lib.marker;
+package org.mixare;
 
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
@@ -28,6 +28,7 @@ import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
@@ -133,7 +134,7 @@ abstract public class Marker implements MarkerInterface {
 	}
 
 	private void calcV(Camera viewCam) {
-		isVisible = true;
+		isVisible = false;
 //		isLookingAt = false;
 //		deltaCenter = Float.MAX_VALUE;
 
@@ -209,11 +210,6 @@ abstract public class Marker implements MarkerInterface {
 		drawCircle(dw);
 		drawTextBlock(dw);
 	}
-	
-	public String[] remoteDraw(){
-		String[] result = {"drawCircle", "drawTextBlock"};
-		return result;
-	}
 
 	public void drawCircle(PaintScreen dw) {
 
@@ -270,15 +266,13 @@ abstract public class Marker implements MarkerInterface {
 
 	}
 
-	public String fClick(float x, float y) {
-		try{
-			if (isClickValid(x, y)) {
-				return URL;
-			}
-		}catch(Exception e){
-			e.printStackTrace();
+	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state) {
+		boolean evtHandled = false;
+
+		if (isClickValid(x, y)) {
+			evtHandled = state.handleEvent(ctx, URL);
 		}
-		return null;
+		return evtHandled;
 	}
 
 	public double getDistance() {
@@ -298,10 +292,10 @@ abstract public class Marker implements MarkerInterface {
 		ID = iD;
 	}
 
-	public int compareTo(Marker another) {
+	public int compareTo(MarkerInterface another) {
 
-		Marker leftPm = this;
-		Marker rightPm = another;
+		MarkerInterface leftPm = this;
+		MarkerInterface rightPm = another;
 
 		return Double.compare(leftPm.getDistance(), rightPm.getDistance());
 
@@ -321,72 +315,27 @@ abstract public class Marker implements MarkerInterface {
 	}
 
 	abstract public int getMaxObjects();
-
-	@Override
-	public boolean fClick(float x, float y, MixContextInterface ctx,
-			MixStateInterface state) {
-		boolean evtHandled = false;
-
-		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, getURL());
-		}
-		return evtHandled;
-	}
-
-	@Override
-	public int compareTo(MarkerInterface another) {
-		return this.getID().compareTo(another.getID());
-	}
-
-	public void setImage(Bitmap bitmap){
+	
+	public void setImage(Bitmap image){
 	}
 	
-	public Label getTxtLab(){
-		return txtLab;
-	}
-	
-	@Override
-	public void setTxtLab(Label txtLab){
-		this.txtLab = txtLab;
-	}
-
-	@Override
-	public Bitmap getImage() {
+	public Bitmap getImage(){
 		return null;
-	}
-
-	@Override
-	public MixVector getCMarker() {
-		return cMarker;
-	}
-
-	@Override
-	public MixVector getSignMarker() {
-		return signMarker;
-	}
-
-	@Override
-	public TextObj getTextBlock() {
-		return textBlock;
-	}
-
-	@Override
-	public boolean getUnderline() {
-		return underline;
-	}
-
-	@Override
-	public boolean isVisible() {
-		return isVisible;
-	}
-
-	@Override
-	public void setTextBlock(TextObj txtBlock) {
-		this.textBlock = txtBlock;
 	}
 
 	//get Colour for OpenStreetMap based on the URL number
 	public int getColour() {
 		return colour;
 	}
+
+	@Override
+	public void setTxtLab(Label txtLab) {
+		this.txtLab = txtLab;
+	}
+
+	@Override
+	public Label getTxtLab() {
+		return txtLab;
+	}
+
 }

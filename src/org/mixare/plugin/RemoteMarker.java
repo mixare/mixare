@@ -4,8 +4,8 @@ import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
-import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.marker.MarkerInterface;
+import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -20,9 +20,6 @@ public class RemoteMarker implements MarkerInterface{
 	private String markerName;
 	private IMarkerService iMarkerService;
 	
-	private TextObj textObj;
-	private Label txtLab = new Label();
-
 	public RemoteMarker(String pluginName, IMarkerService iMarkerService){
 		this.iMarkerService = iMarkerService;
 	}
@@ -59,9 +56,13 @@ public class RemoteMarker implements MarkerInterface{
 	@Override
 	public void draw(PaintScreen dw) {
 		try {
-			String[] drawMethods = iMarkerService.remoteDraw(markerName);
-			RemoteDrawer rd = new RemoteDrawer(this);
-			rd.draw(drawMethods, dw);
+			DrawCommand[] drawCommands= iMarkerService.remoteDraw(markerName);
+			for(DrawCommand drawCommand: drawCommands){
+				drawCommand.draw(dw);
+				if(drawCommand.getProperty("textlab") != null){
+					setTxtLab((Label)drawCommand.getProperty("textObj"));
+				}
+			}
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}	
@@ -150,7 +151,19 @@ public class RemoteMarker implements MarkerInterface{
 
 	@Override
 	public Label getTxtLab() {
-		return txtLab;
+		try {
+			return iMarkerService.getTxtLab(markerName);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void setTxtLab(Label txtLab){
+		try{
+			iMarkerService.setTxtLab(markerName, txtLab);
+		} catch (RemoteException e){
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -213,19 +226,8 @@ public class RemoteMarker implements MarkerInterface{
 		return state.handleEvent(ctx, url);
 	}
 
-	@Override
-	public boolean isVisible(){
+	private String fClick(float x, float y){
 		try {
-			return iMarkerService.isVisible(markerName);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public String fClick(float x, float y){
-		try {
-			this.setTxtLab(txtLab);
 			return iMarkerService.fClick(markerName, x, y);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
@@ -250,11 +252,8 @@ public class RemoteMarker implements MarkerInterface{
 
 	@Override
 	public int compareTo(MarkerInterface another) {
-		if(another instanceof RemoteMarker){
-			RemoteMarker rm = (RemoteMarker)another;
-			this.getID().compareTo(rm.getID());
-		}
-		throw new IllegalArgumentException("param is not a instance of RemoteMarker");
+		MarkerInterface rm = (MarkerInterface)another;
+		return this.getID().compareTo(rm.getID());
 	}
 
 	@Override
@@ -270,57 +269,6 @@ public class RemoteMarker implements MarkerInterface{
 	public Bitmap getImage(){
 		try{
 			return iMarkerService.getImage(markerName);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public MixVector getCMarker(){
-		try{
-			return iMarkerService.getCMarker(markerName);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public MixVector getSignMarker(){
-		try{
-			return iMarkerService.getSignMarker(markerName);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public boolean getUnderline(){
-		try{
-			return iMarkerService.getUnderline(markerName);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public TextObj getTextBlock(){
-		return textObj;
-	}
-
-	@Override
-	public void setTextBlock(TextObj txtObj){
-		this.textObj = txtObj;
-	}
-
-	@Override
-	public String[] remoteDraw() {
-		return null;
-	}
-
-	@Override
-	public void setTxtLab(Label txtLab) {
-		try {
-			iMarkerService.setTxtLab(markerName, txtLab);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

@@ -19,7 +19,8 @@
 
 package org.mixare;
 
-import org.mixare.lib.marker.Marker;
+import org.mixare.Marker;
+import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
 
 import android.location.Location;
@@ -81,5 +82,6 @@ public class SocialMarker extends Marker {
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
 	}
+
 	
 }

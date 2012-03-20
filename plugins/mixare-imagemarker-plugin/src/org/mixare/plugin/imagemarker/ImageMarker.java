@@ -3,8 +3,11 @@
  */
 package org.mixare.plugin.imagemarker;
 
-import org.mixare.lib.marker.Marker;
 import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.marker.PluginMarker;
+import org.mixare.lib.marker.draw.DrawCommand;
+import org.mixare.lib.marker.draw.DrawImage;
+import org.mixare.lib.marker.draw.DrawTextBox;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,7 +17,7 @@ import android.location.Location;
  * @author A.Egal
  *
  */
-public class ImageMarker extends Marker{
+public class ImageMarker extends PluginMarker{
 
 	public static final int MAX_OBJECTS = 20;
 	private Bitmap image; 
@@ -36,15 +39,12 @@ public class ImageMarker extends Marker{
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
 	}
-
-	@Override
-	public void draw(PaintScreen dw) {
-		this.drawImage(dw);
-		super.drawTextBlock(dw);
-	}
 	
-	public String[] remoteDraw(){
-		return new String[] {"drawImage", "drawTextBlock"};
+	public DrawCommand[] remoteDraw(){
+		DrawCommand[] dCommands = new DrawCommand[2];
+		dCommands[0] = new DrawImage(isVisible, signMarker, image);
+		dCommands[1] = new DrawTextBox(isVisible, distance, title, underline, textBlock, txtLab, signMarker);
+		return dCommands;
 	}
 
 	public void drawImage(PaintScreen dw){

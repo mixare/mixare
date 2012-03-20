@@ -36,8 +36,8 @@ import java.util.List;
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
-import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.marker.MarkerInterface;
 import org.mixare.lib.render.Matrix;
 
 import android.app.Activity;

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mixare.lib.gui.Label;
-import org.mixare.lib.gui.TextObj;
-import org.mixare.lib.marker.Marker;
+import org.mixare.lib.marker.PluginMarker;
+import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -22,7 +22,7 @@ public class ImageMarkerService extends Service{
 	
 	static final String PLUGIN_NAME = "imagemarker";
 	static final String CATEGORY_PLUGIN= "mixare.intent.category.MARKER_PLUGIN";
-	private Map<String, Marker> markers = new HashMap<String, Marker>();
+	private Map<String, PluginMarker> markers = new HashMap<String, PluginMarker>();
 	private Integer count = 0;
 
 	public void onStart(Intent intent, int startId) {
@@ -48,7 +48,7 @@ public class ImageMarkerService extends Service{
 		@Override
 		public String buildMarker(String title, double latitude, double longitude, double altitude, String URL, int type, int color)
 				throws RemoteException {
-			Marker marker = new ImageMarker(title, latitude, longitude, altitude, URL, type, color);
+			PluginMarker marker = new ImageMarker(title, latitude, longitude, altitude, URL, type, color);
 			String markerName = "imageMarker-"+count+"-"+marker.getID();
 			markers.put(markerName, marker);
 			return markerName;
@@ -66,7 +66,7 @@ public class ImageMarkerService extends Service{
 		}
 
 		@Override
-		public String[] remoteDraw(String markerName) throws RemoteException {
+		public DrawCommand[] remoteDraw(String markerName) throws RemoteException {
 			return markers.get(markerName).remoteDraw();
 		}
 
@@ -114,12 +114,7 @@ public class ImageMarkerService extends Service{
 		public String getTitle(String markerName) throws RemoteException {
 			return markers.get(markerName).getTitle();
 		}
-
-		@Override
-		public Label getTxtLab(String markerName) throws RemoteException {
-			return markers.get(markerName).getTxtLab();
-		}
-
+		
 		@Override
 		public String getURL(String markerName) throws RemoteException {
 			return markers.get(markerName).getURL();
@@ -182,28 +177,23 @@ public class ImageMarkerService extends Service{
 		}
 
 		@Override
-		public TextObj getTextBlock(String markerName) throws RemoteException {
-			return markers.get(markerName).getTextBlock();
-		}
-
-		@Override
 		public boolean getUnderline(String markerName) throws RemoteException {
 			return markers.get(markerName).getUnderline();
-		}
-
-		@Override
-		public void setTextBlock(String markerName, TextObj txtBlock)
-				throws RemoteException {
-			markers.get(markerName).setTextBlock(txtBlock);
 		}
 
 		@Override
 		public boolean isVisible(String markerName) throws RemoteException {
 			return markers.get(markerName).isVisible();
 		}
-
+		
+		@Override
 		public void setTxtLab(String markerName, Label txtLab) throws RemoteException {
 			markers.get(markerName).setTxtLab(txtLab);
+		}
+		
+		@Override
+		public Label getTxtLab(String markerName) throws RemoteException {
+			return markers.get(markerName).getTxtLab();
 		}
     };
 

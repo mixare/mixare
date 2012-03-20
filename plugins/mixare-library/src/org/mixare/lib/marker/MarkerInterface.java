@@ -4,7 +4,6 @@ import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
-import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 
@@ -31,8 +30,6 @@ public interface MarkerInterface extends Comparable<MarkerInterface>{
 
 	void draw(PaintScreen dw);
 
-	String[] remoteDraw();
-
 	double getDistance();
 
 	void setDistance(double distance);
@@ -51,10 +48,6 @@ public interface MarkerInterface extends Comparable<MarkerInterface>{
 
 	Label getTxtLab();
 
-	boolean isVisible();
-
-	public String fClick(float x, float y);
-
 	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state);
 
 	int getMaxObjects();
@@ -62,15 +55,5 @@ public interface MarkerInterface extends Comparable<MarkerInterface>{
 	void setImage(Bitmap image);
 
 	Bitmap getImage();
-
-	MixVector getCMarker();
-
-	MixVector getSignMarker();
-
-	boolean getUnderline();
-
-	TextObj getTextBlock();
-
-	void setTextBlock(TextObj txtObj);
 
 }
