@@ -16,7 +16,11 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.RemoteException;
 
-
+/**
+ * The remote marker sends request to the (remote)plugin that it is connected to through IMarkerService.
+ * the remote marker is treated like a normal marker in the core. And it overrides the marker interface.
+ * @author A. Egal
+ */
 public class RemoteMarker implements Marker{
 
 	private String markerName;

@@ -112,7 +112,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		SharedPreferences settings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
 		int size = settings.getAll().size();
-		if (size <= 1){ //including the barcode scanner
+		if (size == 0){ //including the barcode scanner
 			SharedPreferences.Editor dataSourceEditor = settings.edit();
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");

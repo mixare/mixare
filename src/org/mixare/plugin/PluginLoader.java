@@ -2,10 +2,15 @@ package org.mixare.plugin;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
+import org.mixare.plugin.connection.ActivityConnection;
+import org.mixare.plugin.connection.MarkerServiceConnection;
+import org.mixare.plugin.connection.PluginConnection;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -14,44 +19,104 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.os.RemoteException;
 
+/**
+ * Searches, loads and executes available plugins that are installed on the device.
+ * @author A.Egal
+ */
 public class PluginLoader {
-
-	public static final String MARKER_PLUGIN = "org.mixare.plugin.marker";
-	public static HashMap<String, IMarkerService> markerServices = new HashMap<String, IMarkerService>();
-	private static ServiceConnection serviceConnection = new MarkerServiceConnection();
 	
-	public static void loadMarkerPlugins(Context ctx) {
-		PackageManager packageManager = ctx.getPackageManager();
-		Intent baseIntent = new Intent(MARKER_PLUGIN);
+	private static PluginLoader instance;
+	private Activity activity;
+	/** A map holding the plugin name and the connector to use the plugin */
+	Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
+	/** The number of pending activities that should return a result */
+	private int pendingActivitiesOnResult = 0;
+	
+	public static PluginLoader getInstance() {
+		if(instance == null){
+			instance = new PluginLoader();
+		}
+		return instance;
+	}
+
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+	}
+	
+	public void loadPlugin(PluginType pluginType) {
+		PackageManager packageManager = activity.getPackageManager();
+		Intent baseIntent = new Intent(pluginType.getActionName());
 		baseIntent.setFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
 		List<ResolveInfo> list = packageManager.queryIntentServices(baseIntent,
 				PackageManager.GET_RESOLVED_FILTER);
-		startPlugin(list, ctx);
+		
+		startService(list, activity, pluginType);
 	}
 	
-	private static void startPlugin(List<ResolveInfo> list, Context ctx){
+	public void startPlugin(PluginType pluginType, String pluginName){
+		if(pluginType.getLoader() == Loader.Activity){
+			ActivityConnection activityConnection = (ActivityConnection)pluginMap.get(pluginName);
+			activityConnection.startActivityForResult(activity);
+		}
+		else{
+			throw new PluginNotFoundException("Cannot directly start a non-activity plugin," +
+					" you must call a instance for it");
+		}	
+	}
+	
+	private void startService(List<ResolveInfo> list, Activity activity, PluginType pluginType){
 		for (int i = 0; i < list.size(); ++i) {
 			ResolveInfo info = list.get(i);
 			ServiceInfo sinfo = info.serviceInfo;
 			if (sinfo != null) {
 				Intent serviceIntent = new Intent();
 				serviceIntent.setClassName(sinfo.packageName, sinfo.name);
-				ctx.bindService(serviceIntent, serviceConnection,
+				activity.bindService(serviceIntent, (ServiceConnection)pluginType.getPluginConnection(),
 						Context.BIND_AUTO_CREATE);
+				checkForPendingActivity(pluginType);
 			}
 		}
 	}
-
-	public static Marker getMarkerInstance(String markername, String title,
+	
+	public void addFoundPluginToMap(String pluginName, PluginConnection pluginConnection){
+		pluginMap.put(pluginName, pluginConnection);
+	}
+	
+	public Marker getMarkerInstance(String markername, String title,
 			double latitude, double longitude, double altitude, String link,
 			int type, int color) throws PluginNotFoundException, RemoteException {
-		IMarkerService iMarkerService = markerServices.get(markername);
+		
+		MarkerServiceConnection msc = (MarkerServiceConnection)pluginMap.get(PluginType.MARKER.toString());
+		IMarkerService iMarkerService = msc.getMarkerServices().get(markername);		
+		
 		if (iMarkerService == null) {
 			throw new PluginNotFoundException();
 		}
 		RemoteMarker rm = new RemoteMarker(markername, iMarkerService);
 		rm.buildMarker(title, latitude, longitude, altitude, link, type, color);
 		return rm; 
+	}
+	
+	public PluginConnection getPluginConnection(String name){
+		return pluginMap.get(name);
+	}
+	
+	public int getPendingActivitiesOnResult(){
+		return pendingActivitiesOnResult;
+	}
+	
+	public void increasePendingActivitiesOnResult(){
+		pendingActivitiesOnResult++;
+	}
+	
+	public void decreasePendingActivitiesOnResult(){
+		pendingActivitiesOnResult--;
+	}
+	
+	private void checkForPendingActivity(PluginType pluginType){
+		if(pluginType.getLoader() == Loader.Activity){
+			increasePendingActivitiesOnResult();
+		}
 	}
 
 }

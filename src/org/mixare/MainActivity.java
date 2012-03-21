@@ -1,9 +1,9 @@
 package org.mixare;
 
-import org.mixare.barcode.IntentIntegrator;
-import org.mixare.barcode.IntentResult;
 import org.mixare.data.DataSourceList;
 import org.mixare.plugin.PluginLoader;
+import org.mixare.plugin.PluginType;
+import org.mixare.plugin.connection.BootStrapActivityConnection;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,14 +16,14 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
- * The user can scan for a url with the zxing barcode scanner.
- * 
+ * This is the main activity for mixare. This activity will load a splashscreen and then initializes the PluginLoader
+ * It will then launch the visible bootstrapplugins and waits for their results. After all bootstrap plugins are loaded
+ * then mixare will be launched
  * @author A.Egal
- * 
  */
-public class BarcodeMainActivity extends Activity {
+public class MainActivity extends Activity {
 
-	private static final int SPLASHTIME = 5000;
+	private static final int SPLASHTIME = 2000; //2 seconds
 	public static final int SCANNER_REQUEST_CODE = 0;
 	protected Handler exitHandler = null;
 	protected Runnable exitRunnable = null;
@@ -59,23 +59,32 @@ public class BarcodeMainActivity extends Activity {
 	}
 
 	private void exitSplash() {
-		IntentIntegrator integrator = new IntentIntegrator(this);
-		integrator.initiateScan();
-
+		PluginLoader.getInstance().setActivity(this);
+		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
+		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP);
+		
+		startMixare();
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		IntentResult scanResult = IntentIntegrator.parseActivityResult(
-				requestCode, resultCode, data);
-		if (scanResult != null) {
-			String url = scanResult.getContents();
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if(BootStrapActivityConnection.BOOTSTRAP_REQUEST_CODE == requestCode){
+			String url = data.getExtras().getString("url");
 			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
 			SharedPreferences.Editor dataSourceEditor = settings.edit();
-			dataSourceEditor.putString("DataSource4", "Arena|"+url+"|5|2|true");
+			//remove other datasources because you scanned a new one with a barcodescanner.
+			dataSourceEditor.clear();
+			dataSourceEditor.putString("DataSource0", "Arena|"+url+"|5|2|true");
 			dataSourceEditor.commit();
-			startActivity(new Intent(this, MixView.class));
-			PluginLoader.loadMarkerPlugins(this);
+			PluginLoader.getInstance().decreasePendingActivitiesOnResult();
 		}
-		super.onActivityResult(requestCode, resultCode, data);
+		startMixare();
+	}
+	
+	private void startMixare(){
+		if(PluginLoader.getInstance().getPendingActivitiesOnResult() == 0){
+			startActivity(new Intent(this, MixView.class));
+		}
 	}
 }

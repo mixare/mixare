@@ -177,7 +177,7 @@ public class Json extends DataHandler {
 						image = getBitmapFromURL(jo.getString("object_url"));
 					}
 					try {
-						ma = PluginLoader.getMarkerInstance("imagemarker",
+						ma = PluginLoader.getInstance().getMarkerInstance("imagemarker",
 								unescapeHTML(jo.getString("title"), 0),
 								jo.getDouble("lat"), jo.getDouble("lng"),
 								jo.getDouble("elevation"), link, datasource.getTypeId(), datasource.getColor());
