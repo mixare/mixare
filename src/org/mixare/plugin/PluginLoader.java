@@ -71,6 +71,17 @@ public class PluginLoader {
 			}
 		}
 	}
+	
+	/**
+	 * Unbinds all plugins from the activity
+	 */
+	public void unBindServices(){
+		for(PluginConnection pluginConnection : pluginMap.values()){
+			if(pluginConnection instanceof ServiceConnection){
+				activity.unbindService((ServiceConnection)pluginConnection);
+			}
+		}
+	}
 
 	/**
 	 * Starts an activity plugin

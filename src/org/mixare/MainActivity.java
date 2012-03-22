@@ -70,6 +70,7 @@ public class MainActivity extends Activity {
 		loadPlugins();		
 		startMixare();
 	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -84,7 +85,6 @@ public class MainActivity extends Activity {
 	private void startMixare(){
 		if(ArePendingActivitiesFinished()){
 			startActivity(new Intent(this, MixView.class));
-			finish();
 		}
 	}
 	
@@ -102,6 +102,13 @@ public class MainActivity extends Activity {
 			dataSourceEditor.putString("DataSource0", "Arena|"+url+"|5|2|true");
 			dataSourceEditor.commit();
 		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		PluginLoader.getInstance().unBindServices();
+		PluginLoader.getInstance().setActivity(null);
+		super.onDestroy();
 	}
 	
 	private void procesCustomSplashScreen(Intent data){
