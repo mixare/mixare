@@ -36,7 +36,11 @@ public class DrawImage extends DrawCommand{
 			Bitmap bitmap = getBitmapProperty(PROPERTY_NAME_IMAGE);
 			
 			dw.setColor(Color.argb(155, 255, 255, 255));
+			try{
 			dw.paintBitmap(bitmap, signMarker.x - (bitmap.getWidth()/2), signMarker.y - (bitmap.getHeight() / 2));
+			}catch(NullPointerException ne){
+				throw new RuntimeException(ne);
+			}
 		}
 	}	
 	

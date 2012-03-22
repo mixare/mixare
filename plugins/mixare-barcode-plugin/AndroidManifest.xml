@@ -15,6 +15,7 @@
             android:exported="true" >
             <intent-filter>
                <action android:name="org.mixare.plugin.bootstrap2"/>
+               <action android:name="org.mixare.plugin.dataselector"/>
                <category android:name="mixare.intent.category.BOOTSTRAP_PLUGIN"/>
             </intent-filter>
         </service>
