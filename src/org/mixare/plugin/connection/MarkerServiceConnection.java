@@ -3,6 +3,7 @@ package org.mixare.plugin.connection;
 import java.util.HashMap;
 
 import org.mixare.lib.service.IMarkerService;
+import org.mixare.plugin.PluginConnection;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;

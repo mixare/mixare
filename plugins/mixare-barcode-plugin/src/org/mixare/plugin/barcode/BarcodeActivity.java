@@ -10,6 +10,8 @@ import android.os.Bundle;
 
 public class BarcodeActivity extends Activity{
 	
+	public final String resultType = "Datasource";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,6 +27,7 @@ public class BarcodeActivity extends Activity{
 			String url = scanResult.getContents();
 			
 			Intent intent = new Intent();
+			intent.putExtra("resultType", resultType);
 			intent.putExtra("url", url);
 			setResult(BarcodeService.ACTIVITY_REQUEST_CODE, intent);
 		}

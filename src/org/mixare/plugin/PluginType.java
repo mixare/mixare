@@ -2,7 +2,6 @@ package org.mixare.plugin;
 
 import org.mixare.plugin.connection.BootStrapActivityConnection;
 import org.mixare.plugin.connection.MarkerServiceConnection;
-import org.mixare.plugin.connection.PluginConnection;
 
 /**
  * This enum contains the plugin types that can be loaded, they also contain
@@ -11,7 +10,58 @@ import org.mixare.plugin.connection.PluginConnection;
  *
  */
 public enum PluginType{
-	
+	/** A bootstrap plugin that will be loaded first I.E. a splashscreen */
+	BOOTSTRAP_PHASE_1(){
+
+		public String getActionName() {
+			return "org.mixare.plugin.bootstrap1";
+		}
+
+		public PluginConnection getPluginConnection() {
+			PluginConnection pluginConnection = new BootStrapActivityConnection();
+			pluginConnection.setPluginType(this);
+			return pluginConnection;
+		}
+
+		public Loader getLoader() {
+			return Loader.Activity;
+		}		
+	},
+	/** A bootstrap plugin that will be loaded after the fist boostrap phase */
+	BOOTSTRAP_PHASE_2(){
+
+		public String getActionName() {
+			return "org.mixare.plugin.bootstrap2";
+		}
+
+		public PluginConnection getPluginConnection() {
+			PluginConnection pluginConnection = new BootStrapActivityConnection();
+			pluginConnection.setPluginType(this);
+			return pluginConnection;
+		}
+
+		public Loader getLoader() {
+			return Loader.Activity;
+		}		
+	},
+	/** A plugin that returns a custom datasource */
+	DATASELECTOR(){
+		
+		public String getActionName() {
+			return "org.mixare.plugin.dataselector";
+		}
+
+		public PluginConnection getPluginConnection() {
+			PluginConnection pluginConnection = new BootStrapActivityConnection();
+			pluginConnection.setPluginType(this);
+			return pluginConnection;
+		}
+
+		public Loader getLoader() {
+			return Loader.Activity;
+		}			
+	},
+	/** A plugin that contains a custom marker */
 	MARKER(){
 		
 		public String getActionName() {
@@ -27,24 +77,8 @@ public enum PluginType{
 		public Loader getLoader() {
 			return Loader.Service;
 		}		
-	},
-	BOOTSTRAP(){
-
-		public String getActionName() {
-			return "org.mixare.plugin.bootstrap";
-		}
-
-		public PluginConnection getPluginConnection() {
-			PluginConnection pluginConnection = new BootStrapActivityConnection();
-			pluginConnection.setPluginType(this);
-			return pluginConnection;
-		}
-
-		public Loader getLoader() {
-			return Loader.Activity;
-		}
-		
-	};	
+	};
+	//TODO DataHandlers plugins that can convert json to markerdata
 	
 	/** The package name to find the plugin */
 	public abstract String getActionName();

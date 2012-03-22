@@ -71,7 +71,9 @@ public class RemoteMarker implements Marker{
 			}
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
-		}	
+		} catch (NullPointerException ne){
+			throw new RuntimeException(ne);
+		}
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package org.mixare;
 import org.mixare.data.DataSourceList;
 import org.mixare.plugin.PluginLoader;
 import org.mixare.plugin.PluginType;
-import org.mixare.plugin.connection.BootStrapActivityConnection;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -32,6 +31,15 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		PluginLoader.getInstance().setActivity(this);
+		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
+		
+		if(ArePendingActivitiesFinished()){
+			startDefaultSplashScreen();
+		}
+	}
+	
+	private void startDefaultSplashScreen(){
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -59,32 +67,51 @@ public class MainActivity extends Activity {
 	}
 
 	private void exitSplash() {
-		PluginLoader.getInstance().setActivity(this);
-		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
-		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP);
-		
+		loadPlugins();		
 		startMixare();
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		if(BootStrapActivityConnection.BOOTSTRAP_REQUEST_CODE == requestCode){
-			String url = data.getExtras().getString("url");
-			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
-			//remove other datasources because you scanned a new one with a barcodescanner.
-			dataSourceEditor.clear();
-			dataSourceEditor.putString("DataSource0", "Arena|"+url+"|5|2|true");
-			dataSourceEditor.commit();
-			PluginLoader.getInstance().decreasePendingActivitiesOnResult();
-		}
+		procesDataSourceFromIntent(data);
+		procesCustomSplashScreen(data);
+		
+		PluginLoader.getInstance().decreasePendingActivitiesOnResult();
 		startMixare();
 	}
 	
 	private void startMixare(){
-		if(PluginLoader.getInstance().getPendingActivitiesOnResult() == 0){
+		if(ArePendingActivitiesFinished()){
 			startActivity(new Intent(this, MixView.class));
+			finish();
 		}
+	}
+	
+	private boolean ArePendingActivitiesFinished(){
+		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
+	}
+	
+	private void procesDataSourceFromIntent(Intent data){
+		if(data != null && data.getExtras().getString("resultType").equals("Datasource")){
+			String url = data.getExtras().getString("url");
+			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+			SharedPreferences.Editor dataSourceEditor = settings.edit();
+			//remove other datasources because you received a new one with a plugin.
+			dataSourceEditor.clear();
+			dataSourceEditor.putString("DataSource0", "Arena|"+url+"|5|2|true");
+			dataSourceEditor.commit();
+		}
+	}
+	
+	private void procesCustomSplashScreen(Intent data){
+		if(data != null && data.getExtras().getString("resultType").equals("Splashscreen")){
+			loadPlugins();
+		}
+	}
+	
+	private void loadPlugins(){
+		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
+		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_2);
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.mixare.plugin.barcode"
+    package="org.mixare.plugin.arenasplash"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,12 +9,12 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
-        <activity android:name="BarcodeActivity" android:exported="true"></activity>
+        <activity android:name="ArenaSplashActivity" android:exported="true"></activity>
         <service
-            android:name=".service.BarcodeService"
+            android:name=".service.ArenaSplashService"
             android:exported="true" >
             <intent-filter>
-               <action android:name="org.mixare.plugin.bootstrap2"/>
+               <action android:name="org.mixare.plugin.bootstrap1"/>
                <category android:name="mixare.intent.category.BOOTSTRAP_PLUGIN"/>
             </intent-filter>
         </service>

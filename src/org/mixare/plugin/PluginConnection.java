@@ -1,15 +1,13 @@
-package org.mixare.plugin.connection;
+package org.mixare.plugin;
 
-import org.mixare.plugin.PluginLoader;
-import org.mixare.plugin.PluginType;
 
 /**
- * Main interface for activity and service connections
+ * Main interface for activity and service connections -> in package org.mixare.plugin.connection
  * @author A.Egal
  */
 public abstract class PluginConnection {
 
-	PluginType pluginType;
+	protected PluginType pluginType;
 	
 	public void setPluginType(PluginType pluginType) {
 		this.pluginType = pluginType;
@@ -19,11 +17,11 @@ public abstract class PluginConnection {
 		return pluginType.getActionName();
 	}
 	
-	void storeFoundPlugin(){
+	protected void storeFoundPlugin(){
 		PluginLoader.getInstance().addFoundPluginToMap(pluginType.toString(), this);
 	}
 	
-	void storeFoundPlugin(String pluginName){
+	protected void storeFoundPlugin(String pluginName){
 		PluginLoader.getInstance().addFoundPluginToMap(pluginName, this);
 	}
 }

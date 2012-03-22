@@ -1,6 +1,7 @@
 package org.mixare.plugin.connection;
 
 import org.mixare.lib.service.IBootStrap;
+import org.mixare.plugin.PluginConnection;
 import org.mixare.plugin.PluginLoader;
 import org.mixare.plugin.PluginNotFoundException;
 

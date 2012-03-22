@@ -10,6 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/logo" />
+        android:src="@drawable/arena" />
     
 </RelativeLayout>

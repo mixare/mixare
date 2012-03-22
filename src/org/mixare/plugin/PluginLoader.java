@@ -8,7 +8,6 @@ import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
 import org.mixare.plugin.connection.ActivityConnection;
 import org.mixare.plugin.connection.MarkerServiceConnection;
-import org.mixare.plugin.connection.PluginConnection;
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,6 +42,9 @@ public class PluginLoader {
 		this.activity = activity;
 	}
 	
+	/**
+	 * loads all plugins from a plugin type.
+	 */
 	public void loadPlugin(PluginType pluginType) {
 		PackageManager packageManager = activity.getPackageManager();
 		Intent baseIntent = new Intent(pluginType.getActionName());
@@ -50,21 +52,13 @@ public class PluginLoader {
 		List<ResolveInfo> list = packageManager.queryIntentServices(baseIntent,
 				PackageManager.GET_RESOLVED_FILTER);
 		
-		startService(list, activity, pluginType);
+		initService(list, activity, pluginType);
 	}
 	
-	public void startPlugin(PluginType pluginType, String pluginName){
-		if(pluginType.getLoader() == Loader.Activity){
-			ActivityConnection activityConnection = (ActivityConnection)pluginMap.get(pluginName);
-			activityConnection.startActivityForResult(activity);
-		}
-		else{
-			throw new PluginNotFoundException("Cannot directly start a non-activity plugin," +
-					" you must call a instance for it");
-		}	
-	}
-	
-	private void startService(List<ResolveInfo> list, Activity activity, PluginType pluginType){
+	/**
+	 * Initializes the services from the loaded plugins and stores them in the pluginmap
+	 */
+	private void initService(List<ResolveInfo> list, Activity activity, PluginType pluginType){
 		for (int i = 0; i < list.size(); ++i) {
 			ResolveInfo info = list.get(i);
 			ServiceInfo sinfo = info.serviceInfo;
@@ -77,8 +71,22 @@ public class PluginLoader {
 			}
 		}
 	}
+
+	/**
+	 * Starts an activity plugin
+	 */
+	public void startPlugin(PluginType pluginType, String pluginName){
+		if(pluginType.getLoader() == Loader.Activity){
+			ActivityConnection activityConnection = (ActivityConnection)pluginMap.get(pluginName);
+			activityConnection.startActivityForResult(activity);
+		}
+		else{
+			throw new PluginNotFoundException("Cannot directly start a non-activity plugin," +
+					" you must call a instance for it");
+		}	
+	}
 	
-	public void addFoundPluginToMap(String pluginName, PluginConnection pluginConnection){
+	protected void addFoundPluginToMap(String pluginName, PluginConnection pluginConnection){
 		pluginMap.put(pluginName, pluginConnection);
 	}
 	
