@@ -36,6 +36,7 @@ import java.util.List;
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
+import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Matrix;
@@ -213,8 +214,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		MixView.CONTEXT = this;
 		try {
 
-
-
 			handleIntent(getIntent());
 
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -227,8 +226,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
-
-			SharedPreferences DataSourceSettings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
 			
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
@@ -284,12 +281,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				editor.commit();
 
 				//add the default datasources to the preferences file
-				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
-				dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-				dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-				dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
-				dataSourceEditor.commit();
+				DataSourceStorage.getInstance().fillDefaultDataSources();
 
 			} 
 

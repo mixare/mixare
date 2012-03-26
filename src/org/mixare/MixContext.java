@@ -42,7 +42,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSourceList;
+import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.render.Matrix;
 
@@ -52,7 +52,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -109,21 +108,14 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	
 	public void refreshDataSources() {
 		this.allDataSources.clear();
-		SharedPreferences settings = getSharedPreferences(
-				DataSourceList.SHARED_PREFS, 0);
-		int size = settings.getAll().size();
-		if (size == 0){
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
-			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
-			dataSourceEditor.commit();
-			size = settings.getAll().size();
-		}
+		
+		DataSourceStorage.getInstance().fillDefaultDataSources();
+
+		int size = DataSourceStorage.getInstance().getSize();
+		
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
-			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+			String fields[] = DataSourceStorage.getInstance().getFields(i);
 			this.allDataSources.add(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
 		}
 	}

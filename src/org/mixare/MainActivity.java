@@ -1,12 +1,11 @@
 package org.mixare;
 
-import org.mixare.data.DataSourceList;
+import org.mixare.data.DataSourceStorage;
 import org.mixare.plugin.PluginLoader;
 import org.mixare.plugin.PluginType;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +32,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
+		DataSourceStorage.init(this);
 		
 		if(arePendingActivitiesFinished()){
 			startDefaultSplashScreen();
@@ -75,7 +75,7 @@ public class MainActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		procesDataSourceFromIntent(data);
+		processDataSourceFromPlugin(data);
 		procesCustomSplashScreen(data);
 		
 		PluginLoader.getInstance().decreasePendingActivitiesOnResult();
@@ -92,15 +92,11 @@ public class MainActivity extends Activity {
 		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
 	}
 	
-	private void procesDataSourceFromIntent(Intent data){
+	private void processDataSourceFromPlugin(Intent data){
 		if(data != null && data.getExtras().getString("resultType").equals("Datasource")){
 			String url = data.getExtras().getString("url");
-			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
 			//remove other datasources because you received a new one with a plugin.
-			dataSourceEditor.clear();
-			dataSourceEditor.putString("DataSource0", "Arena|"+url+"|5|2|true");
-			dataSourceEditor.commit();
+			DataSourceStorage.getInstance().add("DataSource0", "Barcode_source|"+url+"|5|2|true");
 		}
 	}
 	
