@@ -85,6 +85,7 @@ public class MainActivity extends Activity {
 	private void startMixare(){
 		if(ArePendingActivitiesFinished()){
 			startActivity(new Intent(this, MixView.class));
+			finish();
 		}
 	}
 	

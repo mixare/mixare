@@ -79,7 +79,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
-	
+
 	public MixView mixView;
 	Context ctx;
 	boolean isURLvalid = true;
@@ -89,24 +89,24 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	Matrix rotationM = new Matrix();
 	float declination = 0f;
-	
+
 	//Location related
 	private LocationManager lm;
 	Location curLoc;
 	Location locationAtLastDownload;
-	
+
 	private ArrayList<DataSource> allDataSources=new ArrayList<DataSource>();
 
-	
+
 	public ArrayList<DataSource> getAllDataSources() {
 		return this.allDataSources;
 	}
-	
+
 	public void setAllDataSourcesforLauncher(DataSource datasource) {
 		this.allDataSources.clear();
 		this.allDataSources.add(datasource);
 	}
-	
+
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 		SharedPreferences settings = getSharedPreferences(
@@ -164,7 +164,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		hardFix.setLatitude(46.480302);
 		hardFix.setLongitude(11.296005);
 		hardFix.setAltitude(300);
-		
+
 		try {
 			curLoc = getBestLocation();
 		} catch (Exception ex2) {
@@ -195,10 +195,14 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	private void requestAllLocationUpdates(long freq, float dist) {
 		for (String provider : lm.getAllProviders()) {
-			lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			try{
+				lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			}catch(SecurityException se){
+				throw new RuntimeException(se);
+			}
 		}
 	}
-	
+
 	public void unregisterLocationManager() {
 		if (lm != null) {
 			lm.removeUpdates(lnormal);
@@ -229,6 +233,10 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	}
 
 	public Location getCurrentLocation() {
+		if(curLoc == null){
+			Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
+			throw new RuntimeException("No GPS Found");
+		}
 		synchronized (curLoc) {
 			return curLoc;
 		}
@@ -243,7 +251,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
 	        System.setProperty("http.keepAlive", "false");
 	    }
-	    
+
 		if (urlStr.startsWith("file://"))			
 			return new FileInputStream(urlStr.replace("file://", ""));
 
@@ -267,7 +275,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		HttpsURLConnection.setDefaultSSLSocketFactory(
 				context.getSocketFactory());
 		}
-		
+
 		try {
 			URL url = new URL(urlStr);
 			conn =  url.openConnection();
@@ -275,7 +283,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 			conn.setConnectTimeout(10000);
 
 			is = conn.getInputStream();
-			
+
 			return is;
 		} catch (Exception ex) {
 			try {
@@ -287,7 +295,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 					((HttpURLConnection)conn).disconnect();
 			} catch (Exception ignore) {			
 			}
-			
+
 			throw ex;				
 
 		}
@@ -338,7 +346,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 			}
 
 			is = conn.getInputStream();
-			
+
 			return is;
 		} catch (Exception ex) {
 
@@ -415,14 +423,14 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 				return true;
 			}
 		};
-		
+
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
 				view.loadUrl(url);
 				return true;
 			}
-			
+
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				// TODO Auto-generated method stub
@@ -444,14 +452,14 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 		d.show();
 		webview.loadUrl(url);
-		
+
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
 		// TODO
 		WebView webview = new WebView(context);
 		webview.setBackgroundColor(0x99FFFFFF);
-		
+
 		final Dialog d = new Dialog(context) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
@@ -459,7 +467,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 				return true;
 			}
 		};
-		
+
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
 			     view.loadUrl(url);
@@ -478,7 +486,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 			}
 
 		});
-				
+
 		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.getWindow().setGravity(Gravity.BOTTOM);
 		d.addContentView(webview, new FrameLayout.LayoutParams(
@@ -486,7 +494,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 				Gravity.BOTTOM));
 
 		d.show();
-		
+
 		webview.loadUrl(url);
 	}
 
@@ -497,7 +505,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
-	
+
 	private LocationListener lbounce = new LocationListener() {
 
 		@Override
@@ -506,7 +514,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 
 			downloadManager.purgeLists();
-			
+
 			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
 				lm.removeUpdates(lbounce);			
@@ -526,9 +534,9 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
-	
+
 	private LocationListener lcoarse = new LocationListener() {
 
 		@Override
@@ -551,7 +559,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
 
 	private LocationListener lnormal = new LocationListener() {
