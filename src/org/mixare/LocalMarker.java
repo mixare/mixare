@@ -43,7 +43,7 @@ import android.location.Location;
  * NavigationMarkers, since this class is abstract
  */
 
-abstract public class LocalMarker implements Marker {
+public abstract class LocalMarker implements Marker {
 
 	private String ID;
 	protected String title;
@@ -140,20 +140,6 @@ abstract public class LocalMarker implements Marker {
 
 		if (cMarker.z < -1f) {
 			isVisible = true;
-
-			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
-					viewCam.width, viewCam.height)) {
-
-//				float xDist = cMarker.x - viewCam.width / 2;
-//				float yDist = cMarker.y - viewCam.height / 2;
-//				float dist = xDist * xDist + yDist * yDist;
-
-//				deltaCenter = (float) Math.sqrt(dist);
-//
-//				if (dist < 50 * 50) {
-//					isLookingAt = true;
-//				}
-			}
 		}
 	}
 
@@ -304,6 +290,11 @@ abstract public class LocalMarker implements Marker {
 	@Override
 	public boolean equals (Object marker) {
 		return this.ID.equals(((LocalMarker) marker).getID());
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.ID.hashCode();
 	}
 
 	public boolean isActive() {

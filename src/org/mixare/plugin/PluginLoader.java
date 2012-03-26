@@ -25,10 +25,11 @@ import android.os.RemoteException;
 public class PluginLoader {
 	
 	private static PluginLoader instance;
+	
 	private Activity activity;
-	/** A map holding the plugin name and the connector to use the plugin */
-	Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
-	/** The number of pending activities that should return a result */
+	
+	private Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
+	
 	private int pendingActivitiesOnResult = 0;
 	
 	public static PluginLoader getInstance() {
@@ -111,7 +112,7 @@ public class PluginLoader {
 		if (iMarkerService == null) {
 			throw new PluginNotFoundException();
 		}
-		RemoteMarker rm = new RemoteMarker(markername, iMarkerService);
+		RemoteMarker rm = new RemoteMarker(iMarkerService);
 		rm.buildMarker(title, latitude, longitude, altitude, link, type, color);
 		return rm; 
 	}

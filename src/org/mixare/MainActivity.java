@@ -24,8 +24,8 @@ public class MainActivity extends Activity {
 
 	private static final int SPLASHTIME = 2000; //2 seconds
 	public static final int SCANNER_REQUEST_CODE = 0;
-	protected Handler exitHandler = null;
-	protected Runnable exitRunnable = null;
+	private Handler exitHandler = null;
+	private Runnable exitRunnable = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
 		
-		if(ArePendingActivitiesFinished()){
+		if(arePendingActivitiesFinished()){
 			startDefaultSplashScreen();
 		}
 	}
@@ -83,12 +83,12 @@ public class MainActivity extends Activity {
 	}
 	
 	private void startMixare(){
-		if(ArePendingActivitiesFinished()){
+		if(arePendingActivitiesFinished()){
 			startActivity(new Intent(this, MixView.class));
 		}
 	}
 	
-	private boolean ArePendingActivitiesFinished(){
+	private boolean arePendingActivitiesFinished(){
 		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
 	}
 	

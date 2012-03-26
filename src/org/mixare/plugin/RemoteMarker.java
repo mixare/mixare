@@ -26,7 +26,7 @@ public class RemoteMarker implements Marker{
 	private String markerName;
 	private IMarkerService iMarkerService;
 	
-	public RemoteMarker(String pluginName, IMarkerService iMarkerService){
+	public RemoteMarker(IMarkerService iMarkerService){
 		this.iMarkerService = iMarkerService;
 	}
 
@@ -34,11 +34,11 @@ public class RemoteMarker implements Marker{
 		return 0;
 	}
 
-	public void buildMarker(String title, double latitude, double longitude, double altitude, String URL, int type, int color){
+	public void buildMarker(String title, double latitude, double longitude, double altitude, String url, int type, int color){
 		try {
-			this.markerName = iMarkerService.buildMarker(title, latitude, longitude, altitude, URL, type, color);
+			this.markerName = iMarkerService.buildMarker(title, latitude, longitude, altitude, url, type, color);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getPluginName();
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.calcPaint(markerName, viewCam, addX, addY);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -70,9 +70,9 @@ public class RemoteMarker implements Marker{
 				}
 			}
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		} catch (NullPointerException ne){
-			throw new RuntimeException(ne);
+			throw new PluginNotFoundException(ne);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getAltitude(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -90,7 +90,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getColour(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getDistance(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getID(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getLatitude(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getLocationVector(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -135,7 +135,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getLongitude(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getMaxObjects(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getTitle(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -162,7 +162,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getTxtLab(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 	
@@ -172,7 +172,7 @@ public class RemoteMarker implements Marker{
 				iMarkerService.setTxtLab(markerName, txtLab);
 			}
 		} catch (RemoteException e){
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -181,7 +181,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.getURL(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -190,7 +190,7 @@ public class RemoteMarker implements Marker{
 		try {
 			return iMarkerService.isActive(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -199,7 +199,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.setActive(markerName, active);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -208,7 +208,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.setDistance(markerName, distance);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -217,7 +217,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.setID(markerName, iD);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -226,7 +226,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.update(markerName, curGPSFix);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -237,7 +237,7 @@ public class RemoteMarker implements Marker{
 			clickHandler = iMarkerService.fClick(markerName);
 			return clickHandler.handleClick(x, y, ctx, state);
 		} catch (RemoteException e) {
-			throw new RuntimeException();
+			throw new PluginNotFoundException();
 		}
 	}
 	
@@ -268,7 +268,7 @@ public class RemoteMarker implements Marker{
 		try {
 			iMarkerService.setImage(markerName, image);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}	
 	}
 
@@ -277,7 +277,7 @@ public class RemoteMarker implements Marker{
 		try{
 			return iMarkerService.getImage(markerName);
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 

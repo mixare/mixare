@@ -1,9 +1,11 @@
 package org.mixare.plugin.connection;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.mixare.lib.service.IMarkerService;
 import org.mixare.plugin.PluginConnection;
+import org.mixare.plugin.PluginNotFoundException;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
@@ -18,7 +20,7 @@ import android.os.RemoteException;
  */
 public class MarkerServiceConnection extends PluginConnection implements ServiceConnection{
 
-	HashMap<String, IMarkerService> markerServices = new HashMap<String, IMarkerService>();
+	private Map<String, IMarkerService> markerServices = new HashMap<String, IMarkerService>();
 
 	@Override
 	public void onServiceDisconnected(ComponentName name) {
@@ -35,11 +37,11 @@ public class MarkerServiceConnection extends PluginConnection implements Service
 			markerServices.put(markername, iMarkerService);
 			storeFoundPlugin();
 		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+			throw new PluginNotFoundException(e);
 		}
 	}
 	
-	public HashMap<String, IMarkerService> getMarkerServices() {
+	public Map<String, IMarkerService> getMarkerServices() {
 		return markerServices;
 	}
 }

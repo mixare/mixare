@@ -195,7 +195,11 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	private void requestAllLocationUpdates(long freq, float dist) {
 		for (String provider : lm.getAllProviders()) {
-			lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			try{
+				lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			}catch(SecurityException se){
+				throw new RuntimeException(se);
+			}
 		}
 	}
 	
@@ -229,6 +233,10 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	}
 
 	public Location getCurrentLocation() {
+		if(curLoc == null){
+			Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
+			throw new RuntimeException("No GPS Found");
+		}
 		synchronized (curLoc) {
 			return curLoc;
 		}

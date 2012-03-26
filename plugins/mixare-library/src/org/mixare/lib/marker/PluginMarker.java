@@ -184,9 +184,9 @@ public abstract class PluginMarker{
 		if (cMarker.z < -1f) {
 			isVisible = true;
 
-			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
-					viewCam.width, viewCam.height)) {
-			}
+			//if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0,
+			//		viewCam.width, viewCam.height)) {
+			//}
 		}
 	}
 	

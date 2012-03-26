@@ -11,6 +11,10 @@ public class PluginNotFoundException extends RuntimeException{
 	public PluginNotFoundException() {
 		super();
 	}
+	
+	public PluginNotFoundException(Throwable throwable){
+		super(throwable);
+	}
 
 	public PluginNotFoundException(String message) {
 		super(message);
