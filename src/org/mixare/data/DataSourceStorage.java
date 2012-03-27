@@ -16,6 +16,8 @@ public class DataSourceStorage {
 	private Context ctx;
 	
 	public static DataSourceStorage instance;
+	
+	private boolean customDataSourceSelected = false;
 		
 	public DataSourceStorage(Context ctx){
 		this.ctx = ctx;
@@ -63,8 +65,12 @@ public class DataSourceStorage {
 	
 	public void fillDefaultDataSources(){
 		String[] datasources = ctx.getResources().getStringArray(R.array.defaultdatasources);
-		for(int i = 0; i < datasources.length; i++){
-			add("DataSource"+i, datasources[i]);
+		if(datasources.length > getSize()){
+			for(int i = 0; i < datasources.length; i++){
+				int id = getSize();
+				add("DataSource"+ id, datasources[i]);
+				onCustomDataSourceSelected(id);
+			}
 		}
 	}
 	
@@ -76,4 +82,12 @@ public class DataSourceStorage {
 		return settings.getAll().size();
 	}
 	
+	public void setCustomDataSourceSelected(boolean customDataSourceSelected){
+		this.customDataSourceSelected = customDataSourceSelected;
+	}
+		
+	private void onCustomDataSourceSelected(int id) {
+		// if a custom data source is selected, then hide the datasources
+		editVisibility(id, !customDataSourceSelected);
+	}
 }

@@ -23,8 +23,8 @@ public class MainActivity extends Activity {
 
 	private static final int SPLASHTIME = 2000; //2 seconds
 	public static final int SCANNER_REQUEST_CODE = 0;
-	private Handler exitHandler = null;
-	private Runnable exitRunnable = null;
+	protected Handler exitHandler = null;
+	protected Runnable exitRunnable = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -96,8 +96,10 @@ public class MainActivity extends Activity {
 	private void processDataSourceFromPlugin(Intent data){
 		if(data != null && data.getExtras().getString("resultType").equals("Datasource")){
 			String url = data.getExtras().getString("url");
-			//remove other datasources because you received a new one with a plugin.
-			DataSourceStorage.getInstance().add("DataSource0", "Barcode_source|"+url+"|5|2|true");
+			//clear all datasources for a reinit
+			DataSourceStorage.getInstance().clear();
+			DataSourceStorage.getInstance().add("DataSource0", "Barcode source|"+url+"|5|2|true");
+			DataSourceStorage.getInstance().setCustomDataSourceSelected(true);
 		}
 	}
 	
