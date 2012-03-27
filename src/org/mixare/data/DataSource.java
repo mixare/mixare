@@ -22,7 +22,6 @@ package org.mixare.data;
 import org.mixare.R;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,8 +62,7 @@ public class DataSource extends Activity{
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			if (extras.containsKey("DataSourceId")) {
-				SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-				String fields[] = settings.getString("DataSource" + extras.getInt("DataSourceId"), "").split("\\|", -1);
+				String fields[] = DataSourceStorage.getInstance().getFields(extras.getInt("DataSourceId"));
 				nameField.setText(fields[0], TextView.BufferType.EDITABLE);
 				urlField.setText(fields[1], TextView.BufferType.EDITABLE);
 				typeSpinner.setSelection(Integer.parseInt(fields[2])-3);
@@ -89,17 +87,14 @@ public class DataSource extends Activity{
 			//TODO: fix the weird hack for type!
 			DataSource newDS = new DataSource(name, url, typeId+3, displayId, true);
 
-			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			int index = settings.getAll().size();
+			int index = DataSourceStorage.getInstance().getSize();
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
 				if (extras.containsKey("DataSourceId")) {
 					index = extras.getInt("DataSourceId");
 				}
 			}
-			editor.putString("DataSource"+index, newDS.serialize());
-			editor.commit();
+			DataSourceStorage.getInstance().add("DataSource"+index, newDS.serialize());
 		}
 
 		return super.onKeyDown(keyCode, event);

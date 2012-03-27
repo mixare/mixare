@@ -44,7 +44,7 @@ import android.util.Log;
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
-	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
+	private static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
 	private int state = NOT_STARTED;
 
 	private int id = 0;

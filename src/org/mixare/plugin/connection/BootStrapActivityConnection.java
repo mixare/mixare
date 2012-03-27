@@ -19,7 +19,7 @@ public class BootStrapActivityConnection extends PluginConnection implements Act
 
 	private IBootStrap iBootStrap;
 	private Intent activityIntent;
-	public static int BOOTSTRAP_REQUEST_CODE = -1;
+	private int bootstrapRequestCode = -1;
 	
 	@Override
 	public void startActivityForResult(Activity activity) {
@@ -28,10 +28,10 @@ public class BootStrapActivityConnection extends PluginConnection implements Act
 			throw new PluginNotFoundException();
 		}
 		try{
-			BOOTSTRAP_REQUEST_CODE = iBootStrap.getActivityRequestCode();
-			activity.startActivityForResult(activityIntent, BOOTSTRAP_REQUEST_CODE);
+			bootstrapRequestCode = iBootStrap.getActivityRequestCode();
+			activity.startActivityForResult(activityIntent, bootstrapRequestCode);
 		}catch(RemoteException e){
-			throw new PluginNotFoundException("Remote exception occured when accessing bootstrap plugin");
+			throw new PluginNotFoundException(e);
 		}
 	}
 
@@ -43,7 +43,7 @@ public class BootStrapActivityConnection extends PluginConnection implements Act
 			String pluginName = iBootStrap.getPluginName();
 			storeFoundPlugin(pluginName);
 			PluginLoader.getInstance().increasePendingActivitiesOnResult();
-			PluginLoader.getInstance().startPlugin(pluginType, pluginName);
+			PluginLoader.getInstance().startPlugin(getPluginType(), pluginName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}		

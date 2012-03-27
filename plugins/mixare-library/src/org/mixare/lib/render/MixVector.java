@@ -75,6 +75,14 @@ public class MixVector implements Parcelable{
 	public boolean equals(float x, float y, float z) {
 		return (this.x == x && this.y == y && this.z == z);
 	}
+	
+	@Override
+	public int hashCode() {
+		Float xf = x;
+		Float yf = y;
+		Float zf = z;
+		return xf.hashCode()+yf.hashCode()+zf.hashCode();
+	}
 
 	@Override
 	public String toString() {

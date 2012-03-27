@@ -13,7 +13,7 @@ import android.os.Parcel;
  */
 public class DrawArrow extends DrawCommand{
 
-	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawArrow";
+	private static String CLASS_NAME = DrawArrow.class.getName();
 	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_CMARKER = "cMarker";

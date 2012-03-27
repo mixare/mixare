@@ -12,7 +12,7 @@ import android.os.Parcel;
 
 public class DrawTextBox extends DrawCommand {
 
-	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawTextBox";	
+	private static String CLASS_NAME = DrawTextBox.class.getName();
 	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_DISTANCE = "distance";

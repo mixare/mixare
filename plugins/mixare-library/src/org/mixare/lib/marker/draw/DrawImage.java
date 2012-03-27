@@ -9,7 +9,7 @@ import android.os.Parcel;
 
 public class DrawImage extends DrawCommand{
 	
-	private static String CLASS_NAME = "org.mixare.lib.marker.draw.DrawImage";
+	private static String CLASS_NAME = DrawImage.class.getName();
 	
 	private static String PROPERTY_NAME_VISIBLE = "visible";
 	private static String PROPERTY_NAME_SIGNMARKER = "signMarker";

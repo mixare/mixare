@@ -7,10 +7,14 @@ package org.mixare.plugin;
  */
 public abstract class PluginConnection {
 
-	protected PluginType pluginType;
+	private PluginType pluginType;
 	
 	public void setPluginType(PluginType pluginType) {
 		this.pluginType = pluginType;
+	}
+	
+	public PluginType getPluginType() {
+		return pluginType;
 	}
 		
 	public String getPluginName() {
