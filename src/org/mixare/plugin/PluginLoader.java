@@ -66,6 +66,7 @@ public class PluginLoader {
 			if (sinfo != null) {
 				Intent serviceIntent = new Intent();
 				serviceIntent.setClassName(sinfo.packageName, sinfo.name);
+				activity.startService(serviceIntent);
 				activity.bindService(serviceIntent, (ServiceConnection)pluginType.getPluginConnection(),
 						Context.BIND_AUTO_CREATE);
 				checkForPendingActivity(pluginType);

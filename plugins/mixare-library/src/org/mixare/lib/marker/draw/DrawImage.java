@@ -6,6 +6,7 @@ import org.mixare.lib.render.MixVector;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Parcel;
+import android.util.Log;
 
 public class DrawImage extends DrawCommand{
 	
@@ -36,11 +37,11 @@ public class DrawImage extends DrawCommand{
 			Bitmap bitmap = getBitmapProperty(PROPERTY_NAME_IMAGE);
 			
 			dw.setColor(Color.argb(155, 255, 255, 255));
-			try{
-			dw.paintBitmap(bitmap, signMarker.x - (bitmap.getWidth()/2), signMarker.y - (bitmap.getHeight() / 2));
-			}catch(NullPointerException ne){
-				throw new RuntimeException(ne);
+			if(bitmap == null){
+				Log.e("mixare-lib", "bitmap = null");
+				return;
 			}
+			dw.paintBitmap(bitmap, signMarker.x - (bitmap.getWidth()/2), signMarker.y - (bitmap.getHeight() / 2));
 		}
 	}	
 	

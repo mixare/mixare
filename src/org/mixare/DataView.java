@@ -26,15 +26,18 @@ import static android.view.KeyEvent.KEYCODE_DPAD_RIGHT;
 import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.gui.RadarPoints;
-import org.mixare.lib.marker.Marker;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
+import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Camera;
 
 import android.graphics.Color;
@@ -74,6 +77,10 @@ public class DataView {
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
 	private float radius = 20;
+	
+	/** timer to refresh the browser */
+	private Timer refresh = null;
+	private final long refreshDelay = 45 * 1000; //refresh every 45 seconds
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
 	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
@@ -290,9 +297,22 @@ public class DataView {
 			if(dm.isDone()) {
 				retry=0;
 				state.nextLStatus = MixState.DONE;
+				
+				if(refresh == null){ //start the refresh timer if it is null
+					refresh = new Timer(false);
+					Date date = new Date(System.currentTimeMillis()+refreshDelay);
+					refresh.schedule(new TimerTask() {
+						
+						@Override
+						public void run() {
+							callRefreshToast();
+							MixView.CONTEXT.repaint();	
+							refresh.cancel();
+						}
+					}, date, refreshDelay);
+				}
 			}
 		}
-
 		
 		// Update markers
 		dataHandler.updateActivationStatus(mixContext);
@@ -417,6 +437,23 @@ public class DataView {
 			uiEvents.clear();
 		}
 	}
+	
+	public void cancelRefreshTimer(){
+		if( refresh != null) {
+			refresh.cancel();
+		}
+	}
+	
+	private void callRefreshToast(){
+		MixView.CONTEXT.runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				Toast.makeText(mixContext, mixContext.getResources().getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+	
 }
 
 class UIEvent {
