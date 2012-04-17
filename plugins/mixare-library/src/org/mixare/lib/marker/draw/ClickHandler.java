@@ -42,6 +42,13 @@ public class ClickHandler implements Parcelable{
 		readFromParcel(in);
 	}
 	
+	/**
+	 * A click handler without a click valid check.
+	 */
+	public boolean fakeClick(MixContextInterface ctx, MixStateInterface state){
+		return state.handleEvent(ctx, url);
+	}
+	
 	public boolean handleClick(float x, float y, MixContextInterface ctx, MixStateInterface state){
 		if(isClickValid(x, y)){
 			return state.handleEvent(ctx, url);

@@ -26,14 +26,6 @@ public class ImageMarkerService extends Service{
 	private Map<String, PluginMarker> markers = new HashMap<String, PluginMarker>();
 	private Integer count = 0;
 
-	public void onStart(Intent intent, int startId) {
-		super.onStart( intent, startId );
-	}
-
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
