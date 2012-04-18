@@ -7,6 +7,8 @@ import org.mixare.lib.gui.Label;
 import org.mixare.lib.marker.PluginMarker;
 import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
+import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -14,15 +16,14 @@ import org.mixare.plugin.imagemarker.ImageMarker;
 
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.IBinder;
 import android.os.RemoteException;
 
 public class ImageMarkerService extends Service{
 	
-	static final String PLUGIN_NAME = "imagemarker";
-	static final String CATEGORY_PLUGIN= "mixare.intent.category.MARKER_PLUGIN";
+	public final String PLUGIN_NAME = "imagemarker";
+	public final String CATEGORY_PLUGIN= "mixare.intent.category.MARKER_PLUGIN";
 	private Map<String, PluginMarker> markers = new HashMap<String, PluginMarker>();
 	private Integer count = 0;
 
@@ -148,20 +149,10 @@ public class ImageMarkerService extends Service{
 				throws RemoteException {
 			return markers.get(markerName).fClick();
 		}
-
-		@Override
-		public void setImage(String markerName, Bitmap bitmap) throws RemoteException {
-			markers.get(markerName).setImage(bitmap);			
-		}
-
+		
 		@Override
 		public MixVector getCMarker(String markerName) throws RemoteException {
 			return markers.get(markerName).getCMarker();
-		}
-
-		@Override
-		public Bitmap getImage(String markerName) throws RemoteException {
-			return markers.get(markerName).getImage();
 		}
 
 		@Override
@@ -187,6 +178,19 @@ public class ImageMarkerService extends Service{
 		@Override
 		public Label getTxtLab(String markerName) throws RemoteException {
 			return markers.get(markerName).getTxtLab();
+		}
+
+		@Override
+		public void setExtrasParc(String markerName, String name,
+				ParcelableProperty value) throws RemoteException {
+			markers.get(markerName).setExtras(name, value);
+		}
+
+		@Override
+		public void setExtrasPrim(String markerName, String name,
+				PrimitiveProperty value) throws RemoteException {
+			markers.get(markerName).setExtras(name, value);
+			
 		}
     };
 

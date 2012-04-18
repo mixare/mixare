@@ -7,6 +7,7 @@ import org.mixare.lib.marker.PluginMarker;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.marker.draw.DrawImage;
 import org.mixare.lib.marker.draw.DrawTextBox;
+import org.mixare.lib.marker.draw.ParcelableProperty;
 
 import android.graphics.Bitmap;
 
@@ -37,15 +38,12 @@ public class ImageMarker extends PluginMarker{
 		dCommands[1] = new DrawTextBox(isVisible, distance, title, underline, textBlock, txtLab, signMarker);
 		return dCommands;
 	}
-	
-	@Override
-	public void setImage(Bitmap image) {
-		this.image = image;
-	}
 
 	@Override
-	public Bitmap getImage() {
-		return image;
+	public void setExtras(String name, ParcelableProperty parcelableProperty) {
+		if(name.equals("bitmap")){
+			image = (Bitmap)parcelableProperty.getObject();
+		}
 	}
 	
 }

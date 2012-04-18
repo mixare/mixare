@@ -7,6 +7,8 @@ import org.mixare.lib.render.Camera;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.marker.draw.ClickHandler;
 /**
@@ -60,12 +62,12 @@ interface IMarkerService {
 
 	ClickHandler fClick(String markerName);
 
-	void setImage(String markerName, in Bitmap image);
-
 	boolean isVisible(String markerName);
 
-	Bitmap getImage(String markerName);
-
+	void setExtrasParc(String markerName, String name, in ParcelableProperty parcelableProperty);
+	
+	void setExtrasPrim(String markerName, String name, in PrimitiveProperty primitiveProperty);
+	
 	MixVector getCMarker(String markerName);
 
 	MixVector getSignMarker(String markerName);

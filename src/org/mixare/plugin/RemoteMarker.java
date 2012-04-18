@@ -8,11 +8,11 @@ import org.mixare.lib.marker.Marker;
 import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.RemoteException;
 
@@ -229,6 +229,22 @@ public class RemoteMarker implements Marker{
 			throw new PluginNotFoundException(e);
 		}
 	}
+	
+	public void setExtras(String name, ParcelableProperty parcelableProperty){
+		try {
+			iMarkerService.setExtrasParc(markerName, name, parcelableProperty);
+		} catch (RemoteException e) {
+			throw new PluginNotFoundException(e);
+		}
+	}
+	
+	public void setExtras(String name, PrimitiveProperty primitiveProperty){
+		try {
+			iMarkerService.setExtrasPrim(markerName, name, primitiveProperty);
+		} catch (RemoteException e) {
+			throw new PluginNotFoundException(e);
+		}
+	}
 
 	@Override
 	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state) {
@@ -261,24 +277,6 @@ public class RemoteMarker implements Marker{
 	public int compareTo(Marker another) {
 		Marker rm = (Marker)another;
 		return this.getID().compareTo(rm.getID());
-	}
-
-	@Override
-	public void setImage(Bitmap image) {
-		try {
-			iMarkerService.setImage(markerName, image);
-		} catch (RemoteException e) {
-			throw new PluginNotFoundException(e);
-		}	
-	}
-
-	@Override
-	public Bitmap getImage(){
-		try{
-			return iMarkerService.getImage(markerName);
-		} catch (RemoteException e) {
-			throw new PluginNotFoundException(e);
-		}
 	}
 
 }

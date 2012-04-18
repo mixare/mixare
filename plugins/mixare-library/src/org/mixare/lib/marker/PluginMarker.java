@@ -2,16 +2,16 @@ package org.mixare.lib.marker;
 
 import java.net.URLDecoder;
 
-import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
+import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 
 /**
@@ -118,10 +118,6 @@ public abstract class PluginMarker{
 
 	public abstract int getMaxObjects();
 
-	public abstract void setImage(Bitmap image);
-
-	public abstract Bitmap getImage();
-
 	public MixVector getCMarker() {
 		return cMarker;
 	}
@@ -197,5 +193,14 @@ public abstract class PluginMarker{
 	public Label getTxtLab() {
 		return txtLab;
 	}
+	
+	public void setExtras(String name, ParcelableProperty parcelableProperty){
+		//can be overriden
+	}
+	
+	public void setExtras(String name, PrimitiveProperty primitiveProperty){
+		//can be overriden
+	}
+	
 
 }

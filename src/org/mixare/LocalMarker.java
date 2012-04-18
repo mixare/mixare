@@ -29,6 +29,8 @@ import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.gui.TextObj;
 import org.mixare.lib.marker.Marker;
+import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.reality.PhysicalPlace;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
@@ -328,5 +330,12 @@ public abstract class LocalMarker implements Marker {
 	public Label getTxtLab() {
 		return txtLab;
 	}
+	
+	public void setExtras(String name, PrimitiveProperty primitiveProperty){
+		//nothing to add
+	}
 
+	public void setExtras(String name, ParcelableProperty parcelableProperty){
+		//nothing to add
+	}
 }

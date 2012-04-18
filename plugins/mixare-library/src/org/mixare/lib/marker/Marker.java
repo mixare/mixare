@@ -4,10 +4,11 @@ import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.gui.Label;
 import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.marker.draw.ParcelableProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 
 /**
@@ -55,9 +56,9 @@ public interface Marker extends Comparable<Marker>{
 	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state);
 
 	int getMaxObjects();
-
-	void setImage(Bitmap image);
-
-	Bitmap getImage();
+	
+	void setExtras(String name, ParcelableProperty parcelableProperty);
+	
+	void setExtras(String name, PrimitiveProperty primitiveProperty);
 
 }

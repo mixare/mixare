@@ -1,6 +1,7 @@
 package org.mixare.plugin;
 
 import org.mixare.plugin.connection.BootStrapActivityConnection;
+import org.mixare.plugin.connection.DataHandlerServiceConnection;
 import org.mixare.plugin.connection.MarkerServiceConnection;
 
 /**
@@ -77,8 +78,24 @@ public enum PluginType{
 		public Loader getLoader() {
 			return Loader.Service;
 		}		
+	},
+	/** A plugin that handles the conversion of data to marker*/
+	DATAHANDLER(){
+		
+		public String getActionName() {
+			return "org.mixare.plugin.datahandler";
+		}
+		
+		public PluginConnection getPluginConnection() {
+			PluginConnection pluginConnection = new DataHandlerServiceConnection();
+			pluginConnection.setPluginType(this);
+			return pluginConnection;
+		}
+
+		public Loader getLoader() {
+			return Loader.Service;
+		}		
 	};
-	//TODO DataHandlers plugins that can convert json to markerdata
 	
 	/** The package name to find the plugin */
 	public abstract String getActionName();

@@ -20,6 +20,7 @@
 package org.mixare.data;
 
 import org.mixare.R;
+import org.mixare.data.convert.DataConvertor;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -201,7 +202,7 @@ public class DataSource extends Activity{
 			break;
 			
 			case OSM: 
-				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
+				ret+= DataConvertor.getOSMBoundingBox(lat, lon, radius);
 			break;
 			}
 			

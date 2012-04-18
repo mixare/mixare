@@ -29,8 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.data.DataSource;
-import org.mixare.data.Json;
-import org.mixare.data.XMLHandler;
+import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -38,13 +37,14 @@ import org.xml.sax.InputSource;
 import android.util.Log;
 
 /**
- * This class establishes a connection and downloads the data for
- * each entry in its todo list one after another.
+ * This class establishes a connection and downloads the data for each entry in
+ * its todo list one after another.
  */
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
-	private static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
+	private static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2,
+			PAUSED = 3, STOPPED = 4;
 	private int state = NOT_STARTED;
 
 	private int id = 0;
@@ -114,11 +114,11 @@ public class DownloadManager implements Runnable {
 		state = STOPPED;
 	}
 
-	public int checkForConnection(){
+	public int checkForConnection() {
 		return state;
 	}
 
-	private void sleep(long ms){
+	private void sleep(long ms) {
 		try {
 			Thread.sleep(ms);
 		} catch (java.lang.InterruptedException ex) {
@@ -132,66 +132,30 @@ public class DownloadManager implements Runnable {
 
 	private DownloadResult processRequest(DownloadRequest request) {
 		DownloadResult result = new DownloadResult();
-		//assume an error until everything is fine
+		// assume an error until everything is fine
 		result.error = true;
 		try {
-			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.source.getUrl())!=null){
+			if (ctx != null
+					&& request != null
+					&& ctx.getHttpGETInputStream(request.source.getUrl()) != null) {
 
-				is = ctx.getHttpGETInputStream(request.source.getUrl() + request.params);
+				is = ctx.getHttpGETInputStream(request.source.getUrl()
+						+ request.params);
 				String tmp = ctx.getHttpInputString(is);
 
-				Json layer = new Json();
+				// try loading Marker data
 
-				// try loading JSON DATA
-				try {
+				List<Marker> markers = DataConvertor.getInstance().load(
+						request.source.getUrl(), tmp, request.source);
+				result.setMarkers(markers);
 
-					Log.v(MixView.TAG, "try to load JSON data");
-
-					JSONObject root = new JSONObject(tmp);
-
-					Log.d(MixView.TAG, "loading JSON data");
-
-					List<Marker> markers = layer.load(root,request.source);
-					result.setMarkers(markers);
-
-					result.source = request.source;
-					result.error = false;
-					result.errorMsg = null;
-
-				}
-				catch (JSONException e) {
-
-					Log.v(MixView.TAG, "no JSON data");
-					Log.v(MixView.TAG, "try to load XML data");
-
-					try {
-						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-						//Document doc = builder.parse(is);d
-						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
-
-						//Document doc = builder.parse(is);
-
-						XMLHandler xml = new XMLHandler();
-
-						Log.i(MixView.TAG, "loading XML data");	
-						
-
-						List<Marker> markers = xml.load(doc, request.source);
-						
-						result.setMarkers(markers);
-
-						result.source = request.source;
-						result.error = false;
-						result.errorMsg = null;
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}				
-				}
+				result.source = request.source;
+				result.error = false;
+				result.errorMsg = null;
 				ctx.returnHttpInputStream(is);
 				is = null;
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
@@ -214,25 +178,25 @@ public class DownloadManager implements Runnable {
 	}
 
 	public synchronized String submitJob(DownloadRequest job) {
-		if(job!=null) {
+		if (job != null) {
 			String jobId = "";
-			//ensure that we only have one download per each datasource
+			// ensure that we only have one download per each datasource
 			String currDSname = job.source.getName();
 			boolean found = false;
-			if (!todoList.isEmpty()){
-			for (String k: todoList.keySet()) {
-				if (currDSname.equals(todoList.get(k).source.getName())) {
-					found = true;
-					jobId = k;
+			if (!todoList.isEmpty()) {
+				for (String k : todoList.keySet()) {
+					if (currDSname.equals(todoList.get(k).source.getName())) {
+						found = true;
+						jobId = k;
+					}
 				}
 			}
-			}
 			if (!found) {
-			jobId = "ID_" + (id++);
-			todoList.put(jobId, job);
-			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
-					+ job.source.getType() + ", params: " + job.params + ", url: "
-					+ job.source.getUrl());
+				jobId = "ID_" + (id++);
+				todoList.put(jobId, job);
+				Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
+						+ job.source.getType() + ", params: " + job.params
+						+ ", url: " + job.source.getUrl());
 			}
 			return jobId;
 		}
@@ -253,6 +217,7 @@ public class DownloadManager implements Runnable {
 	public String getActiveReqId() {
 		return currJobId;
 	}
+
 	public void pause() {
 		pause = true;
 	}
@@ -264,16 +229,17 @@ public class DownloadManager implements Runnable {
 	public void stop() {
 		stop = true;
 	}
-	
+
 	public synchronized DownloadResult getNextResult() {
-		if(!doneList.isEmpty()) {
-			String nextId=doneList.keySet().iterator().next();
+		if (!doneList.isEmpty()) {
+			String nextId = doneList.keySet().iterator().next();
 			DownloadResult result = doneList.get(nextId);
 			doneList.remove(nextId);
 			return result;
 		}
 		return null;
 	}
+
 	public Boolean isDone() {
 		return todoList.isEmpty();
 	}
@@ -292,15 +258,15 @@ class DownloadResult {
 	List<Marker> markers;
 
 	boolean error;
-	String errorMsg="";
+	String errorMsg = "";
 	DownloadRequest errorRequest;
-
 
 	public List<Marker> getMarkers() {
 		return markers;
 	}
+
 	public void setMarkers(List<Marker> markers) {
 		this.markers = markers;
 	}
-	
+
 }
