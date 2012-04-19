@@ -26,24 +26,23 @@ import org.mixare.R;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class DataSourceList extends ListActivity {
 	
@@ -67,21 +66,14 @@ public class DataSourceList extends ListActivity {
 	protected void onResume() {
 		super.onResume();
 
-		SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+		DataSourceStorage.getInstance().fillDefaultDataSources();
 
-		int size = settings.getAll().size();
-		if (size == 0){
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
-			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
-			dataSourceEditor.commit();
-		}
+		int size = DataSourceStorage.getInstance().getSize();
+		
 		// copy the value from shared preference to adapter
 		dataSourceAdapter = new DataSourceAdapter();
 		for (int i = 0; i < size; i++) {
-			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+			String fields[] = DataSourceStorage.getInstance().getFields(i);
 			dataSourceAdapter.addItem(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
 		}
 		setListAdapter(dataSourceAdapter);
@@ -92,17 +84,13 @@ public class DataSourceList extends ListActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.clear();
+		DataSourceStorage.getInstance().clear();
 		//every URL in Adapter 
 		//put the URL link and status inside the Shared Preference
 		for (int k = 0; k < dataSourceAdapter.getCount(); k++) {
-			editor.putString("DataSource" + k, dataSourceAdapter.serialize(k));
+			DataSourceStorage.getInstance().add("DataSource" + k, dataSourceAdapter.serialize(k));
 		}
-		editor.commit();
 	}
-
 
 	//TODO: check if it's really needed
 	public static String getDataSourcesStringList() {

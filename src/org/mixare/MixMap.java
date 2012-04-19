@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
+import org.mixare.lib.marker.Marker;
+import org.mixare.lib.MixUtils;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -86,7 +88,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		map = this;
 
 		setMapContext(this);
-		mapView= new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA");
+		mapView= new MapView(this, "0kUKFqU7tCTkGeOx2GXzBQRmaXgPQ7bBhgjoBug");
 		mapView.setBuiltInZoomControls(true);
 		mapView.setClickable(true);
 		mapView.setSatellite(true);

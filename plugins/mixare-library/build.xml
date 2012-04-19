@@ -1,0 +1,13 @@
+<project name="mixare-lib" default="dist" basedir=".">
+   <description>Mixare Library</description>
+   <!-- Setting global properties for this build -->
+   <property name="src" location="src" />
+   <property name="bin" location="bin" />
+ 
+   <target name="dist">
+      <jar destfile="mixarelib.jar" basedir="bin/classes">
+         <!-- Use ** to include the directory recursively -->
+         <include name="org/**" />
+      </jar>
+   </target>
+</project>

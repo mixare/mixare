@@ -1,0 +1,5 @@
+/bin
+/gen
+*.jar
+/.sonar
+sonar-project.properties

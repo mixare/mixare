@@ -21,9 +21,10 @@ package org.mixare;
 
 import java.text.DecimalFormat;
 
-import org.mixare.data.DataSource;
-import org.mixare.gui.PaintScreen;
-import org.mixare.gui.TextObj;
+import org.mixare.LocalMarker;
+import org.mixare.lib.MixUtils;
+import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.gui.TextObj;
 
 import android.graphics.Color;
 import android.graphics.Path;
@@ -37,14 +38,14 @@ import android.location.Location;
  * @author hannes
  * 
  */
-public class POIMarker extends Marker {
+public class POIMarker extends LocalMarker {
 
 	public static final int MAX_OBJECTS = 20;
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 
 	public POIMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 
 	}
 

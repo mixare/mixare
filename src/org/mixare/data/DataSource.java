@@ -20,10 +20,9 @@
 package org.mixare.data;
 
 import org.mixare.R;
+import org.mixare.data.convert.DataConvertor;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,13 +40,13 @@ import android.widget.TextView;
  * @author hannes
  * 
  */
-public class DataSource extends Activity {
+public class DataSource extends Activity{
 	
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE };
-	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER };
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, ARENA };
+	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, IMAGE_MARKER };
 	private boolean enabled;
 	private TYPE type;
 	private DISPLAY display;
@@ -64,8 +63,7 @@ public class DataSource extends Activity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			if (extras.containsKey("DataSourceId")) {
-				SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-				String fields[] = settings.getString("DataSource" + extras.getInt("DataSourceId"), "").split("\\|", -1);
+				String fields[] = DataSourceStorage.getInstance().getFields(extras.getInt("DataSourceId"));
 				nameField.setText(fields[0], TextView.BufferType.EDITABLE);
 				urlField.setText(fields[1], TextView.BufferType.EDITABLE);
 				typeSpinner.setSelection(Integer.parseInt(fields[2])-3);
@@ -90,17 +88,14 @@ public class DataSource extends Activity {
 			//TODO: fix the weird hack for type!
 			DataSource newDS = new DataSource(name, url, typeId+3, displayId, true);
 
-			SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			int index = settings.getAll().size();
+			int index = DataSourceStorage.getInstance().getSize();
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) {
 				if (extras.containsKey("DataSourceId")) {
 					index = extras.getInt("DataSourceId");
 				}
 			}
-			editor.putString("DataSource"+index, newDS.serialize());
-			editor.commit();
+			DataSourceStorage.getInstance().add("DataSource"+index, newDS.serialize());
 		}
 
 		return super.onKeyDown(keyCode, event);
@@ -199,9 +194,15 @@ public class DataSource extends Activity {
 				"&altitude=" + Double.toString(alt) +
 				"&radius=" + Double.toString(radius);
 			break;
+
+			case ARENA:
+				ret+=
+				"&lat=" + Double.toString(lat) + 
+				"&lng=" + Double.toString(lon);
+			break;
 			
 			case OSM: 
-				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
+				ret+= DataConvertor.getOSMBoundingBox(lat, lon, radius);
 			break;
 			}
 			
@@ -216,6 +217,7 @@ public class DataSource extends Activity {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
+			case ARENA:		ret=Color.RED; break;
 			default:		ret=Color.WHITE; break;
 		}
 		return ret;
@@ -235,6 +237,9 @@ public class DataSource extends Activity {
 				break;
 			case WIKIPEDIA:	
 				ret=R.drawable.wikipedia; 
+				break;
+			case ARENA:	
+				ret=R.drawable.arena; 
 				break;
 			default:		
 				ret=R.drawable.ic_launcher; 
