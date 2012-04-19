@@ -115,5 +115,5 @@ public class ClickHandler implements Parcelable{
 		signMarker = in.readParcelable(MixVector.class.getClassLoader());
 		cMarker = in.readParcelable(MixVector.class.getClassLoader());
 	}
-	
+
 }

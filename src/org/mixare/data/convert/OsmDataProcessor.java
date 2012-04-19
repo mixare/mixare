@@ -9,7 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.json.JSONException;
 import org.mixare.MixView;
-import org.mixare.POIMarker;
+import org.mixare.NavigationMarker;
 import org.mixare.data.DataHandler;
 import org.mixare.lib.marker.Marker;
 import org.w3c.dom.Document;
@@ -66,7 +66,7 @@ public class OsmDataProcessor extends DataHandler implements DataProcessor {
 						Log.v(MixView.TAG, "OSM Node: " + name + " lat " + lat
 								+ " lon " + lon + "\n");
 
-						Marker ma = new POIMarker(
+						Marker ma = new NavigationMarker(
 								name,
 								lat,
 								lon,

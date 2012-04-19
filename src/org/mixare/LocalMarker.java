@@ -291,7 +291,7 @@ public abstract class LocalMarker implements Marker {
 
 	@Override
 	public boolean equals (Object marker) {
-		return this.ID.equals(((LocalMarker) marker).getID());
+		return this.ID.equals(((Marker) marker).getID());
 	}
 	
 	@Override

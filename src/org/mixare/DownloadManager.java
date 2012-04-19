@@ -19,20 +19,12 @@
 package org.mixare;
 
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mixare.data.DataSource;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import android.util.Log;
 

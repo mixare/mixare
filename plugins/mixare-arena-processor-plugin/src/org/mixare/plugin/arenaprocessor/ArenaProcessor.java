@@ -18,7 +18,6 @@ import org.mixare.plugin.arenaprocessor.service.ArenaProcessorService;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 public class ArenaProcessor extends PluginDataProcessor {
 
@@ -56,16 +55,8 @@ public class ArenaProcessor extends PluginDataProcessor {
 						&& jo.has("webpage"))
 					link = jo.getString("webpage");
 
-				Bitmap image = null;
-				if (jo.getString("object_type").equals("information")) {
-					image = BitmapFactory.decodeResource(
-							ArenaProcessorService.instance.getResources(),
-							R.drawable.information);
-				} else if (jo.getString("object_type").equals("question")) {
-					image = getBitmapFromURL(jo.getString("object_url"));
-				} else if (jo.getString("object_type").equals("image")) {
-					image = getBitmapFromURL(jo.getString("object_url"));
-				}
+				Bitmap image = getBitmapFromURL(jo.getString("object_url"));
+				
 				InitialMarkerData ma = new InitialMarkerData(
 						HtmlUnescape.unescapeHTML(jo.getString("title"), 0),
 						jo.getDouble("lat"), jo.getDouble("lng"),
