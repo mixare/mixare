@@ -20,6 +20,7 @@ package org.mixare.lib.render;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.FloatMath;
 
 /**
  * The Matrix class represents a 3x3 matrix which can store decimal numbers.
@@ -84,19 +85,19 @@ public class Matrix implements Parcelable{
 	}
 
 	public void toXRot(float angleX) {
-		set(1f, 0f, 0f, 0f, (float) Math.cos(angleX), (float) -Math
-				.sin(angleX), 0f, (float) Math.sin(angleX), (float) Math
+		set(1f, 0f, 0f, 0f, (float) FloatMath.cos(angleX), (float) -FloatMath
+				.sin(angleX), 0f, (float) FloatMath.sin(angleX), (float) FloatMath
 				.cos(angleX));
 	}
 
 	public void toYRot(float angleY) {
-		set((float) Math.cos(angleY), 0f, (float) Math.sin(angleY), 0f, 1f,
-				0f, (float) -Math.sin(angleY), 0f, (float) Math.cos(angleY));
+		set((float) FloatMath.cos(angleY), 0f, (float) FloatMath.sin(angleY), 0f, 1f,
+				0f, (float) -FloatMath.sin(angleY), 0f, (float) FloatMath.cos(angleY));
 	}
 
 	public void toZRot(float angleZ) {
-		set((float) Math.cos(angleZ), (float) -Math.sin(angleZ), 0f,
-				(float) Math.sin(angleZ), (float) Math.cos(angleZ), 0f, 0f, 0f,
+		set((float) FloatMath.cos(angleZ), (float) -FloatMath.sin(angleZ), 0f,
+				(float) FloatMath.sin(angleZ), (float) FloatMath.cos(angleZ), 0f, 0f, 0f,
 				1f);
 	}
 

@@ -67,7 +67,7 @@ public class ClickHandler implements Parcelable{
 		//TODO adapt the following to the variable radius!
 		pPt.x = x - signMarker.x;
 		pPt.y = y - signMarker.y;
-		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
+		pPt.rotate((float) Math.toRadians(-(currentAngle + 90)));
 		pPt.x += txtLab.getX();
 		pPt.y += txtLab.getY();
 

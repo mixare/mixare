@@ -95,7 +95,6 @@
 	<string name="data_source_delete">Apagar base de dados</string>
 	<string name="data_source_change_wikipedia">A base de dados mudou para a Wikipedia</string>
 	<string name="data_source_change_twitter">A base de dados mudou para o Twitter</string>
-	<string name="data_source_change_buzz">A base de dados mudou para o Google Buzz</string>
 	<string name="data_source_change_osm">A base de dados mudou para o OpenStreetMap</string>
 
 	<string name="search_failed_notification">Procura sem resultados</string>

@@ -20,6 +20,7 @@ package org.mixare.lib.render;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.FloatMath;
 
 /**
  * This class holds information of a point in a three-dimensional coordinate
@@ -130,11 +131,11 @@ public class MixVector implements Parcelable{
 	}
 
 	public float length() {
-		return (float) Math.sqrt(x * x + y * y + z * z);
+		return (float) FloatMath.sqrt(x * x + y * y + z * z);
 	}
 
 	public float length2D() {
-		return (float) Math.sqrt(x * x + z * z);
+		return (float) FloatMath.sqrt(x * x + z * z);
 	}
 
 	public void norm() {

@@ -59,7 +59,7 @@
 	<string name="latitude">Breitengrad: </string>
 	<string name="altitude">Meereshöhe: </string>
 	<string name="speed">Geschwindigkeit: </string>
-	<string name="acurracy">Genauigkeit: </string>
+	<string name="accuracy">Genauigkeit: </string>
 	<string name="gps_last_fix">Letztes GPS Update: </string>
 	
 	<string name="map_menu_normal_mode">Karte</string>

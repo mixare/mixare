@@ -56,7 +56,7 @@
 	<string name="latitude">Latitudine: </string>
 	<string name="altitude">Altitudine: </string>
 	<string name="speed">velocità: </string>
-	<string name="acurracy">Precisione: </string>
+	<string name="accuracy">Precisione: </string>
 	<string name="gps_last_fix">Ultimo GPS update: </string>
 	
 	<string name="map_menu_normal_mode">Mappa</string>

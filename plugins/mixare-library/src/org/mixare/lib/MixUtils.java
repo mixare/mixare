@@ -18,6 +18,8 @@
  */
 package org.mixare.lib;
 
+import android.util.FloatMath;
+
 /**
  * This class has the ability to calculate the declination of a line between two
  * points. It is able to check if a point is in a given rectangle and it also can
@@ -57,7 +59,7 @@ public class MixUtils {
 			float post_y) {
 		float tmpv_x = post_x - center_x;
 		float tmpv_y = post_y - center_y;
-		float d = (float) Math.sqrt(tmpv_x * tmpv_x + tmpv_y * tmpv_y);
+		float d = (float) FloatMath.sqrt(tmpv_x * tmpv_x + tmpv_y * tmpv_y);
 		float cos = tmpv_x / d;
 		float angle = (float) Math.toDegrees(Math.acos(cos));
 
