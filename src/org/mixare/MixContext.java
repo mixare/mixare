@@ -42,8 +42,9 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
 import org.mixare.data.DataSource;
-import org.mixare.data.DataSourceList;
-import org.mixare.render.Matrix;
+import org.mixare.data.DataSourceStorage;
+import org.mixare.lib.MixContextInterface;
+import org.mixare.lib.render.Matrix;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -51,10 +52,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -64,8 +63,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -75,11 +74,11 @@ import android.widget.Toast;
  * Cares about location management and about
  * the data (source, inputstream)
  */
-public class MixContext extends ContextWrapper {
+public class MixContext extends ContextWrapper implements MixContextInterface{
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
-	
+
 	public MixView mixView;
 	Context ctx;
 	boolean isURLvalid = true;
@@ -89,143 +88,113 @@ public class MixContext extends ContextWrapper {
 
 	Matrix rotationM = new Matrix();
 	float declination = 0f;
-	
+
 	//Location related
 	private LocationManager lm;
 	Location curLoc;
 	Location locationAtLastDownload;
-	
+
 	private ArrayList<DataSource> allDataSources=new ArrayList<DataSource>();
 
-	
+
 	public ArrayList<DataSource> getAllDataSources() {
 		return this.allDataSources;
 	}
-	
+
 	public void setAllDataSourcesforLauncher(DataSource datasource) {
 		this.allDataSources.clear();
 		this.allDataSources.add(datasource);
 	}
-	
+
 	public void refreshDataSources() {
 		this.allDataSources.clear();
-		SharedPreferences settings = getSharedPreferences(
-				DataSourceList.SHARED_PREFS, 0);
-		int size = settings.getAll().size();
-		if (size == 0){
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
-			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
-			dataSourceEditor.commit();
-			size = settings.getAll().size();
-		}
+		
+		DataSourceStorage.getInstance().fillDefaultDataSources();
+
+		int size = DataSourceStorage.getInstance().getSize();
+		
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
-			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+			String fields[] = DataSourceStorage.getInstance().getFields(i);
 			this.allDataSources.add(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
 		}
 	}
 	public MixContext(Context appCtx) {
-	
+
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
 
 		refreshDataSources();
-		
-		boolean atLeastOneDatasourceSelected=false;
-		
-		for(DataSource ds: this.allDataSources) {
-			if(ds.getEnabled())
-				atLeastOneDatasourceSelected=true;
+
+		boolean atLeastOneDatasourceSelected = false;
+
+		for (DataSource ds : this.allDataSources) {
+			if (ds.getEnabled())
+				atLeastOneDatasourceSelected = true;
 		}
-		// select Wikipedia if nothing was previously selected  
-		if(!atLeastOneDatasourceSelected)
-			//TODO>: start intent data source select
-		
-		
-		rotationM.toIdentity();
-		
+
+		if (!atLeastOneDatasourceSelected) {
+			rotationM.toIdentity();
+		}
+
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		
-		Criteria c = new Criteria();
-		//try to use the coarse provider first to get a rough position
-		c.setAccuracy(Criteria.ACCURACY_COARSE);
-		String coarseProvider = lm.getBestProvider(c, true);
-		try {
-			lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the coarse provider");
-		}
-		
-		//need to be precise
-		c.setAccuracy(Criteria.ACCURACY_FINE);				
-		//fineProvider will be used for the initial phase (requesting fast updates)
-		//as well as during normal program usage
-		//NB: using "true" as second parameters means we get the provider only if it's enabled
-		String fineProvider = lm.getBestProvider(c, true);
-		try {
-			lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the bounce provider");
-		}
-		
-		//fallback for the case where GPS and network providers are disabled
+
+		// frequency and minimum distance for update
+		// this values will only be used after there's a good GPS fix
+		// see back-off pattern discussion
+		// http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
+		// thanks Reto Meier for his presentation at gddde 2010
+		long freq = 5000; // 5 seconds
+		float dist = 20; // 20 meters
+		requestAllLocationUpdates(freq, dist);
+
+		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
 
-		//Frangart, Eppan, Bozen, Italy
+		// Frangart, Eppan, Bozen, Italy
 		hardFix.setLatitude(46.480302);
 		hardFix.setLongitude(11.296005);
 		hardFix.setAltitude(300);
 
-		/*New York*/
-//		hardFix.setLatitude(40.731510);
-//		hardFix.setLongitude(-73.991547);
-		
-		// TU Wien
-//		hardFix.setLatitude(48.196349);
-//		hardFix.setLongitude(16.368653);
-//		hardFix.setAltitude(180);
-
-		//frequency and minimum distance for update
-		//this values will only be used after there's a good GPS fix
-		//see back-off pattern discussion 
-		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		//thanks Reto Meier for his presentation at gddde 2010
-		long lFreq = 60000;	//60 seconds
-		float lDist = 50;		//20 meters
 		try {
-			lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the normal provider");
-			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-		}
-		
-		try {
-			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
-			Location lastCoarsePos=lm.getLastKnownLocation(coarseProvider);
-			if(lastFinePos!=null)
-				curLoc = lastFinePos;
-			else if (lastCoarsePos!=null)
-				curLoc = lastCoarsePos;
-			else
-				curLoc = hardFix;
-			
+			curLoc = getBestLocation();
 		} catch (Exception ex2) {
-			//ex2.printStackTrace();
+			// ex2.printStackTrace();
 			curLoc = hardFix;
-			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+			Toast.makeText(this,
+					getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
+					Toast.LENGTH_LONG).show();
 		}
-		
+
 		setLocationAtLastDownload(curLoc);
-
-//TODO fix logic
-
-	
 	}
-	
+
+	private Location getBestLocation() {
+		float accuracy = 0;
+		Location result = null;
+		for (String provider : lm.getAllProviders()) {
+			Location location = lm.getLastKnownLocation(provider);
+			if (location != null) {
+				if (location.getAccuracy() > accuracy) {
+					accuracy = location.getAccuracy();
+					result = location;
+				}
+			}
+		}
+		return result;
+	}
+
+	private void requestAllLocationUpdates(long freq, float dist) {
+		for (String provider : lm.getAllProviders()) {
+			try{
+				lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			}catch(SecurityException se){
+				throw new RuntimeException(se);
+			}
+		}
+	}
+
 	public void unregisterLocationManager() {
 		if (lm != null) {
 			lm.removeUpdates(lnormal);
@@ -256,6 +225,10 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public Location getCurrentLocation() {
+		if(curLoc == null){
+			Toast.makeText(this, getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
+			throw new RuntimeException("No GPS Found");
+		}
 		synchronized (curLoc) {
 			return curLoc;
 		}
@@ -270,7 +243,7 @@ public class MixContext extends ContextWrapper {
 	    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
 	        System.setProperty("http.keepAlive", "false");
 	    }
-	    
+
 		if (urlStr.startsWith("file://"))			
 			return new FileInputStream(urlStr.replace("file://", ""));
 
@@ -294,7 +267,7 @@ public class MixContext extends ContextWrapper {
 		HttpsURLConnection.setDefaultSSLSocketFactory(
 				context.getSocketFactory());
 		}
-		
+
 		try {
 			URL url = new URL(urlStr);
 			conn =  url.openConnection();
@@ -302,7 +275,7 @@ public class MixContext extends ContextWrapper {
 			conn.setConnectTimeout(10000);
 
 			is = conn.getInputStream();
-			
+
 			return is;
 		} catch (Exception ex) {
 			try {
@@ -314,7 +287,7 @@ public class MixContext extends ContextWrapper {
 					((HttpURLConnection)conn).disconnect();
 			} catch (Exception ignore) {			
 			}
-			
+
 			throw ex;				
 
 		}
@@ -365,7 +338,7 @@ public class MixContext extends ContextWrapper {
 			}
 
 			is = conn.getInputStream();
-			
+
 			return is;
 		} catch (Exception ex) {
 
@@ -435,21 +408,34 @@ public class MixContext extends ContextWrapper {
 		WebView webview = new WebView(mixView);
 		webview.getSettings().setJavaScriptEnabled(true);
 
-		webview.setWebViewClient(new WebViewClient() {
-			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
-				return true;
-			}
-
-		});
-				
-		Dialog d = new Dialog(mixView) {
+		final Dialog d = new Dialog(mixView) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
 					this.dismiss();
 				return true;
 			}
 		};
+
+		webview.setWebViewClient(new WebViewClient() {
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				view.loadUrl(url);
+				return true;
+			}
+
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				// TODO Auto-generated method stub
+				if(url.contains("return")){
+					d.dismiss();
+					mixView.repaint();
+				}
+				else{
+					super.onPageFinished(view, url);
+				}				
+			}
+
+		});
 		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.getWindow().setGravity(Gravity.BOTTOM);
 		d.addContentView(webview, new FrameLayout.LayoutParams(
@@ -457,28 +443,42 @@ public class MixContext extends ContextWrapper {
 				Gravity.BOTTOM));
 
 		d.show();
-		
+		webview.loadUrl(url);
+
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
 		// TODO
 		WebView webview = new WebView(context);
-		
-		webview.setWebViewClient(new WebViewClient() {
-			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
-				return true;
-			}
+		webview.setBackgroundColor(0x99FFFFFF);
 
-		});
-				
-		Dialog d = new Dialog(context) {
+		final Dialog d = new Dialog(context) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
 					this.dismiss();
 				return true;
 			}
 		};
+
+		webview.setWebViewClient(new WebViewClient() {
+			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
+			     view.loadUrl(url);
+				return true;
+			}
+
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				// TODO Auto-generated method stub
+				if(url.contains("return")){
+					d.dismiss();
+				}
+				else{
+					super.onPageFinished(view, url);
+				}				
+			}
+
+		});
+
 		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.getWindow().setGravity(Gravity.BOTTOM);
 		d.addContentView(webview, new FrameLayout.LayoutParams(
@@ -486,7 +486,7 @@ public class MixContext extends ContextWrapper {
 				Gravity.BOTTOM));
 
 		d.show();
-		
+
 		webview.loadUrl(url);
 	}
 
@@ -497,7 +497,7 @@ public class MixContext extends ContextWrapper {
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
-	
+
 	private LocationListener lbounce = new LocationListener() {
 
 		@Override
@@ -506,7 +506,7 @@ public class MixContext extends ContextWrapper {
 			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 
 			downloadManager.purgeLists();
-			
+
 			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
 				lm.removeUpdates(lbounce);			
@@ -526,9 +526,9 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
-	
+
 	private LocationListener lcoarse = new LocationListener() {
 
 		@Override
@@ -551,7 +551,7 @@ public class MixContext extends ContextWrapper {
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
 	};
 
 	private LocationListener lnormal = new LocationListener() {

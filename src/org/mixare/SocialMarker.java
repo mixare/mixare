@@ -19,11 +19,8 @@
 
 package org.mixare;
 
-import org.mixare.data.DataSource;
-import org.mixare.gui.PaintScreen;
+import org.mixare.lib.gui.PaintScreen;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 
 /**
@@ -34,13 +31,13 @@ import android.location.Location;
  * @author hannes
  *
  */
-public class SocialMarker extends Marker {
+public class SocialMarker extends LocalMarker {
 	
 	public static final int MAX_OBJECTS=15;
 
 	public SocialMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override
@@ -83,5 +80,6 @@ public class SocialMarker extends Marker {
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
 	}
+
 	
 }

@@ -19,8 +19,9 @@
 
 package org.mixare;
 
-import org.mixare.data.DataSource;
-import org.mixare.gui.PaintScreen;
+import org.mixare.LocalMarker;
+import org.mixare.lib.MixUtils;
+import org.mixare.lib.gui.PaintScreen;
 
 import android.graphics.Path;
 import android.location.Location;
@@ -33,13 +34,13 @@ import android.location.Location;
  * @author hannes
  *
  */
-public class NavigationMarker extends Marker {
+public class NavigationMarker extends LocalMarker {
 	
 	public static final int MAX_OBJECTS=10;
 
 	public NavigationMarker(String title, double latitude, double longitude,
-			double altitude, String URL, DataSource datasource) {
-		super(title, latitude, longitude, altitude, URL, datasource);
+			double altitude, String URL, int type, int color) {
+		super(title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override

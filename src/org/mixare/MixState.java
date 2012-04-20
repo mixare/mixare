@@ -18,13 +18,16 @@
  */
 package org.mixare;
 
-import org.mixare.render.Matrix;
-import org.mixare.render.MixVector;
+import org.mixare.lib.MixContextInterface;
+import org.mixare.lib.MixStateInterface;
+import org.mixare.lib.MixUtils;
+import org.mixare.lib.render.Matrix;
+import org.mixare.lib.render.MixVector;
 
 /**
  * This class calculates the bearing and pitch out of the angles
  */
-public class MixState {
+public class MixState implements MixStateInterface{
 
 	public static int NOT_STARTED = 0; 
 	public static int PROCESSING = 1; 
@@ -39,13 +42,14 @@ public class MixState {
 
 	private boolean detailsView;
 
-	public boolean handleEvent(MixContext ctx, String onPress) {
+	public boolean handleEvent(MixContextInterface ctx, String onPress) {
 		if (onPress != null && onPress.startsWith("webpage")) {
 			try {
 				String webpage = MixUtils.parseAction(onPress);
 				this.detailsView = true;
 				ctx.loadMixViewWebPage(webpage);
 			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		} 
 		return true;
