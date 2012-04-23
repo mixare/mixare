@@ -109,7 +109,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 		
-		DataSourceStorage.getInstance().fillDefaultDataSources();
+		DataSourceStorage.getInstance(this).fillDefaultDataSources();
 
 		int size = DataSourceStorage.getInstance().getSize();
 		

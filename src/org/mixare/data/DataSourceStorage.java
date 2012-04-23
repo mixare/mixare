@@ -32,6 +32,13 @@ public class DataSourceStorage {
 		return instance;
 	}
 	
+	public static DataSourceStorage getInstance(Context ctx) {
+		if(instance == null){
+			instance = new DataSourceStorage(ctx);
+		}
+		return instance;
+	}
+	
 	public void add(String name, String url, String type, String display, boolean visible) {
 		SharedPreferences.Editor dataSourceEditor = settings.edit();
 		dataSourceEditor.putString("DataSource"+getSize(), 
