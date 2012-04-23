@@ -404,7 +404,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 	}
 
 	public void loadMixViewWebPage(String url) throws Exception {
-		// TODO
 		WebView webview = new WebView(mixView);
 		webview.getSettings().setJavaScriptEnabled(true);
 
@@ -425,10 +424,11 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				// TODO Auto-generated method stub
 				if(url.contains("return")){
 					d.dismiss();
 					mixView.repaint();
+				}else if(processUrl(url, view)){
+					return;
 				}
 				else{
 					super.onPageFinished(view, url);
@@ -448,7 +448,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
-		// TODO
 		WebView webview = new WebView(context);
 		webview.setBackgroundColor(0x99FFFFFF);
 
@@ -462,15 +461,17 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean  shouldOverrideUrlLoading  (WebView view, String url) {
-			     view.loadUrl(url);
+				view.loadUrl(url);
 				return true;
 			}
 
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				// TODO Auto-generated method stub
 				if(url.contains("return")){
 					d.dismiss();
+					mixView.repaint();
+				}else if(processUrl(url, view)){
+					return;
 				}
 				else{
 					super.onPageFinished(view, url);
@@ -490,6 +491,24 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		webview.loadUrl(url);
 	}
 
+	public boolean processUrl(String url, WebView view){
+		//process audio
+		if (url.endsWith(".mp3")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(url), "audio/*");
+            view.getContext().startActivity(intent);   
+            return true;
+        //process video
+        } else if (url.endsWith(".mp4") || url.endsWith(".3gp")) {
+                Intent intent = new Intent(Intent.ACTION_VIEW); 
+                intent.setDataAndType(Uri.parse(url), "video/*");
+                view.getContext().startActivity(intent);   
+                return true;
+        }
+		//dont do anything with the url
+		return false;
+	}
+	
 	public Location getLocationAtLastDownload() {
 		return locationAtLastDownload;
 	}
