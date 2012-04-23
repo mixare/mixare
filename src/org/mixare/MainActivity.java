@@ -119,6 +119,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private void loadPlugins(){
+		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_2);
 		PluginLoader.getInstance().loadPlugin(PluginType.DATAHANDLER);
