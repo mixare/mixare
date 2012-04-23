@@ -36,8 +36,10 @@ import java.util.List;
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
-import org.mixare.gui.PaintScreen;
-import org.mixare.render.Matrix;
+import org.mixare.data.DataSourceStorage;
+import org.mixare.lib.gui.PaintScreen;
+import org.mixare.lib.marker.Marker;
+import org.mixare.lib.render.Matrix;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -60,8 +62,8 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
+import android.util.FloatMath;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,10 +72,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -124,6 +125,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
+	
+	public static MixView CONTEXT;
 
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
@@ -209,10 +212,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		MixView.CONTEXT = this;
 		try {
-
-
 
 			handleIntent(getIntent());
 
@@ -226,8 +227,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
-
-			SharedPreferences DataSourceSettings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
 			
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
@@ -283,13 +282,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				editor.commit();
 
 				//add the default datasources to the preferences file
-				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
-				dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
-				dataSourceEditor.putString("DataSource2", "Buzz|https://www.googleapis.com/buzz/v1/activities/search?alt=json&max-results=20|1|0|true");
-				dataSourceEditor.putString("DataSource3", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-				dataSourceEditor.putString("DataSource4", "Own URL|http://mixare.org/geotest.php|4|0|false");
-				dataSourceEditor.commit();
+				DataSourceStorage.getInstance().fillDefaultDataSources();
 
 			} 
 
@@ -351,6 +344,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 				mixContext.unregisterLocationManager();
 				mixContext.downloadManager.stop();
+				
+				if(dataView != null){
+					dataView.cancelRefreshTimer();
+				}
 			} catch (Exception ignore) {
 			}
 
@@ -370,7 +367,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			this.mWakeLock.acquire();
 
 			killOnError();
-			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			mixContext.mixView = this;
 			dataView.doStart();
 			dataView.clearEvents();
@@ -378,33 +374,34 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			mixContext.refreshDataSources();
 			
-			double angleX, angleY;
+			float angleX, angleY;
 
 			int marker_orientation = -90;
-			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+			int rotation = Compatibility.getRotation(this);
 			
 			//display text from left to right and keep it horizontal
-			angleX = Math.toRadians(marker_orientation);
+			angleX = (float) Math.toRadians(marker_orientation);
 			m1.set(	1f,	0f, 						0f, 
-					0f,	(float) Math.cos(angleX),	(float) -Math.sin(angleX),
-					0f,	(float) Math.sin(angleX),	(float) Math.cos(angleX)
+					0f,	(float) FloatMath.cos(angleX),	(float) -FloatMath.sin(angleX),
+					0f,	(float) FloatMath.sin(angleX),	(float) FloatMath.cos(angleX)
 			);
-			angleX = Math.toRadians(marker_orientation);
-			angleY = Math.toRadians(marker_orientation);
-			if (display.getRotation() == 1) {
+			angleX = (float) Math.toRadians(marker_orientation);
+			angleY = (float) Math.toRadians(marker_orientation);
+			if (rotation == 1) {
 				m2.set(	1f,	0f,							0f,
-						0f,	(float) Math.cos(angleX),	(float) -Math.sin(angleX),
-						0f,	(float) Math.sin(angleX),	(float) Math.cos(angleX));
-				m3.set(	(float) Math.cos(angleY),	0f,	(float) Math.sin(angleY),
+						0f,	(float) FloatMath.cos(angleX),	(float) -FloatMath.sin(angleX),
+						0f,	(float) FloatMath.sin(angleX),	(float) FloatMath.cos(angleX));
+				m3.set(	(float) FloatMath.cos(angleY),	0f,	(float) FloatMath.sin(angleY),
 						0f,							1f,	0f,
-						(float) -Math.sin(angleY),	0f,	(float) Math.cos(angleY));
+						(float) -FloatMath.sin(angleY),	0f,	(float) FloatMath.cos(angleY));
 			} else {
-				m2.set(	(float) Math.cos(angleX),	0f,	(float) Math.sin(angleX),
+				m2.set(	(float) FloatMath.cos(angleX),	0f,	(float) FloatMath.sin(angleX),
 						0f,							1f,	0f,
-						(float) -Math.sin(angleX),	0f, (float) Math.cos(angleX));
+						(float) -FloatMath.sin(angleX),	0f, (float) FloatMath.cos(angleX));
 				m3.set(	1f,	0f,							0f, 
-						0f,	(float) Math.cos(angleY),	(float) -Math.sin(angleY),
-						0f,	(float) Math.sin(angleY),	(float) Math.cos(angleY));
+						0f,	(float) FloatMath.cos(angleY),	(float) -FloatMath.sin(angleY),
+						0f,	(float) FloatMath.sin(angleY),	(float) FloatMath.cos(angleY));
 				
 			}
 			
@@ -436,10 +433,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 						(float) mixContext.curLoc.getAltitude(), System
 						.currentTimeMillis());
 
-				angleY = Math.toRadians(-gmf.getDeclination());
-				m4.set((float) Math.cos(angleY), 0f,
-						(float) Math.sin(angleY), 0f, 1f, 0f, (float) -Math
-						.sin(angleY), 0f, (float) Math.cos(angleY));
+				angleY = (float) Math.toRadians(-gmf.getDeclination());
+				m4.set((float) FloatMath.cos(angleY), 0f,
+						(float) FloatMath.sin(angleY), 0f, 1f, 0f, (float) -FloatMath
+						.sin(angleY), 0f, (float) FloatMath.cos(angleY));
 				mixContext.declination = gmf.getDeclination();
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
@@ -680,8 +677,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
-			Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			if (display.getRotation() == 1) {
+			
+			int rotation = Compatibility.getRotation(this);
+			
+			if (rotation == 1) {
 				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
 			} else {
 				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z, Rot);
@@ -930,6 +929,8 @@ class AugmentedView extends View {
 	int searchObjWidth = 0;
 	int searchObjHeight=0;
 
+	Paint zoomPaint = new Paint();
+
 	public AugmentedView(Context context) {
 		super(context);
 
@@ -969,7 +970,6 @@ class AugmentedView extends View {
 				MixView.dataView.init(MixView.dWindow.getWidth(), MixView.dWindow.getHeight());
 			}
 			if (app.isZoombarVisible()){
-				Paint zoomPaint = new Paint();
 				zoomPaint.setColor(Color.WHITE);
 				zoomPaint.setTextSize(14);
 				String startKM, endKM;

@@ -25,6 +25,8 @@ import java.util.Vector;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
+import org.mixare.lib.marker.Marker;
+import org.mixare.lib.MixUtils;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -39,13 +41,13 @@ import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -354,6 +356,8 @@ class ListItemAdapter extends BaseAdapter {
 			changeColor(3, Color.WHITE, Color.DKGRAY);
 		else if (source.equals("OwnURL"))
 			changeColor(4, Color.WHITE, Color.DKGRAY);
+		else if (source.equals("ARENA"))
+			changeColor(5, Color.WHITE, Color.DKGRAY);
 	}
 
 	@Override

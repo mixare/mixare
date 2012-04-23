@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="18" android:versionName="0.7.1" package="org.mixare" android:installLocation="auto">
+      android:versionCode="21" android:versionName="0.8" package="org.mixare" android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="9"/>
 
@@ -10,18 +10,25 @@
 	<uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
 	<uses-feature android:required="false" android:name="android.hardware.camera.flash"></uses-feature>
 	<uses-feature android:required="false" android:name="android.hardware.camera.front"></uses-feature>
+	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+	
+	<supports-screens android:anyDensity="true" android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true"></supports-screens>
+	
 	
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
     	<uses-library android:name="com.google.android.maps" />
         
-        <activity android:label="@string/app_name" android:name=".MixView" 
-        android:screenOrientation="landscape"  
-        android:launchMode="singleTop" >
-        
+    	<activity android:name=".MainActivity" android:icon="@drawable/ic_launcher"
+				  android:label="@string/app_name" android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> 
+            </intent-filter>     	    
+    	</activity>
+    	
+        <activity android:label="@string/app_name" android:name=".MixView" 
+        android:screenOrientation="landscape"  
+        android:launchMode="singleTop" >
             
             <intent-filter>  
                   <action android:name="android.intent.action.VIEW" />
@@ -65,7 +72,4 @@
 		 
 </application>
 
-<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-
-<supports-screens android:anyDensity="true" android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true"></supports-screens>
 </manifest> 

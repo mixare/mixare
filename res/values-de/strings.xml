@@ -43,7 +43,7 @@
 	<string name="connection_error_dialog_button2">Einstellungen</string>
 	<string name="connection_error_dialog_button3">Verlassen</string>
 	
-	<string name="connection_GPS_dialog_text">Die GPS position kann nicht aktualisiert werden... \nFalls Sie fortfahren möchten kann es sein 
+	<string name="connection_GPS_dialog_text">Die GPS-Position kann nicht aktualisiert werden... \nFalls Sie fortfahren möchten kann es sein 
 		\ndass sich die Informationen nicht am richtigen Platz befinden.</string>
 	<string name="connection_GPS_dialog_button1">Fortfahren</string>
 	<string name="connection_GPS_dialog_button2">Schließen</string>
@@ -54,12 +54,12 @@
 	<string name="close_button">Schließen</string>
 	<string name="general_info_title">Allgemeine Informationen</string>
 	
-	<string name="general_info_text">GPS info: </string>
+	<string name="general_info_text">GPS-Info: </string>
 	<string name="longitude">Längengrad: </string>
 	<string name="latitude">Breitengrad: </string>
 	<string name="altitude">Meereshöhe: </string>
 	<string name="speed">Geschwindigkeit: </string>
-	<string name="acurracy">Genauigkeit: </string>
+	<string name="accuracy">Genauigkeit: </string>
 	<string name="gps_last_fix">Letztes GPS Update: </string>
 	
 	<string name="map_menu_normal_mode">Karte</string>
@@ -71,7 +71,6 @@
 	
 	<string name="data_source_change_wikipedia">Wikipedia wurde als Datenquelle gewählt</string>
 	<string name="data_source_change_twitter">Twitter wurde als Datenquelle gewählt</string>
-	<string name="data_source_change_buzz">Google Buzz wurde als Datenquelle gewählt</string>
 	<string name="data_source_change_osm">OpenStreetMap wurde als Datenquelle gewählt</string>
 	
 	<string name="search_failed_notification">Keine Suchergebnisse gefunden</string>

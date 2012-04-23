@@ -74,7 +74,6 @@
 	
 	<string name="data_source_change_wikipedia">Se ha cambiado a Wikipedia como fuente de datos</string>
 	<string name="data_source_change_twitter">Se ha cambiado a Twitter como fuente de datos</string>
-	<string name="data_source_change_buzz">Se ha cambiado a Buzz como fuente de datos</string>
 	
 	<string name="search_failed_notification">No hay resultados de búsqueda</string>
 	<string name="source_openstreetmap">estaciones de tren en la zona</string>
