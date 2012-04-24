@@ -43,9 +43,9 @@ public class POIMarker extends LocalMarker {
 	public static final int MAX_OBJECTS = 20;
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 
-	public POIMarker(String title, double latitude, double longitude,
+	public POIMarker(String id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
-		super(title, latitude, longitude, altitude, URL, type, color);
+		super(id, title, latitude, longitude, altitude, URL, type, color);
 
 	}
 
