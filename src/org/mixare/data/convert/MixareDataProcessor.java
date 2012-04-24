@@ -48,6 +48,10 @@ public class MixareDataProcessor extends DataHandler implements DataProcessor{
 			if (jo.has("title") && jo.has("lat") && jo.has("lng")
 					&& jo.has("elevation")) {
 
+				String id = "";
+				if(jo.has("id"))
+						id = jo.getString("id");
+				
 				Log.v(MixView.TAG, "processing Mixare JSON object");
 				String link=null;
 		
@@ -55,6 +59,7 @@ public class MixareDataProcessor extends DataHandler implements DataProcessor{
 					link=jo.getString("webpage");
 				
 				ma = new POIMarker(
+						id,
 						HtmlUnescape.unescapeHTML(jo.getString("title"), 0), 
 						jo.getDouble("lat"), 
 						jo.getDouble("lng"), 

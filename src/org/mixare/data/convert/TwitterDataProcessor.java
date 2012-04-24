@@ -78,6 +78,7 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 					String url="http://twitter.com/"+user;
 					
 					ma = new SocialMarker(
+							"",
 							user+": "+jo.getString("text"), 
 							lat, 
 							lon, 

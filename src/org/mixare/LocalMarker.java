@@ -76,7 +76,7 @@ public abstract class LocalMarker implements Marker {
 	public Label txtLab = new Label();
 	protected TextObj textBlock;
 
-	public LocalMarker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
+	public LocalMarker(String id, String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
 		super();
 
 		this.active = false;
@@ -88,7 +88,7 @@ public abstract class LocalMarker implements Marker {
 		}
 		this.colour = colour;
 
-		this.ID=type +"##"+title;
+		this.ID = id + "##" + type + "##" + title;
 
 	}
 

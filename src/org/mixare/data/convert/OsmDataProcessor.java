@@ -58,6 +58,7 @@ public class OsmDataProcessor extends DataHandler implements DataProcessor {
 
 						String name = tag.getAttributes().getNamedItem("v")
 								.getNodeValue();
+						String id = att.getNamedItem("id").getNodeValue();
 						double lat = Double.valueOf(att.getNamedItem("lat")
 								.getNodeValue());
 						double lon = Double.valueOf(att.getNamedItem("lon")
@@ -67,12 +68,12 @@ public class OsmDataProcessor extends DataHandler implements DataProcessor {
 								+ " lon " + lon + "\n");
 
 						Marker ma = new NavigationMarker(
+								id,
 								name,
 								lat,
 								lon,
 								0,
-								"http://www.openstreetmap.org/?node="
-										+ att.getNamedItem("id").getNodeValue(),
+								"http://www.openstreetmap.org/?node="+ id,
 								taskId, colour);
 						markers.add(ma);
 

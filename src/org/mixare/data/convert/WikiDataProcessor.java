@@ -52,6 +52,7 @@ public class WikiDataProcessor extends DataHandler implements DataProcessor{
 				Log.v(MixView.TAG, "processing Wikipedia JSON object");
 		
 				ma = new POIMarker(
+						"",
 						HtmlUnescape.unescapeHTML(jo.getString("title"), 0), 
 						jo.getDouble("lat"), 
 						jo.getDouble("lng"), 
