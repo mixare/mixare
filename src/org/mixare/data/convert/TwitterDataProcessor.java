@@ -77,7 +77,9 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 					String user=jo.getString("from_user");
 					String url="http://twitter.com/"+user;
 					
+					//no ID is needed, since identical tweet by identical user may be safely merged into one.
 					ma = new SocialMarker(
+							"",
 							user+": "+jo.getString("text"), 
 							lat, 
 							lon, 

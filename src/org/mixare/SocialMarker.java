@@ -35,9 +35,9 @@ public class SocialMarker extends LocalMarker {
 	
 	public static final int MAX_OBJECTS=15;
 
-	public SocialMarker(String title, double latitude, double longitude,
+	public SocialMarker(String id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
-		super(title, latitude, longitude, altitude, URL, type, color);
+		super(id, title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override

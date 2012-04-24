@@ -38,9 +38,9 @@ public class NavigationMarker extends LocalMarker {
 	
 	public static final int MAX_OBJECTS=10;
 
-	public NavigationMarker(String title, double latitude, double longitude,
+	public NavigationMarker(String id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
-		super(title, latitude, longitude, altitude, URL, type, color);
+		super(id, title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override
