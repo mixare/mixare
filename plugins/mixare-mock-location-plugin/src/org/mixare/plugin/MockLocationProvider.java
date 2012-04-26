@@ -18,15 +18,75 @@
  */
 package org.mixare.plugin;
 
+import java.io.IOException;
+import java.util.List;
+
+import android.location.Location;
+import android.location.LocationManager;
+import android.util.Log;
+
 /**
- * MockLocation Provider registers a new LocationProvider for the telephone
- * The MockLocationProvider has an accuracy of 100%, so mixare will obviously choose
- * this provider as its main provider (GPS can not achieve this value). 
+ * MockLocation Provider registers a new LocationProvider for the telephone The
+ * MockLocationProvider has an accuracy of 100%, so mixare will obviously choose
+ * this provider as its main provider (GPS can not achieve this value).
+ * 
  * @author A.Egal
  */
-public class MockLocationProvider extends Thread{
+public class MockLocationProvider extends Thread {
 
-	
-	
-	
+	private List<String> data;
+
+	private LocationManager locationManager;
+
+	private String mocLocationProvider;
+
+	private String LOG_TAG = "mixare-mock-location";
+
+	public MockLocationProvider(LocationManager locationManager,
+			String mocLocationProvider, List<String> data) throws IOException {
+		this.locationManager = locationManager;
+		this.mocLocationProvider = mocLocationProvider;
+		this.data = data;
+	}
+
+	/**
+	 * Changes the location every 30 seconds to the next entry of the ArrayList
+	 */
+	@Override
+	public void run() {
+		
+		for (String str : data) {
+
+			try {
+				Thread.sleep(30 * 1000);
+			} catch (InterruptedException e) {
+
+				e.printStackTrace();
+			}
+
+			// Set one position
+			String[] parts = str.split(",");
+			Double latitude = Double.valueOf(parts[0]);
+			Double longitude = Double.valueOf(parts[1]);
+			Double altitude = Double.valueOf(parts[2]);
+			Location location = new Location(mocLocationProvider);
+			location.setLatitude(latitude);
+			location.setLongitude(longitude);
+			location.setAltitude(altitude);
+			location.setAccuracy(100.0f); //set accuracy to max
+
+			Log.e(LOG_TAG, location.toString());
+
+			// set the time in the location. If the time on this location
+			// matches the time on the one in the previous set call, it will be
+			// ignored
+			location.setTime(System.currentTimeMillis());
+
+			locationManager.setTestProviderLocation(mocLocationProvider,
+					location);
+		}
+		Log.e(LOG_TAG, "LOCATION MOCKING ENDED");
+		locationManager.removeTestProvider(mocLocationProvider);
+	}
+
 }
