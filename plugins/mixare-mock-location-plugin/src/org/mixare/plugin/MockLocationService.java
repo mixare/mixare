@@ -18,27 +18,91 @@
  */
 package org.mixare.plugin;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
- * A service that registers the MockLocationProvider, and will carefully terminate it
- * when closed.
+ * A service that registers the MockLocationProvider, and will carefully
+ * terminate it when closed.
+ * 
  * @author A.Egal
  */
-public class MockLocationService extends Service{
+public class MockLocationService extends Service implements LocationListener {
+
+	private String LOG_TAG = "mixare-mock-location";
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		String mocLocationProvider = LocationManager.GPS_PROVIDER;
+		locationManager.addTestProvider(mocLocationProvider, false, false,
+				false, false, true, true, true, 0, 5);
+		locationManager.setTestProviderEnabled(mocLocationProvider, true);
+		locationManager.requestLocationUpdates(mocLocationProvider, 0, 0, this);
+		Log.e(LOG_TAG, "STARTING");
+		try {
+
+			List<String> data = new ArrayList<String>();
+			InputStream is = getAssets().open("data.txt");
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(is));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				Log.e(LOG_TAG, line);
+				data.add(line);
+			}
+			Log.e(LOG_TAG, data.size() + " lines");
+
+			new MockLocationProvider(locationManager, mocLocationProvider, data)
+					.start();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
+
 	@Override
 	public boolean onUnbind(Intent intent) {
-		
+
 		return super.onUnbind(intent);
 	}
-	
-	
+
+	@Override
+	public void onLocationChanged(Location location) {
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
 }

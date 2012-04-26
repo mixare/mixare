@@ -147,7 +147,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		// thanks Reto Meier for his presentation at gddde 2010
 		long freq = 5000; // 5 seconds
 		float dist = 20; // 20 meters
-		requestAllLocationUpdates(freq, dist);
 
 		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
@@ -159,6 +158,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 
 		try {
 			curLoc = getBestLocation();
+			lm.requestLocationUpdates(curLoc.getProvider(), freq, dist, lnormal);
 		} catch (Exception ex2) {
 			// ex2.printStackTrace();
 			curLoc = hardFix;
@@ -176,23 +176,13 @@ public class MixContext extends ContextWrapper implements MixContextInterface{
 		for (String provider : lm.getAllProviders()) {
 			Location location = lm.getLastKnownLocation(provider);
 			if (location != null) {
-				if (location.getAccuracy() > accuracy) {
+				if(lm.getProvider(provider).getAccuracy() > accuracy){
 					accuracy = location.getAccuracy();
 					result = location;
 				}
 			}
 		}
 		return result;
-	}
-
-	private void requestAllLocationUpdates(long freq, float dist) {
-		for (String provider : lm.getAllProviders()) {
-			try{
-				lm.requestLocationUpdates(provider, freq, dist, lnormal);
-			}catch(SecurityException se){
-				throw new RuntimeException(se);
-			}
-		}
 	}
 
 	public void unregisterLocationManager() {
