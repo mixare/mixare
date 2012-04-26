@@ -44,6 +44,9 @@ public class DataHandler {
 	public void addMarkers(List<Marker> markers) {
 
 		Log.v(MixView.TAG, "Marker before: "+markerList.size());
+		if(markers == null){
+			return;
+		}
 		for(Marker ma:markers) {
 			if(!markerList.contains(ma))
 				markerList.add(ma);
