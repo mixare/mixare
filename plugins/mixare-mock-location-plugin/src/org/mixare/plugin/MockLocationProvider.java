@@ -50,7 +50,7 @@ public class MockLocationProvider extends Thread {
 	}
 
 	/**
-	 * Changes the location every 10 seconds to the next entry of the ArrayList
+	 * Changes the location every 30 seconds to the next entry of the ArrayList
 	 */
 	@Override
 	public void run() {
@@ -58,7 +58,7 @@ public class MockLocationProvider extends Thread {
 		for (String str : data) {
 
 			try {
-				Thread.sleep(10 * 1000);
+				Thread.sleep(30 * 1000);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();
