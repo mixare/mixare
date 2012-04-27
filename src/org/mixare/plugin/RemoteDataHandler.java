@@ -72,6 +72,14 @@ public class RemoteDataHandler extends DataHandler implements DataProcessor{
 		}
 	}
 	
+	@Override
+	public boolean matchesRequiredType(String type) {
+		//TODO: change the datasource so that it can have more types, 
+		//      so that plugins can also have a required type
+		return true; 
+	}
+
+	
 	public List<Marker> load(String rawData, int taskId, int colour) throws JSONException {
 		try {
 			List<InitialMarkerData> initialMarkerData = iDataHandlerService.load(dataHandlerName, rawData, taskId, colour);

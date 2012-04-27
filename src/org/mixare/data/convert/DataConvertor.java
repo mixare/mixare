@@ -63,7 +63,7 @@ public class DataConvertor {
 	}
 	
 	public List<Marker> load(String url, String rawResult, DataSource ds){
-		DataProcessor dataProcessor = searchForMatchingDataProcessors(url, rawResult);
+		DataProcessor dataProcessor = searchForMatchingDataProcessors(url, rawResult, ds.getType());
 		if(dataProcessor == null){
 			dataProcessor = new MixareDataProcessor(); //using this as default if nothing is found.
 		}
@@ -81,18 +81,20 @@ public class DataConvertor {
 		return null;
 	}
 	
-	private DataProcessor searchForMatchingDataProcessors(String url, String rawResult){
+	private DataProcessor searchForMatchingDataProcessors(String url, String rawResult, DataSource.TYPE type){
 		for(DataProcessor dp : dataProcessors){
-			//checking if url matches any dataprocessor identifiers
-			for(String urlIdentifier : dp.getUrlMatch()){
-				if(url.contains(urlIdentifier)){
-					return dp;
+			if(dp.matchesRequiredType(type.name())){
+				//checking if url matches any dataprocessor identifiers
+				for(String urlIdentifier : dp.getUrlMatch()){
+					if(url.toLowerCase().contains(urlIdentifier.toLowerCase())){
+						return dp;
+					}
 				}
-			}
-			//checking if data matches any dataprocessor identifiers
-			for(String dataIdentifier : dp.getDataMatch()){
-				if(rawResult.contains(dataIdentifier)){
-					return dp;
+				//checking if data matches any dataprocessor identifiers
+				for(String dataIdentifier : dp.getDataMatch()){
+					if(rawResult.contains(dataIdentifier)){
+						return dp;
+					}
 				}
 			}
 		}
