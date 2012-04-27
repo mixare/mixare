@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.mixare.MixView;
 import org.mixare.SocialMarker;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 import org.mixare.lib.marker.Marker;
 
 import android.util.Log;
@@ -51,6 +52,14 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 	public String[] getDataMatch() {
 		String[] str = {"twitter"};
 		return str;
+	}
+	
+	@Override
+	public boolean matchesRequiredType(String type) {
+		if(type.equals(DataSource.TYPE.TWITTER.name())){
+			return true;
+		}
+		return false;
 	}
 
 	@Override

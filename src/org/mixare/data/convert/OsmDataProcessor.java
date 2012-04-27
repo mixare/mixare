@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 import org.mixare.lib.marker.Marker;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,6 +54,14 @@ public class OsmDataProcessor extends DataHandler implements DataProcessor {
 	public String[] getDataMatch() {
 		String[] str = { "mapquestapi", "osm" };
 		return str;
+	}
+	
+	@Override
+	public boolean matchesRequiredType(String type) {
+		if(type.equals(DataSource.TYPE.OSM.name())){
+			return true;
+		}
+		return false;
 	}
 
 	@Override

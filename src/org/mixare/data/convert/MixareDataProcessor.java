@@ -51,6 +51,11 @@ public class MixareDataProcessor extends DataHandler implements DataProcessor{
 		String[] str = new String[0]; //only use this data source if all the others don't match
 		return str;
 	}
+	
+	@Override
+	public boolean matchesRequiredType(String type) {
+		return true; //this datasources has no required type, it will always match.
+	}
 
 	@Override
 	public List<Marker> load(String rawData, int taskId, int colour) throws JSONException {
