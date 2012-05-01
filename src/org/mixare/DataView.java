@@ -27,6 +27,7 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -285,13 +286,15 @@ public class DataView {
 				}
 				
 				if(!dRes.error) {
-					//jLayer = (DataHandler) dRes.obj;
-					Log.i(MixView.TAG,"Adding Markers");
-					dataHandler.addMarkers(dRes.getMarkers());
-					dataHandler.onLocationChanged(curFix);
-					// Notification
-					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
-
+					if(dRes.getMarkers() != null){
+						//jLayer = (DataHandler) dRes.obj;
+						Log.i(MixView.TAG,"Adding Markers");
+	
+						dataHandler.addMarkers(dRes.getMarkers());
+						dataHandler.onLocationChanged(curFix);
+						// Notification
+						Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
+					}
 				}
 			}
 			if(dm.isDone()) {
