@@ -44,13 +44,17 @@ import android.util.Log;
 public class MockLocationService extends Service implements LocationListener {
 
 	private String LOG_TAG = "mixare-mock-location";
-
+	private String mocLocationProvider;
+	private LocationManager locationManager;
+	public static Service instance;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		instance = this;
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-		String mocLocationProvider = LocationManager.GPS_PROVIDER;
+		mocLocationProvider = LocationManager.GPS_PROVIDER;
 		locationManager.addTestProvider(mocLocationProvider, false, false,
 				false, false, true, true, true, 0, 5);
 		locationManager.setTestProviderEnabled(mocLocationProvider, true);
@@ -76,6 +80,13 @@ public class MockLocationService extends Service implements LocationListener {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void onDestroy() {
+		Log.e(LOG_TAG, "Terminating mock-location-provider");
+		locationManager.removeTestProvider(mocLocationProvider);
+		super.onDestroy();
+	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -84,7 +95,6 @@ public class MockLocationService extends Service implements LocationListener {
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-
 		return super.onUnbind(intent);
 	}
 

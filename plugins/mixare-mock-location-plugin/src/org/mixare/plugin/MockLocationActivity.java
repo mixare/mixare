@@ -18,6 +18,7 @@ public class MockLocationActivity extends Activity{
 		            //Yes button clicked
 		        	Intent serviceIntent = new Intent();
 					serviceIntent.setClassName("org.mixare.plugin", "org.mixare.plugin.MockLocationService");
+					stopService(serviceIntent);
 					startService(serviceIntent);
 		        	finish();
 		            break;

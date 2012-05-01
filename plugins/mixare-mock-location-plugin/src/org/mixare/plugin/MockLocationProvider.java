@@ -57,13 +57,6 @@ public class MockLocationProvider extends Thread {
 		
 		for (String str : data) {
 
-			try {
-				Thread.sleep(30 * 1000);
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-			}
-
 			// Set one position
 			String[] parts = str.split(",");
 			Double latitude = Double.valueOf(parts[0]);
@@ -84,9 +77,17 @@ public class MockLocationProvider extends Thread {
 
 			locationManager.setTestProviderLocation(mocLocationProvider,
 					location);
+
+			try {
+				Thread.sleep(30 * 1000);
+			} catch (InterruptedException e) {
+
+				e.printStackTrace();
+			}
 		}
 		Log.e(LOG_TAG, "LOCATION MOCKING ENDED");
 		locationManager.removeTestProvider(mocLocationProvider);
+		MockLocationService.instance.stopSelf();
 	}
 
 }
