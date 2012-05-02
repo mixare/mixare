@@ -1,6 +1,7 @@
 package org.mixare;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,10 +17,19 @@ import android.widget.Toast;
 public class LocationFinder {
 
 	private LocationManager lm;
+	private String bestLocationProvider;
 	private DownloadManager downloadManager;
 	private MixView mixView;
 	private Location curLoc;
 	private Location locationAtLastDownload;
+	
+	// frequency and minimum distance for update
+	// this values will only be used after there's a good GPS fix
+	// see back-off pattern discussion
+	// http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
+	// thanks Reto Meier for his presentation at gddde 2010
+	private final long freq = 5000; // 5 seconds
+	private final float dist = 20; // 20 meters
 	
 	public LocationFinder(DownloadManager downloadManager, MixView mixView){
 		this.downloadManager = downloadManager;
@@ -28,14 +38,6 @@ public class LocationFinder {
 	
 	public Location findLocation(Context ctx) {
 		lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
-
-		// frequency and minimum distance for update
-		// this values will only be used after there's a good GPS fix
-		// see back-off pattern discussion
-		// http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		// thanks Reto Meier for his presentation at gddde 2010
-		long freq = 5000; // 5 seconds
-		float dist = 20; // 20 meters
 
 		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
@@ -46,8 +48,8 @@ public class LocationFinder {
 		hardFix.setAltitude(300);
 
 		try {
-			curLoc = getBestLocation();
-			lm.requestLocationUpdates(curLoc.getProvider(), freq, dist, lnormal);
+			requestBestLocationUpdates();
+			curLoc = lm.getLastKnownLocation(bestLocationProvider);
 		} catch (Exception ex2) {
 			// ex2.printStackTrace();
 			curLoc = hardFix;
@@ -60,19 +62,16 @@ public class LocationFinder {
 		return curLoc;
 	}
 
-	private Location getBestLocation() {
-		float accuracy = 0;
-		Location result = null;
-		for (String provider : lm.getAllProviders()) {
-			Location location = lm.getLastKnownLocation(provider);
-			if (location != null) {
-				if (lm.getProvider(provider).getAccuracy() > accuracy) {
-					accuracy = location.getAccuracy();
-					result = location;
-				}
-			}
+	private void requestBestLocationUpdates() {
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		String provider = lm.getBestProvider(criteria, true);
+		if(provider != null && !provider.equals(bestLocationProvider)){
+			Log.i(MixContext.TAG, "Location provider has changed, old provider: "+ bestLocationProvider + " changed to new provider: "+ provider);
+			lm.removeUpdates(lnormal);
+			lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			bestLocationProvider = provider;
 		}
-		return result;
 	}
 	
 	public void unregisterLocationManager() {
@@ -113,6 +112,7 @@ public class LocationFinder {
 					Location lastLoc=getLocationAtLastDownload();
 					if(lastLoc==null)
 						setLocationAtLastDownload(location);
+				requestBestLocationUpdates();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
