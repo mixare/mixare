@@ -1,7 +1,6 @@
 package org.mixare;
 
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -63,14 +62,22 @@ public class LocationFinder {
 	}
 
 	private void requestBestLocationUpdates() {
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		String provider = lm.getBestProvider(criteria, true);
+		float accuracy = 0;
+		String provider = null;  	
+		for (String p : lm.getAllProviders()) {
+			Location location = lm.getLastKnownLocation(p);
+			if (location != null) {
+				if (lm.getProvider(p).getAccuracy() > accuracy) {
+					accuracy = location.getAccuracy();
+					provider = p;
+				}
+			}
+		}
 		if(provider != null && !provider.equals(bestLocationProvider)){
 			Log.i(MixContext.TAG, "Location provider has changed, old provider: "+ bestLocationProvider + " changed to new provider: "+ provider);
-			lm.removeUpdates(lnormal);
-			lm.requestLocationUpdates(provider, freq, dist, lnormal);
-			bestLocationProvider = provider;
+		 	lm.removeUpdates(lnormal);
+		 	lm.requestLocationUpdates(provider, freq, dist, lnormal);
+		 	bestLocationProvider = provider;
 		}
 	}
 	
