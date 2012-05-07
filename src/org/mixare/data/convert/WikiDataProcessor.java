@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.mixare.MixView;
 import org.mixare.POIMarker;
 import org.mixare.data.DataHandler;
+import org.mixare.data.DataSource;
 import org.mixare.lib.HtmlUnescape;
 import org.mixare.data.convert.DataProcessor;
 import org.mixare.lib.marker.Marker;
@@ -51,6 +52,14 @@ public class WikiDataProcessor extends DataHandler implements DataProcessor{
 	public String[] getDataMatch() {
 		String[] str = {"wiki"};
 		return str;
+	}
+	
+	@Override
+	public boolean matchesRequiredType(String type) {
+		if(type.equals(DataSource.TYPE.WIKIPEDIA.name())){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
