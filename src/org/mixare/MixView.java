@@ -125,7 +125,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	//TAG for logging
 	public static final String TAG = "Mixare";
-	
+
 	public static MixView CONTEXT;
 
 	/*string to name & access the preference file in the internal storage*/
@@ -227,7 +227,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
-			
+
 			myZoomBar = new SeekBar(this);
 			myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
@@ -254,7 +254,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			if (!isInited) {
 				mixContext = new MixContext(this);
-				mixContext.downloadManager = new DownloadManager(mixContext);
+				mixContext.setDownloadManager(new DownloadManager(mixContext));
 				dWindow = new PaintScreen();
 				dataView = new DataView(mixContext);
 
@@ -343,8 +343,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				sensorMgr = null;
 
 				mixContext.unregisterLocationManager();
-				mixContext.downloadManager.stop();
-				
+				mixContext.getDownloadManager().stop();
+
 				if(dataView != null){
 					dataView.cancelRefreshTimer();
 				}
@@ -373,13 +373,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 
 			mixContext.refreshDataSources();
-			
+
 			float angleX, angleY;
 
 			int marker_orientation = -90;
 
 			int rotation = Compatibility.getRotation(this);
-			
+
 			//display text from left to right and keep it horizontal
 			angleX = (float) Math.toRadians(marker_orientation);
 			m1.set(	1f,	0f, 						0f, 
@@ -402,9 +402,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				m3.set(	1f,	0f,							0f, 
 						0f,	(float) FloatMath.cos(angleY),	(float) -FloatMath.sin(angleY),
 						0f,	(float) FloatMath.sin(angleY),	(float) FloatMath.cos(angleY));
-				
+
 			}
-			
+
 			m4.toIdentity();
 
 			for (int i = 0; i < histR.length; i++) {
@@ -428,20 +428,19 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			try {
 
-				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
-						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
-						(float) mixContext.curLoc.getAltitude(), System
+				GeomagneticField gmf = new GeomagneticField((float) mixContext.getCurrentLocation()
+						.getLatitude(), (float) mixContext.getCurrentLocation().getLongitude(),
+						(float) mixContext.getCurrentLocation().getAltitude(), System
 						.currentTimeMillis());
 
 				angleY = (float) Math.toRadians(-gmf.getDeclination());
 				m4.set((float) FloatMath.cos(angleY), 0f,
 						(float) FloatMath.sin(angleY), 0f, 1f, 0f, (float) -FloatMath
 						.sin(angleY), 0f, (float) FloatMath.cos(angleY));
-				mixContext.declination = gmf.getDeclination();
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			downloadThread = new Thread(mixContext.downloadManager);
+			downloadThread = new Thread(mixContext.getDownloadManager());
 			downloadThread.start();
 		} catch (Exception ex) {
 			doError(ex);
@@ -454,8 +453,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 				if (mixContext != null) {
 					mixContext.unregisterLocationManager();
-					if (mixContext.downloadManager != null)
-						mixContext.downloadManager.stop();
+					if (mixContext.getDownloadManager() != null)
+						mixContext.getDownloadManager().stop();
 				}
 			} catch (Exception ignore) {
 			}
@@ -617,7 +616,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		dataView.doStart();
 		dataView.clearEvents();
-		downloadThread = new Thread(mixContext.downloadManager);
+		downloadThread = new Thread(mixContext.getDownloadManager());
 		downloadThread.start();
 
 	};
@@ -661,7 +660,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-			
+
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 				grav[0] = evt.values[0];
 				grav[1] = evt.values[1];
@@ -677,9 +676,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 
 			SensorManager.getRotationMatrix(RTmp, I, grav, mag);
-			
+
 			int rotation = Compatibility.getRotation(this);
-			
+
 			if (rotation == 1) {
 				SensorManager.remapCoordinateSystem(RTmp, SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, Rot);
 			} else {
