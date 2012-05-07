@@ -36,5 +36,7 @@ public interface DataProcessor {
 	
 	String[] getDataMatch();
 	
+	boolean matchesRequiredType(String type);
+	
 	List<Marker> load(String rawData, int taskId, int colour) throws JSONException;
 }
