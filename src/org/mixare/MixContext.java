@@ -34,7 +34,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -58,12 +57,8 @@ import android.content.pm.ResolveInfo;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.ViewGroup.LayoutParams;
@@ -71,7 +66,6 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 /**
  * Cares about location management and about the data (source, inputstream)
@@ -82,22 +76,18 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	public static final String TAG = "Mixare";
 
 	public MixView mixView;
-	Context ctx;
-	boolean isURLvalid = true;
-	Random rand;
 
-	DownloadManager downloadManager;
+	public Context ctx;
+	
+	private DownloadManager downloadManager;
 
-	Matrix rotationM = new Matrix();
-	float declination = 0f;
-
-	// Location related
-	private LocationManager lm;
-	Location curLoc;
-	Location locationAtLastDownload;
+	public Matrix rotationM = new Matrix();
 
 	private ArrayList<DataSource> allDataSources = new ArrayList<DataSource>();
 
+	/** Responsible for all location tasks */
+	private LocationFinder locationFinder;
+	
 	public ArrayList<DataSource> getAllDataSources() {
 		return this.allDataSources;
 	}
@@ -140,71 +130,9 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		if (!atLeastOneDatasourceSelected) {
 			rotationM.toIdentity();
 		}
-
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		// frequency and minimum distance for update
-		// this values will only be used after there's a good GPS fix
-		// see back-off pattern discussion
-		// http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		// thanks Reto Meier for his presentation at gddde 2010
-		long freq = 5000; // 5 seconds
-		float dist = 20; // 20 meters
-		requestAllLocationUpdates(freq, dist);
-
-		// fallback for the case where GPS and network providers are disabled
-		Location hardFix = new Location("reverseGeocoded");
-
-		// Frangart, Eppan, Bozen, Italy
-		hardFix.setLatitude(46.480302);
-		hardFix.setLongitude(11.296005);
-		hardFix.setAltitude(300);
-
-		try {
-			curLoc = getBestLocation();
-		} catch (Exception ex2) {
-			// ex2.printStackTrace();
-			curLoc = hardFix;
-			Toast.makeText(this,
-					getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
-					Toast.LENGTH_LONG).show();
-		}
-
-		setLocationAtLastDownload(curLoc);
-	}
-
-	private Location getBestLocation() {
-		float accuracy = 0;
-		Location result = null;
-		for (String provider : lm.getAllProviders()) {
-			Location location = lm.getLastKnownLocation(provider);
-			if (location != null) {
-				if (location.getAccuracy() > accuracy) {
-					accuracy = location.getAccuracy();
-					result = location;
-				}
-			}
-		}
-		return result;
-	}
-
-	private void requestAllLocationUpdates(long freq, float dist) {
-		for (String provider : lm.getAllProviders()) {
-			try {
-				lm.requestLocationUpdates(provider, freq, dist, lnormal);
-			} catch (SecurityException se) {
-				throw new RuntimeException(se);
-			}
-		}
-	}
-
-	public void unregisterLocationManager() {
-		if (lm != null) {
-			lm.removeUpdates(lnormal);
-			lm.removeUpdates(lcoarse);
-			lm.removeUpdates(lbounce);
-			lm = null;
-		}
+		
+		locationFinder = new LocationFinder(downloadManager, mixView);
+		locationFinder.findLocation(this);
 	}
 
 	public DownloadManager getDownloader() {
@@ -224,18 +152,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	public void getRM(Matrix dest) {
 		synchronized (rotationM) {
 			dest.set(rotationM);
-		}
-	}
-
-	public Location getCurrentLocation() {
-		if (curLoc == null) {
-			Toast.makeText(this,
-					getResources().getString(R.string.location_not_found),
-					Toast.LENGTH_LONG).show();
-			throw new RuntimeException("No GPS Found");
-		}
-		synchronized (curLoc) {
-			return curLoc;
 		}
 	}
 
@@ -297,11 +213,8 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 			try {
 				if (conn instanceof HttpURLConnection)
 					((HttpURLConnection) conn).disconnect();
-			} catch (Exception ignore) {
-			}
-
+			} catch (Exception ignore) {}
 			throw ex;
-
 		}
 	}
 
@@ -373,7 +286,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 			if (conn != null && conn.getResponseCode() == 405) {
 				return getHttpGETInputStream(urlStr);
 			} else {
-
 				throw ex;
 			}
 		}
@@ -414,47 +326,47 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		if (is != null)
 			is.close();
 	}
-
-	public void loadMixViewWebPage(String url) throws Exception {
-		WebView webview = new WebView(mixView);
-		webview.getSettings().setJavaScriptEnabled(true);
-
-		final Dialog d = new Dialog(mixView) {
-			public boolean onKeyDown(int keyCode, KeyEvent event) {
-				if (keyCode == KeyEvent.KEYCODE_BACK)
-					this.dismiss();
-				return true;
-			}
-		};
-
-		webview.setWebViewClient(new WebViewClient() {
-
-			@Override
-			public void onPageFinished(WebView view, String url) {
-				if (url.endsWith("return")) {
-					d.dismiss();
-					mixView.repaint();
-				} else {
-					super.onPageFinished(view, url);
-				}
-			}
-
-		});
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.getWindow().setGravity(Gravity.BOTTOM);
-		d.addContentView(webview, new FrameLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
-				Gravity.BOTTOM));
-		
-		if(!processUrl(url, mixView)){ //if the url could not be processed by another intent
-			d.show();
-			webview.loadUrl(url);
-		}
+	/**
+	 * Returns the current location.
+	 */
+	public Location getCurrentLocation() {
+		return locationFinder.getCurrentLocation();
 	}
 
+	/**
+	 * Sets the property to the location with the last successfull download.
+	 */
+	public void setLocationAtLastDownload(Location locationAtLastDownload) {
+		locationFinder.setLocationAtLastDownload(locationAtLastDownload);
+	}
+
+	public void unregisterLocationManager(){
+		locationFinder.unregisterLocationManager();
+	}
+	
+	/**
+	 * Shows a webpage with the given url when clicked on a marker.
+	 */
+	public void loadMixViewWebPage(String url) throws Exception {
+		loadWebPage(url, mixView);
+	}
+	
+	public DownloadManager getDownloadManager() {
+		return downloadManager;
+	}
+
+	public void setDownloadManager(DownloadManager downloadManager) {
+		this.downloadManager = downloadManager;
+		locationFinder.setDownloadManager(downloadManager);
+	}
+	
+	/**
+	 * Shows a webpage with the given url if a markerobject is selected
+	 * (mixlistview, mixoverlay).
+	 */
 	public void loadWebPage(String url, Context context) throws Exception {
 		WebView webview = new WebView(context);
-		webview.setBackgroundColor(0x99FFFFFF);
+		webview.getSettings().setJavaScriptEnabled(true);
 
 		final Dialog d = new Dialog(context) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -530,128 +442,4 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 				PackageManager.GET_RESOLVED_FILTER);
 	}
 
-	public Location getLocationAtLastDownload() {
-		return locationAtLastDownload;
-	}
-
-	public void setLocationAtLastDownload(Location locationAtLastDownload) {
-		this.locationAtLastDownload = locationAtLastDownload;
-	}
-
-	private LocationListener lbounce = new LocationListener() {
-
-		@Override
-		public void onLocationChanged(Location location) {
-			Log.d(TAG,
-					"bounce Location Changed: " + location.getProvider()
-							+ " lat: " + location.getLatitude() + " lon: "
-							+ location.getLongitude() + " alt: "
-							+ location.getAltitude() + " acc: "
-							+ location.getAccuracy());
-			// Toast.makeText(ctx,
-			// "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
-			// Toast.LENGTH_LONG).show();
-
-			downloadManager.purgeLists();
-
-			if (location.getAccuracy() < 40) {
-				lm.removeUpdates(lcoarse);
-				lm.removeUpdates(lbounce);
-			}
-		}
-
-		@Override
-		public void onProviderDisabled(String arg0) {
-			Log.d(TAG, "bounce disabled");
-		}
-
-		@Override
-		public void onProviderEnabled(String arg0) {
-			Log.d(TAG, "bounce enabled");
-
-		}
-
-		@Override
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		}
-
-	};
-
-	private LocationListener lcoarse = new LocationListener() {
-
-		@Override
-		public void onLocationChanged(Location location) {
-			try {
-				Log.d(TAG,
-						"coarse Location Changed: " + location.getProvider()
-								+ " lat: " + location.getLatitude() + " lon: "
-								+ location.getLongitude() + " alt: "
-								+ location.getAltitude() + " acc: "
-								+ location.getAccuracy());
-				// Toast.makeText(ctx,
-				// "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
-				// Toast.LENGTH_LONG).show();
-				lm.removeUpdates(lcoarse);
-				downloadManager.purgeLists();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
-		@Override
-		public void onProviderDisabled(String arg0) {
-		}
-
-		@Override
-		public void onProviderEnabled(String arg0) {
-		}
-
-		@Override
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		}
-
-	};
-
-	private LocationListener lnormal = new LocationListener() {
-		public void onProviderDisabled(String provider) {
-		}
-
-		public void onProviderEnabled(String provider) {
-		}
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-		public void onLocationChanged(Location location) {
-			Log.d(TAG,
-					"normal Location Changed: " + location.getProvider()
-							+ " lat: " + location.getLatitude() + " lon: "
-							+ location.getLongitude() + " alt: "
-							+ location.getAltitude() + " acc: "
-							+ location.getAccuracy());
-			// Toast.makeText(ctx,
-			// "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
-			// Toast.LENGTH_LONG).show();
-			try {
-
-				downloadManager.purgeLists();
-				Log.v(TAG,
-						"Location Changed: " + location.getProvider()
-								+ " lat: " + location.getLatitude() + " lon: "
-								+ location.getLongitude() + " alt: "
-								+ location.getAltitude() + " acc: "
-								+ location.getAccuracy());
-				synchronized (curLoc) {
-					curLoc = location;
-				}
-				mixView.repaint();
-				Location lastLoc = getLocationAtLastDownload();
-				if (lastLoc == null)
-					setLocationAtLastDownload(location);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-
-	};
 }
