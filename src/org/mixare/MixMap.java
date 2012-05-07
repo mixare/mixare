@@ -209,10 +209,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
-//	public static ArrayList<Marker> getMarkerList(){
-//		return markerList;
-//	}
-
 	public void setMarkerList(List<Marker> maList){
 		markerList = maList;
 	}
@@ -220,18 +216,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	public DataView getDataView(){
 		return dataView;
 	}
-
-//	public static void setDataView(DataView view){
-//		dataView= view;
-//	}
-
-//	public static void setMixContext(MixContext context){
-//		ctx= context;
-//	}
-//
-//	public static MixContext getMixContext(){
-//		return ctx;
-//	}
 
 	public List<Overlay> getMapOverlayList(){
 		return mapOverlays;

@@ -254,7 +254,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			if (!isInited) {
 				mixContext = new MixContext(this);
-				mixContext.downloadManager = new DownloadManager(mixContext);
+				mixContext.setDownloadManager(new DownloadManager(mixContext));
 				dWindow = new PaintScreen();
 				dataView = new DataView(mixContext);
 
@@ -343,7 +343,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				sensorMgr = null;
 
 				mixContext.unregisterLocationManager();
-				mixContext.downloadManager.stop();
+				mixContext.getDownloadManager().stop();
 				
 				if(dataView != null){
 					dataView.cancelRefreshTimer();
@@ -428,20 +428,19 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			try {
 
-				GeomagneticField gmf = new GeomagneticField((float) mixContext.curLoc
-						.getLatitude(), (float) mixContext.curLoc.getLongitude(),
-						(float) mixContext.curLoc.getAltitude(), System
+				GeomagneticField gmf = new GeomagneticField((float) mixContext.getCurrentLocation()
+						.getLatitude(), (float) mixContext.getCurrentLocation().getLongitude(),
+						(float) mixContext.getCurrentLocation().getAltitude(), System
 						.currentTimeMillis());
 
 				angleY = (float) Math.toRadians(-gmf.getDeclination());
 				m4.set((float) FloatMath.cos(angleY), 0f,
 						(float) FloatMath.sin(angleY), 0f, 1f, 0f, (float) -FloatMath
 						.sin(angleY), 0f, (float) FloatMath.cos(angleY));
-				mixContext.declination = gmf.getDeclination();
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			downloadThread = new Thread(mixContext.downloadManager);
+			downloadThread = new Thread(mixContext.getDownloadManager());
 			downloadThread.start();
 		} catch (Exception ex) {
 			doError(ex);
@@ -454,8 +453,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 				if (mixContext != null) {
 					mixContext.unregisterLocationManager();
-					if (mixContext.downloadManager != null)
-						mixContext.downloadManager.stop();
+					if (mixContext.getDownloadManager() != null)
+						mixContext.getDownloadManager().stop();
 				}
 			} catch (Exception ignore) {
 			}
@@ -617,7 +616,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		dataView.doStart();
 		dataView.clearEvents();
-		downloadThread = new Thread(mixContext.downloadManager);
+		downloadThread = new Thread(mixContext.getDownloadManager());
 		downloadThread.start();
 
 	};
