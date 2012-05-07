@@ -431,7 +431,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				if (url.contains("return")) {
+				if (url.endsWith("return")) {
 					d.dismiss();
 					mixView.repaint();
 				} else {
@@ -453,7 +453,6 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	}
 
 	public void loadWebPage(String url, Context context) throws Exception {
-		url = "http://www.youtube.com/watch?v=cxLG2wtE7TM";
 		WebView webview = new WebView(context);
 		webview.setBackgroundColor(0x99FFFFFF);
 
@@ -473,7 +472,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				if (url.contains("return")) {
+				if (url.endsWith("return")) {
 					d.dismiss();
 					mixView.repaint();
 				} else {
