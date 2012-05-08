@@ -73,7 +73,9 @@
 	<string name="map_menu_satellite_mode">Satellite</string>
 	<string name="map_menu_cam_mode">Camera</string>
 	<string name="map_my_location">My Location</string>
-
+	<string name="map_toggle_path_on">Show Path</string>
+	<string name="map_toggle_path_off">Hide Path</string>
+	
 	<string name="map_current_location_click">Your current location</string>
 
 	<string name="data_source_add">Add data source</string>
