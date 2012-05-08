@@ -18,6 +18,8 @@
  */
 package org.mixare;
 
+import com.google.android.maps.GeoPoint;
+
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -127,7 +129,7 @@ public class LocationFinder {
 			Log.d(MixContext.TAG, "normal Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			//Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 			try {
-
+				MixMap.addWalkingPathPosition(new GeoPoint((int)(location.getLatitude() * 1E6), (int)(location.getLongitude() * 1E6)));
 				downloadManager.purgeLists();
 				Log.v(MixContext.TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 					synchronized (curLoc) {

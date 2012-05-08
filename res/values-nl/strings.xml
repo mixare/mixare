@@ -73,6 +73,8 @@
 	<string name="map_menu_satellite_mode">Sateliet</string>
 	<string name="map_menu_cam_mode">Camera</string>
 	<string name="map_my_location">Mijn locatie</string>
+	<string name="map_toggle_path_on">Toon pad</string>
+	<string name="map_toggle_path_off">Verberg pad</string>
 
 	<string name="map_current_location_click">Jouw huidige locatie</string>
 

@@ -30,7 +30,12 @@ import org.mixare.lib.MixUtils;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -51,6 +56,7 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
+import com.google.android.maps.Projection;
 
 /**
  * This class creates the map view and its overlay. It also adds an overlay with
@@ -64,6 +70,9 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static List<Marker> markerList;
 	private static DataView dataView;
 	private static GeoPoint startPoint;
+	private static List<GeoPoint> walkingPath = new ArrayList<GeoPoint>();
+	
+	public static final String PREFS_NAME = "MixMapPrefs";
 
 	private MixContext mixContext;
 	private MapView mapView;
@@ -98,7 +107,8 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 		setStartPoint();
 		createOverlay();
-
+		createWalkingPath();
+		
 		if (dataView.isFrozen()){
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
@@ -149,6 +159,14 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		myOverlay.addOverlay(item);
 		mapOverlays.add(myOverlay); 
 	}
+	
+	public void createWalkingPath(){
+		if(isPathVisible()){
+			mapOverlays=mapView.getOverlays();
+			Overlay item = new MixPath(walkingPath);
+			mapOverlays.add(item);
+		}
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -156,17 +174,22 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		/*define the first*/
 		MenuItem item1 =menu.add(base, base, base, getString(DataView.MAP_MENU_NORMAL_MODE)); 
 		MenuItem item2 =menu.add(base, base+1, base+1, getString(DataView.MAP_MENU_SATELLITE_MODE));
-		MenuItem item3 =menu.add(base, base+2, base+2, getString(DataView.MAP_MY_LOCATION)); 
+		MenuItem item3 =menu.add(base, base+2, base+2, getString(DataView.MAP_MY_LOCATION)); 		
 		MenuItem item4 =menu.add(base, base+3, base+3, getString(DataView.MENU_ITEM_2)); 
 		MenuItem item5 =menu.add(base, base+4, base+4, getString(DataView.MENU_CAM_MODE)); 
-
+		MenuItem item6 =null;
+		if(isPathVisible()){
+			item6 =menu.add(base, base+5, base+5, getString(DataView.MAP_TOGGLE_PATH_OFF)); 
+		}else{
+			item6 =menu.add(base, base+5, base+5, getString(DataView.MAP_TOGGLE_PATH_OFF));
+		}
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_gallery);
 		item2.setIcon(android.R.drawable.ic_menu_mapmode);
 		item3.setIcon(android.R.drawable.ic_menu_mylocation);
 		item4.setIcon(android.R.drawable.ic_menu_view);
 		item5.setIcon(android.R.drawable.ic_menu_camera);
-
+		item6.setIcon(android.R.drawable.ic_menu_directions);
 		return true;
 	}
 
@@ -194,6 +217,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		case 5:
 			finish();
 			break;
+		case 6:
+			togglePath();
+			//refresh:
+			startActivity(getIntent()); 
+			finish();
 		}
 		return true;
 	}
@@ -207,6 +235,13 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		else{
 			Toast.makeText( this, DataView.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
 		}
+	}
+	
+	/**
+	 * Adds a position to the walking route.(This route will be drawn on the map)
+	 */
+	public static void addWalkingPathPosition(GeoPoint geoPoint){
+		walkingPath.add(geoPoint);
 	}
 
 	public void setMarkerList(List<Marker> maList){
@@ -287,10 +322,27 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 		return false;
 	}
+	
+	private boolean isPathVisible(){
+		final String property = "pathVisible";
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		return settings.getBoolean(property, true);
+	}
+	
+	private void togglePath(){
+		final String property = "pathVisible";
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		boolean result = settings.getBoolean(property, true);
+		editor.putBoolean(property, !result);
+		editor.commit();		
+	}
 
 }
 
-
+/**
+ * Draws Items on the map.
+ */
 class MixOverlay extends ItemizedOverlay<OverlayItem> {
 
 	private ArrayList<OverlayItem> overlayItems = new ArrayList<OverlayItem>();
@@ -339,4 +391,49 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 		populate();
 	}
 }
+
+/**
+ * Draws a path(line) on the map.
+ */
+class MixPath extends Overlay{
+
+	private List<GeoPoint> geoPoints;
+
+	public MixPath(List<GeoPoint> geoPoints) {
+		Log.i("MapActivity", geoPoints.toString());
+		this.geoPoints = geoPoints;
+	}
+
+	public void draw(Canvas canvas, MapView mapv, boolean shadow){
+        super.draw(canvas, mapv, shadow);
+
+        if(geoPoints.size() <= 0){
+        	return;
+        }
+        
+        Projection projection = mapv.getProjection();
+        Paint mPaint = new Paint();
+        mPaint.setDither(true);
+        mPaint.setColor(Color.BLUE);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeWidth(3);
+
+        Path path = new Path();
+       
+        Point start = new Point();
+        projection.toPixels(geoPoints.get(0), start);        
+        path.moveTo(start.x, start.y);
+               
+        for(GeoPoint gp : geoPoints){
+        	Point p = new Point();
+            projection.toPixels(gp, p);        
+            path.lineTo(p.x, p.y);
+        }
+        
+        canvas.drawPath(path, mPaint);
+    }
+}
+
 
