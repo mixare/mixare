@@ -27,7 +27,6 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -123,6 +122,8 @@ public class DataView {
 	public static final int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
 	public static final int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
 	public static final int MENU_CAM_MODE = R.string.map_menu_cam_mode;
+	public static final int MAP_TOGGLE_PATH_ON = R.string.map_toggle_path_on;
+	public static final int MAP_TOGGLE_PATH_OFF = R.string.map_toggle_path_off;
 	public static final int MAP_MY_LOCATION = R.string.map_my_location;
 	public static final int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
 
