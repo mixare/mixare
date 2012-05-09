@@ -77,7 +77,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private MixContext mixContext;
 	private MapView mapView;
 
-	static MixMap map;
+	//static MixMap map; 
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
 	public static List<Marker> originalMarkerList;
@@ -92,18 +92,18 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataView = MixView.getDataView();
-		mixContext = dataView.getContext();
+		setMixContext(dataView.getContext());
 		setMarkerList(dataView.getDataHandler().getMarkerList());
-		map = this;
+		//map = this; //savedInstanceState will save the instance for you.
 
 		setMapContext(this);
-		mapView= new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA");
-		mapView.setBuiltInZoomControls(true);
-		mapView.setClickable(true);
-		mapView.setSatellite(true);
-		mapView.setEnabled(true);
+		setMapView(new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA"));
+		getMapView().setBuiltInZoomControls(true);
+		getMapView().setClickable(true);
+		getMapView().setSatellite(true);
+		getMapView().setEnabled(true);
 
-		this.setContentView(mapView);
+		this.setContentView(getMapView());
 
 		setStartPoint();
 		createOverlay();
@@ -121,37 +121,45 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		}
 	}
-
 	
 	/**
-	 * Closes MapView Activity and returns that request to NOT refresh screen.
+	 * Closes MapView Activity and returns that request to NOT refresh screen by default.
+	 * @param boolean do refresh? true or false
 	 */
-
-	private void closeMapViewActivity() {
+	private void closeMapViewActivity(boolean doRefreshScreen) {
 		Intent closeMapView = new Intent();
-		closeMapView.putExtra("RefreshScreen", false);
+		closeMapView.putExtra("RefreshScreen", doRefreshScreen);
 		setResult(RESULT_OK, closeMapView);
 		finish();
 	}
 	
+	/**
+	 * Closes MapView Activity and returns that request to NOT refresh screen.
+	 * Default value is false
+	 */
+	private void closeMapViewActivity() {
+		closeMapViewActivity(false);
+	}
+
+	/* ********* Operators ***********/ 
 	public void setStartPoint() {
-		Location location = mixContext.getLocationFinder().getCurrentLocation();
+		Location location = getMixContext().getLocationFinder().getCurrentLocation();
 		MapController controller;
 
 		double latitude = location.getLatitude()*1E6;
 		double longitude = location.getLongitude()*1E6;
 
-		controller = mapView.getController();
+		controller = getMapView().getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
 		controller.setCenter(startPoint);
 		controller.setZoom(15);
 	}
 
 	public void createOverlay(){
-		mapOverlays=mapView.getOverlays();
+		setMapOverlays(getMapView().getOverlays());
 		OverlayItem item; 
-		drawable = this.getResources().getDrawable(R.drawable.icon_map);
-		MixOverlay mixOverlay = new MixOverlay(this, drawable);
+		setDrawable(this.getResources().getDrawable(R.drawable.icon_map));
+		MixOverlay mixOverlay = new MixOverlay(this, getDrawable());
 
 		for(Marker marker:markerList) {
 			if(marker.isActive()) {
@@ -161,15 +169,15 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			}
 		}
 		//Solved issue 39: only one overlay with all marker instead of one overlay for each marker
-		mapOverlays.add(mixOverlay);
+		getMapOverlays().add(mixOverlay);
 
 		MixOverlay myOverlay;
-		drawable = this.getResources().getDrawable(R.drawable.loc_icon);
-		myOverlay = new MixOverlay(this, drawable);
+		setDrawable(this.getResources().getDrawable(R.drawable.loc_icon));
+		myOverlay = new MixOverlay(this, getDrawable());
 
 		item = new OverlayItem(startPoint, "Your Position", "");
 		myOverlay.addOverlay(item);
-		mapOverlays.add(myOverlay); 
+		getMapOverlays().add(myOverlay); 
 	}
 	
 	public void createWalkingPath(){
@@ -180,6 +188,28 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
+	public void createListView(){
+		if (dataView.getDataHandler().getMarkerCount() > 0) {
+			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
+			startActivityForResult(intent1, 42);
+		}
+		/*if the list is empty*/
+		else{
+			Toast.makeText( this, R.string.empty_list, Toast.LENGTH_LONG ).show();			
+		}
+	}
+	
+	private void togglePath(){
+		final String property = "pathVisible";
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		boolean result = settings.getBoolean(property, true);
+		editor.putBoolean(property, !result);
+		editor.commit();		
+	}
+
+	/* ********* Operator - Menu ******/
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
@@ -211,11 +241,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		switch(item.getItemId()){
 		/*Satellite View*/
 		case 1:
-			mapView.setSatellite(false);
+			getMapView().setSatellite(false);
 			break;
 			/*street View*/
 		case 2:		
-			mapView.setSatellite(true);
+			getMapView().setSatellite(true);
 			break;
 			/*go to users location*/
 		case 3:
@@ -239,48 +269,12 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		return true;
 	}
 
-	public void createListView(){
-		if (dataView.getDataHandler().getMarkerCount() > 0) {
-			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
-			startActivityForResult(intent1, 42);
-		}
-		/*if the list is empty*/
-		else{
-			Toast.makeText( this, R.string.empty_list, Toast.LENGTH_LONG ).show();			
-		}
-	}
-	
-	/**
-	 * Adds a position to the walking route.(This route will be drawn on the map)
-	 */
-	public static void addWalkingPathPosition(GeoPoint geoPoint){
-		walkingPath.add(geoPoint);
-	}
-
-	public void setMarkerList(List<Marker> maList){
-		markerList = maList;
-	}
-
-	public DataView getDataView(){
-		return dataView;
-	}
-
-	public List<Overlay> getMapOverlayList(){
-		return mapOverlays;
-	}
-
-	public void setMapContext(Context context){
-		thisContext= context;
-	}
-
-	public Context getMapContext(){
-		return thisContext;
-	}
-
 	public void startPointMsg(){
 		Toast.makeText(getMapContext(), R.string.map_current_location_click, Toast.LENGTH_LONG).show();
 	}
 
+	/* ************ Handlers *************/
+	
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
@@ -336,21 +330,97 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		return false;
 	}
 	
+	/* ******* Getter and Setters ***********/
+
+
+	/**
+	 * @return the mapOverlays
+	 */
+	private static List<Overlay> getMapOverlays() {
+		return mapOverlays;
+	}
+
+	/**
+	 * @param mapOverlays the mapOverlays to set
+	 */
+	private static void setMapOverlays(List<Overlay> mapOverlays) {
+		MixMap.mapOverlays = mapOverlays;
+	}
+
+	/**
+	 * @return the drawable
+	 */
+	private Drawable getDrawable() {
+		return drawable;
+	}
+
+	/**
+	 * @param drawable the drawable to set
+	 */
+	private void setDrawable(Drawable drawable) {
+		this.drawable = drawable;
+	}
+
+	/**
+	 * @return the mixContext
+	 */
+	private MixContext getMixContext() {
+		return mixContext;
+	}
+
+	/**
+	 * @param mixContext the mixContext to set
+	 */
+	private void setMixContext(MixContext mixContext) {
+		this.mixContext = mixContext;
+	}
+
+	/**
+	 * @return the mapView
+	 */
+	private MapView getMapView() {
+		return mapView;
+	}
+
+	/**
+	 * @param mapView the mapView to set
+	 */
+	private void setMapView(MapView mapView) {
+		this.mapView = mapView;
+	}
+	
+	public void setMarkerList(List<Marker> maList){
+		markerList = maList;
+	}
+
+	public DataView getDataView(){
+		return dataView;
+	}
+
+	public List<Overlay> getMapOverlayList(){
+		return getMapOverlays();
+	}
+
+	public void setMapContext(Context context){
+		thisContext= context;
+	}
+
+	public Context getMapContext(){
+		return thisContext;
+	}
+	
+	/**
+	 * Adds a position to the walking route.(This route will be drawn on the map)
+	 */
+	public static void addWalkingPathPosition(GeoPoint geoPoint){
+		walkingPath.add(geoPoint);
+	}
+
 	private boolean isPathVisible(){
 		final String property = "pathVisible";
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		return settings.getBoolean(property, true);
 	}
-	
-	private void togglePath(){
-		final String property = "pathVisible";
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		boolean result = settings.getBoolean(property, true);
-		editor.putBoolean(property, !result);
-		editor.commit();		
-	}
-
 }
 
 /**
@@ -448,5 +518,3 @@ class MixPath extends Overlay{
         canvas.drawPath(path, mPaint);
     }
 }
-
-
