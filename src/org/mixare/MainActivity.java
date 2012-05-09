@@ -1,127 +1,117 @@
 package org.mixare;
 
-import org.mixare.data.DataSourceStorage;
-import org.mixare.plugin.PluginLoader;
+import java.util.List;
+
 import org.mixare.plugin.PluginType;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.CheckBox;
 
 /**
- * This is the main activity for mixare. This activity will load a splashscreen and then initializes the PluginLoader
- * It will then launch the visible bootstrapplugins and waits for their results. After all bootstrap plugins are loaded
- * then mixare will be launched
+ * This is the main activity of mixare, that will be opened if mixare is
+ * launched through the android.intent.action.MAIN the main tasks of this
+ * activity is showing a prompt dialog where the user can decide to launch the
+ * plugins, or not to launch the plugins. This class is also able to remember
+ * those decisions, so that it can forward directly to the next activity.
+ * 
  * @author A.Egal
  */
 public class MainActivity extends Activity {
 
-	private static final int SPLASHTIME = 2000; //2 seconds
-	public static final int SCANNER_REQUEST_CODE = 0;
-	protected Handler exitHandler = null;
-	protected Runnable exitRunnable = null;
-
-	/** Called when the activity is first created. */
+	private Context ctx;
+	private final String usePluginsPrefs = "mixareUsePluginsPrefs";
+	private final String usePluginsKey = "usePlugins";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		PluginLoader.getInstance().setActivity(this);
-		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
-		DataSourceStorage.init(this);
-		
-		if(arePendingActivitiesFinished()){
-			startDefaultSplashScreen();
-		}
-	}
-	
-	private void startDefaultSplashScreen(){
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.splashscreen);
-		// Runnable exiting the splash screen and launching the menu
-		exitRunnable = new Runnable() {
-			public void run() {
-				exitSplash();
-			}
-		};
-		// Run the exitRunnable in in _splashTime ms
-		exitHandler = new Handler();
-		exitHandler.postDelayed(exitRunnable, SPLASHTIME);
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			// Remove the exitRunnable callback from the handler queue
-			exitHandler.removeCallbacks(exitRunnable);
-			// Run the exit code manually
-			exitSplash();
-		}
-		return true;
-	}
-
-	private void exitSplash() {
-		loadPlugins();		
-		startMixare();
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		processDataSourceFromPlugin(data);
-		procesCustomSplashScreen(data);
-		
-		PluginLoader.getInstance().decreasePendingActivitiesOnResult();
-		startMixare();
-	}
-	
-	private void startMixare(){
-		if(arePendingActivitiesFinished()){
-			startActivity(new Intent(this, MixView.class));
-			finish();
-		}
-	}
-	
-	private boolean arePendingActivitiesFinished(){
-		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
-	}
-	
-	private void processDataSourceFromPlugin(Intent data){
-		if(data != null && data.getExtras().getString("resultType").equals("Datasource")){
-			String[] url = data.getExtras().getStringArray("url");
-			//clear all datasources for a reinit
-			for(int i = 0; i < url.length; i++){
-				DataSourceStorage.getInstance().clear();
-				DataSourceStorage.getInstance().add("DataSource0", "Barcode source|"+url[i]+"|5|2|true");
-				DataSourceStorage.getInstance().setCustomDataSourceSelected(true);
+		ctx = this;
+		if(arePluginsAvailable() && isDecisionRemembered()){
+			showDialog();
+		}else{
+			if(getRememberedDecision()){ 		//yes button
+				startActivity(new Intent(ctx, PluginLoaderActivity.class));
+				finish();
+			} else{								//no button
+				startActivity(new Intent(ctx, MixView.class));
+				finish();
 			}
 		}
+	}	
+
+	/**
+	 * Shows a dialog
+	 */
+	public void showDialog() {
+		final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+		dialog.setTitle(R.string.launch_plugins);
+		dialog.setMessage(R.string.plugin_message);
+
+		final CheckBox checkBox = new CheckBox(ctx);
+		checkBox.setText(R.string.remember_this_decision);
+		dialog.setView(checkBox);		
+		
+		dialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface d, int whichButton) {
+				processCheckbox(true, checkBox);
+				startActivity(new Intent(ctx, PluginLoaderActivity.class));
+				finish();
+			}
+		});
+
+		dialog.setNegativeButton(R.string.no,new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface d, int whichButton) {
+				processCheckbox(true, checkBox);
+				startActivity(new Intent(ctx, MixView.class));
+				finish();
+			}
+		});
+
+		dialog.show();
 	}
 	
-	@Override
-	protected void onDestroy() {
-		PluginLoader.getInstance().unBindServices();
-		PluginLoader.getInstance().setActivity(null);
-		super.onDestroy();
+	private boolean isDecisionRemembered(){
+		SharedPreferences sharedPreferences = getSharedPreferences(usePluginsPrefs, MODE_PRIVATE);
+		return !sharedPreferences.contains(usePluginsKey);
 	}
 	
-	private void procesCustomSplashScreen(Intent data){
-		if(data != null && data.getExtras().getString("resultType").equals("Splashscreen")){
-			loadPlugins();
+	private boolean arePluginsAvailable(){
+		PluginType[] allPluginTypes = PluginType.values();
+		for(PluginType pluginType : allPluginTypes){
+			PackageManager packageManager = getPackageManager();
+			Intent baseIntent = new Intent(pluginType.getActionName());
+			List<ResolveInfo> list = packageManager.queryIntentServices(baseIntent,
+					PackageManager.GET_RESOLVED_FILTER);
+			
+			if(list.size() > 0){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void processCheckbox(boolean loadplugin, CheckBox checkBox){
+		if(checkBox.isChecked()){
+			SharedPreferences sharedPreferences = getSharedPreferences(usePluginsPrefs, MODE_PRIVATE);
+			Editor editor = sharedPreferences.edit();
+			editor.putBoolean(usePluginsKey, loadplugin);
+			editor.commit();
 		}
 	}
 	
-	private void loadPlugins(){
-		PluginLoader.getInstance().setActivity(this);
-		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
-		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_2);
-		PluginLoader.getInstance().loadPlugin(PluginType.DATAHANDLER);
+	private boolean getRememberedDecision(){
+		SharedPreferences sharedPreferences = getSharedPreferences(usePluginsPrefs, MODE_PRIVATE);
+		return sharedPreferences.getBoolean(usePluginsKey, false);
 	}
+
 }
