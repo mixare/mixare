@@ -88,7 +88,7 @@ public class MixListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//		mixCtx = MixView.ctx;
-		dataView = MixView.dataView;	
+		dataView = MixView.getDataView();	
 		ctx = this;
 		mixContext = dataView.getContext();
 
@@ -123,8 +123,8 @@ public class MixListView extends ListActivity {
 
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
-				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+				searchNotificationTxt.setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(R.string.search_active_2));
+				searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
 				searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
@@ -182,7 +182,7 @@ public class MixListView extends ListActivity {
 			}
 		}
 		if (listViewMenu.size() == 0) {
-			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
 		}
 		else {
 			jLayer.setMarkerList(searchResultMarkers);
@@ -204,7 +204,7 @@ public class MixListView extends ListActivity {
 		/*if no website is available for this item*/
 		String selectedURL = position < selectedItemURL.size() ? selectedItemURL.get(position) : null;
 		if (selectedURL == null || selectedURL.length() <= 0)
-			Toast.makeText( this, getString(DataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
+			Toast.makeText( this, getString(R.string.no_website_available), Toast.LENGTH_LONG ).show();			
 		else if("search".equals(selectedURL)){
 			dataView.setFrozen(false);
 			dataView.getDataHandler().setMarkerList(originalMarkerList);
@@ -229,8 +229,8 @@ public class MixListView extends ListActivity {
 		int base = Menu.FIRST;
 
 		/*define menu items*/
-		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
-		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
+		MenuItem item1 = menu.add(base, base, base, getString(R.string.menu_item_3)); 
+		MenuItem item2 = menu.add(base, base+1, base+1, getString(R.string.map_menu_cam_mode));
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
