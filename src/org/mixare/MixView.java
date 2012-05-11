@@ -1,19 +1,19 @@
 /*
  * Copyright (C) 2010- Peer internet solutions
- *
+ * 
  * This file is part of mixare.
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
+ * 
+ * This program is free software: you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version. 
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License along with
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 package org.mixare;
@@ -109,29 +109,20 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		try {
 						
 			handleIntent(getIntent());
+
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			getMixViewData().setmWakeLock(pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag"));
 
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			/*
-			 * Get the preference file PREFS_NAME stored in the internal memory
-			 * of the phone
-			 */
-			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-			FrameLayout frameLayout = createZoomBar(settings);
-
-			camScreen = new CameraSurface(this);
-			augScreen = new AugmentedView(this);
+			maintainCamera();
+			maintainAugmentR();
+			maintainZoomBar();
 			
-			setContentView(camScreen);
-			addContentView(augScreen, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-			addContentView(frameLayout, new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
-
 			if (!isInited) {
-				
+				//getMixViewData().setMixContext(new MixContext(this));
+				//getMixViewData().getMixContext().setDownloadManager(new DownloadManager(mixViewData.getMixContext()));
 				setdWindow(new PaintScreen());
 				setDataView(new DataView(getMixViewData().getMixContext()));
 
@@ -140,8 +131,11 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				isInited = true;
 			}
 
-			/* check if the application is launched for the first time */
-			if (settings.getBoolean("firstAccess", false) == false) {
+			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
+			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+			
+			/*check if the application is launched for the first time*/
+			if(settings.getBoolean("firstAccess",false)==false){
 				firstAccess(settings);
 
 			}
@@ -350,57 +344,126 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().setSearchNotificationTxt(null);
 		}
 	}
-
-	/* ********* Operators ********** */
+	
+	/**
+	 * {@inheritDoc}
+	 * Customize Activity after switching back to it.
+	 * Currently it maintain and ensures view creation.
+	 */
+	protected void onRestart (){
+		super.onRestart();
+		maintainCamera();
+		maintainAugmentR();
+		maintainZoomBar();
+		
+	}
+	
+	/* ********* Operators ***********/ 
 
 	public void repaint() {
-		setDataView(new DataView(getMixViewData().getMixContext()));
+		//clear stored data
+		getDataView().clearEvents();
+		setDataView(null); //It's smelly code, but enforce garbage collector 
+							//to release data.
+		setDataView(new DataView(mixViewData.getMixContext()));
 		setdWindow(new PaintScreen());
-		setZoomLevel(); // @TODO Caller has to set the zoom. This function
-						// repaints only.
+		//setZoomLevel(); //@TODO Caller has to set the zoom. This function repaints only.
 	}
+	
+	/**
+	 *  Checks camScreen, if it does not exist, it creates one.
+	 */
+	private void maintainCamera() {
+		if (camScreen == null){
+		camScreen = new CameraSurface(this);
+		}
+		setContentView(camScreen);
+	}
+	
+	/**
+	 * Checks augScreen, if it does not exist, it creates one.
+	 */
+	private void maintainAugmentR() {
+		if (augScreen == null ){
+		augScreen = new AugmentedView(this);
+		}
+		addContentView(augScreen, new LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
-	public void setErrorDialog() {
+	}
+	
+	/**
+	 * Creates a zoom bar and adds it to view.
+	 */
+	private void maintainZoomBar() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		FrameLayout frameLayout = createZoomBar(settings);
+		addContentView(frameLayout, new FrameLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
+				Gravity.BOTTOM));
+	}
+	
+	/**
+	 * Refreshes Download 
+	 * TODO refresh downloads
+	 */
+	private void refreshDownload(){
+//		try {
+//			if (getMixViewData().getDownloadThread() != null){
+//				if (!getMixViewData().getDownloadThread().isInterrupted()){
+//					getMixViewData().getDownloadThread().interrupt();
+//					getMixViewData().getMixContext().getDownloadManager().restart();
+//				}
+//			}else { //if no download thread found
+//				getMixViewData().setDownloadThread(new Thread(getMixViewData()
+//						.getMixContext().getDownloadManager()));
+//				//@TODO Syncronize DownloadManager, call Start instead of run.
+//				mixViewData.getMixContext().getDownloadManager().run();
+//			}
+//		}catch (Exception ex){
+//		}
+	}
+	public void setErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.connection_error_dialog));
 		builder.setCancelable(false);
 
-		/* Retry */
-		builder.setPositiveButton(R.string.connection_error_dialog_button1,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						fError = false;
-						// TODO improve
-						try {
-							repaint();
-						} catch (Exception ex) {
-							// Don't call doError, it will be a recursive call.
-							// doError(ex);
-						}
-					}
-				});
-		/* Open settings */
-		builder.setNeutralButton(R.string.connection_error_dialog_button2,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent intent1 = new Intent(
-								Settings.ACTION_WIRELESS_SETTINGS);
-						startActivityForResult(intent1, 42);
-					}
-				});
-		/* Close application */
-		builder.setNegativeButton(R.string.connection_error_dialog_button3,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						System.exit(0); // wouldn't be better to use finish (to
-										// stop the app normally?)
-					}
-				});
+		/*Retry*/
+		builder.setPositiveButton(R.string.connection_error_dialog_button1, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				fError=false;
+				//TODO improve
+				try {
+					maintainCamera();
+					maintainAugmentR();
+					repaint();
+					setZoomLevel();
+				}
+				catch(Exception ex){
+					//Don't call doError, it will be a recursive call.
+					//doError(ex);
+				}
+			}
+		});
+		/*Open settings*/
+		builder.setNeutralButton(R.string.connection_error_dialog_button2, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
+				startActivityForResult(intent1, 42);
+			}
+		});
+		/*Close application*/
+		builder.setNegativeButton(R.string.connection_error_dialog_button3, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				System.exit(0); //wouldn't be better to use finish (to stop the app normally?)
+			}
+		});
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
 
-	public float calcZoomLevel() {
+	
+	public float calcZoomLevel(){
 
 		int myZoomLevel = getMixViewData().getMyZoomBar().getProgress();
 		float myout = 5;
@@ -418,6 +481,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		} else {
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
+
 
 		return myout;
 	}
@@ -457,8 +521,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 * hidden and not added to view, Caller needs to add the frameLayout to
 	 * view, and enable visibility when needed.
 	 * 
-	 * @param SharedOreference
-	 *            settings where setting is stored
+	 * @param SharedOreference settings where setting is stored
 	 * @return FrameLayout Hidden Zoom Bar
 	 */
 	private FrameLayout createZoomBar(SharedPreferences settings) {
@@ -476,8 +539,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		frameLayout.setPadding(10, 0, 10, 10);
 		return frameLayout;
 	}
-
-	/* ********* Operator - Menu ***** */
+	
+	/* ********* Operator - Menu ******/
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -510,6 +574,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -530,7 +595,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			 * empty
 			 */
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
-				Intent intent1 = new Intent(MixView.this, MixListView.class);
+				Intent intent1 = new Intent(MixView.this, MixListView.class); 
 				startActivityForResult(intent1, 42);
 			}
 			/* if the list is empty */
@@ -635,10 +700,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().getMyZoomBar().getProgress();
 
 			t.cancel();
+			//repaint after zoom level changed.
+			repaint();
 			setZoomLevel();
 		}
 
 	};
+
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
@@ -775,39 +843,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return false;
 	}
 
-	/* ************ Handlers ************ */
 
-//	/**
-//	 * Refreshes Download
-//	 * Under Construction --
-//	 */
-	private void refreshDownload() {
-//
-//		try {
-//			if (mixViewData.getDownloadThread() != null) {
-//				if (!mixViewData.getDownloadThread().isInterrupted()) {
-//					mixViewData.getDownloadThread().interrupt();
-//					mixViewData.getMixContext().getDownloadManager().restart();
-//				}
-//
-//			} else { // if no download thread found
-//				Log.w(TAG + " WorkFlow",
-//						"MixView - refreshDownload - ops DownloadManager was not created, check workflow.");
-//
-//				((Object) mixViewData).setDownloadThread(new Thread(mixViewData
-//						.getMixContext().getDownloadManager()));
-//
-//				// @TODO Syncronize DownloadManager, call Start instead of run.
-//
-//				mixViewData.getMixContext().getDownloadManager().run();
-//			}
-//
-//		} catch (Exception ex) {
-//			Log.e(TAG,
-//					"MixView - refreshDownload - Error refreshing DownloadManager");
-//		}
-	}
-
+	/* ************ Handlers *************/
 
 	public void doError(Exception ex1) {
 		if (!fError) {
@@ -879,17 +916,18 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return getMixViewData().getMyZoomBar() != null
 				&& getMixViewData().getMyZoomBar().getVisibility() == View.VISIBLE;
 	}
-
+	
 	public String getZoomLevel() {
 		return getMixViewData().getZoomLevel();
 	}
-
+	
 	/**
 	 * @return the dWindow
 	 */
 	static PaintScreen getdWindow() {
 		return dWindow;
 	}
+
 
 	/**
 	 * @param dWindow
@@ -898,6 +936,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	static void setdWindow(PaintScreen dWindow) {
 		MixView.dWindow = dWindow;
 	}
+
 
 	/**
 	 * @return the dataView
@@ -914,6 +953,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		MixView.dataView = dataView;
 	}
 
+
 	public int getZoomProgress() {
 		return getMixViewData().getZoomProgress();
 	}
@@ -922,12 +962,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		float myout = calcZoomLevel();
 
 		getDataView().setRadius(myout);
+		//caller has the to control of zoombar visibility, not setzoom
+		//mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);
+		mixViewData.setZoomLevel(String.valueOf(myout));
+		//setZoomLevel, caller has to call refreash download if needed.
+//		mixViewData.setDownloadThread(new Thread(mixViewData.getMixContext().getDownloadManager()));
+//		mixViewData.getDownloadThread().start();
 
-		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
-		getMixViewData().setZoomLevel(String.valueOf(myout));
-
-		getDataView().doStart();
-		getDataView().clearEvents();
 
 		getMixViewData().getMixContext().getDownloadManager().switchOn();
 
@@ -935,9 +976,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 }
 
+
 /**
  * @author daniele
- * 
+ *
  */
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 	MixView app;
@@ -1010,6 +1052,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 			ex.printStackTrace();
 		}
 	}
+
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		try {
