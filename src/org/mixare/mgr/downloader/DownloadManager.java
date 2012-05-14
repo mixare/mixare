@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare;
+package org.mixare.mgr.downloader;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
+import org.mixare.MixContext;
+import org.mixare.MixView;
 import org.mixare.data.DataSource;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
@@ -47,6 +49,7 @@ public class DownloadManager implements Runnable {
 	private String currJobId = null;
 
 	MixContext ctx;
+	private Thread downloadThread;
 
 	public DownloadManager(MixContext ctx) {
 		this.ctx = ctx;
@@ -125,7 +128,7 @@ public class DownloadManager implements Runnable {
 	private DownloadResult processRequest(DownloadRequest request) {
 		DownloadResult result = new DownloadResult();
 		// assume an error until everything is fine
-		result.error = true;
+		result.setError(true);
 		try {
 			if (ctx != null
 					&& request != null
@@ -141,28 +144,25 @@ public class DownloadManager implements Runnable {
 						request.source.getUrl(), tmp, request.source);
 				result.setMarkers(markers);
 
-				result.source = request.source;
-				result.error = false;
-				result.errorMsg = null;
+				result.setDataSource(request.source);
+				result.setError(false);
 				ctx.returnHttpInputStream(is);
 				is = null;
 			}
 		} catch (Exception ex) {
-			result.errorMsg = ex.getMessage();
-			result.errorRequest = request;
-
+			result.setError(ex,request);
 			try {
 				ctx.returnHttpInputStream(is);
 			} catch (Exception ignore) {
-			}
 
+			}
 			ex.printStackTrace();
 		}
-
 		currJobId = null;
-
 		return result;
 	}
+
+
 
 	public synchronized void purgeLists() {
 		todoList.clear();
@@ -235,30 +235,11 @@ public class DownloadManager implements Runnable {
 	public Boolean isDone() {
 		return todoList.isEmpty();
 	}
-}
 
-class DownloadRequest {
-
-	public DataSource source;
-	String params;
-
-}
-
-class DownloadResult {
-	public DataSource source;
-	String params;
-	List<Marker> markers;
-
-	boolean error;
-	String errorMsg = "";
-	DownloadRequest errorRequest;
-
-	public List<Marker> getMarkers() {
-		return markers;
+	public void goOnline() {
+		 downloadThread = new Thread(this);
+		downloadThread.start();
 	}
-
-	public void setMarkers(List<Marker> markers) {
-		this.markers = markers;
-	}
-
 }
+
+

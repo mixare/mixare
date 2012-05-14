@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.location;
+package org.mixare.mgr.location;
 
 import org.mixare.DataView;
-import org.mixare.DownloadManager;
 import org.mixare.MixContext;
 import org.mixare.MixMap;
 import org.mixare.MixView;
 import org.mixare.R;
 import org.mixare.R.string;
+import org.mixare.mgr.downloader.DownloadManager;
 
 import com.google.android.maps.GeoPoint;
 
@@ -58,8 +58,7 @@ public class LocationFinder {
 	private final long freq = 5000; // 5 seconds
 	private final float dist = 20; // 20 meters
 
-	public LocationFinder(DownloadManager downloadManager, MixView mixView){
-		this.downloadManager = downloadManager;
+	public LocationFinder(MixView mixView){
 		this.mixView = mixView;
 	}
 

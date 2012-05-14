@@ -39,6 +39,9 @@ import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Camera;
+import org.mixare.mgr.downloader.DownloadManager;
+import org.mixare.mgr.downloader.DownloadRequest;
+import org.mixare.mgr.downloader.DownloadResult;
 
 import android.graphics.Color;
 import android.location.Location;
@@ -223,7 +226,7 @@ public class DataView {
 		DownloadRequest request = new DownloadRequest();
 		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
 		request.params = "";
-		mixContext.setAllDataSourcesforLauncher(request.source);
+		mixContext.getDataSourceManager().setAllDataSourcesforLauncher(request.source);
 		mixContext.getDownloader().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
@@ -254,7 +257,7 @@ public class DataView {
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				ArrayList<DataSource> allDataSources = mixContext.getAllDataSources();
+				ArrayList<DataSource> allDataSources = mixContext.getDataSourceManager().getAllDataSources();
 				for(DataSource ds: allDataSources) {
 					/*when type is OpenStreetMap
 					 * iterate the URL list and for selected URL send data request 
@@ -279,14 +282,14 @@ public class DataView {
 			
 			while((dRes=dm.getNextResult())!=null)
 			{
-				if (dRes.error && retry < 3) {
+				if (dRes.isError() && retry < 3) {
 					retry++;
-					mixContext.getDownloader().submitJob(dRes.errorRequest);
+					mixContext.getDownloader().submitJob(dRes.getErrorRequest());
 					// Notification
 					//Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}
 				
-				if(!dRes.error) {
+				if(!dRes.isError()) {
 					if(dRes.getMarkers() != null){
 						//jLayer = (DataHandler) dRes.obj;
 						Log.i(MixView.TAG,"Adding Markers");
@@ -294,7 +297,7 @@ public class DataView {
 						dataHandler.addMarkers(dRes.getMarkers());
 						dataHandler.onLocationChanged(curFix);
 						// Notification
-						Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
+						Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.getDataSource().getName(), Toast.LENGTH_SHORT).show();
 					}
 				}
 			}

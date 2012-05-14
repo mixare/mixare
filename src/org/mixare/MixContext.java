@@ -45,7 +45,10 @@ import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.render.Matrix;
-import org.mixare.location.LocationFinder;
+import org.mixare.mgr.datasource.DataSourceManager;
+import org.mixare.mgr.datasource.DataSourceMgrImpl;
+import org.mixare.mgr.downloader.DownloadManager;
+import org.mixare.mgr.location.LocationFinder;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -77,64 +80,36 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	public static final String TAG = "Mixare";
 
 	private MixView mixView;
-
-	private Context ctx;
 	
 	private DownloadManager downloadManager;
 
 	private Matrix rotationM = new Matrix();
 
-	private ArrayList<DataSource> allDataSources = new ArrayList<DataSource>();
+	
 
 	/** Responsible for all location tasks */
 	private LocationFinder locationFinder;
 	
-	public ArrayList<DataSource> getAllDataSources() {
-		return this.allDataSources;
-	}
+	/** Responsible for data Source Management */
+	private DataSourceManager dataSourceManager;
+	
 
-	public void setAllDataSourcesforLauncher(DataSource datasource) {
-		this.allDataSources.clear();
-		this.allDataSources.add(datasource);
-	}
-
-	public void refreshDataSources() {
-		this.allDataSources.clear();
-
-		DataSourceStorage.getInstance(this).fillDefaultDataSources();
-
-		int size = DataSourceStorage.getInstance().getSize();
-
-		// copy the value from shared preference to adapter
-		for (int i = 0; i < size; i++) {
-			String fields[] = DataSourceStorage.getInstance().getFields(i);
-			this.allDataSources.add(new DataSource(fields[0], fields[1],
-					fields[2], fields[3], fields[4]));
-		}
-	}
 
 	public MixContext(Context appCtx) {
-
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
-		this.ctx = appCtx.getApplicationContext();
+		
+		getDataSourceManager().refreshDataSources();
 
-		refreshDataSources();
-
-		boolean atLeastOneDatasourceSelected = false;
-
-		for (DataSource ds : this.allDataSources) {
-			if (ds.getEnabled())
-				atLeastOneDatasourceSelected = true;
-		}
-
-		if (!atLeastOneDatasourceSelected) {
+		if (!getDataSourceManager().isAtLeastOneDatasourceSelected()) {
 			rotationM.toIdentity();
 		}
 		
-		locationFinder = new LocationFinder(downloadManager, mixView);
-		locationFinder.findLocation(this);
+		getLocationFinder().findLocation(this);
 	}
+	
+	
+	
 
 	public DownloadManager getDownloader() {
 		return downloadManager;
@@ -351,15 +326,8 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	public void loadMixViewWebPage(String url) throws Exception {
 		loadWebPage(url, mixView);
 	}
-	
-	public DownloadManager getDownloadManager() {
-		return downloadManager;
-	}
 
-	public void setDownloadManager(DownloadManager downloadManager) {
-		this.downloadManager = downloadManager;
-		locationFinder.setDownloadManager(downloadManager);
-	}
+
 	
 	/**
 	 * Shows a webpage with the given url if a markerobject is selected
@@ -452,6 +420,30 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		synchronized (rotationM) {
 			rotationM.set(smoothR);
 		}
+	}
+	
+	
+	public DataSourceManager getDataSourceManager(){
+		if (this.dataSourceManager == null){
+			dataSourceManager= new DataSourceMgrImpl(mixView);
+		}
+		return dataSourceManager;
+	}
+	
+	public LocationFinder getLocationFinder(){
+		if (this.locationFinder == null){
+			locationFinder= new LocationFinder(this.mixView);
+		}
+		return locationFinder;
+	}
+	
+	
+	public DownloadManager getDownloadManager(){
+		if (this.downloadManager == null){
+			downloadManager= new DownloadManager(this);
+			getLocationFinder().setDownloadManager(downloadManager);
+		}
+		return downloadManager;
 	}
 
 }

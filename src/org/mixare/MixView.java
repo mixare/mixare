@@ -89,7 +89,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private MixContext mixContext;
 	static PaintScreen dWindow;
 	static DataView dataView;
-	private Thread downloadThread;
+	//private Thread downloadThread;
 
 	private float RTmp[] = new float[9];
 	private float Rot[] = new float[9];
@@ -254,7 +254,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			if (!isInited) {
 				mixContext = new MixContext(this);
-				mixContext.setDownloadManager(new DownloadManager(mixContext));
 				dWindow = new PaintScreen();
 				dataView = new DataView(mixContext);
 
@@ -372,7 +371,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			dataView.clearEvents();
 
 
-			mixContext.refreshDataSources();
+			mixContext.getDataSourceManager().refreshDataSources();
 
 			float angleX, angleY;
 
@@ -440,8 +439,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			downloadThread = new Thread(mixContext.getDownloadManager());
-			downloadThread.start();
+			mixContext.getDownloadManager().goOnline();
+
 		} catch (Exception ex) {
 			doError(ex);
 			try {
@@ -616,9 +615,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		dataView.doStart();
 		dataView.clearEvents();
-		downloadThread = new Thread(mixContext.getDownloadManager());
-		downloadThread.start();
-
+	    mixContext.getDownloadManager().goOnline();
 	};
 
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
