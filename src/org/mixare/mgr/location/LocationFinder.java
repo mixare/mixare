@@ -23,12 +23,12 @@ import org.mixare.MixContext;
 import org.mixare.MixMap;
 import org.mixare.MixView;
 import org.mixare.R;
-import org.mixare.R.string;
 import org.mixare.mgr.downloader.DownloadManager;
 
 import com.google.android.maps.GeoPoint;
 
 import android.content.Context;
+import android.hardware.GeomagneticField;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -46,7 +46,7 @@ public class LocationFinder {
 	private LocationManager lm;
 	private String bestLocationProvider;
 	private DownloadManager downloadManager;
-	private MixView mixView;
+	private MixContext mixContext;
 	private Location curLoc;
 	private Location locationAtLastDownload;
 
@@ -58,8 +58,10 @@ public class LocationFinder {
 	private final long freq = 5000; // 5 seconds
 	private final float dist = 20; // 20 meters
 
-	public LocationFinder(MixView mixView){
-		this.mixView = mixView;
+	
+	public LocationFinder(MixContext mixContext){
+		// TODO: check access of download manager
+		this.mixContext = mixContext;
 	}
 
 	public Location findLocation(Context ctx) {
@@ -114,9 +116,13 @@ public class LocationFinder {
 			lm = null;
 		}
 	}
-
+	
+	/**
+	 * Returns the current location.
+	 */
 	public Location getCurrentLocation() {
 		if(curLoc == null){
+			MixView mixView = mixContext.getActualMixView();
 			Toast.makeText(mixView, mixView.getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
 			throw new RuntimeException("No GPS Found");
 		}
@@ -142,7 +148,7 @@ public class LocationFinder {
 					synchronized (curLoc) {
 						curLoc = location;
 					}
-					mixView.repaint();
+					mixContext.getActualMixView().repaint();
 					Location lastLoc=getLocationAtLastDownload();
 					if(lastLoc==null)
 						setLocationAtLastDownload(location);
@@ -158,12 +164,22 @@ public class LocationFinder {
 		return locationAtLastDownload;
 	}
 
+	/**
+	 * Sets the property to the location with the last successfull download.
+	 */
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
 
 	public void setDownloadManager(DownloadManager downloadManager) {
 		this.downloadManager = downloadManager;
+	}
+
+	public GeomagneticField getGeomagneticField() {
+		Location location = getCurrentLocation();
+		GeomagneticField gmf = new GeomagneticField((float) location.getLatitude(), (float) location.getLongitude(),
+				(float) location.getAltitude(), System.currentTimeMillis());
+		return gmf;
 	}
 
 

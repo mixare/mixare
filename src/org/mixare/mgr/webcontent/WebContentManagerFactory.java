@@ -1,5 +1,5 @@
 /*
- * Copyleft 2012 - Peer internet solutions & Alessandro Staniscia
+ * Copyleft 2012 - Alessandro Staniscia
  * 
  * This file is part of mixare.
  * 
@@ -16,20 +16,22 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.mgr.datasource;
+package org.mixare.mgr.webcontent;
 
-import java.util.ArrayList;
+import org.mixare.MixContext;
 
-import org.mixare.data.DataSource;
-
-public interface DataSourceManager {
-	
-	boolean isAtLeastOneDatasourceSelected();
-
-	void refreshDataSources();
-
-	void setAllDataSourcesforLauncher(DataSource source);
-
-	ArrayList<DataSource> getAllDataSources();
+/**
+ * Factory Of  WebContentManager
+ *
+ */
+public class WebContentManagerFactory {
+	/**
+	 * Hide implementation Of WebContentManager
+	 * @param mixContext
+	 * @return WebContentManager
+	 */
+	public static WebContentManager makeWebContentManager(MixContext mixContext){
+		return new WebPageMgrImpl(mixContext);
+	}
 
 }

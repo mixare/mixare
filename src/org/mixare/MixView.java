@@ -341,8 +341,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				sensorMgr.unregisterListener(this, sensorMag);
 				sensorMgr = null;
 
-				mixContext.unregisterLocationManager();
-				mixContext.getDownloadManager().stop();
+				mixContext.getLocationFinder().unregisterLocationManager();
+				mixContext.getDownloadManager().switchOff();
 
 				if(dataView != null){
 					dataView.cancelRefreshTimer();
@@ -427,11 +427,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			try {
 
-				GeomagneticField gmf = new GeomagneticField((float) mixContext.getCurrentLocation()
-						.getLatitude(), (float) mixContext.getCurrentLocation().getLongitude(),
-						(float) mixContext.getCurrentLocation().getAltitude(), System
-						.currentTimeMillis());
 
+
+				GeomagneticField gmf =  mixContext.getLocationFinder().getGeomagneticField();
 				angleY = (float) Math.toRadians(-gmf.getDeclination());
 				m4.set((float) FloatMath.cos(angleY), 0f,
 						(float) FloatMath.sin(angleY), 0f, 1f, 0f, (float) -FloatMath
@@ -439,7 +437,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			mixContext.getDownloadManager().goOnline();
+			mixContext.getDownloadManager().switchOn();
 
 		} catch (Exception ex) {
 			doError(ex);
@@ -451,9 +449,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				}
 
 				if (mixContext != null) {
-					mixContext.unregisterLocationManager();
+					mixContext.getLocationFinder().unregisterLocationManager();
 					if (mixContext.getDownloadManager() != null)
-						mixContext.getDownloadManager().stop();
+						mixContext.getDownloadManager().switchOff();
 				}
 			} catch (Exception ignore) {
 			}
@@ -542,7 +540,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			break;
 			/*GPS Information*/
 		case 6:
-			Location currentGPSInfo = mixContext.getCurrentLocation();
+			Location currentGPSInfo = mixContext.getLocationFinder().getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
 					getString(DataView.GPS_LONGITUDE) + currentGPSInfo.getLongitude() + "\n" +
@@ -615,7 +613,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		dataView.doStart();
 		dataView.clearEvents();
-	    mixContext.getDownloadManager().goOnline();
+	    mixContext.getDownloadManager().switchOn();
 	};
 
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {

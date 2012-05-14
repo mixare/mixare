@@ -1,5 +1,5 @@
 /*
- * Copyleft 2012 - Peer internet solutions & Alessandro Staniscia
+ * Copyright (C) 2012- Peer internet solutions 
  * 
  * This file is part of mixare.
  * 
@@ -16,20 +16,28 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.mgr.datasource;
+package org.mixare.mgr.webcontent;
 
-import java.util.ArrayList;
+import android.content.Context;
 
-import org.mixare.data.DataSource;
+public interface WebContentManager {
 
-public interface DataSourceManager {
-	
-	boolean isAtLeastOneDatasourceSelected();
+	/**
+	 * Shows a webpage with the given url if a markerobject is selected
+	 * (mixlistview, mixoverlay).
+	 */
+	void loadWebPage(String url, Context context) throws Exception;
 
-	void refreshDataSources();
-
-	void setAllDataSourcesforLauncher(DataSource source);
-
-	ArrayList<DataSource> getAllDataSources();
+	/**
+	 * Checks if the url can be opened by another intent activity, instead of
+	 * the webview This method searches for possible intents that can be used
+	 * instead. I.E. a mp3 file can be forwarded to a mediaplayer.
+	 * 
+	 * @param url
+	 *            the url to process
+	 * @param view
+	 * @return
+	 */
+	boolean processUrl(String url, Context ctx);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyleft 2012 - Peer internet solutions & Alessandro Staniscia
+ * Copyleft 2012 - Alessandro Staniscia
  * 
  * This file is part of mixare.
  * 
@@ -18,18 +18,15 @@
  */
 package org.mixare.mgr.datasource;
 
-import java.util.ArrayList;
+import android.content.Context;
 
-import org.mixare.data.DataSource;
-
-public interface DataSourceManager {
-	
-	boolean isAtLeastOneDatasourceSelected();
-
-	void refreshDataSources();
-
-	void setAllDataSourcesforLauncher(DataSource source);
-
-	ArrayList<DataSource> getAllDataSources();
-
+public class DataSourceManagerFactory {
+	/**
+	 * Hide implementation Of DataSourceManager
+	 * @param context
+	 * @return DataSourceManager
+	 */
+	public static DataSourceManager makeDataSourceManager(Context ctx){
+		return new DataSourceMgrImpl(ctx);
+	}
 }

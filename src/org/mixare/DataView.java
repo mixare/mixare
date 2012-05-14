@@ -194,7 +194,7 @@ public class DataView {
 
 	public void doStart() {
 		state.nextLStatus = MixState.NOT_STARTED;
-		mixContext.setLocationAtLastDownload(curFix);
+		mixContext.getLocationFinder().setLocationAtLastDownload(curFix);
 	}
 
 	public boolean isInited() {
@@ -227,7 +227,7 @@ public class DataView {
 		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
 		request.params = "";
 		mixContext.getDataSourceManager().setAllDataSourcesforLauncher(request.source);
-		mixContext.getDownloader().submitJob(request);
+		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
@@ -237,13 +237,13 @@ public class DataView {
 		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
 		request.source = datasource;
 		
-		mixContext.getDownloader().submitJob(request);
+		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
-		curFix = mixContext.getCurrentLocation();
+		curFix = mixContext.getLocationFinder().getCurrentLocation();
 
 		state.calcPitchBearing(cam.transform);
 
@@ -277,14 +277,14 @@ public class DataView {
 
 		
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			DownloadManager dm=mixContext.getDownloader();
+			DownloadManager dm=mixContext.getDownloadManager();
 			DownloadResult dRes;
 			
 			while((dRes=dm.getNextResult())!=null)
 			{
 				if (dRes.isError() && retry < 3) {
 					retry++;
-					mixContext.getDownloader().submitJob(dRes.getErrorRequest());
+					mixContext.getDownloadManager().submitJob(dRes.getErrorRequest());
 					// Notification
 					//Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}

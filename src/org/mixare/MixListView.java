@@ -216,7 +216,7 @@ public class MixListView extends ListActivity {
 			try {
 				if (selectedURL.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(selectedURL);
-					dataView.getContext().loadWebPage(newUrl, this);
+					dataView.getContext().getWebContentManager().loadWebPage(newUrl, this);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
