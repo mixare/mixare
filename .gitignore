@@ -2,3 +2,14 @@
 /gen
 /.sonar
 sonar-project.properties
+.classpath
+project.properties
+settings/
+
+#External tools
+.externalToolBuilders
+
+#launch
+.launch
+
+.buildpath

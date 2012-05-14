@@ -57,6 +57,7 @@ public class DataView {
 
 	/**current context */
 	private MixContext mixContext;
+
 	/** is the view Inited? */
 	private boolean isInit;
 	
@@ -82,58 +83,58 @@ public class DataView {
 	private Timer refresh = null;
 	private final long refreshDelay = 45 * 1000; //refresh every 45 seconds
 	
-	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
-	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
-	public static final int OPTION_NOT_AVAILABLE_STRING_ID = R.string.option_not_available;
-	public static final int EMPTY_LIST_STRIG_ID = R.string.empty_list;
-	public static final int MENU_ITEM_1 = R.string.menu_item_1;
-	public static final int MENU_ITEM_2 = R.string.menu_item_2;
-	public static final int MENU_ITEM_3 = R.string.menu_item_3;
-	public static final int MENU_ITEM_4 = R.string.menu_item_4;
-	public static final int MENU_ITEM_5 = R.string.menu_item_5;
-	public static final int MENU_ITEM_6 = R.string.menu_item_6;
-	public static final int MENU_ITEM_7 = R.string.menu_item_7;
-
-	public static final int CONNECTION_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
-	public static final int CONNECTION_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
-	public static final int CONNECTION_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
-	public static final int CONNECTION_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
-	
-	public static final int CONNECTION_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
-	public static final int CONNECTION_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
-	public static final int CONNECTION_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
-
-	/*if in the listview option for a specific title no website is provided*/
-	public static final int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
-	public static final int LICENSE_TEXT = R.string.license;
-	public static final int LICENSE_TITLE = R.string.license_title;
-	public static final int CLOSE_BUTTON = R.string.close_button;
-	
-	/*Strings for general information*/
-	public static final int GENERAL_INFO_TITLE = R.string.general_info_title;
-	public static final int GENERAL_INFO_TEXT = R.string.general_info_text;
-	public static final int GPS_LONGITUDE = R.string.longitude;
-	public static final int GPS_LATITUDE = R.string.latitude;
-	public static final int GPS_ALTITUDE = R.string.altitude;
-	public static final int GPS_SPEED = R.string.speed;
-	public static final int GPS_ACCURACY = R.string.accuracy;
-	public static final int GPS_LAST_FIX = R.string.gps_last_fix;
-
-	public static final int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
-	public static final int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
-	public static final int MENU_CAM_MODE = R.string.map_menu_cam_mode;
-	public static final int MAP_TOGGLE_PATH_ON = R.string.map_toggle_path_on;
-	public static final int MAP_TOGGLE_PATH_OFF = R.string.map_toggle_path_off;
-	public static final int MAP_MY_LOCATION = R.string.map_my_location;
-	public static final int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
-
-	public static final int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
-	public static final int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
-	public static final int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
-	public static final int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
-	public static final int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;
-	public static final int SEARCH_ACTIVE_1=R.string.search_active_1;
-	public static final int SEARCH_ACTIVE_2=R.string.search_active_2;
+	//There is no need for duplicate fields, they are already stored in R
+	//http://developer.android.com/guid/topics/resources/accessing-resources.html
+//	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
+//	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;
+//	public static final int OPTION_NOT_AVAILABLE_STRING_ID = R.string.option_not_available;
+//	public static final int EMPTY_LIST_STRIG_ID = R.string.empty_list;
+//	public static final int MENU_ITEM_1 = R.string.menu_item_1;
+//	public static final int MENU_ITEM_2 = R.string.menu_item_2;
+//	public static final int MENU_ITEM_3 = R.string.menu_item_3;
+//	public static final int MENU_ITEM_4 = R.string.menu_item_4;
+//	public static final int MENU_ITEM_5 = R.string.menu_item_5;
+//	public static final int MENU_ITEM_6 = R.string.menu_item_6;
+//	public static final int MENU_ITEM_7 = R.string.menu_item_7;
+//
+//	public static final int CONNECTION_ERROR_DIALOG_TEXT = R.string.connection_error_dialog;
+//	public static final int CONNECTION_ERROR_DIALOG_BUTTON1 = R.string.connection_error_dialog_button1;
+//	public static final int CONNECTION_ERROR_DIALOG_BUTTON2 = R.string.connection_error_dialog_button2;
+//	public static final int CONNECTION_ERROR_DIALOG_BUTTON3 = R.string.connection_error_dialog_button3;
+//	
+//	public static final int CONNECTION_GPS_DIALOG_TEXT = R.string.connection_GPS_dialog_text;
+//	public static final int CONNECTION_GPS_DIALOG_BUTTON1 = R.string.connection_GPS_dialog_button1;
+//	public static final int CONNECTION_GPS_DIALOG_BUTTON2 = R.string.connection_GPS_dialog_button2;
+//
+//	/*if in the listview option for a specific title no website is provided*/
+//	public static final int NO_WEBINFO_AVAILABLE = R.string.no_website_available;
+//	public static final int LICENSE_TEXT = R.string.license;
+//	public static final int LICENSE_TITLE = R.string.license_title;
+//	public static final int CLOSE_BUTTON = R.string.close_button;
+//	
+//	/*Strings for general information*/
+//	public static final int GENERAL_INFO_TITLE = R.string.general_info_title;
+//	public static final int GENERAL_INFO_TEXT = R.string.general_info_text;
+//	public static final int GPS_LONGITUDE = R.string.longitude;
+//	public static final int GPS_LATITUDE = R.string.latitude;
+//	public static final int GPS_ALTITUDE = R.string.altitude;
+//	public static final int GPS_SPEED = R.string.speed;
+//	public static final int GPS_ACCURACY = R.string.accuracy;
+//	public static final int GPS_LAST_FIX = R.string.gps_last_fix;
+//
+//	public static final int MAP_MENU_NORMAL_MODE = R.string.map_menu_normal_mode;
+//	public static final int MAP_MENU_SATELLITE_MODE = R.string.map_menu_satellite_mode;
+//	public static final int MENU_CAM_MODE = R.string.map_menu_cam_mode;
+//	public static final int MAP_MY_LOCATION = R.string.map_my_location;
+//	public static final int MAP_CURRENT_LOCATION_CLICK = R.string.map_current_location_click;
+//
+//	public static final int DATA_SOURCE_CHANGE_WIKIPEDIA = R.string.data_source_change_wikipedia;
+//	public static final int DATA_SOURCE_CHANGE_TWITTER = R.string.data_source_change_twitter;
+//	public static final int DATA_SOURCE_CHANGE_OSM = R.string.data_source_change_osm;
+//	public static final int SEARCH_FAILED_NOTIFICATION = R.string.search_failed_notification;
+//	public static final int SOURCE_OPENSTREETMAP=R.string.source_openstreetmap;
+//	public static final int SEARCH_ACTIVE_1=R.string.search_active_1;
+//	public static final int SEARCH_ACTIVE_2=R.string.search_active_2;
 		
 	private boolean isLauncherStarted;
 	
@@ -155,6 +156,10 @@ public class DataView {
 	
 	public MixContext getContext() {
 		return mixContext;
+	}
+	
+	public void setMixContext(MixContext mixContext) {
+		this.mixContext = mixContext;
 	}
 
 	public boolean isLauncherStarted() {
@@ -224,7 +229,7 @@ public class DataView {
 		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
 		request.params = "";
 		mixContext.setAllDataSourcesforLauncher(request.source);
-		mixContext.getDownloader().submitJob(request);
+		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
@@ -234,7 +239,7 @@ public class DataView {
 		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
 		request.source = datasource;
 		
-		mixContext.getDownloader().submitJob(request);
+		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
@@ -274,28 +279,26 @@ public class DataView {
 
 		
 		} else if (state.nextLStatus == MixState.PROCESSING) {
-			DownloadManager dm=mixContext.getDownloader();
+			DownloadManager dm=mixContext.getDownloadManager();
 			DownloadResult dRes;
 			
 			while((dRes=dm.getNextResult())!=null)
 			{
 				if (dRes.error && retry < 3) {
 					retry++;
-					mixContext.getDownloader().submitJob(dRes.errorRequest);
+					mixContext.getDownloadManager().submitJob(dRes.errorRequest);
 					// Notification
 					//Toast.makeText(mixContext, dRes.errorMsg, Toast.LENGTH_SHORT).show();
 				}
 				
 				if(!dRes.error) {
-					if(dRes.getMarkers() != null){
-						//jLayer = (DataHandler) dRes.obj;
-						Log.i(MixView.TAG,"Adding Markers");
-	
-						dataHandler.addMarkers(dRes.getMarkers());
-						dataHandler.onLocationChanged(curFix);
-						// Notification
-						Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
-					}
+					//jLayer = (DataHandler) dRes.obj;
+					Log.i(MixView.TAG,"Adding Markers");
+					dataHandler.addMarkers(dRes.getMarkers());
+					dataHandler.onLocationChanged(curFix);
+					// Notification
+					Toast.makeText(mixContext, mixContext.getResources().getString(R.string.download_received) +" "+ dRes.source.getName(), Toast.LENGTH_SHORT).show();
+
 				}
 			}
 			if(dm.isDone()) {

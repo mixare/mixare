@@ -27,8 +27,10 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -92,6 +94,34 @@ public class DataSourceList extends ListActivity {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * KeyEven Handler.
+	 * Handles
+	 * -Back button (closes the activity)
+	 */
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		try{
+			if (keyCode == KeyEvent.KEYCODE_BACK){
+				closeDSListActivity();
+			}else{
+				return false;
+			}
+		}catch (Exception ex){
+			Log.w("Mixare", "DSL key undefined");
+		}
+		return true;
+	}
+	
+	/**
+	 * Closes DataSourceList Activity and returns that request to refresh screen.
+	 */
+	private void closeDSListActivity() {
+		Intent closeDSList = new Intent();
+		closeDSList.putExtra("RefreshScreen", true);
+		setResult(RESULT_OK, closeDSList);
+		finish();
+	}
 	//TODO: check if it's really needed
 	public static String getDataSourcesStringList() {
 		String ret="";
@@ -109,6 +139,7 @@ public class DataSourceList extends ListActivity {
 
 		return ret;
 	}
+	
 	private class DataSourceAdapter extends BaseAdapter implements
 	OnCheckedChangeListener {
 

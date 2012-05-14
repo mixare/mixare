@@ -147,6 +147,7 @@ public class DataSource extends Activity{
 		this.display = displayEnum;
 		this.enabled = enabled;
 	}
+	
 	public DataSource(String name, String url, String typeString, String displayString, String enabledString) {
 		TYPE typeEnum = TYPE.values()[Integer.parseInt(typeString)];
 		DISPLAY displayEnum = DISPLAY.values()[Integer.parseInt(displayString)];
