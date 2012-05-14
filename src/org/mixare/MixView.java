@@ -367,7 +367,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			this.mWakeLock.acquire();
 
 			killOnError();
-			mixContext.mixView = this;
+			mixContext.doResume(this);
 			dataView.doStart();
 			dataView.clearEvents();
 
@@ -706,9 +706,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 			smoothR.mult(1 / (float) histR.length);
 
-			synchronized (mixContext.rotationM) {
-				mixContext.rotationM.set(smoothR);
-			}
+			mixContext.updateSmoothRotation(smoothR);
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

@@ -45,6 +45,7 @@ import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.render.Matrix;
+import org.mixare.location.LocationFinder;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -75,13 +76,13 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	// TAG for logging
 	public static final String TAG = "Mixare";
 
-	public MixView mixView;
+	private MixView mixView;
 
-	public Context ctx;
+	private Context ctx;
 	
 	private DownloadManager downloadManager;
 
-	public Matrix rotationM = new Matrix();
+	private Matrix rotationM = new Matrix();
 
 	private ArrayList<DataSource> allDataSources = new ArrayList<DataSource>();
 
@@ -440,6 +441,17 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		intent.setData(Uri.parse(url));
 		return packageManager.queryIntentActivities(intent,
 				PackageManager.GET_RESOLVED_FILTER);
+	}
+
+	public void doResume(MixView mixView) {
+		this.mixView = mixView;
+		
+	}
+
+	public void updateSmoothRotation(Matrix smoothR) {
+		synchronized (rotationM) {
+			rotationM.set(smoothR);
+		}
 	}
 
 }
