@@ -209,8 +209,7 @@ class LocationMgrImpl implements LocationFinder {
 
 	@Override
 	public LocationFinderState getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return state;
 	}
 	
 	private synchronized LocationObserver getObserver() {

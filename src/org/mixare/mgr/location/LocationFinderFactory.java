@@ -25,6 +25,7 @@ import org.mixare.MixContext;
  *
  */
 public class LocationFinderFactory {
+	
 	/**
 	 * Hide implementation Of LocationFinder
 	 * @param mixContext

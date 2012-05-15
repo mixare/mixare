@@ -24,10 +24,19 @@ import android.content.Context;
 import android.hardware.GeomagneticField;
 import android.location.Location;
 
+/**
+ * This class is repsonsible for finding the location, and sending it back to
+ * the mixcontext. It will also
+ */
 public interface LocationFinder {
 
-	enum LocationFinderState {
-		Active, Inactive, Confused
+	/**
+	 * Possible status of LocationFinder
+	 */
+	public enum LocationFinderState {
+		Active, // Providing Location Information
+		Inactive, // No-Active
+		Confused // Same problem in internal state
 	}
 
 	Location findLocation(Context ctx);
@@ -37,6 +46,11 @@ public interface LocationFinder {
 	 */
 	Location getCurrentLocation();
 
+	/**
+	 * ?
+	 * 
+	 * @return
+	 */
 	Location getLocationAtLastDownload();
 
 	/**
@@ -44,14 +58,34 @@ public interface LocationFinder {
 	 */
 	void setLocationAtLastDownload(Location locationAtLastDownload);
 
+	/**
+	 * Set the DownloadManager manager at this service
+	 * 
+	 * @param downloadManager
+	 */
 	void setDownloadManager(DownloadManager downloadManager);
 
+	/**
+	 * Request to active the service
+	 */
 	void switchOn();
 
+	/**
+	 * Request to deactive the service
+	 */
 	void switchOff();
 
+	/**
+	 * Status of service
+	 * 
+	 * @return
+	 */
 	LocationFinderState getStatus();
 
+	/**
+	 * 
+	 * @return GeomagneticField
+	 */
 	GeomagneticField getGeomagneticField();
 
 }

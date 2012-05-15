@@ -18,25 +18,26 @@
  */
 package org.mixare.mgr.datasource;
 
-import java.util.ArrayList;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.mixare.MixContext;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceStorage;
-
-import android.content.Context;
+import org.mixare.mgr.downloader.DownloadRequest;
 
 class DataSourceMgrImpl implements DataSourceManager {
+
+	private final ConcurrentLinkedQueue<DataSource> allDataSources=new ConcurrentLinkedQueue<DataSource>(); 
 	
-	private ArrayList<DataSource> allDataSources = new ArrayList<DataSource>();
-	
-	private Context ctx;
-	
-	public DataSourceMgrImpl(Context ctx){
-		this.ctx=ctx;
+	private final MixContext ctx;
+
+	public DataSourceMgrImpl(MixContext ctx) {
+		this.ctx = ctx;
 	}
-	
+
 	@Override
-	public boolean isAtLeastOneDatasourceSelected(){
+	public boolean isAtLeastOneDatasourceSelected() {
 		boolean atLeastOneDatasourceSelected = false;
 		for (DataSource ds : this.allDataSources) {
 			if (ds.getEnabled())
@@ -44,16 +45,14 @@ class DataSourceMgrImpl implements DataSourceManager {
 		}
 		return atLeastOneDatasourceSelected;
 	}
-	
-	public ArrayList<DataSource> getAllDataSources() {
-		return this.allDataSources;
-	}
+
+
 
 	public void setAllDataSourcesforLauncher(DataSource datasource) {
-		this.allDataSources.clear();
+		this.allDataSources.clear(); // TODO WHY? CLEAN ALL
 		this.allDataSources.add(datasource);
 	}
-	
+
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 
@@ -67,6 +66,29 @@ class DataSourceMgrImpl implements DataSourceManager {
 			this.allDataSources.add(new DataSource(fields[0], fields[1],
 					fields[2], fields[3], fields[4]));
 		}
+	}
+
+	public void requestDataFromAllActiveDataSource(double lat, double lon,
+			double alt, float radius) {
+		for (DataSource ds : allDataSources) {
+			/*
+			 * when type is OpenStreetMap iterate the URL list and for selected
+			 * URL send data request
+			 */
+			if (ds.getEnabled()) {
+				requestData(ds, lat, lon, alt, radius, Locale.getDefault()
+						.getLanguage());
+			}
+		}
+
+	}
+
+	private void requestData(DataSource datasource, double lat, double lon,
+			double alt, float radius, String locale) {
+		DownloadRequest request = new DownloadRequest(datasource,
+				datasource.createRequestParams(lat, lon, alt, radius, locale));
+		ctx.getDownloadManager().submitJob(request);
+
 	}
 
 }

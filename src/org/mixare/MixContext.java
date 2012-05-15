@@ -59,9 +59,11 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	/** Responsible for Web Content */
 	private WebContentManager webContentManager;
 
-	public MixContext(Context appCtx) {
+	public MixContext(MixView appCtx) {
 		super(appCtx);
-		this.mixView = (MixView) appCtx;
+		mixView=appCtx;
+
+		
 
 		// TODO: RE-ORDER THIS SEQUENCE... IS NECESSARY?
 		getDataSourceManager().refreshDataSources();
@@ -74,7 +76,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	}
 
 	public String getStartUrl() {
-		Intent intent = ((Activity) mixView).getIntent();
+		Intent intent = ((Activity) getActualMixView()).getIntent();
 		if (intent.getAction() != null
 				&& intent.getAction().equals(Intent.ACTION_VIEW)) {
 			return intent.getData().toString();
@@ -94,11 +96,11 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	 */
 	public void loadMixViewWebPage(String url) throws Exception {
 		// TODO: CHECK INTERFACE METHOD
-		getWebContentManager().loadWebPage(url, mixView);
+		getWebContentManager().loadWebPage(url, getActualMixView());
 	}
 
 	public void doResume(MixView mixView) {
-		this.mixView = mixView;
+		setActualMixView(mixView);
 	}
 
 	public void updateSmoothRotation(Matrix smoothR) {
@@ -139,7 +141,15 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	}
 
 	public MixView getActualMixView() {
-		return this.mixView;
+		synchronized (mixView) {
+		   return this.mixView;
+		}
+	}
+	
+	private void setActualMixView(MixView mv) {
+		synchronized (mixView) {
+		   this.mixView=mv;
+		}
 	}
 
 	public ContentResolver getContentResolver() {

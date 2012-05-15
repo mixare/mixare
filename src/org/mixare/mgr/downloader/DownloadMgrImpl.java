@@ -85,6 +85,10 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			if (request == null) {
 				throw new Exception("Request is null");
 			}
+			
+			if (!request.getSource().isWellFormed()) {
+				throw new Exception("Datasource in not WellFormed");
+			}
 
 			String pageContent = HttpTools.getPageContent(request,
 					ctx.getContentResolver());
@@ -99,7 +103,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			}
 		} catch (Exception ex) {
 			result.setError(ex, request);
-			ex.printStackTrace();
+			Log.w(MixContext.TAG, "ERROR ON DOWNLOAD REQUEST", ex);
 		}
 		return result;
 	}
@@ -109,7 +113,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	 * 
 	 * @see org.mixare.mgr.downloader.DownloadManager#purgeLists()
 	 */
-	public synchronized void purgeLists() {
+	public synchronized void resetActivity() {
 		todoList.clear();
 		doneList.clear();
 	}

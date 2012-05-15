@@ -287,4 +287,19 @@ public class DataSource extends Activity{
 		this.enabled = isChecked;
 	}
 	
+	
+	/**
+	 * Check the minimum required data
+	 * @return boolean
+	 */
+	public boolean isWellFormed(){
+		boolean out=false;
+		if (getUrl()!= null || !getUrl().isEmpty()){
+			if (getName()!= null || !getName().isEmpty()){
+				out=true;
+			}
+		}
+		return out;
+	}
+	
 }

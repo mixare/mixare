@@ -230,12 +230,8 @@ public class DataView {
 		
 	}
 
-	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
-		DownloadRequest request = new DownloadRequest(datasource, datasource.createRequestParams(lat, lon, alt, radius, locale));
-		mixContext.getDownloadManager().submitJob(request);
-		state.nextLStatus = MixState.PROCESSING;
-		
-	}
+
+	
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
 		curFix = mixContext.getLocationFinder().getCurrentLocation();
@@ -252,15 +248,8 @@ public class DataView {
 
 			else {
 				double lat = curFix.getLatitude(), lon = curFix.getLongitude(),alt = curFix.getAltitude();
-				ArrayList<DataSource> allDataSources = mixContext.getDataSourceManager().getAllDataSources();
-				for(DataSource ds: allDataSources) {
-					/*when type is OpenStreetMap
-					 * iterate the URL list and for selected URL send data request 
-					 * */
-					if (ds.getEnabled()) {
-						requestData(ds,lat, lon, alt, radius, Locale.getDefault().getLanguage());
-					}
-				}
+				state.nextLStatus = MixState.PROCESSING;
+				mixContext.getDataSourceManager().requestDataFromAllActiveDataSource(lat, lon, alt, radius);
 			}
 			
 			// if no datasources are activated

@@ -22,7 +22,6 @@ import org.mixare.MixContext;
 
 /**
  * Factory Of  WebContentManager
- *
  */
 public class WebContentManagerFactory {
 	/**

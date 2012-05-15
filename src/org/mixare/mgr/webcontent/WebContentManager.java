@@ -20,6 +20,9 @@ package org.mixare.mgr.webcontent;
 
 import android.content.Context;
 
+/**
+ * This class is repsonsible for Web Content
+ */
 public interface WebContentManager {
 
 	/**

@@ -18,15 +18,18 @@
  */
 package org.mixare.mgr.datasource;
 
-import android.content.Context;
+import org.mixare.MixContext;
 
+/**
+ * Factory Of DataSourceManager
+ */
 public class DataSourceManagerFactory {
 	/**
 	 * Hide implementation Of DataSourceManager
 	 * @param context
 	 * @return DataSourceManager
 	 */
-	public static DataSourceManager makeDataSourceManager(Context ctx){
+	public static DataSourceManager makeDataSourceManager(MixContext ctx){
 		return new DataSourceMgrImpl(ctx);
 	}
 }

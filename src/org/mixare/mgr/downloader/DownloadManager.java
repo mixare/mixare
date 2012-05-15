@@ -24,24 +24,64 @@ package org.mixare.mgr.downloader;
  */
 public interface DownloadManager {
 
+	/**
+	 * Possible state of this Manager
+	 */
 	enum DownloadManagerState {
-		OnLine, OffLine, Downloading, Confused
+		OnLine, //manage downlad request 
+		OffLine, // No OnLine
+		Downloading, //Process some Download Request
+		Confused // Internal state not congruent
 	}
 
-	void purgeLists();
+	/**
+	 * Reset all Request and Responce
+	 */
+	void resetActivity();
 
+	/**
+	 * Submit new DownloadRequest
+	 * 
+	 * @param job
+	 * @return reference Of Job
+	 */
 	String submitJob(DownloadRequest job);
 
+	/**
+	 * Get result of job if exist, null otherwise
+	 * 
+	 * @param jobId reference of Job
+	 * @return result 
+	 */
 	DownloadResult getReqResult(String jobId);
 
+	/**
+	 * Pseudo Iterator on results 
+	 * @return actual Download Result
+	 */
 	DownloadResult getNextResult();
 
+	/**
+	 * check if all Download request is done
+	 *  
+	 * @return BOOLEAN
+	 */
 	Boolean isDone();
 
+	/**
+	 * Request to active the service
+	 */
 	void switchOn();
 
+	/**
+	 * Request to deactive the service
+	 */
 	void switchOff();
 
+	/**
+	 * Request state of service
+	 * @return
+	 */
 	DownloadManagerState getState();
 
 }
