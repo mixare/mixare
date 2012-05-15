@@ -31,7 +31,13 @@
 		\n\n You should have received a copy of the GNU General Public License along with this program. 
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
-
+	
+	<string name="launch_plugins">Launch plugins?</string>
+	<string name="plugin_message">Some plugins where found, do you want to enable them?</string>
+	<string name="remember_this_decision">Remember this decision</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+		
 	<string name="menu_item_1">Data Source</string>
 	<string name="menu_item_2">List view</string>
 	<string name="menu_item_3">Map view</string>
