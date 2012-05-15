@@ -48,6 +48,8 @@
                		android:value=".MixView" />
         </activity>
         
+		<activity android:name="PluginLoaderActivity"></activity>
+		
 		<activity android:name="MixListView" 
 			android:screenOrientation="user" 
 			android:launchMode="singleTop">
@@ -69,6 +71,7 @@
 		</activity>
 		 <activity android:name=".data.DataSource" />
 		 <activity android:name=".data.DataSourceList" />
+		 
 		 
 </application>
 
