@@ -1,3 +1,9 @@
+/**
+ * A draw command that can be send by a plugin marker to draw an arrow on the client.
+ * This class extends the drawcommand, that stores the properties, so that it can be
+ * transfered to the client.
+ * @author A. Egal
+ */
 package org.mixare.lib.marker.draw;
 
 import java.text.DecimalFormat;
@@ -10,6 +16,12 @@ import org.mixare.lib.render.MixVector;
 import android.graphics.Color;
 import android.os.Parcel;
 
+/**
+ * A draw command that can be send by a plugin marker to draw an textbox on the client.
+ * This class extends the DrawCommand, that stores the properties, so that it can be
+ * transfered to the client.
+ * @author A. Egal
+ */
 public class DrawTextBox extends DrawCommand {
 
 	private static String CLASS_NAME = DrawTextBox.class.getName();
