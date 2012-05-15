@@ -25,6 +25,7 @@ import org.mixare.mgr.datasource.DataSourceManagerFactory;
 import org.mixare.mgr.downloader.DownloadManager;
 import org.mixare.mgr.downloader.DownloadManagerFactory;
 import org.mixare.mgr.location.LocationFinder;
+import org.mixare.mgr.location.LocationFinderFactory;
 import org.mixare.mgr.webcontent.WebContentManager;
 import org.mixare.mgr.webcontent.WebContentManagerFactory;
 
@@ -45,16 +46,16 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	private MixView mixView;
 
 	private Matrix rotationM = new Matrix();
-	
+
 	/** Responsible for all download */
 	private DownloadManager downloadManager;
 
 	/** Responsible for all location tasks */
 	private LocationFinder locationFinder;
-	
+
 	/** Responsible for data Source Management */
 	private DataSourceManager dataSourceManager;
-	
+
 	/** Responsible for Web Content */
 	private WebContentManager webContentManager;
 
@@ -68,10 +69,9 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		if (!getDataSourceManager().isAtLeastOneDatasourceSelected()) {
 			rotationM.toIdentity();
 		}
-		
+
 		getLocationFinder().findLocation(this);
 	}
-
 
 	public String getStartUrl() {
 		Intent intent = ((Activity) mixView).getIntent();
@@ -88,7 +88,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 			dest.set(rotationM);
 		}
 	}
-	
+
 	/**
 	 * Shows a webpage with the given url when clicked on a marker.
 	 */
@@ -106,45 +106,44 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 			rotationM.set(smoothR);
 		}
 	}
-	
-	
-	public DataSourceManager getDataSourceManager(){
-		if (this.dataSourceManager == null){
-			dataSourceManager= DataSourceManagerFactory.makeDataSourceManager(this);
+
+	public DataSourceManager getDataSourceManager() {
+		if (this.dataSourceManager == null) {
+			dataSourceManager = DataSourceManagerFactory
+					.makeDataSourceManager(this);
 		}
 		return dataSourceManager;
 	}
-	
-	public LocationFinder getLocationFinder(){
-		if (this.locationFinder == null){
-			locationFinder= new LocationFinder(this);
+
+	public LocationFinder getLocationFinder() {
+		if (this.locationFinder == null) {
+			locationFinder = LocationFinderFactory.makeLocationFinder(this);
 		}
 		return locationFinder;
 	}
-	
-	
-	public DownloadManager getDownloadManager(){
-		if (this.downloadManager == null){
-			downloadManager= DownloadManagerFactory.makeDownloadManager(this);
+
+	public DownloadManager getDownloadManager() {
+		if (this.downloadManager == null) {
+			downloadManager = DownloadManagerFactory.makeDownloadManager(this);
 			getLocationFinder().setDownloadManager(downloadManager);
 		}
 		return downloadManager;
 	}
-	
-	
-	public WebContentManager getWebContentManager(){
-		if (this.webContentManager == null){
-			webContentManager= WebContentManagerFactory.makeWebContentManager(this);
+
+	public WebContentManager getWebContentManager() {
+		if (this.webContentManager == null) {
+			webContentManager = WebContentManagerFactory
+					.makeWebContentManager(this);
 		}
 		return webContentManager;
 	}
-	
-	public MixView getActualMixView(){
+
+	public MixView getActualMixView() {
 		return this.mixView;
 	}
-	
-	public ContentResolver getContentResolver(){
+
+	public ContentResolver getContentResolver() {
 		return this.mixView.getContentResolver();
-	} 
+	}
 
 }

@@ -31,7 +31,6 @@ class DataSourceMgrImpl implements DataSourceManager {
 	
 	private Context ctx;
 	
-	
 	public DataSourceMgrImpl(Context ctx){
 		this.ctx=ctx;
 	}
@@ -39,7 +38,6 @@ class DataSourceMgrImpl implements DataSourceManager {
 	@Override
 	public boolean isAtLeastOneDatasourceSelected(){
 		boolean atLeastOneDatasourceSelected = false;
-
 		for (DataSource ds : this.allDataSources) {
 			if (ds.getEnabled())
 				atLeastOneDatasourceSelected = true;

@@ -341,7 +341,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				sensorMgr.unregisterListener(this, sensorMag);
 				sensorMgr = null;
 
-				mixContext.getLocationFinder().unregisterLocationManager();
+				mixContext.getLocationFinder().switchOff();
 				mixContext.getDownloadManager().switchOff();
 
 				if(dataView != null){
@@ -449,9 +449,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				}
 
 				if (mixContext != null) {
-					mixContext.getLocationFinder().unregisterLocationManager();
-					if (mixContext.getDownloadManager() != null)
-						mixContext.getDownloadManager().switchOff();
+					mixContext.getLocationFinder().switchOff();
+					mixContext.getDownloadManager().switchOff();
 				}
 			} catch (Exception ignore) {
 			}
