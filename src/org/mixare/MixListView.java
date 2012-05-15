@@ -88,7 +88,7 @@ public class MixListView extends ListActivity {
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//		mixCtx = MixView.ctx;
-		dataView = MixView.dataView;	
+		dataView = MixView.getDataView();	
 		ctx = this;
 		mixContext = dataView.getContext();
 
@@ -124,7 +124,7 @@ public class MixListView extends ListActivity {
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
 				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
-				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+				searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
 				searchNotificationTxt.setBackgroundColor(Color.DKGRAY);

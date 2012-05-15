@@ -91,7 +91,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dataView = MixView.dataView;
+		dataView = MixView.getDataView();
 		mixContext = dataView.getContext();
 		setMarkerList(dataView.getDataHandler().getMarkerList());
 		map = this;
@@ -111,7 +111,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		
 		if (dataView.isFrozen()){
 			searchNotificationTxt = new TextView(this);
-			searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+			searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);			
 			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
