@@ -133,6 +133,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		
 		locationFinder = new LocationFinder(downloadManager, mixView);
 		locationFinder.findLocation(this);
+
 	}
 
 	public DownloadManager getDownloader() {

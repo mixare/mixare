@@ -73,7 +73,7 @@ public class LocationFinder {
 			// ex2.printStackTrace();
 			curLoc = hardFix;
 			Toast.makeText(ctx,
-					ctx.getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
+					ctx.getString(R.string.connection_GPS_dialog_text),
 					Toast.LENGTH_LONG).show();
 		}
 

@@ -290,7 +290,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			mixViewData.setSearchNotificationTxt(new TextView(this));
 			mixViewData.getSearchNotificationTxt().setWidth(getdWindow().getWidth());
 			mixViewData.getSearchNotificationTxt().setPadding(10, 2, 0, 0);			
-			mixViewData.getSearchNotificationTxt().setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList()+ getString(DataView.SEARCH_ACTIVE_2));;
+			mixViewData.getSearchNotificationTxt().setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList()+ getString(R.string.search_active_2));;
 			mixViewData.getSearchNotificationTxt().setBackgroundColor(Color.DKGRAY);
 			mixViewData.getSearchNotificationTxt().setTextColor(Color.WHITE);
 
@@ -315,11 +315,11 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	public void setErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(DataView.CONNECTION_ERROR_DIALOG_TEXT));
+		builder.setMessage(getString(R.string.connection_error_dialog));
 		builder.setCancelable(false);
 
 		/*Retry*/
-		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.connection_error_dialog_button1, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				fError=false;
 				//TODO improve
@@ -333,16 +333,16 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 		});
 		/*Open settings*/
-		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2, new DialogInterface.OnClickListener() {
+		builder.setNeutralButton(R.string.connection_error_dialog_button2, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
 				startActivityForResult(intent1, 42);
 			}
 		});
 		/*Close application*/
-		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3, new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(R.string.connection_error_dialog_button3, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				System.exit(0);
+				System.exit(0); //wouldn't be better to use finish (to stop the app normally?)
 			}
 		});
 		AlertDialog alert = builder.create();
@@ -384,14 +384,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private void firstAccess(SharedPreferences settings) {
 		SharedPreferences.Editor editor = settings.edit();
 		AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-		builder1.setMessage(getString(DataView.LICENSE_TEXT));
-		builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+		builder1.setMessage(getString(R.string.license));
+		builder1.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.dismiss();
 			}
 		});
 		AlertDialog alert1 = builder1.create();
-		alert1.setTitle(getString(DataView.LICENSE_TITLE));
+		alert1.setTitle(getString(R.string.license_title));
 		alert1.show();
 		editor.putBoolean("firstAccess", true);
 
@@ -435,13 +435,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
 		/*define the first*/
-		MenuItem item1 =menu.add(base, base, base, getString(DataView.MENU_ITEM_1)); 
-		MenuItem item2 =menu.add(base, base+1, base+1,  getString(DataView.MENU_ITEM_2)); 
-		MenuItem item3 =menu.add(base, base+2, base+2,  getString(DataView.MENU_ITEM_3));
-		MenuItem item4 =menu.add(base, base+3, base+3,  getString(DataView.MENU_ITEM_4));
-		MenuItem item5 =menu.add(base, base+4, base+4,  getString(DataView.MENU_ITEM_5));
-		MenuItem item6 =menu.add(base, base+5, base+5,  getString(DataView.MENU_ITEM_6));
-		MenuItem item7 =menu.add(base, base+6, base+6,  getString(DataView.MENU_ITEM_7));
+		MenuItem item1 =menu.add(base, base, base, getString(R.string.menu_item_1)); 
+		MenuItem item2 =menu.add(base, base+1, base+1,  getString(R.string.menu_item_2)); 
+		MenuItem item3 =menu.add(base, base+2, base+2,  getString(R.string.menu_item_3));
+		MenuItem item4 =menu.add(base, base+3, base+3,  getString(R.string.menu_item_4));
+		MenuItem item5 =menu.add(base, base+4, base+4,  getString(R.string.menu_item_5));
+		MenuItem item6 =menu.add(base, base+5, base+5,  getString(R.string.menu_item_6));
+		MenuItem item7 =menu.add(base, base+6, base+6,  getString(R.string.menu_item_7));
 
 		/*assign icons to the menu items*/
 		item1.setIcon(drawable.icon_datasource);
@@ -466,7 +466,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				startActivityForResult(intent, 40);
 			}
 			else{
-				Toast.makeText( this, getString(DataView.OPTION_NOT_AVAILABLE_STRING_ID), Toast.LENGTH_LONG ).show();		
+				Toast.makeText( this, getString(R.string.no_website_available), Toast.LENGTH_LONG ).show();		
 			}
 			break;
 			/*List view*/
@@ -478,7 +478,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 			/*if the list is empty*/
 			else{
-				Toast.makeText( this, DataView.EMPTY_LIST_STRING_ID, Toast.LENGTH_LONG ).show();			
+				Toast.makeText( this, R.string.empty_list, Toast.LENGTH_LONG ).show();			
 			}
 			break;
 			/*Map View*/
@@ -499,34 +499,34 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		case 6:
 			Location currentGPSInfo = mixViewData.getMixContext().getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(getString(DataView.GENERAL_INFO_TEXT)+ "\n\n" +
-					getString(DataView.GPS_LONGITUDE) + currentGPSInfo.getLongitude() + "\n" +
-					getString(DataView.GPS_LATITUDE) + currentGPSInfo.getLatitude() + "\n" +
-					getString(DataView.GPS_ALTITUDE)+ currentGPSInfo.getAltitude() + "m\n" +
-					getString(DataView.GPS_SPEED) + currentGPSInfo.getSpeed() + "km/h\n" +
-					getString(DataView.GPS_ACCURACY) + currentGPSInfo.getAccuracy() + "m\n" +
-					getString(DataView.GPS_LAST_FIX) + new Date(currentGPSInfo.getTime()).toString() + "\n");
-			builder.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+			builder.setMessage(getString(R.string.general_info_text)+ "\n\n" +
+					getString(R.string.longitude) + currentGPSInfo.getLongitude() + "\n" +
+					getString(R.string.latitude) + currentGPSInfo.getLatitude() + "\n" +
+					getString(R.string.altitude)+ currentGPSInfo.getAltitude() + "m\n" +
+					getString(R.string.speed) + currentGPSInfo.getSpeed() + "km/h\n" +
+					getString(R.string.accuracy) + currentGPSInfo.getAccuracy() + "m\n" +
+					getString(R.string.gps_last_fix) + new Date(currentGPSInfo.getTime()).toString() + "\n");
+			builder.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 				}
 			});
 			AlertDialog alert = builder.create();
-			alert.setTitle(getString(DataView.GENERAL_INFO_TITLE));
+			alert.setTitle(getString(R.string.general_info_title));
 			alert.show();
 			break;
 			/*Case 6: license agreements*/
 		case 7:
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-			builder1.setMessage(getString(DataView.LICENSE_TEXT));	
+			builder1.setMessage(getString(R.string.license));	
 			/*Retry*/
-			builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON), new DialogInterface.OnClickListener() {
+			builder1.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 				}
 			});
 			AlertDialog alert1 = builder1.create();
-			alert1.setTitle(getString(DataView.LICENSE_TITLE));
+			alert1.setTitle(getString(R.string.license_title));
 			alert1.show();
 			break;
 
@@ -758,7 +758,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			jLayer.setMarkerList(searchResults);
 		}
 		else
-			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
 	}
 
 
@@ -1041,7 +1041,7 @@ class AugmentedView extends View {
 	}
 }
 
-/*
+/**
  * Internal class that holds Mixview field Data.
  * 
  * @author A B
