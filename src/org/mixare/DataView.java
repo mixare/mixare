@@ -223,20 +223,15 @@ public class DataView {
 	}
 	
 	public void requestData(String url) {
-		DownloadRequest request = new DownloadRequest();
-		request.source = new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true);
-		request.params = "";
-		mixContext.getDataSourceManager().setAllDataSourcesforLauncher(request.source);
+		DownloadRequest request = new DownloadRequest(new DataSource("LAUNCHER", url, DataSource.TYPE.MIXARE, DataSource.DISPLAY.CIRCLE_MARKER, true));
+		mixContext.getDataSourceManager().setAllDataSourcesforLauncher(request.getSource());
 		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
 
 	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
-		DownloadRequest request = new DownloadRequest();
-		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
-		request.source = datasource;
-		
+		DownloadRequest request = new DownloadRequest(datasource, datasource.createRequestParams(lat, lon, alt, radius, locale));
 		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
 		

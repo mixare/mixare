@@ -18,6 +18,7 @@
  */
 package org.mixare.mgr.downloader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mixare.data.DataSource;
@@ -26,6 +27,7 @@ import org.mixare.lib.marker.Marker;
 
 
 public class DownloadResult {
+	
 	private DataSource dataSource;
 	private String params;
 	private List<Marker> markers;
@@ -33,6 +35,34 @@ public class DownloadResult {
 	private boolean error;
 	private String errorMsg = "";
 	private DownloadRequest errorRequest;
+	private String idOfDownloadRequest;
+	
+	
+
+	public DownloadResult() {
+		super();
+		this.dataSource = null;
+		this.params = "";
+		this.markers = new ArrayList<Marker>();
+		this.error = true;
+		this.errorMsg = "DUMMY OBJECT";
+		this.errorRequest = null;
+		this.idOfDownloadRequest="";
+	}
+
+	
+	
+	public String getIdOfDownloadRequest() {
+		return idOfDownloadRequest;
+	}
+
+
+
+	public void setIdOfDownloadRequest(String idRequest) {
+		idOfDownloadRequest = idRequest;
+	}
+
+
 
 	public List<Marker> getMarkers() {
 		return markers;
@@ -92,6 +122,13 @@ public class DownloadResult {
 	}
 	
 	
-	
+	public void setAccomplish(String idOfDownloadRequest, List<Marker> markers, DataSource ds ) {
+		setIdOfDownloadRequest(idOfDownloadRequest);
+		setMarkers(markers);
+		setDataSource(ds);
+		setError(false);
+		errorMsg="NO ERROR";
+		errorRequest=null;
+	}
 
 }

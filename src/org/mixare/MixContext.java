@@ -29,6 +29,7 @@ import org.mixare.mgr.webcontent.WebContentManager;
 import org.mixare.mgr.webcontent.WebContentManagerFactory;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -140,6 +141,10 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	
 	public MixView getActualMixView(){
 		return this.mixView;
+	}
+	
+	public ContentResolver getContentResolver(){
+		return this.mixView.getContentResolver();
 	} 
 
 }

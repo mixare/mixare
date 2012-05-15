@@ -41,6 +41,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 
+import org.mixare.mgr.downloader.DownloadRequest;
+
 import android.content.ContentResolver;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -50,7 +52,51 @@ import android.os.Build;
 public final class HttpTools {
 	
 	
-	public static InputStream getHttpGETInputStream(String urlStr,ContentResolver cr ) throws Exception {
+	/**
+	 * Prefered To use InputStream managed!
+	 * 
+	 * @param request
+	 * @param cr
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getPageContent(DownloadRequest request, ContentResolver cr) throws Exception {
+		String pageContent;
+		InputStream is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+		pageContent = HttpTools.getHttpInputString(is);
+		HttpTools.returnHttpInputStream(is);
+		return pageContent;
+	}
+	
+	
+	public static String getHttpInputString(InputStream is) {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
+
+	
+	
+	/**
+	 * Input Stream with unsafe close 
+	 */
+	@Deprecated
+	public static InputStream getHttpGETInputStream(String urlStr, ContentResolver cr ) throws Exception {
 		InputStream is = null;
 		URLConnection conn = null;
 
@@ -113,7 +159,10 @@ public final class HttpTools {
 		}
 	}
 	
-	
+	/**
+	 * Input Stream with unsafe close 
+	 */
+	@Deprecated	
 	public static InputStream getHttpPOSTInputStream(String urlStr, String params,ContentResolver cr )
 			throws Exception {
 		InputStream is = null;
@@ -165,6 +214,10 @@ public final class HttpTools {
 		}
 	}
 
+	/**
+	 * Input Stream with unsafe close 
+	 */
+	@Deprecated
 	public static InputStream getContentInputStream(String urlStr, String params,ContentResolver cr)
 			throws Exception {
 		//ContentResolver cr = mixView.getContentResolver();
@@ -185,44 +238,35 @@ public final class HttpTools {
 		}
 	}
 
+	/**
+	 * Input Stream management not safe  
+	 */
+	@Deprecated
 	public static void returnHttpInputStream(InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}
 	}
 
+
+	/**
+	 * Input Stream management not safe  
+	 */
+	@Deprecated
 	public InputStream getResourceInputStream(String name,AssetManager mgr) throws Exception {
 		//AssetManager mgr = mixView.getAssets();
 		return mgr.open(name);
 	}
 
+
+	/**
+	 * Input Stream management not safe  
+	 */
+	@Deprecated
 	public static void returnResourceInputStream(InputStream is) throws Exception {
 		if (is != null)
 			is.close();
 	}
-	
-	public static String getHttpInputString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is),
-				8 * 1024);
-		StringBuilder sb = new StringBuilder();
-
-		try {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return sb.toString();
-	}
-	
 	
 
 }

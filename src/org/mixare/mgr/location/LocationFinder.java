@@ -37,8 +37,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * This class is repsonsible for finding the location, and sending it back to the mixcontext.
- * It will also 
+ * This class is repsonsible for finding the location, and sending it back to
+ * the mixcontext. It will also
+ * 
  * @author A. Egal
  */
 public class LocationFinder {
@@ -58,9 +59,8 @@ public class LocationFinder {
 	private final long freq = 5000; // 5 seconds
 	private final float dist = 20; // 20 meters
 
-	
-	public LocationFinder(MixContext mixContext){
-		// TODO: check access of download manager
+	public LocationFinder(MixContext mixContext) {
+		
 		this.mixContext = mixContext;
 	}
 
@@ -92,7 +92,7 @@ public class LocationFinder {
 
 	private void requestBestLocationUpdates() {
 		float accuracy = 0;
-		String provider = null;  	
+		String provider = null;
 		for (String p : lm.getAllProviders()) {
 			Location location = lm.getLastKnownLocation(p);
 			if (location != null) {
@@ -102,11 +102,14 @@ public class LocationFinder {
 				}
 			}
 		}
-		if(provider != null && !provider.equals(bestLocationProvider)){
-			Log.i(MixContext.TAG, "Location provider has changed, old provider: "+ bestLocationProvider + " changed to new provider: "+ provider);
-		 	lm.removeUpdates(lnormal);
-		 	lm.requestLocationUpdates(provider, freq, dist, lnormal);
-		 	bestLocationProvider = provider;
+		if (provider != null && !provider.equals(bestLocationProvider)) {
+			Log.i(MixContext.TAG,
+					"Location provider has changed, old provider: "
+							+ bestLocationProvider
+							+ " changed to new provider: " + provider);
+			lm.removeUpdates(lnormal);
+			lm.requestLocationUpdates(provider, freq, dist, lnormal);
+			bestLocationProvider = provider;
 		}
 	}
 
@@ -116,14 +119,18 @@ public class LocationFinder {
 			lm = null;
 		}
 	}
-	
+
 	/**
 	 * Returns the current location.
 	 */
 	public Location getCurrentLocation() {
-		if(curLoc == null){
+		if (curLoc == null) {
 			MixView mixView = mixContext.getActualMixView();
-			Toast.makeText(mixView, mixView.getResources().getString(R.string.location_not_found), Toast.LENGTH_LONG).show();
+			Toast.makeText(
+					mixView,
+					mixView.getResources().getString(
+							R.string.location_not_found), Toast.LENGTH_LONG)
+					.show();
 			throw new RuntimeException("No GPS Found");
 		}
 		synchronized (curLoc) {
@@ -132,26 +139,45 @@ public class LocationFinder {
 	}
 
 	private LocationListener lnormal = new LocationListener() {
-		public void onProviderDisabled(String provider) {}
+		public void onProviderDisabled(String provider) {
+		}
 
-		public void onProviderEnabled(String provider) {}
+		public void onProviderEnabled(String provider) {
+		}
 
-		public void onStatusChanged(String provider, int status, Bundle extras) {}
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
 
 		public void onLocationChanged(Location location) {
-			Log.d(MixContext.TAG, "normal Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			//Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+			Log.d(MixContext.TAG,
+					"normal Location Changed: " + location.getProvider()
+							+ " lat: " + location.getLatitude() + " lon: "
+							+ location.getLongitude() + " alt: "
+							+ location.getAltitude() + " acc: "
+							+ location.getAccuracy());
+			// Toast.makeText(ctx,
+			// "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
+			// Toast.LENGTH_LONG).show();
 			try {
-				MixMap.addWalkingPathPosition(new GeoPoint((int)(location.getLatitude() * 1E6), (int)(location.getLongitude() * 1E6)));
+				MixMap.addWalkingPathPosition(new GeoPoint((int) (location
+						.getLatitude() * 1E6),
+						(int) (location.getLongitude() * 1E6)));
+				if (downloadManager!=null){
 				downloadManager.purgeLists();
-				Log.v(MixContext.TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-					synchronized (curLoc) {
-						curLoc = location;
-					}
-					mixContext.getActualMixView().repaint();
-					Location lastLoc=getLocationAtLastDownload();
-					if(lastLoc==null)
-						setLocationAtLastDownload(location);
+				}
+				Log.v(MixContext.TAG,
+						"Location Changed: " + location.getProvider()
+								+ " lat: " + location.getLatitude() + " lon: "
+								+ location.getLongitude() + " alt: "
+								+ location.getAltitude() + " acc: "
+								+ location.getAccuracy());
+				synchronized (curLoc) {
+					curLoc = location;
+				}
+				mixContext.getActualMixView().repaint();
+				Location lastLoc = getLocationAtLastDownload();
+				if (lastLoc == null)
+					setLocationAtLastDownload(location);
 				requestBestLocationUpdates();
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -177,10 +203,11 @@ public class LocationFinder {
 
 	public GeomagneticField getGeomagneticField() {
 		Location location = getCurrentLocation();
-		GeomagneticField gmf = new GeomagneticField((float) location.getLatitude(), (float) location.getLongitude(),
+		GeomagneticField gmf = new GeomagneticField(
+				(float) location.getLatitude(),
+				(float) location.getLongitude(),
 				(float) location.getAltitude(), System.currentTimeMillis());
 		return gmf;
 	}
-
 
 }
