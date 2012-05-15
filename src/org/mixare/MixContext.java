@@ -69,7 +69,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		if (!getDataSourceManager().isAtLeastOneDatasourceSelected()) {
 			rotationM.toIdentity();
 		}
-
+		getLocationFinder().switchOn();
 		getLocationFinder().findLocation();
 	}
 
