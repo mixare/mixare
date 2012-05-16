@@ -438,12 +438,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 */
 	private FrameLayout createZoomBar(SharedPreferences settings) {
 		getMixViewData().setMyZoomBar(new SeekBar(this));
-		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
 		getMixViewData().getMyZoomBar().setMax(100);
 		getMixViewData().getMyZoomBar()
 				.setProgress(settings.getInt("zoomLevel", 65));
-		getMixViewData().getMyZoomBar().setOnSeekBarChangeListener(
-				myZoomBarOnSeekBarChangeListener);
+		getMixViewData().getMyZoomBar().setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
 
 		FrameLayout frameLayout = new FrameLayout(this);
