@@ -39,7 +39,13 @@ public interface LocationFinder {
 		Confused // Same problem in internal state
 	}
 
-	Location findLocation(Context ctx);
+	/**
+	 * ?
+	 *  
+	 * @param ctx
+	 * @return
+	 */
+	Location findLocation();
 
 	/**
 	 * Returns the current location.

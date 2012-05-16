@@ -19,7 +19,6 @@
 package org.mixare.mgr.location;
 
 
-import org.mixare.DataView;
 import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.R;
@@ -65,7 +64,7 @@ class LocationMgrImpl implements LocationFinder {
 	/* (non-Javadoc)
 	 * @see org.mixare.mgr.location.LocationFinder#findLocation(android.content.Context)
 	 */
-	public Location findLocation(Context ctx) {
+	public Location findLocation() {
 		
 
 		// fallback for the case where GPS and network providers are disabled
@@ -82,9 +81,8 @@ class LocationMgrImpl implements LocationFinder {
 		} catch (Exception ex2) {
 			// ex2.printStackTrace();
 			curLoc = hardFix;
-			Toast.makeText(ctx,
-					ctx.getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
-					Toast.LENGTH_LONG).show();
+			mixContext.doPopUp(R.string.connection_GPS_dialog_text);
+
 		}
 
 		setLocationAtLastDownload(curLoc);
@@ -117,12 +115,7 @@ class LocationMgrImpl implements LocationFinder {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mixare.mgr.location.LocationFinder#unregisterLocationManager()
-	 */
-	public void unregisterLocationManager() {
-		
-	}
+
 
 	/* (non-Javadoc)
 	 * @see org.mixare.mgr.location.LocationFinder#getCurrentLocation()

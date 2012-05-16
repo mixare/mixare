@@ -40,6 +40,13 @@ import android.widget.FrameLayout;
 class WebPageMgrImpl implements WebContentManager {
 
 	protected MixContext mixContext;
+	
+	/**
+	 * Shows a webpage with the given url when clicked on a marker.
+	 */
+	public void loadMixViewWebPage(String url) throws Exception {
+		loadWebPage(url, mixContext.getActualMixView());
+	}
 
 	public WebPageMgrImpl(MixContext mixContext) {
        this.mixContext=mixContext;

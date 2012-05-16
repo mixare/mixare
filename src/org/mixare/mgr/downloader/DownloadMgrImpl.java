@@ -127,7 +127,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	 */
 	public String submitJob(DownloadRequest job) {
 		String jobId = null;
-		if (job != null) {
+		if (job != null && job.getSource().isWellFormed()) {
 			ManagedDownloadRequest mJob;
 			if (!todoList.contains(job)) {
 				mJob = new ManagedDownloadRequest(job);

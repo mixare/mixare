@@ -31,9 +31,9 @@ import org.mixare.mgr.webcontent.WebContentManagerFactory;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.widget.Toast;
 
 /**
  * Cares about location management and about the data (source, inputstream)
@@ -61,9 +61,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 
 	public MixContext(MixView appCtx) {
 		super(appCtx);
-		mixView=appCtx;
-
-		
+		mixView = appCtx;
 
 		// TODO: RE-ORDER THIS SEQUENCE... IS NECESSARY?
 		getDataSourceManager().refreshDataSources();
@@ -72,7 +70,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 			rotationM.toIdentity();
 		}
 
-		getLocationFinder().findLocation(this);
+		getLocationFinder().findLocation();
 	}
 
 	public String getStartUrl() {
@@ -142,18 +140,39 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 
 	public MixView getActualMixView() {
 		synchronized (mixView) {
-		   return this.mixView;
+			return this.mixView;
 		}
 	}
-	
+
 	private void setActualMixView(MixView mv) {
 		synchronized (mixView) {
-		   this.mixView=mv;
+			this.mixView = mv;
 		}
 	}
 
 	public ContentResolver getContentResolver() {
-		return this.mixView.getContentResolver();
+		ContentResolver out = super.getContentResolver();
+		if (super.getContentResolver() == null) {
+			out = getActualMixView().getContentResolver();
+		}
+		return out;
+	}
+	
+	/**
+	 * Toast POPUP notification
+	 * 
+	 * @param string message
+	 */
+	public void doPopUp(final String string){
+       Toast.makeText(this,string,Toast.LENGTH_LONG).show();
 	}
 
+	/**
+	 * Toast POPUP notification
+	 * 
+	 * @param connectionGpsDialogText
+	 */
+	public void doPopUp(int RidOfString) {
+        doPopUp(this.getString(RidOfString));
+	}
 }

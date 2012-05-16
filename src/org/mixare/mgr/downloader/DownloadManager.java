@@ -43,7 +43,7 @@ public interface DownloadManager {
 	 * Submit new DownloadRequest
 	 * 
 	 * @param job
-	 * @return reference Of Job
+	 * @return reference Of Job or null if job is rejected
 	 */
 	String submitJob(DownloadRequest job);
 
