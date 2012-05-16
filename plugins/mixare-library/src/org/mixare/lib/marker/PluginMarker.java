@@ -62,7 +62,7 @@ public abstract class PluginMarker{
 	public Label txtLab = new Label();
 	protected TextObj textBlock;
 	
-	public PluginMarker(String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
+	public PluginMarker(int id, String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
 		super();
 
 		this.active = true;
@@ -74,7 +74,7 @@ public abstract class PluginMarker{
 		}
 		this.colour = colour;
 
-		this.ID=type +"##"+title;
+		this.ID= id + "##"+ type +"##"+title;
 
 	}	
 	

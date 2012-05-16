@@ -58,9 +58,9 @@ public class ImageMarkerService extends Service{
 		}
 
 		@Override
-		public String buildMarker(String title, double latitude, double longitude, double altitude, String URL, int type, int color)
+		public String buildMarker(int id, String title, double latitude, double longitude, double altitude, String URL, int type, int color)
 				throws RemoteException {
-			PluginMarker marker = new ImageMarker(title, latitude, longitude, altitude, URL, type, color);
+			PluginMarker marker = new ImageMarker(id, title, latitude, longitude, altitude, URL, type, color);
 			String markerName = "imageMarker-"+count+"-"+marker.getID();
 			markers.put(markerName, marker);
 			return markerName;

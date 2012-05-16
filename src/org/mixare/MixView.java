@@ -281,6 +281,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 
 			getMixViewData().getMixContext().getDownloadManager().switchOn();
+			getMixViewData().getMixContext().getLocationFinder().switchOn();
 		} catch (Exception ex) {
 			doError(ex);
 			try {

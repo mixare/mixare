@@ -26,6 +26,7 @@ import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
 import org.mixare.plugin.connection.ActivityConnection;
 import org.mixare.plugin.connection.MarkerServiceConnection;
+import org.mixare.plugin.remoteobjects.RemoteMarker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -121,7 +122,7 @@ public class PluginLoader {
 		pluginMap.put(pluginName, pluginConnection);
 	}
 	
-	public Marker getMarkerInstance(String markername, String title,
+	public Marker getMarkerInstance(String markername, int id, String title,
 			double latitude, double longitude, double altitude, String link,
 			int type, int color) throws PluginNotFoundException, RemoteException {
 		
@@ -132,7 +133,7 @@ public class PluginLoader {
 			throw new PluginNotFoundException();
 		}
 		RemoteMarker rm = new RemoteMarker(iMarkerService);
-		rm.buildMarker(title, latitude, longitude, altitude, link, type, color);
+		rm.buildMarker(id, title, latitude, longitude, altitude, link, type, color);
 		return rm; 
 	}
 	
