@@ -123,7 +123,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void setStartPoint() {
-		Location location = mixContext.getCurrentLocation();
+		Location location = mixContext.getLocationFinder().getCurrentLocation();
 		MapController controller;
 
 		double latitude = location.getLatitude()*1E6;
@@ -377,7 +377,7 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 			try {
 				if (url != null && url.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(url);
-					mixMap.getDataView().getContext().loadWebPage(newUrl, mixMap.getMapContext());
+					mixMap.getDataView().getContext().getWebContentManager().loadWebPage(newUrl, mixMap.getMapContext());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

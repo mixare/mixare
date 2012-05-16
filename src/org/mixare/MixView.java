@@ -1,19 +1,19 @@
 /*
  * Copyright (C) 2010- Peer internet solutions
- * 
+ *
  * This file is part of mixare.
- * 
- * This program is free software: you can redistribute it and/or modify it 
- * under the terms of the GNU General Public License as published by 
- * the Free Software Foundation, either version 3 of the License, or 
- * (at your option) any later version. 
- * 
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License 
- * for more details. 
- * 
- * You should have received a copy of the GNU General Public License along with 
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 package org.mixare;
@@ -80,7 +80,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MixView extends Activity implements SensorEventListener, OnTouchListener{
+public class MixView extends Activity implements SensorEventListener, OnTouchListener {
 
 	private CameraSurface camScreen;
 	private AugmentedView augScreen;
@@ -90,87 +90,93 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private static DataView dataView;
 	private boolean fError;
 
-	private MixViewDataHolder mixViewData = new MixViewDataHolder();
-	//TAG for logging
-	public static final String TAG = "Mixare";
+	//----------
+    private MixViewDataHolder mixViewData  ;
 	
-	//why use Memory to save a state? MixContext? activity lifecycle?
-	public static MixView CONTEXT;
+	// TAG for logging
+	public static final String TAG = "Mixare";
 
-	/*string to name & access the preference file in the internal storage*/
+	// why use Memory to save a state? MixContext? activity lifecycle?
+	//private static MixView CONTEXT;
+
+	/* string to name & access the preference file in the internal storage */
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		MixView.CONTEXT = this;
+		//MixView.CONTEXT = this;
 		try {
-			
+						
 			handleIntent(getIntent());
-
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			this.mixViewData.setmWakeLock(pm.newWakeLock(
-					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag"));
+			getMixViewData().setmWakeLock(pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag"));
 
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
+			/*
+			 * Get the preference file PREFS_NAME stored in the internal memory
+			 * of the phone
+			 */
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			
-			
+
 			FrameLayout frameLayout = createZoomBar(settings);
 
 			camScreen = new CameraSurface(this);
 			augScreen = new AugmentedView(this);
+			
 			setContentView(camScreen);
-
-			addContentView(augScreen, new LayoutParams(
-					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-			addContentView(frameLayout, new FrameLayout.LayoutParams(
-					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,
-					Gravity.BOTTOM));
+			addContentView(augScreen, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			addContentView(frameLayout, new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT,Gravity.BOTTOM));
 
 			if (!isInited) {
-				mixViewData.setMixContext(new MixContext(this));
-				mixViewData.getMixContext().setDownloadManager(new DownloadManager(mixViewData.getMixContext()));
+				
 				setdWindow(new PaintScreen());
-				setDataView(new DataView(mixViewData.getMixContext()));
+				setDataView(new DataView(getMixViewData().getMixContext()));
 
-				/*set the radius in data view to the last selected by the user*/
-				setZoomLevel(); 
-				isInited = true;		
+				/* set the radius in data view to the last selected by the user */
+				setZoomLevel();
+				isInited = true;
 			}
 
-			/*check if the application is launched for the first time*/
-			if(settings.getBoolean("firstAccess",false)==false){
+			/* check if the application is launched for the first time */
+			if (settings.getBoolean("firstAccess", false) == false) {
 				firstAccess(settings);
 
-			} 
+			}
 
 		} catch (Exception ex) {
 			doError(ex);
 		}
 	}
 
+	public MixViewDataHolder getMixViewData() {
+		if (mixViewData==null){
+			// TODO: VERY inportant, only one!
+			mixViewData = new MixViewDataHolder(new MixContext(this));
+		}
+		return mixViewData;
+	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 
 		try {
-			this.mixViewData.getmWakeLock().release();
+			this.getMixViewData().getmWakeLock().release();
 
 			try {
-				mixViewData.getSensorMgr().unregisterListener(this, mixViewData.getSensorGrav());
-				mixViewData.getSensorMgr().unregisterListener(this, mixViewData.getSensorMag());
-				mixViewData.setSensorMgr(null);
-
-				mixViewData.getMixContext().unregisterLocationManager();
-				mixViewData.getMixContext().getDownloadManager().stop();
+				getMixViewData().getSensorMgr().unregisterListener(this,
+						getMixViewData().getSensorGrav());
+				getMixViewData().getSensorMgr().unregisterListener(this,
+						getMixViewData().getSensorMag());
+				getMixViewData().setSensorMgr(null);
 				
-				if(getDataView() != null){
+				getMixViewData().getMixContext().getLocationFinder().switchOff();
+				getMixViewData().getMixContext().getDownloadManager().switchOff();
+
+				if (getDataView() != null) {
 					getDataView().cancelRefreshTimer();
 				}
 			} catch (Exception ignore) {
@@ -189,261 +195,287 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		super.onResume();
 
 		try {
-			this.mixViewData.getmWakeLock().acquire();
+			this.getMixViewData().getmWakeLock().acquire();
 
 			killOnError();
-			mixViewData.getMixContext().mixView = this;
+			getMixViewData().getMixContext().doResume(this);
+
 			getDataView().doStart();
 			getDataView().clearEvents();
 
+			getMixViewData().getMixContext().getDataSourceManager().refreshDataSources();
 
-			mixViewData.getMixContext().refreshDataSources();
-			
 			float angleX, angleY;
 
 			int marker_orientation = -90;
 
 			int rotation = Compatibility.getRotation(this);
 
-			//display text from left to right and keep it horizontal
+			// display text from left to right and keep it horizontal
 			angleX = (float) Math.toRadians(marker_orientation);
-			mixViewData.getM1().set(	1f,	0f, 						0f, 
-					0f,	(float) FloatMath.cos(angleX),	(float) -FloatMath.sin(angleX),
-					0f,	(float) FloatMath.sin(angleX),	(float) FloatMath.cos(angleX)
-			);
+			getMixViewData().getM1().set(1f, 0f, 0f, 0f,
+					(float) FloatMath.cos(angleX),
+					(float) -FloatMath.sin(angleX), 0f,
+					(float) FloatMath.sin(angleX),
+					(float) FloatMath.cos(angleX));
 			angleX = (float) Math.toRadians(marker_orientation);
 			angleY = (float) Math.toRadians(marker_orientation);
 			if (rotation == 1) {
-				mixViewData.getM2().set(	1f,	0f,							0f,
-						0f,	(float) FloatMath.cos(angleX),	(float) -FloatMath.sin(angleX),
-						0f,	(float) FloatMath.sin(angleX),	(float) FloatMath.cos(angleX));
-				mixViewData.getM3().set(	(float) FloatMath.cos(angleY),	0f,	(float) FloatMath.sin(angleY),
-						0f,							1f,	0f,
-						(float) -FloatMath.sin(angleY),	0f,	(float) FloatMath.cos(angleY));
+				getMixViewData().getM2().set(1f, 0f, 0f, 0f,
+						(float) FloatMath.cos(angleX),
+						(float) -FloatMath.sin(angleX), 0f,
+						(float) FloatMath.sin(angleX),
+						(float) FloatMath.cos(angleX));
+				getMixViewData().getM3().set((float) FloatMath.cos(angleY), 0f,
+						(float) FloatMath.sin(angleY), 0f, 1f, 0f,
+						(float) -FloatMath.sin(angleY), 0f,
+						(float) FloatMath.cos(angleY));
 			} else {
-				mixViewData.getM2().set(	(float) FloatMath.cos(angleX),	0f,	(float) FloatMath.sin(angleX),
-						0f,							1f,	0f,
-						(float) -FloatMath.sin(angleX),	0f, (float) FloatMath.cos(angleX));
-				mixViewData.getM3().set(	1f,	0f,							0f, 
-						0f,	(float) FloatMath.cos(angleY),	(float) -FloatMath.sin(angleY),
-						0f,	(float) FloatMath.sin(angleY),	(float) FloatMath.cos(angleY));
+				getMixViewData().getM2().set((float) FloatMath.cos(angleX), 0f,
+						(float) FloatMath.sin(angleX), 0f, 1f, 0f,
+						(float) -FloatMath.sin(angleX), 0f,
+						(float) FloatMath.cos(angleX));
+				getMixViewData().getM3().set(1f, 0f, 0f, 0f,
+						(float) FloatMath.cos(angleY),
+						(float) -FloatMath.sin(angleY), 0f,
+						(float) FloatMath.sin(angleY),
+						(float) FloatMath.cos(angleY));
 
 			}
-			
-			mixViewData.getM4().toIdentity();
 
-			for (int i = 0; i < mixViewData.getHistR().length; i++) {
-				mixViewData.getHistR()[i] = new Matrix();
+			getMixViewData().getM4().toIdentity();
+
+			for (int i = 0; i < getMixViewData().getHistR().length; i++) {
+				getMixViewData().getHistR()[i] = new Matrix();
 			}
 
-			mixViewData.setSensorMgr((SensorManager) getSystemService(SENSOR_SERVICE));
+			getMixViewData()
+					.setSensorMgr((SensorManager) getSystemService(SENSOR_SERVICE));
 
-			mixViewData.setSensors(mixViewData.getSensorMgr().getSensorList(Sensor.TYPE_ACCELEROMETER));
-			if (mixViewData.getSensors().size() > 0) {
-				mixViewData.setSensorGrav(mixViewData.getSensors().get(0));
+			getMixViewData().setSensors(getMixViewData().getSensorMgr().getSensorList(
+					Sensor.TYPE_ACCELEROMETER));
+			if (getMixViewData().getSensors().size() > 0) {
+				getMixViewData().setSensorGrav(getMixViewData().getSensors().get(0));
 			}
 
-			mixViewData.setSensors(mixViewData.getSensorMgr().getSensorList(Sensor.TYPE_MAGNETIC_FIELD));
-			if (mixViewData.getSensors().size() > 0) {
-				mixViewData.setSensorMag(mixViewData.getSensors().get(0));
+			getMixViewData().setSensors(getMixViewData().getSensorMgr().getSensorList(
+					Sensor.TYPE_MAGNETIC_FIELD));
+			if (getMixViewData().getSensors().size() > 0) {
+				getMixViewData().setSensorMag(getMixViewData().getSensors().get(0));
 			}
 
-			mixViewData.getSensorMgr().registerListener(this, mixViewData.getSensorGrav(), SENSOR_DELAY_GAME);
-			mixViewData.getSensorMgr().registerListener(this, mixViewData.getSensorMag(), SENSOR_DELAY_GAME);
+			getMixViewData().getSensorMgr().registerListener(this,
+					getMixViewData().getSensorGrav(), SENSOR_DELAY_GAME);
+			getMixViewData().getSensorMgr().registerListener(this,
+					getMixViewData().getSensorMag(), SENSOR_DELAY_GAME);
 
 			try {
-
-				GeomagneticField gmf = new GeomagneticField((float) mixViewData.getMixContext().getCurrentLocation()
-						.getLatitude(), (float) mixViewData.getMixContext().getCurrentLocation().getLongitude(),
-						(float) mixViewData.getMixContext().getCurrentLocation().getAltitude(), System
-						.currentTimeMillis());
-
+				GeomagneticField gmf = getMixViewData().getMixContext().getLocationFinder().getGeomagneticField(); 
 				angleY = (float) Math.toRadians(-gmf.getDeclination());
-				mixViewData.getM4().set((float) FloatMath.cos(angleY), 0f,
-						(float) FloatMath.sin(angleY), 0f, 1f, 0f, (float) -FloatMath
-						.sin(angleY), 0f, (float) FloatMath.cos(angleY));
+				getMixViewData().getM4().set((float) FloatMath.cos(angleY), 0f,
+						(float) FloatMath.sin(angleY), 0f, 1f, 0f,
+						(float) -FloatMath.sin(angleY), 0f,
+						(float) FloatMath.cos(angleY));
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			mixViewData.setDownloadThread(new Thread(mixViewData.getMixContext().getDownloadManager()));
-			mixViewData.getDownloadThread().start();
+
+			getMixViewData().getMixContext().getDownloadManager().switchOn();
 		} catch (Exception ex) {
 			doError(ex);
 			try {
-				if (mixViewData.getSensorMgr() != null) {
-					mixViewData.getSensorMgr().unregisterListener(this, mixViewData.getSensorGrav());
-					mixViewData.getSensorMgr().unregisterListener(this, mixViewData.getSensorMag());
-					mixViewData.setSensorMgr(null);
+				if (getMixViewData().getSensorMgr() != null) {
+					getMixViewData().getSensorMgr().unregisterListener(this,
+							getMixViewData().getSensorGrav());
+					getMixViewData().getSensorMgr().unregisterListener(this,
+							getMixViewData().getSensorMag());
+					getMixViewData().setSensorMgr(null);
 				}
-				
-				if (mixViewData.getMixContext() != null) {
-					mixViewData.getMixContext().unregisterLocationManager();
-					if (mixViewData.getMixContext().getDownloadManager() != null)
-						mixViewData.getMixContext().getDownloadManager().stop();
+
+				if (getMixViewData().getMixContext() != null) {
+					getMixViewData().getMixContext().getLocationFinder().switchOff();
+					getMixViewData().getMixContext().getDownloadManager().switchOff();
 				}
 			} catch (Exception ignore) {
 			}
 		}
 
-		Log.d("-------------------------------------------","resume");
-		if (getDataView().isFrozen() && mixViewData.getSearchNotificationTxt() == null){
-			mixViewData.setSearchNotificationTxt(new TextView(this));
-			mixViewData.getSearchNotificationTxt().setWidth(getdWindow().getWidth());
-			mixViewData.getSearchNotificationTxt().setPadding(10, 2, 0, 0);			
-			mixViewData.getSearchNotificationTxt().setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList()+ getString(R.string.search_active_2));;
-			mixViewData.getSearchNotificationTxt().setBackgroundColor(Color.DKGRAY);
-			mixViewData.getSearchNotificationTxt().setTextColor(Color.WHITE);
+		Log.d("-------------------------------------------", "resume");
+		if (getDataView().isFrozen() && getMixViewData().getSearchNotificationTxt() == null) {
+			getMixViewData().setSearchNotificationTxt(new TextView(this));
+			getMixViewData().getSearchNotificationTxt().setWidth(
+					getdWindow().getWidth());
+			getMixViewData().getSearchNotificationTxt().setPadding(10, 2, 0, 0);
+			getMixViewData().getSearchNotificationTxt().setText(
+					getString(R.string.search_active_1) + " "
+							+ DataSourceList.getDataSourcesStringList()
+							+ getString(R.string.search_active_2));
+			;
+			getMixViewData().getSearchNotificationTxt().setBackgroundColor(
+					Color.DKGRAY);
+			getMixViewData().getSearchNotificationTxt().setTextColor(Color.WHITE);
 
-			mixViewData.getSearchNotificationTxt().setOnTouchListener(this);
-			addContentView(mixViewData.getSearchNotificationTxt(), new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		}
-		else if(!getDataView().isFrozen() && mixViewData.getSearchNotificationTxt() != null){
-			mixViewData.getSearchNotificationTxt().setVisibility(View.GONE);
-			mixViewData.setSearchNotificationTxt(null);
+			getMixViewData().getSearchNotificationTxt().setOnTouchListener(this);
+			addContentView(getMixViewData().getSearchNotificationTxt(),
+					new LayoutParams(LayoutParams.FILL_PARENT,
+							LayoutParams.WRAP_CONTENT));
+		} else if (!getDataView().isFrozen()
+				&& getMixViewData().getSearchNotificationTxt() != null) {
+			getMixViewData().getSearchNotificationTxt().setVisibility(View.GONE);
+			getMixViewData().setSearchNotificationTxt(null);
 		}
 	}
-	
 
-	/* ********* Operators ***********/ 
+	/* ********* Operators ********** */
 
 	public void repaint() {
-		setDataView(new DataView(mixViewData.getMixContext()));
+		setDataView(new DataView(getMixViewData().getMixContext()));
 		setdWindow(new PaintScreen());
-		setZoomLevel(); //@TODO Caller has to set the zoom. This function repaints only.
+		setZoomLevel(); // @TODO Caller has to set the zoom. This function
+						// repaints only.
 	}
-	
 
-	public void setErrorDialog(){
+	public void setErrorDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.connection_error_dialog));
 		builder.setCancelable(false);
 
-		/*Retry*/
-		builder.setPositiveButton(R.string.connection_error_dialog_button1, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				fError=false;
-				//TODO improve
-				try {
-					repaint();	       		
-				}
-				catch(Exception ex){
-					//Don't call doError, it will be a recursive call.
-					//doError(ex);
-				}
-			}
-		});
-		/*Open settings*/
-		builder.setNeutralButton(R.string.connection_error_dialog_button2, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
-				startActivityForResult(intent1, 42);
-			}
-		});
-		/*Close application*/
-		builder.setNegativeButton(R.string.connection_error_dialog_button3, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				System.exit(0); //wouldn't be better to use finish (to stop the app normally?)
-			}
-		});
+		/* Retry */
+		builder.setPositiveButton(R.string.connection_error_dialog_button1,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						fError = false;
+						// TODO improve
+						try {
+							repaint();
+						} catch (Exception ex) {
+							// Don't call doError, it will be a recursive call.
+							// doError(ex);
+						}
+					}
+				});
+		/* Open settings */
+		builder.setNeutralButton(R.string.connection_error_dialog_button2,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent1 = new Intent(
+								Settings.ACTION_WIRELESS_SETTINGS);
+						startActivityForResult(intent1, 42);
+					}
+				});
+		/* Close application */
+		builder.setNegativeButton(R.string.connection_error_dialog_button3,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						System.exit(0); // wouldn't be better to use finish (to
+										// stop the app normally?)
+					}
+				});
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
 
-	
-	public float calcZoomLevel(){
+	public float calcZoomLevel() {
 
-		int myZoomLevel = mixViewData.getMyZoomBar().getProgress();
+		int myZoomLevel = getMixViewData().getMyZoomBar().getProgress();
 		float myout = 5;
 
 		if (myZoomLevel <= 26) {
 			myout = myZoomLevel / 25f;
 		} else if (25 < myZoomLevel && myZoomLevel < 50) {
 			myout = (1 + (myZoomLevel - 25)) * 0.38f;
-		} 
-		else if (25== myZoomLevel) {
+		} else if (25 == myZoomLevel) {
 			myout = 1;
-		} 
-		else if (50== myZoomLevel) {
+		} else if (50 == myZoomLevel) {
 			myout = 10;
-		} 
-		else if (50 < myZoomLevel && myZoomLevel < 75) {
+		} else if (50 < myZoomLevel && myZoomLevel < 75) {
 			myout = (10 + (myZoomLevel - 50)) * 0.83f;
 		} else {
 			myout = (30 + (myZoomLevel - 75) * 2f);
 		}
 
-
 		return myout;
 	}
-	
+
 	/**
-	 *  Handle First time users. It display license agreement
-	 *  and store user's acceptance.
+	 * Handle First time users. It display license agreement and store user's
+	 * acceptance.
+	 * 
 	 * @param settings
 	 */
 	private void firstAccess(SharedPreferences settings) {
 		SharedPreferences.Editor editor = settings.edit();
 		AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
 		builder1.setMessage(getString(R.string.license));
-		builder1.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.dismiss();
-			}
-		});
+		builder1.setNegativeButton(getString(R.string.close_button),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
 		AlertDialog alert1 = builder1.create();
 		alert1.setTitle(getString(R.string.license_title));
 		alert1.show();
 		editor.putBoolean("firstAccess", true);
 
-		//value for maximum POI for each selected OSM URL to be active by default is 5
-		editor.putInt("osmMaxObject",5);
+		// value for maximum POI for each selected OSM URL to be active by
+		// default is 5
+		editor.putInt("osmMaxObject", 5);
 		editor.commit();
 
-		//add the default datasources to the preferences file
+		// add the default datasources to the preferences file
 		DataSourceStorage.getInstance().fillDefaultDataSources();
 	}
 
 	/**
-	 * Create zoom bar and returns FrameLayout.
-	 * FrameLayout is created to be hidden and not added to view,
-	 * Caller needs to add the frameLayout to view, and enable visibility 
-	 * when needed.
+	 * Create zoom bar and returns FrameLayout. FrameLayout is created to be
+	 * hidden and not added to view, Caller needs to add the frameLayout to
+	 * view, and enable visibility when needed.
 	 * 
-	 * @param SharedOreference settings where setting is stored
+	 * @param SharedOreference
+	 *            settings where setting is stored
 	 * @return FrameLayout Hidden Zoom Bar
 	 */
 	private FrameLayout createZoomBar(SharedPreferences settings) {
-		mixViewData.setMyZoomBar(new SeekBar(this));
-		mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);
-		mixViewData.getMyZoomBar().setMax(100);
-		mixViewData.getMyZoomBar().setProgress(settings.getInt("zoomLevel", 65));
-		mixViewData.getMyZoomBar().setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
-		mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);			
+		getMixViewData().setMyZoomBar(new SeekBar(this));
+		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
+		getMixViewData().getMyZoomBar().setMax(100);
+		getMixViewData().getMyZoomBar()
+				.setProgress(settings.getInt("zoomLevel", 65));
+		getMixViewData().getMyZoomBar().setOnSeekBarChangeListener(
+				myZoomBarOnSeekBarChangeListener);
+		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
 
 		FrameLayout frameLayout = new FrameLayout(this);
 
 		frameLayout.setMinimumWidth(3000);
-		frameLayout.addView(mixViewData.getMyZoomBar());
+		frameLayout.addView(getMixViewData().getMyZoomBar());
 		frameLayout.setPadding(10, 0, 10, 10);
 		return frameLayout;
 	}
-	
-	/* ********* Operator - Menu ******/
-	
+
+	/* ********* Operator - Menu ***** */
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
-		/*define the first*/
-		MenuItem item1 =menu.add(base, base, base, getString(R.string.menu_item_1)); 
-		MenuItem item2 =menu.add(base, base+1, base+1,  getString(R.string.menu_item_2)); 
-		MenuItem item3 =menu.add(base, base+2, base+2,  getString(R.string.menu_item_3));
-		MenuItem item4 =menu.add(base, base+3, base+3,  getString(R.string.menu_item_4));
-		MenuItem item5 =menu.add(base, base+4, base+4,  getString(R.string.menu_item_5));
-		MenuItem item6 =menu.add(base, base+5, base+5,  getString(R.string.menu_item_6));
-		MenuItem item7 =menu.add(base, base+6, base+6,  getString(R.string.menu_item_7));
+		/* define the first */
+		MenuItem item1 = menu.add(base, base, base,
+				getString(R.string.menu_item_1));
+		MenuItem item2 = menu.add(base, base + 1, base + 1,
+				getString(R.string.menu_item_2));
+		MenuItem item3 = menu.add(base, base + 2, base + 2,
+				getString(R.string.menu_item_3));
+		MenuItem item4 = menu.add(base, base + 3, base + 3,
+				getString(R.string.menu_item_4));
+		MenuItem item5 = menu.add(base, base + 4, base + 4,
+				getString(R.string.menu_item_5));
+		MenuItem item6 = menu.add(base, base + 5, base + 5,
+				getString(R.string.menu_item_6));
+		MenuItem item7 = menu.add(base, base + 6, base + 6,
+				getString(R.string.menu_item_7));
 
-		/*assign icons to the menu items*/
+		/* assign icons to the menu items */
 		item1.setIcon(drawable.icon_datasource);
 		item2.setIcon(android.R.drawable.ic_menu_view);
 		item3.setIcon(android.R.drawable.ic_menu_mapmode);
@@ -455,76 +487,87 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return true;
 	}
 
-	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		/*Data sources*/
-		case 1:		
-			if(!getDataView().isLauncherStarted()){
-				Intent intent = new Intent(MixView.this, DataSourceList.class); 
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		/* Data sources */
+		case 1:
+			if (!getDataView().isLauncherStarted()) {
+				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
-			}
-			else{
-				Toast.makeText( this, getString(R.string.no_website_available), Toast.LENGTH_LONG ).show();		
+			} else {
+				Toast.makeText(this, getString(R.string.no_website_available),
+						Toast.LENGTH_LONG).show();
 			}
 			break;
-			/*List view*/
+		/* List view */
 		case 2:
-			/*if the list of titles to show in alternative list view is not empty*/
+			/*
+			 * if the list of titles to show in alternative list view is not
+			 * empty
+			 */
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
-				Intent intent1 = new Intent(MixView.this, MixListView.class); 
+				Intent intent1 = new Intent(MixView.this, MixListView.class);
 				startActivityForResult(intent1, 42);
 			}
-			/*if the list is empty*/
-			else{
-				Toast.makeText( this, R.string.empty_list, Toast.LENGTH_LONG ).show();			
+			/* if the list is empty */
+			else {
+				Toast.makeText(this, R.string.empty_list, Toast.LENGTH_LONG)
+						.show();
 			}
 			break;
-			/*Map View*/
+		/* Map View */
 		case 3:
-			Intent intent2 = new Intent(MixView.this, MixMap.class); 
+			Intent intent2 = new Intent(MixView.this, MixMap.class);
 			startActivityForResult(intent2, 20);
 			break;
-			/*zoom level*/
+		/* zoom level */
 		case 4:
-			mixViewData.getMyZoomBar().setVisibility(View.VISIBLE);
-			mixViewData.setZoomProgress(mixViewData.getMyZoomBar().getProgress());
+			getMixViewData().getMyZoomBar().setVisibility(View.VISIBLE);
+			getMixViewData().setZoomProgress(getMixViewData().getMyZoomBar()
+					.getProgress());
 			break;
-			/*Search*/
+		/* Search */
 		case 5:
 			onSearchRequested();
 			break;
-			/*GPS Information*/
+		/* GPS Information */
 		case 6:
-			Location currentGPSInfo = mixViewData.getMixContext().getCurrentLocation();
+			Location currentGPSInfo = getMixViewData().getMixContext().getLocationFinder().getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(getString(R.string.general_info_text)+ "\n\n" +
-					getString(R.string.longitude) + currentGPSInfo.getLongitude() + "\n" +
-					getString(R.string.latitude) + currentGPSInfo.getLatitude() + "\n" +
-					getString(R.string.altitude)+ currentGPSInfo.getAltitude() + "m\n" +
-					getString(R.string.speed) + currentGPSInfo.getSpeed() + "km/h\n" +
-					getString(R.string.accuracy) + currentGPSInfo.getAccuracy() + "m\n" +
-					getString(R.string.gps_last_fix) + new Date(currentGPSInfo.getTime()).toString() + "\n");
-			builder.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.dismiss();
-				}
-			});
+			builder.setMessage(getString(R.string.general_info_text) + "\n\n"
+					+ getString(R.string.longitude)
+					+ currentGPSInfo.getLongitude() + "\n"
+					+ getString(R.string.latitude)
+					+ currentGPSInfo.getLatitude() + "\n"
+					+ getString(R.string.altitude)
+					+ currentGPSInfo.getAltitude() + "m\n"
+					+ getString(R.string.speed) + currentGPSInfo.getSpeed()
+					+ "km/h\n" + getString(R.string.accuracy)
+					+ currentGPSInfo.getAccuracy() + "m\n"
+					+ getString(R.string.gps_last_fix)
+					+ new Date(currentGPSInfo.getTime()).toString() + "\n");
+			builder.setNegativeButton(getString(R.string.close_button),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
 			AlertDialog alert = builder.create();
 			alert.setTitle(getString(R.string.general_info_title));
 			alert.show();
 			break;
-			/*Case 6: license agreements*/
+		/* Case 6: license agreements */
 		case 7:
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
-			builder1.setMessage(getString(R.string.license));	
-			/*Retry*/
-			builder1.setNegativeButton(getString(R.string.close_button), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.dismiss();
-				}
-			});
+			builder1.setMessage(getString(R.string.license));
+			/* Retry */
+			builder1.setNegativeButton(getString(R.string.close_button),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					});
 			AlertDialog alert1 = builder1.create();
 			alert1.setTitle(getString(R.string.license_title));
 			alert1.show();
@@ -534,16 +577,18 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return true;
 	}
 
-	/* ******** Operators - Sensors *******/
-	
+	/* ******** Operators - Sensors ****** */
+
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 		Toast t;
 
-		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
 			float myout = calcZoomLevel();
 
-			mixViewData.setZoomLevel(String.valueOf(myout));
-			mixViewData.setZoomProgress(mixViewData.getMyZoomBar().getProgress());
+			getMixViewData().setZoomLevel(String.valueOf(myout));
+			getMixViewData().setZoomProgress(getMixViewData().getMyZoomBar()
+					.getProgress());
 
 			t.setText("Radius: " + String.valueOf(myout));
 			t.show();
@@ -552,19 +597,19 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		public void onStartTrackingTouch(SeekBar seekBar) {
 			Context ctx = seekBar.getContext();
 			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			//			zoomChanging= true;
+			// zoomChanging= true;
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
-			/*store the zoom range of the zoom bar selected by the user*/
-			editor.putInt("zoomLevel", mixViewData.getMyZoomBar().getProgress());
+			/* store the zoom range of the zoom bar selected by the user */
+			editor.putInt("zoomLevel", getMixViewData().getMyZoomBar().getProgress());
 			editor.commit();
-			mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);
-			//			zoomChanging= false;
+			getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
+			// zoomChanging= false;
 
-			mixViewData.getMyZoomBar().getProgress();
+			getMixViewData().getMyZoomBar().getProgress();
 
 			t.cancel();
 			setZoomLevel();
@@ -572,58 +617,66 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	};
 
-
 	public void onSensorChanged(SensorEvent evt) {
 		try {
 
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-				mixViewData.getGrav()[0] = evt.values[0];
-				mixViewData.getGrav()[1] = evt.values[1];
-				mixViewData.getGrav()[2] = evt.values[2];
+				getMixViewData().getGrav()[0] = evt.values[0];
+				getMixViewData().getGrav()[1] = evt.values[1];
+				getMixViewData().getGrav()[2] = evt.values[2];
 
 				augScreen.postInvalidate();
 			} else if (evt.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-				mixViewData.getMag()[0] = evt.values[0];
-				mixViewData.getMag()[1] = evt.values[1];
-				mixViewData.getMag()[2] = evt.values[2];
+				getMixViewData().getMag()[0] = evt.values[0];
+				getMixViewData().getMag()[1] = evt.values[1];
+				getMixViewData().getMag()[2] = evt.values[2];
 
 				augScreen.postInvalidate();
 			}
 
-			SensorManager.getRotationMatrix(mixViewData.getRTmp(), mixViewData.getI(), mixViewData.getGrav(), mixViewData.getMag());
-			
+			SensorManager.getRotationMatrix(getMixViewData().getRTmp(),
+					getMixViewData().getI(), getMixViewData().getGrav(),
+					getMixViewData().getMag());
+
 			int rotation = Compatibility.getRotation(this);
 
 			if (rotation == 1) {
-				SensorManager.remapCoordinateSystem(mixViewData.getRTmp(), SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z, mixViewData.getRot());
+				SensorManager.remapCoordinateSystem(getMixViewData().getRTmp(),
+						SensorManager.AXIS_X, SensorManager.AXIS_MINUS_Z,
+						getMixViewData().getRot());
 			} else {
-				SensorManager.remapCoordinateSystem(mixViewData.getRTmp(), SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z, mixViewData.getRot());
+				SensorManager.remapCoordinateSystem(getMixViewData().getRTmp(),
+						SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_Z,
+						getMixViewData().getRot());
 			}
-			mixViewData.getTempR().set(mixViewData.getRot()[0], mixViewData.getRot()[1], mixViewData.getRot()[2], mixViewData.getRot()[3], mixViewData.getRot()[4], mixViewData.getRot()[5], mixViewData.getRot()[6], mixViewData.getRot()[7],
-					mixViewData.getRot()[8]);
+			getMixViewData().getTempR().set(getMixViewData().getRot()[0],
+					getMixViewData().getRot()[1], getMixViewData().getRot()[2],
+					getMixViewData().getRot()[3], getMixViewData().getRot()[4],
+					getMixViewData().getRot()[5], getMixViewData().getRot()[6],
+					getMixViewData().getRot()[7], getMixViewData().getRot()[8]);
 
-			mixViewData.getFinalR().toIdentity();
-			mixViewData.getFinalR().prod(mixViewData.getM4());
-			mixViewData.getFinalR().prod(mixViewData.getM1());
-			mixViewData.getFinalR().prod(mixViewData.getTempR());
-			mixViewData.getFinalR().prod(mixViewData.getM3());
-			mixViewData.getFinalR().prod(mixViewData.getM2());
-			mixViewData.getFinalR().invert(); 
+			getMixViewData().getFinalR().toIdentity();
+			getMixViewData().getFinalR().prod(getMixViewData().getM4());
+			getMixViewData().getFinalR().prod(getMixViewData().getM1());
+			getMixViewData().getFinalR().prod(getMixViewData().getTempR());
+			getMixViewData().getFinalR().prod(getMixViewData().getM3());
+			getMixViewData().getFinalR().prod(getMixViewData().getM2());
+			getMixViewData().getFinalR().invert();
 
-			mixViewData.getHistR()[mixViewData.getrHistIdx()].set(mixViewData.getFinalR());
-			mixViewData.setrHistIdx(mixViewData.getrHistIdx() + 1);
-			if (mixViewData.getrHistIdx() >= mixViewData.getHistR().length)
-				mixViewData.setrHistIdx(0);
+			getMixViewData().getHistR()[getMixViewData().getrHistIdx()].set(getMixViewData()
+					.getFinalR());
+			getMixViewData().setrHistIdx(getMixViewData().getrHistIdx() + 1);
+			if (getMixViewData().getrHistIdx() >= getMixViewData().getHistR().length)
+				getMixViewData().setrHistIdx(0);
 
-			mixViewData.getSmoothR().set(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f);
-			for (int i = 0; i < mixViewData.getHistR().length; i++) {
-				mixViewData.getSmoothR().add(mixViewData.getHistR()[i]);
+			getMixViewData().getSmoothR().set(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f);
+			for (int i = 0; i < getMixViewData().getHistR().length; i++) {
+				getMixViewData().getSmoothR().add(getMixViewData().getHistR()[i]);
 			}
-			mixViewData.getSmoothR().mult(1 / (float) mixViewData.getHistR().length);
+			getMixViewData().getSmoothR().mult(
+					1 / (float) getMixViewData().getHistR().length);
 
-			synchronized (mixViewData.getMixContext().rotationM) {
-				mixViewData.getMixContext().rotationM.set(mixViewData.getSmoothR());
-			}
+			getMixViewData().getMixContext().updateSmoothRotation(getMixViewData().getSmoothR());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -642,7 +695,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			return true;
 		} catch (Exception ex) {
-			//doError(ex);
+			// doError(ex);
 			ex.printStackTrace();
 			return super.onTouchEvent(me);
 		}
@@ -663,8 +716,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				}
 			} else if (keyCode == KeyEvent.KEYCODE_MENU) {
 				return super.onKeyDown(keyCode, event);
-			}
-			else {
+			} else {
 				getDataView().keyEvent(keyCode);
 				return false;
 			}
@@ -676,11 +728,15 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		if(sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD && accuracy==SensorManager.SENSOR_STATUS_UNRELIABLE && mixViewData.getCompassErrorDisplayed() == 0) {
-			for(int i = 0; i <2; i++) {
-				Toast.makeText(mixViewData.getMixContext(), "Compass data unreliable. Please recalibrate compass.", Toast.LENGTH_LONG).show();
+		if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD
+				&& accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE
+				&& getMixViewData().getCompassErrorDisplayed() == 0) {
+			for (int i = 0; i < 2; i++) {
+				Toast.makeText(getMixViewData().getMixContext(),
+						"Compass data unreliable. Please recalibrate compass.",
+						Toast.LENGTH_LONG).show();
 			}
-			mixViewData.setCompassErrorDisplayed(mixViewData
+			getMixViewData().setCompassErrorDisplayed(getMixViewData()
 					.getCompassErrorDisplayed() + 1);
 		}
 	}
@@ -688,15 +744,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		getDataView().setFrozen(false);
-		if (mixViewData.getSearchNotificationTxt() != null) {
-			mixViewData.getSearchNotificationTxt().setVisibility(View.GONE);
-			mixViewData.setSearchNotificationTxt(null);
+		if (getMixViewData().getSearchNotificationTxt() != null) {
+			getMixViewData().getSearchNotificationTxt().setVisibility(View.GONE);
+			getMixViewData().setSearchNotificationTxt(null);
 		}
 		return false;
 	}
 
-
-	/* ************ Handlers *************/
+	/* ************ Handlers ************ */
 
 	public void doError(Exception ex1) {
 		if (!fError) {
@@ -721,7 +776,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		if (fError)
 			throw new Exception();
 	}
-	
+
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
@@ -737,41 +792,42 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	private void doMixSearch(String query) {
 		DataHandler jLayer = getDataView().getDataHandler();
-		if(!getDataView().isFrozen()){
+		if (!getDataView().isFrozen()) {
 			MixListView.originalMarkerList = jLayer.getMarkerList();
 			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
 
-		ArrayList<Marker> searchResults =new ArrayList<Marker>();
-		Log.d("SEARCH-------------------0", ""+query);
+		ArrayList<Marker> searchResults = new ArrayList<Marker>();
+		Log.d("SEARCH-------------------0", "" + query);
 		if (jLayer.getMarkerCount() > 0) {
-			for(int i = 0; i < jLayer.getMarkerCount(); i++) {
+			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
 				Marker ma = jLayer.getMarker(i);
-				if(ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1){
+				if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1) {
 					searchResults.add(ma);
-					/*the website for the corresponding title*/
+					/* the website for the corresponding title */
 				}
 			}
 		}
-		if (searchResults.size() > 0){
+		if (searchResults.size() > 0) {
 			getDataView().setFrozen(true);
 			jLayer.setMarkerList(searchResults);
-		}
-		else
-			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
+		} else
+			Toast.makeText(this,
+					getString(R.string.search_failed_notification),
+					Toast.LENGTH_LONG).show();
 	}
 
-
-	/* ******* Getter and Setters ***********/
+	/* ******* Getter and Setters ********** */
 
 	public boolean isZoombarVisible() {
-		return mixViewData.getMyZoomBar() != null && mixViewData.getMyZoomBar().getVisibility() == View.VISIBLE;
+		return getMixViewData().getMyZoomBar() != null
+				&& getMixViewData().getMyZoomBar().getVisibility() == View.VISIBLE;
 	}
-	
+
 	public String getZoomLevel() {
-		return mixViewData.getZoomLevel();
+		return getMixViewData().getZoomLevel();
 	}
-	
+
 	/**
 	 * @return the dWindow
 	 */
@@ -779,14 +835,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return dWindow;
 	}
 
-
 	/**
-	 * @param dWindow the dWindow to set
+	 * @param dWindow
+	 *            the dWindow to set
 	 */
 	static void setdWindow(PaintScreen dWindow) {
 		MixView.dWindow = dWindow;
 	}
-
 
 	/**
 	 * @return the dataView
@@ -795,17 +850,16 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return dataView;
 	}
 
-
 	/**
-	 * @param dataView the dataView to set
+	 * @param dataView
+	 *            the dataView to set
 	 */
 	static void setDataView(DataView dataView) {
 		MixView.dataView = dataView;
 	}
 
-
 	public int getZoomProgress() {
-		return mixViewData.getZoomProgress();
+		return getMixViewData().getZoomProgress();
 	}
 
 	private void setZoomLevel() {
@@ -813,24 +867,21 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		getDataView().setRadius(myout);
 
-		mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);
-		mixViewData.setZoomLevel(String.valueOf(myout));
+		getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
+		getMixViewData().setZoomLevel(String.valueOf(myout));
 
 		getDataView().doStart();
 		getDataView().clearEvents();
-		mixViewData.setDownloadThread(new Thread(mixViewData.getMixContext().getDownloadManager()));
-		mixViewData.getDownloadThread().start();
+
+		getMixViewData().getMixContext().getDownloadManager().switchOn();
 
 	};
 
-
-
 }
-
 
 /**
  * @author daniele
- *
+ * 
  */
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 	MixView app;
@@ -904,59 +955,71 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		try {
 			Camera.Parameters parameters = camera.getParameters();
 			try {
 				List<Camera.Size> supportedSizes = null;
-				//On older devices (<1.6) the following will fail
-				//the camera will work nevertheless
+				// On older devices (<1.6) the following will fail
+				// the camera will work nevertheless
 				supportedSizes = Compatibility.getSupportedPreviewSizes(parameters);
 
-				//preview form factor
-				float ff = (float)w/h;
-				Log.d("Mixare", "Screen res: w:"+ w + " h:" + h + " aspect ratio:" + ff);
+				// preview form factor
+				float ff = (float) w / h;
+				Log.d("Mixare", "Screen res: w:" + w + " h:" + h
+						+ " aspect ratio:" + ff);
 
-				//holder for the best form factor and size
+				// holder for the best form factor and size
 				float bff = 0;
 				int bestw = 0;
 				int besth = 0;
 				Iterator<Camera.Size> itr = supportedSizes.iterator();
 
-				//we look for the best preview size, it has to be the closest to the
-				//screen form factor, and be less wide than the screen itself
-				//the latter requirement is because the HTC Hero with update 2.1 will
-				//report camera preview sizes larger than the screen, and it will fail
-				//to initialize the camera
-				//other devices could work with previews larger than the screen though
-				while(itr.hasNext()) {
+				// we look for the best preview size, it has to be the closest
+				// to the
+				// screen form factor, and be less wide than the screen itself
+				// the latter requirement is because the HTC Hero with update
+				// 2.1 will
+				// report camera preview sizes larger than the screen, and it
+				// will fail
+				// to initialize the camera
+				// other devices could work with previews larger than the screen
+				// though
+				while (itr.hasNext()) {
 					Camera.Size element = itr.next();
-					//current form factor
-					float cff = (float)element.width/element.height;
-					//check if the current element is a candidate to replace the best match so far
-					//current form factor should be closer to the bff
-					//preview width should be less than screen width
-					//preview width should be more than current bestw
-					//this combination will ensure that the highest resolution will win
-					Log.d("Mixare", "Candidate camera element: w:"+ element.width + " h:" + element.height + " aspect ratio:" + cff);
-					if ((ff-cff <= ff-bff) && (element.width <= w) && (element.width >= bestw)) {
-						bff=cff;
+					// current form factor
+					float cff = (float) element.width / element.height;
+					// check if the current element is a candidate to replace
+					// the best match so far
+					// current form factor should be closer to the bff
+					// preview width should be less than screen width
+					// preview width should be more than current bestw
+					// this combination will ensure that the highest resolution
+					// will win
+					Log.d("Mixare", "Candidate camera element: w:"
+							+ element.width + " h:" + element.height
+							+ " aspect ratio:" + cff);
+					if ((ff - cff <= ff - bff) && (element.width <= w)
+							&& (element.width >= bestw)) {
+						bff = cff;
 						bestw = element.width;
 						besth = element.height;
 					}
-				} 
-				Log.d("Mixare", "Chosen camera element: w:"+ bestw + " h:" + besth + " aspect ratio:" + bff);
-				//Some Samsung phones will end up with bestw and besth = 0 because their minimum preview size is bigger then the screen size.
-				//In this case, we use the default values: 480x320
-				if ((bestw == 0) || (besth == 0)){
+				}
+				Log.d("Mixare", "Chosen camera element: w:" + bestw + " h:"
+						+ besth + " aspect ratio:" + bff);
+				// Some Samsung phones will end up with bestw and besth = 0
+				// because their minimum preview size is bigger then the screen
+				// size.
+				// In this case, we use the default values: 480x320
+				if ((bestw == 0) || (besth == 0)) {
 					Log.d("Mixare", "Using default camera parameters!");
 					bestw = 480;
 					besth = 320;
 				}
 				parameters.setPreviewSize(bestw, besth);
 			} catch (Exception ex) {
-				parameters.setPreviewSize(480 , 320);
+				parameters.setPreviewSize(480, 320);
 			}
 
 			camera.setParameters(parameters);
@@ -969,10 +1032,10 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 
 class AugmentedView extends View {
 	MixView app;
-	int xSearch=200;
+	int xSearch = 200;
 	int ySearch = 10;
 	int searchObjWidth = 0;
-	int searchObjHeight=0;
+	int searchObjHeight = 0;
 
 	Paint zoomPaint = new Paint();
 
@@ -991,18 +1054,18 @@ class AugmentedView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		try {
-			//			if (app.fError) {
+			// if (app.fError) {
 			//
-			//				Paint errPaint = new Paint();
-			//				errPaint.setColor(Color.RED);
-			//				errPaint.setTextSize(16);
-			//				
-			//				/*Draws the Error code*/
-			//				canvas.drawText("ERROR: ", 10, 20, errPaint);
-			//				canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
+			// Paint errPaint = new Paint();
+			// errPaint.setColor(Color.RED);
+			// errPaint.setTextSize(16);
 			//
-			//				return;
-			//			}
+			// /*Draws the Error code*/
+			// canvas.drawText("ERROR: ", 10, 20, errPaint);
+			// canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
+			//
+			// return;
+			// }
 
 			app.killOnError();
 
@@ -1012,26 +1075,31 @@ class AugmentedView extends View {
 			MixView.getdWindow().setCanvas(canvas);
 
 			if (!MixView.getDataView().isInited()) {
-				MixView.getDataView().init(MixView.getdWindow().getWidth(), MixView.getdWindow().getHeight());
+				MixView.getDataView().init(MixView.getdWindow().getWidth(),
+						MixView.getdWindow().getHeight());
 			}
-			if (app.isZoombarVisible()){
+			if (app.isZoombarVisible()) {
 				zoomPaint.setColor(Color.WHITE);
 				zoomPaint.setTextSize(14);
 				String startKM, endKM;
 				endKM = "80km";
 				startKM = "0km";
-				/*if(MixListView.getDataSource().equals("Twitter")){
-					startKM = "1km";
-				}*/
-				canvas.drawText(startKM, canvas.getWidth()/100*4, canvas.getHeight()/100*85, zoomPaint);
-				canvas.drawText(endKM, canvas.getWidth()/100*99+25, canvas.getHeight()/100*85, zoomPaint);
+				/*
+				 * if(MixListView.getDataSource().equals("Twitter")){ startKM =
+				 * "1km"; }
+				 */
+				canvas.drawText(startKM, canvas.getWidth() / 100 * 4,
+						canvas.getHeight() / 100 * 85, zoomPaint);
+				canvas.drawText(endKM, canvas.getWidth() / 100 * 99 + 25,
+						canvas.getHeight() / 100 * 85, zoomPaint);
 
-				int height= canvas.getHeight()/100*85;
+				int height = canvas.getHeight() / 100 * 85;
 				int zoomProgress = app.getZoomProgress();
 				if (zoomProgress > 92 || zoomProgress < 6) {
-					height = canvas.getHeight()/100*80;
+					height = canvas.getHeight() / 100 * 80;
 				}
-				canvas.drawText(app.getZoomLevel(),  (canvas.getWidth())/100*zoomProgress+20, height, zoomPaint);
+				canvas.drawText(app.getZoomLevel(), (canvas.getWidth()) / 100
+						* zoomProgress + 20, height, zoomPaint);
 			}
 
 			MixView.getDataView().draw(MixView.getdWindow());
@@ -1047,8 +1115,7 @@ class AugmentedView extends View {
  * @author A B
  */
 class MixViewDataHolder {
-	private MixContext mixContext;
-	private Thread downloadThread;
+	private final MixContext mixContext;
 	private float[] RTmp;
 	private float[] Rot;
 	private float[] I;
@@ -1074,10 +1141,11 @@ class MixViewDataHolder {
 	private int zoomProgress;
 	private TextView searchNotificationTxt;
 
-	public MixViewDataHolder() {
-		RTmp = new float[9];
-		Rot = new float[9];
-		I = new float[9];
+	public MixViewDataHolder(MixContext mixContext) {
+		this.mixContext=mixContext;
+		this.RTmp = new float[9];
+		this.Rot = new float[9];
+		this.I = new float[9];
 		this.grav = new float[3];
 		this.mag = new float[3];
 		this.rHistIdx = 0;
@@ -1092,21 +1160,9 @@ class MixViewDataHolder {
 		this.compassErrorDisplayed = 0;
 	}
 
-	/* ******* Getter and Setters ***********/
+	/* ******* Getter and Setters ********** */
 	public MixContext getMixContext() {
 		return mixContext;
-	}
-
-	public void setMixContext(MixContext mixContext) {
-		this.mixContext = mixContext;
-	}
-
-	public Thread getDownloadThread() {
-		return downloadThread;
-	}
-
-	public void setDownloadThread(Thread downloadThread) {
-		this.downloadThread = downloadThread;
 	}
 
 	public float[] getRTmp() {
