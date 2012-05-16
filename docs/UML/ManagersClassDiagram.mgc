@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <Class name="org.mixare.MixContext" x="439" y="-61">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+        <Association
+            destinationClassName="org.mixare.mgr.webcontent.WebContentManager"
+            endpointName="webContentManager" kind="Simple"/>
+        <Association
+            destinationClassName="org.mixare.mgr.datasource.DataSourceManager"
+            endpointName="dataSourceManager" kind="Simple"/>
+        <Association
+            destinationClassName="org.mixare.mgr.location.LocationFinder"
+            endpointName="locationFinder" kind="Simple"/>
+        <Association
+            destinationClassName="org.mixare.mgr.downloader.DownloadManager"
+            endpointName="downloadManager" kind="Simple"/>
+        <Communication destinationClassName="org.mixare.mgr.datasource.DataSourceManager"/>
+        <Communication destinationClassName="org.mixare.mgr.webcontent.WebContentManager"/>
+        <Communication destinationClassName="org.mixare.mgr.location.LocationFinder"/>
+    </Class>
+    <Class
+        name="org.mixare.mgr.location.LocationFinder.LocationFinderState"
+        x="26" y="217">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="org.mixare.mgr.downloader.DownloadManager" x="462" y="236">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="true"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+    </Class>
+    <Class name="org.mixare.mgr.datasource.DataSourceManager" x="743" y="223">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="true"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+    </Class>
+    <Class name="org.mixare.mgr.downloader.DownloadResult" x="85" y="395">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+        <Association
+            destinationClassName="org.mixare.mgr.downloader.DownloadRequest"
+            endpointName="errorRequest" kind="Simple"/>
+    </Class>
+    <Class
+        name="org.mixare.mgr.downloader.DownloadManager.DownloadManagerState"
+        x="487" y="445">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="org.mixare.mgr.webcontent.WebContentManager" x="885" y="37">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="false" constructors-accepted="true"/>
+    </Class>
+    <Class name="org.mixare.mgr.HttpTools" x="782" y="460">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="true"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+    </Class>
+    <Class name="org.mixare.mgr.downloader.DownloadRequest" x="211" y="243">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+    </Class>
+    <Class name="org.mixare.mgr.location.LocationFinder" x="28" y="17">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="true"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="true" static-accepted="true"
+            accessors-accepted="true" constructors-accepted="true"/>
+    </Class>
+</ClassDiagram>

@@ -29,7 +29,6 @@ import org.mixare.lib.marker.Marker;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -59,12 +58,13 @@ public class MixListView extends ListActivity {
 	private Vector<String> dataSourceDescription;
 	private Vector<Boolean> dataSourceChecked;
 	private Vector<Integer> dataSourceIcon;
-	
-	private MixContext mixContext;
-
 	private DataView dataView;
+	
+	/*
+	private MixContext mixContext;
 	private ListItemAdapter adapter;
 	private static Context ctx;
+	*/
 	private static String searchQuery = "";
 	private static SpannableString underlinedTitle;
 	public static List<Marker> searchResultMarkers;
@@ -87,10 +87,7 @@ public class MixListView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		//		mixCtx = MixView.ctx;
 		dataView = MixView.getDataView();	
-		ctx = this;
-		mixContext = dataView.getContext();
 
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<SpannableString>();
@@ -216,7 +213,7 @@ public class MixListView extends ListActivity {
 			try {
 				if (selectedURL.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(selectedURL);
-					dataView.getContext().loadWebPage(newUrl, this);
+					dataView.getContext().getWebContentManager().loadWebPage(newUrl, this);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
