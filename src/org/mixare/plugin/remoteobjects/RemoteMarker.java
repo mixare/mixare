@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.plugin;
+package org.mixare.plugin.remoteobjects;
 
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
@@ -30,6 +30,7 @@ import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
+import org.mixare.plugin.PluginNotFoundException;
 
 import android.location.Location;
 import android.os.RemoteException;
@@ -52,9 +53,9 @@ public class RemoteMarker implements Marker{
 		return 0;
 	}
 
-	public void buildMarker(String title, double latitude, double longitude, double altitude, String url, int type, int color){
+	public void buildMarker(int id, String title, double latitude, double longitude, double altitude, String url, int type, int color){
 		try {
-			this.markerName = iMarkerService.buildMarker(title, latitude, longitude, altitude, url, type, color);
+			this.markerName = iMarkerService.buildMarker(id, title, latitude, longitude, altitude, url, type, color);
 		} catch (RemoteException e) {
 			throw new PluginNotFoundException(e);
 		}

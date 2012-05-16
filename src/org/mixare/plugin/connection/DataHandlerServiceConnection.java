@@ -21,7 +21,7 @@ package org.mixare.plugin.connection;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.service.IDataHandlerService;
 import org.mixare.plugin.PluginConnection;
-import org.mixare.plugin.RemoteDataHandler;
+import org.mixare.plugin.remoteobjects.RemoteDataHandler;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
