@@ -20,13 +20,12 @@ package org.mixare.mgr.location;
 
 import org.mixare.mgr.downloader.DownloadManager;
 
-import android.content.Context;
 import android.hardware.GeomagneticField;
 import android.location.Location;
 
 /**
  * This class is repsonsible for finding the location, and sending it back to
- * the mixcontext. It will also
+ * the mixcontext.
  */
 public interface LocationFinder {
 
@@ -40,21 +39,26 @@ public interface LocationFinder {
 	}
 
 	/**
-	 * ?
-	 *  
+	 * Finds the location through the providers  
 	 * @param ctx
 	 * @return
 	 */
-	Location findLocation();
+	void findLocation();
 
+	/**
+	 * A working location provider has been found: check if 
+	 * the found location has the best accuracy.
+	 */
+	void locationCallback(String provider);
+	
 	/**
 	 * Returns the current location.
 	 */
 	Location getCurrentLocation();
 
 	/**
-	 * ?
-	 * 
+	 * Gets the location that was used in the last download for
+	 * datasources.
 	 * @return
 	 */
 	Location getLocationAtLastDownload();

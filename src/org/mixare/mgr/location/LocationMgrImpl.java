@@ -18,6 +18,10 @@
  */
 package org.mixare.mgr.location;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.mixare.MixContext;
 import org.mixare.MixView;
@@ -26,14 +30,14 @@ import org.mixare.mgr.downloader.DownloadManager;
 
 import android.content.Context;
 import android.hardware.GeomagneticField;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
  * This class is repsonsible for finding the location, and sending it back to
- * the mixcontext. It will also
+ * the mixcontext.
  * 
  * @author A. Egal
  */
@@ -46,6 +50,7 @@ class LocationMgrImpl implements LocationFinder {
 	private Location locationAtLastDownload;
 	private LocationFinderState state;
 	private final LocationObserver lob;
+	private List<LocationResolver> locationResolvers;
 
 	// frequency and minimum distance for update
 	// this values will only be used after there's a good GPS fix
@@ -57,15 +62,19 @@ class LocationMgrImpl implements LocationFinder {
 
 	public LocationMgrImpl(MixContext mixContext) {
 		this.mixContext = mixContext;
-		this.lob=new LocationObserver(this);
-		this.state=LocationFinderState.Inactive;
+		this.lob = new LocationObserver(this);
+		this.state = LocationFinderState.Inactive;
+		this.locationResolvers = new ArrayList<LocationResolver>();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mixare.mgr.location.LocationFinder#findLocation(android.content.Context)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.mixare.mgr.location.LocationFinder#findLocation(android.content.Context
+	 * )
 	 */
-	public Location findLocation() {
-		
+	public void findLocation() {
 
 		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
@@ -77,47 +86,54 @@ class LocationMgrImpl implements LocationFinder {
 
 		try {
 			requestBestLocationUpdates();
-			curLoc = lm.getLastKnownLocation(bestLocationProvider);
+			//temporary set the current location, until a good provider is found
+			curLoc = lm.getLastKnownLocation(lm.getBestProvider(new Criteria(), true));
 		} catch (Exception ex2) {
 			// ex2.printStackTrace();
 			curLoc = hardFix;
 			mixContext.doPopUp(R.string.connection_GPS_dialog_text);
 
 		}
-
-		setLocationAtLastDownload(curLoc);
-		return curLoc;
 	}
 
 	private void requestBestLocationUpdates() {
-		float accuracy = 0;
-		String provider = null;
+		Timer timer = new Timer();
 		for (String p : lm.getAllProviders()) {
-			Location location = lm.getLastKnownLocation(p);
-			if (location != null) {
-				if (lm.getProvider(p).getAccuracy() > accuracy) {
-					accuracy = location.getAccuracy();
-					provider = p;
-				}
+			if(lm.isProviderEnabled(p)){
+				LocationResolver lr = new LocationResolver(lm, p, this);
+				locationResolvers.add(lr);
+				lm.requestLocationUpdates(p, 0, 0, lr);
 			}
 		}
-		if (provider != null && !provider.equals(bestLocationProvider)) {
-			Log.i(MixContext.TAG,
-					"Location provider has changed, old provider: "
-							+ bestLocationProvider
-							+ " changed to new provider: " + provider);
-			
-			lm.removeUpdates(getObserver());
-			state=LocationFinderState.Confused;
-			lm.requestLocationUpdates(provider, freq, dist, getObserver());
-			state=LocationFinderState.Active;
-			bestLocationProvider = provider;
-		}
+		timer.schedule(new LocationTimerTask(),20* 1000); //wait 20 seconds for the location updates to find the location
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.mixare.mgr.location.LocationFinder#locationCallback(android.content
+	 * .Context)
+	 */
+	public void locationCallback(String provider) {
+		Location foundLocation = lm.getLastKnownLocation(provider);
+		if (bestLocationProvider != null) {
+			Location bestLocation = lm
+					.getLastKnownLocation(bestLocationProvider);
+			if (foundLocation.getAccuracy() < bestLocation.getAccuracy()) {
+				curLoc = foundLocation;
+				bestLocationProvider = provider;
+			}
+		} else {
+			curLoc = foundLocation;
+			bestLocationProvider = provider;
+		}
+		setLocationAtLastDownload(curLoc);		
+	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mixare.mgr.location.LocationFinder#getCurrentLocation()
 	 */
 	public Location getCurrentLocation() {
@@ -135,30 +151,40 @@ class LocationMgrImpl implements LocationFinder {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mixare.mgr.location.LocationFinder#getLocationAtLastDownload()
 	 */
 	public Location getLocationAtLastDownload() {
 		return locationAtLastDownload;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mixare.mgr.location.LocationFinder#setLocationAtLastDownload(android.location.Location)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.mixare.mgr.location.LocationFinder#setLocationAtLastDownload(android
+	 * .location.Location)
 	 */
 	public void setLocationAtLastDownload(Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.mixare.mgr.location.LocationFinder#setDownloadManager(org.mixare.mgr.downloader.DownloadManager)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.mixare.mgr.location.LocationFinder#setDownloadManager(org.mixare.
+	 * mgr.downloader.DownloadManager)
 	 */
 	public void setDownloadManager(DownloadManager downloadManager) {
-        getObserver().setDownloadManager(downloadManager);
+		getObserver().setDownloadManager(downloadManager);
 	}
 
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mixare.mgr.location.LocationFinder#getGeomagneticField()
 	 */
 	public GeomagneticField getGeomagneticField() {
@@ -170,24 +196,23 @@ class LocationMgrImpl implements LocationFinder {
 		return gmf;
 	}
 
-	
 	public void setPosition(Location location) {
 		synchronized (curLoc) {
 			curLoc = location;
 		}
-		mixContext.getActualMixView().repaint();
+		mixContext.getActualMixView().refresh();
 		Location lastLoc = getLocationAtLastDownload();
-		if (lastLoc == null){
+		if (lastLoc == null) {
 			setLocationAtLastDownload(location);
 		}
-		requestBestLocationUpdates();
 	}
 
 	@Override
 	public void switchOn() {
-		if (!LocationFinderState.Active.equals(state) ){
-		   lm = (LocationManager) mixContext.getSystemService(Context.LOCATION_SERVICE);
-		   state=LocationFinderState.Confused;
+		if (!LocationFinderState.Active.equals(state)) {
+			lm = (LocationManager) mixContext
+					.getSystemService(Context.LOCATION_SERVICE);
+			state = LocationFinderState.Confused;
 		}
 	}
 
@@ -195,8 +220,7 @@ class LocationMgrImpl implements LocationFinder {
 	public void switchOff() {
 		if (lm != null) {
 			lm.removeUpdates(getObserver());
-			lm = null; //TODO WHY?
-			state=LocationFinderState.Inactive;
+			state = LocationFinderState.Inactive;
 		}
 	}
 
@@ -204,9 +228,45 @@ class LocationMgrImpl implements LocationFinder {
 	public LocationFinderState getStatus() {
 		return state;
 	}
-	
+
 	private synchronized LocationObserver getObserver() {
 		return lob;
+	}
+
+	class LocationTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			//remove all location updates
+			for(LocationResolver locationResolver: locationResolvers){
+				lm.removeUpdates(locationResolver);
+			}
+			if(bestLocationProvider != null){
+				lm.removeUpdates(getObserver());
+				state=LocationFinderState.Confused;
+				mixContext.getActualMixView().runOnUiThread(new Runnable() {					
+					@Override
+					public void run() {
+						lm.requestLocationUpdates(bestLocationProvider, freq, dist, getObserver());		
+					}
+				});
+				state=LocationFinderState.Active;
+			}
+			else{ //no location found
+				mixContext.getActualMixView().runOnUiThread(new Runnable() {					
+					@Override
+					public void run() {
+						Toast.makeText(mixContext.getActualMixView(), 
+								mixContext.getActualMixView().getResources().getString(
+								R.string.location_not_found), Toast.LENGTH_LONG);
+					}
+				});
+				
+			}
+			
+			
+		}
+
 	}
 
 }
