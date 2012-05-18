@@ -389,7 +389,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 		addContentView(augScreen, new LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
 	}
 	
 	/**
@@ -423,6 +422,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 //		}catch (Exception ex){
 //		}
 	}
+
+
+	public void refresh(){
+		dataView.refresh();
+	}
+
 	public void setErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.connection_error_dialog));
