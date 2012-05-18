@@ -23,37 +23,25 @@ import java.util.List;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
-import org.mixare.lib.marker.Marker;
 import org.mixare.lib.MixUtils;
+import org.mixare.lib.marker.Marker;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.SearchManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnCreateContextMenuListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,12 +58,13 @@ public class MixListView extends ListActivity {
 	private Vector<String> dataSourceDescription;
 	private Vector<Boolean> dataSourceChecked;
 	private Vector<Integer> dataSourceIcon;
-	
-	private MixContext mixContext;
-
 	private DataView dataView;
+	
+	/*
+	private MixContext mixContext;
 	private ListItemAdapter adapter;
 	private static Context ctx;
+	*/
 	private static String searchQuery = "";
 	private static SpannableString underlinedTitle;
 	public static List<Marker> searchResultMarkers;
@@ -98,10 +87,7 @@ public class MixListView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		//		mixCtx = MixView.ctx;
-		dataView = MixView.dataView;	
-		ctx = this;
-		mixContext = dataView.getContext();
+		dataView = MixView.getDataView();	
 
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<SpannableString>();
@@ -134,8 +120,8 @@ public class MixListView extends ListActivity {
 
 				TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(DataView.SEARCH_ACTIVE_2));
-				searchNotificationTxt.setWidth(MixView.dWindow.getWidth());
+				searchNotificationTxt.setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(R.string.search_active_2));
+				searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
 				searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
@@ -193,7 +179,7 @@ public class MixListView extends ListActivity {
 			}
 		}
 		if (listViewMenu.size() == 0) {
-			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
+			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
 		}
 		else {
 			jLayer.setMarkerList(searchResultMarkers);
@@ -215,7 +201,7 @@ public class MixListView extends ListActivity {
 		/*if no website is available for this item*/
 		String selectedURL = position < selectedItemURL.size() ? selectedItemURL.get(position) : null;
 		if (selectedURL == null || selectedURL.length() <= 0)
-			Toast.makeText( this, getString(DataView.NO_WEBINFO_AVAILABLE), Toast.LENGTH_LONG ).show();			
+			Toast.makeText( this, getString(R.string.no_website_available), Toast.LENGTH_LONG ).show();			
 		else if("search".equals(selectedURL)){
 			dataView.setFrozen(false);
 			dataView.getDataHandler().setMarkerList(originalMarkerList);
@@ -227,7 +213,7 @@ public class MixListView extends ListActivity {
 			try {
 				if (selectedURL.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(selectedURL);
-					dataView.getContext().loadWebPage(newUrl, this);
+					dataView.getContext().getWebContentManager().loadWebPage(newUrl, this);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -240,8 +226,8 @@ public class MixListView extends ListActivity {
 		int base = Menu.FIRST;
 
 		/*define menu items*/
-		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
-		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
+		MenuItem item1 = menu.add(base, base, base, getString(R.string.menu_item_3)); 
+		MenuItem item2 = menu.add(base, base+1, base+1, getString(R.string.map_menu_cam_mode));
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);

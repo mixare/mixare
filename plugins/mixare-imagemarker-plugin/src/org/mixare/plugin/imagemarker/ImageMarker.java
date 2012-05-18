@@ -36,9 +36,9 @@ public class ImageMarker extends PluginMarker{
 	private Bitmap image; 
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 
-	public ImageMarker(String title, double latitude, double longitude,
+	public ImageMarker(int id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
-		super(title, latitude, longitude, altitude, URL, type, color);
+		super(id, title, latitude, longitude, altitude, URL, type, color);
 	}
 
 	@Override

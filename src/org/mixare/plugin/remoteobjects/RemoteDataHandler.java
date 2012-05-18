@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare.plugin;
+package org.mixare.plugin.remoteobjects;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +32,8 @@ import org.mixare.lib.marker.Marker;
 import org.mixare.lib.marker.draw.ParcelableProperty;
 import org.mixare.lib.marker.draw.PrimitiveProperty;
 import org.mixare.lib.service.IDataHandlerService;
+import org.mixare.plugin.PluginLoader;
+import org.mixare.plugin.PluginNotFoundException;
 
 import android.os.RemoteException;
 
@@ -92,9 +94,9 @@ public class RemoteDataHandler extends DataHandler implements DataProcessor{
 	private List<Marker> initializeMarkerData(List<InitialMarkerData> initialMarkerData) throws PluginNotFoundException, RemoteException{
 		List<Marker> markers = new ArrayList<Marker>();
 		for(InitialMarkerData i : initialMarkerData){
-			Marker marker = PluginLoader.getInstance().getMarkerInstance(i.getMarkerName(),
-					(String)i.getConstr()[0], (Double)i.getConstr()[1], (Double)i.getConstr()[2], 
-					(Double)i.getConstr()[3], (String)i.getConstr()[4], (Integer)i.getConstr()[5], (Integer)i.getConstr()[6]);
+			Marker marker = PluginLoader.getInstance().getMarkerInstance(i.getMarkerName(), (Integer)i.getConstr()[0],
+					(String)i.getConstr()[1], (Double)i.getConstr()[2], (Double)i.getConstr()[3], 
+					(Double)i.getConstr()[4], (String)i.getConstr()[5], (Integer)i.getConstr()[6], (Integer)i.getConstr()[7]);
 			fillExtraMarkerParcelableProperties(marker, i.getExtraParcelables());
 			fillExtraMarkerPrimitiveProperties(marker, i.getExtraPrimitives());
 			

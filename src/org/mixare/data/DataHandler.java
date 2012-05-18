@@ -70,7 +70,7 @@ public class DataHandler {
 				
 		for(Marker ma: markerList) {
 
-			Class mClass=ma.getClass();
+			Class<? extends Marker> mClass=ma.getClass();
 			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
 			
 			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
@@ -91,14 +91,14 @@ public class DataHandler {
 	/**
 	 * @deprecated Nobody should get direct access to the list
 	 */
-	public List getMarkerList() {
+	public List<Marker> getMarkerList() {
 		return markerList;
 	}
 	
 	/**
 	 * @deprecated Nobody should get direct access to the list
 	 */
-	public void setMarkerList(List markerList) {
+	public void setMarkerList(List<Marker> markerList) {
 		this.markerList = markerList;
 	}
 

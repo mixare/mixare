@@ -191,8 +191,6 @@ public class TextObj implements ScreenObj, Parcelable{
 	 }
 
 	@Override
-
-
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(txt);
 		dest.writeFloat(fontSize);

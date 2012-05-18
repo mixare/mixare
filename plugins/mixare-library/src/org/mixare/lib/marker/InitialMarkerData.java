@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2012- Peer internet solutions & Finalist IT Group
+ * 
+ * This file is part of mixare.
+ * 
+ * This program is free software: you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package org.mixare.lib.marker;
 
 import java.util.HashMap;
@@ -32,16 +50,17 @@ public class InitialMarkerData implements Parcelable{
 	private Map<String, ParcelableProperty> extraParcelables = new HashMap<String, ParcelableProperty>();
 	
 	
-	public InitialMarkerData(String title, double latitude, double longitude, 
+	public InitialMarkerData(int id, String title, double latitude, double longitude, 
 			double altitude, String link, int type, int colour) {
-		constr = new Object[7];
-		constr[0] = title;
-		constr[1] = latitude;
-		constr[2] = longitude;
-		constr[3] = altitude;
-		constr[4] = link;
-		constr[5] = type;
-		constr[6] = colour;
+		constr = new Object[8];
+		constr[0] = id;
+		constr[1] = title;
+		constr[2] = latitude;
+		constr[3] = longitude;
+		constr[4] = altitude;
+		constr[5] = link;
+		constr[6] = type;
+		constr[7] = colour;
 	}
 	
 	public InitialMarkerData(Parcel in) {
@@ -129,13 +148,14 @@ public class InitialMarkerData implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(markerName);
 		
-		dest.writeString((String)constr[0]);
-		dest.writeDouble((Double)constr[1]);
+		dest.writeInt((Integer)constr[0]);
+		dest.writeString((String)constr[1]);
 		dest.writeDouble((Double)constr[2]);
 		dest.writeDouble((Double)constr[3]);
-		dest.writeString((String)constr[4]);
-		dest.writeInt((Integer)constr[5]);
+		dest.writeDouble((Double)constr[4]);
+		dest.writeString((String)constr[5]);
 		dest.writeInt((Integer)constr[6]);
+		dest.writeInt((Integer)constr[7]);
 		
 		dest.writeInt(extraPrimitives.size());
 		for (String s: extraPrimitives.keySet()) {
@@ -153,14 +173,15 @@ public class InitialMarkerData implements Parcelable{
 	public void readParcel(Parcel in){
 		markerName = in.readString();
 		
-		constr = new Object[7];
-		constr[0] = in.readString(); 
-		constr[1] = in.readDouble();
+		constr = new Object[8];
+		constr[0] = in.readInt(); 
+		constr[1] = in.readString(); 
 		constr[2] = in.readDouble();
 		constr[3] = in.readDouble();
-		constr[4] = in.readString();
-		constr[5] = in.readInt();
+		constr[4] = in.readDouble();
+		constr[5] = in.readString();
 		constr[6] = in.readInt();
+		constr[7] = in.readInt();
 		
 		int countPrim = in.readInt();
         for (int i = 0; i < countPrim; i++) {
