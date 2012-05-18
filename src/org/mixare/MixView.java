@@ -335,6 +335,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		setZoomLevel(); // @TODO Caller has to set the zoom. This function
 						// repaints only.
 	}
+	
+	public void refresh(){
+		dataView.refresh();
+	}
 
 	public void setErrorDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
