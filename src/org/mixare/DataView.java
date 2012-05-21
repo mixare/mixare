@@ -278,6 +278,34 @@ public class DataView {
 		}
 
 		// Draw Radar
+		drawRadar(dw);
+
+		// Get next event
+		UIEvent evt = null;
+		synchronized (uiEvents) {
+			if (uiEvents.size() > 0) {
+				evt = uiEvents.get(0);
+				uiEvents.remove(0);
+			}
+		}
+		if (evt != null) {
+			switch (evt.type) {
+			case UIEvent.KEY:
+				handleKeyEvent((KeyEvent) evt);
+				break;
+			case UIEvent.CLICK:
+				handleClickEvent((ClickEvent) evt);
+				break;
+			}
+		}
+		state.nextLStatus = MixState.PROCESSING;
+	}
+
+	/**
+	 * Handles drawing radar and direction.
+	 * @param PaintScreen screen that radar will be drawn to
+	 */
+	private void drawRadar(PaintScreen dw) {
 		String dirTxt = "";
 		int bearing = (int) state.getCurBearing();
 		int range = (int) (state.getCurBearing() / (360f / 16f));
@@ -314,26 +342,6 @@ public class DataView {
 				+ RadarPoints.RADIUS, ry + RadarPoints.RADIUS * 2 - 10, false);
 		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx
 				+ RadarPoints.RADIUS, ry - 5, true);
-
-		// Get next event
-		UIEvent evt = null;
-		synchronized (uiEvents) {
-			if (uiEvents.size() > 0) {
-				evt = uiEvents.get(0);
-				uiEvents.remove(0);
-			}
-		}
-		if (evt != null) {
-			switch (evt.type) {
-			case UIEvent.KEY:
-				handleKeyEvent((KeyEvent) evt);
-				break;
-			case UIEvent.CLICK:
-				handleClickEvent((ClickEvent) evt);
-				break;
-			}
-		}
-		state.nextLStatus = MixState.PROCESSING;
 	}
 
 	private void handleKeyEvent(KeyEvent evt) {
@@ -378,7 +386,7 @@ public class DataView {
 		return evtHandled;
 	}
 
-	void radarText(PaintScreen dw, String txt, float x, float y, boolean bg) {
+	private void radarText(PaintScreen dw, String txt, float x, float y, boolean bg) {
 		float padw = 4, padh = 2;
 		float w = dw.getTextWidth(txt) + padw * 2;
 		float h = dw.getTextAsc() + dw.getTextDesc() + padh * 2;
