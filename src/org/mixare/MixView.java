@@ -690,7 +690,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			float yPress = me.getY();
 			if (me.getAction() == MotionEvent.ACTION_UP) {
 				getDataView().clickEvent(xPress, yPress);
-			}
+			}//TODO add gesture events (low)
 
 			return true;
 		} catch (Exception ex) {
@@ -711,6 +711,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 					getDataView().setDetailsView(false);
 					return true;
 				} else {
+					//TODO handle keyback to finish app correctly
 					return super.onKeyDown(keyCode, event);
 				}
 			} else if (keyCode == KeyEvent.KEYCODE_MENU) {

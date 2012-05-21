@@ -366,6 +366,8 @@ public class DataView {
 		case KEYCODE_CAMERA:
 			frozen = !frozen;
 			break; // freeze the overlay with the camera button
+		default: //if key is set, then ignore event
+				break;
 		}
 	}
 
@@ -377,6 +379,7 @@ public class DataView {
 			// the following will traverse the markers in ascending order (by
 			// distance) the first marker that
 			// matches triggers the event.
+			//TODO handle collection of markers. (what if user wants the one at the back)
 			for (int i = 0; i < dataHandler.getMarkerCount() && !evtHandled; i++) {
 				Marker pm = dataHandler.getMarker(i);
 
