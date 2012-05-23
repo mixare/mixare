@@ -194,6 +194,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 * {@inheritDoc}
 	 * Mixare - Receives results from other launched activities
 	 * Base on the result returned, it either refreshes screen or not.
+	 * Default value for refreshing is false
 	 */
 	protected void onActivityResult(final int requestCode,
 			final int resultCode, Intent data) {
