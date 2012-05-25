@@ -64,7 +64,12 @@ public final class HttpTools {
 	 */
 	public static String getPageContent(DownloadRequest request, ContentResolver cr) throws Exception {
 		String pageContent;
-		InputStream is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+		InputStream is = null;
+		if(!request.getSource().getUrl().startsWith("file://")){
+			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+		}else{
+			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl(), cr);
+		}
 		pageContent = HttpTools.getHttpInputString(is);
 		HttpTools.returnHttpInputStream(is);
 		return pageContent;
