@@ -122,6 +122,18 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
+	
+	/**
+	 * Closes MapView Activity and returns that request to NOT refresh screen.
+	 */
+
+	private void closeMapViewActivity() {
+		Intent closeMapView = new Intent();
+		closeMapView.putExtra("RefreshScreen", false);
+		setResult(RESULT_OK, closeMapView);
+		finish();
+	}
+	
 	public void setStartPoint() {
 		Location location = mixContext.getLocationFinder().getCurrentLocation();
 		MapController controller;
@@ -212,17 +224,17 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			/*List View*/
 		case 4:
 			createListView();
-			finish();
+			//finish(); don't close map if list view created
 			break;
 			/*back to Camera View*/
 		case 5:
-			finish();
+			closeMapViewActivity();
 			break;
 		case 6:
 			togglePath();
 			//refresh:
 			startActivity(getIntent()); 
-			finish();
+			closeMapViewActivity();
 		}
 		return true;
 	}

@@ -190,6 +190,29 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * Mixare - Receives results from other launched activities
+	 * Base on the result returned, it either refreshes screen or not.
+	 */
+	protected void onActivityResult(final int requestCode,
+			final int resultCode, Intent data) {
+		Log.d(TAG + " WorkFlow", "MixView - onActivityResult Called");
+		// check if the returned is request to refresh screen (setting might be
+		// changed)
+		try {
+			if (data.getBooleanExtra("RefreshScreen", false)) {
+				Log.d(TAG + " WorkFlow",
+						"MixView - Received Refresh Screen Request .. about to refresh");
+				repaint();
+				refreshDownload();
+			}
+
+		} catch (Exception ex) {
+			// do nothing do to mix of return results.
+		}
+	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -752,6 +775,38 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 
 	/* ************ Handlers ************ */
+
+//	/**
+//	 * Refreshes Download
+//	 * Under Construction --
+//	 */
+	private void refreshDownload() {
+//
+//		try {
+//			if (mixViewData.getDownloadThread() != null) {
+//				if (!mixViewData.getDownloadThread().isInterrupted()) {
+//					mixViewData.getDownloadThread().interrupt();
+//					mixViewData.getMixContext().getDownloadManager().restart();
+//				}
+//
+//			} else { // if no download thread found
+//				Log.w(TAG + " WorkFlow",
+//						"MixView - refreshDownload - ops DownloadManager was not created, check workflow.");
+//
+//				((Object) mixViewData).setDownloadThread(new Thread(mixViewData
+//						.getMixContext().getDownloadManager()));
+//
+//				// @TODO Syncronize DownloadManager, call Start instead of run.
+//
+//				mixViewData.getMixContext().getDownloadManager().run();
+//			}
+//
+//		} catch (Exception ex) {
+//			Log.e(TAG,
+//					"MixView - refreshDownload - Error refreshing DownloadManager");
+//		}
+	}
+
 
 	public void doError(Exception ex1) {
 		if (!fError) {
