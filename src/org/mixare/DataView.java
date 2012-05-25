@@ -234,7 +234,6 @@ public class DataView {
 					if(dRes.getMarkers() != null){
 						//jLayer = (DataHandler) dRes.obj;
 						Log.i(MixView.TAG,"Adding Markers");
-						dataHandler = new DataHandler();
 						dataHandler.addMarkers(dRes.getMarkers());
 						dataHandler.onLocationChanged(curFix);
 						// Notification
@@ -442,6 +441,7 @@ public class DataView {
 	 * Re-downloads the markers, and draw them on the map.
 	 */
 	public void refresh(){
+		dataHandler = new DataHandler();
 		state.nextLStatus = MixState.NOT_STARTED;
 	}
 	
