@@ -426,6 +426,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public void refresh(){
 		dataView.refresh();
 	}
+	
+	public void refresh(){
+		dataView.refresh();
+	}
 
 
 	public void refresh(){
