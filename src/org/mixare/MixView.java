@@ -218,6 +218,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			killOnError();
 			getMixViewData().getMixContext().doResume(this);
 
+			getDataView().refresh();
 			getDataView().doStart();
 			getDataView().clearEvents();
 
