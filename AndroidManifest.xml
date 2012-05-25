@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="23" android:versionName="0.8.2" package="org.mixare" android:installLocation="auto">
+      android:versionCode="25" android:versionName="0.9" package="org.mixare" android:installLocation="auto">
 
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="9"/>
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="10"/>
 
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -48,6 +48,12 @@
                		android:value=".MixView" />
         </activity>
         
+		<activity android:name="PluginLoaderActivity">
+		    <intent-filter> 
+         		<action android:name="android.intent.action.MAIN" />
+     		</intent-filter>
+		</activity>
+		
 		<activity android:name="MixListView" 
 			android:screenOrientation="user" 
 			android:launchMode="singleTop">
@@ -69,6 +75,7 @@
 		</activity>
 		 <activity android:name=".data.DataSource" />
 		 <activity android:name=".data.DataSourceList" />
+		 
 		 
 </application>
 

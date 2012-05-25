@@ -168,12 +168,13 @@ public abstract class LocalMarker implements Marker {
 //	}
 
 	private boolean isClickValid(float x, float y) {
-		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-				signMarker.x, signMarker.y);
+		
 		//if the marker is not active (i.e. not shown in AR view) we don't have to check it for clicks
-		if (!isActive())
+		if (!isActive() && !this.isVisible)
 			return false;
 
+		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
+				signMarker.x, signMarker.y);
 		//TODO adapt the following to the variable radius!
 		pPt.x = x - signMarker.x;
 		pPt.y = y - signMarker.y;
