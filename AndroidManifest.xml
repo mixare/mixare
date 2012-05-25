@@ -48,7 +48,11 @@
                		android:value=".MixView" />
         </activity>
         
-		<activity android:name="PluginLoaderActivity"></activity>
+		<activity android:name="PluginLoaderActivity">
+		    <intent-filter> 
+         		<action android:name="android.intent.action.MAIN" />
+     		</intent-filter>
+		</activity>
 		
 		<activity android:name="MixListView" 
 			android:screenOrientation="user" 
