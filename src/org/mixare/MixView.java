@@ -201,6 +201,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 						"MixView - Received Refresh Screen Request .. about to refresh");
 				repaint();
 				refreshDownload();
+			}else{
+				super.onActivityResult(requestCode, resultCode, data);
 			}
 
 		} catch (Exception ex) {
