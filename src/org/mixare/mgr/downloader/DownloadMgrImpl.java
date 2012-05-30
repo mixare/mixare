@@ -165,6 +165,15 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 		}
 		return result;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mixare.mgr.downloader.DownloadManager#getResultSize()
+	 */
+	public int getResultSize(){
+		return doneList.size();
+	}
 
 	/*
 	 * (non-Javadoc)
