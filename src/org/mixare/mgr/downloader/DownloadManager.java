@@ -62,6 +62,12 @@ public interface DownloadManager {
 	DownloadResult getNextResult();
 
 	/**
+	 * Gets the number of downloaded results
+	 * @return the number of results
+	 */
+	int getResultSize();
+	
+	/**
 	 * check if all Download request is done
 	 *  
 	 * @return BOOLEAN
