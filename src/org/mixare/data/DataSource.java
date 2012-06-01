@@ -19,11 +19,6 @@
 
 package org.mixare.data;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.mixare.MixContext;
 import org.mixare.R;
 import org.mixare.data.convert.DataConvertor;
 

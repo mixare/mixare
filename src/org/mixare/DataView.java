@@ -27,6 +27,7 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -196,56 +197,19 @@ public class DataView {
 
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-
-			if (mixContext.getStartUrl().length() > 0) {
-				requestData(mixContext.getStartUrl());
-				isLauncherStarted = true;
-			}
-
-			else {
-				double lat = curFix.getLatitude(), lon = curFix.getLongitude(), alt = curFix
-						.getAltitude();
-				state.nextLStatus = MixState.PROCESSING;
-				mixContext.getDataSourceManager().requestDataFromAllActiveDataSource(lat, lon, alt,	radius);
-			}
-
-			// if no datasources are activated
-			if (state.nextLStatus == MixState.NOT_STARTED)
-				state.nextLStatus = MixState.DONE;
-
-			// TODO:
-			// state.downloadId = mixContext.getDownloader().submitJob(request);
-
-		} else if (state.nextLStatus == MixState.PROCESSING) {
+			loadDrawLayer();
+		}
+		else if (state.nextLStatus == MixState.PROCESSING) {
 			DownloadManager dm = mixContext.getDownloadManager();
-			DownloadResult dRes;
+			DownloadResult dRes = null;
 
-			while ((dRes = dm.getNextResult()) != null) {
-				if (dRes.isError() && retry < 3) {
-					retry++;
-					mixContext.getDownloadManager().submitJob(
-							dRes.getErrorRequest());
-					// Notification
-					// Toast.makeText(mixContext, dRes.errorMsg,
-					// Toast.LENGTH_SHORT).show();
-				}
-				
-				if(!dRes.isError()) {
-					if(dRes.getMarkers() != null){
-						//jLayer = (DataHandler) dRes.obj;
-						Log.i(MixView.TAG,"Adding Markers");
-						dataHandler.addMarkers(dRes.getMarkers());
-						dataHandler.onLocationChanged(curFix);
-						// Notification
-						Toast.makeText(
-								mixContext,
-								mixContext.getResources().getString(
-										R.string.download_received)
-										+ " " + dRes.getDataSource().getName(),
-								Toast.LENGTH_SHORT).show();
-					}
-				}
+			if(dm.getResultSize() > 0){
+				List<Marker> markers = downloadDrawResults(dm, dRes);
+				dataHandler = new DataHandler();
+				dataHandler.addMarkers(markers);
+				dataHandler.onLocationChanged(curFix);
 			}
+			
 			if (dm.isDone()) {
 				retry = 0;
 				state.nextLStatus = MixState.DONE;
@@ -308,6 +272,59 @@ public class DataView {
 		}
 		state.nextLStatus = MixState.PROCESSING;
 	}
+
+	/**
+	 * Part of draw function, loads the layer.
+	 */
+	private void loadDrawLayer(){
+		if (mixContext.getStartUrl().length() > 0) {
+			requestData(mixContext.getStartUrl());
+			isLauncherStarted = true;
+		}
+
+		else {
+			double lat = curFix.getLatitude(), lon = curFix.getLongitude(), alt = curFix
+					.getAltitude();
+			state.nextLStatus = MixState.PROCESSING;
+			mixContext.getDataSourceManager().requestDataFromAllActiveDataSource(lat, lon, alt,	radius);
+		}
+
+		// if no datasources are activated
+		if (state.nextLStatus == MixState.NOT_STARTED)
+			state.nextLStatus = MixState.DONE;
+	}
+	
+	private List<Marker> downloadDrawResults(DownloadManager dm, DownloadResult dRes){
+		List<Marker> markers = new ArrayList<Marker>();
+		while ((dRes = dm.getNextResult()) != null) {
+			if (dRes.isError() && retry < 3) {
+				retry++;
+				mixContext.getDownloadManager().submitJob(
+						dRes.getErrorRequest());
+				// Notification
+				// Toast.makeText(mixContext, dRes.errorMsg,
+				// Toast.LENGTH_SHORT).show();
+			}
+			
+			if(!dRes.isError()) {
+				if(dRes.getMarkers() != null){
+					//jLayer = (DataHandler) dRes.obj;
+					Log.i(MixView.TAG,"Adding Markers");
+					markers.addAll(dRes.getMarkers());
+
+					// Notification
+					Toast.makeText(
+							mixContext,
+							mixContext.getResources().getString(
+									R.string.download_received)
+									+ " " + dRes.getDataSource().getName(),
+							Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
+		return markers;
+	}
+	
 
 	/**
 	 * Handles drawing radar and direction.
@@ -441,7 +458,6 @@ public class DataView {
 	 * Re-downloads the markers, and draw them on the map.
 	 */
 	public void refresh(){
-		dataHandler = new DataHandler();
 		state.nextLStatus = MixState.NOT_STARTED;
 	}
 	

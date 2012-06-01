@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.mixare.MixContext;
 import org.mixare.MixView;
@@ -37,7 +37,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	private boolean stop = false;
 	private MixContext ctx;
 	private DownloadManagerState state = DownloadManagerState.Confused;
-	private LinkedBlockingDeque<ManagedDownloadRequest> todoList = new LinkedBlockingDeque<ManagedDownloadRequest>();
+	private LinkedBlockingQueue<ManagedDownloadRequest> todoList = new LinkedBlockingQueue<ManagedDownloadRequest>();
 	private ConcurrentHashMap<String, DownloadResult> doneList = new ConcurrentHashMap<String, DownloadResult>();
 	private Executor executor = Executors.newSingleThreadExecutor();
 	
@@ -164,6 +164,15 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			doneList.remove(nextId);
 		}
 		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mixare.mgr.downloader.DownloadManager#getResultSize()
+	 */
+	public int getResultSize(){
+		return doneList.size();
 	}
 
 	/*
