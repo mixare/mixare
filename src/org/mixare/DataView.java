@@ -95,6 +95,8 @@ public class DataView {
 	private ScreenLine rrl = new ScreenLine();
 	private float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
+	
+	private List<Marker> markers;
 
 	/**
 	 * Constructor
@@ -198,22 +200,22 @@ public class DataView {
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 			loadDrawLayer();
+			markers = new ArrayList<Marker>();
 		}
 		else if (state.nextLStatus == MixState.PROCESSING) {
 			DownloadManager dm = mixContext.getDownloadManager();
 			DownloadResult dRes = null;
 
-			if(dm.getResultSize() > 0){
-				List<Marker> markers = downloadDrawResults(dm, dRes);
-				dataHandler = new DataHandler();
-				dataHandler.addMarkers(markers);
-				dataHandler.onLocationChanged(curFix);
-			}
+			markers.addAll(downloadDrawResults(dm, dRes));
 			
 			if (dm.isDone()) {
 				retry = 0;
 				state.nextLStatus = MixState.DONE;
-
+				
+				dataHandler = new DataHandler();
+				dataHandler.addMarkers(markers);
+				dataHandler.onLocationChanged(curFix);
+								
 				if (refresh == null) { // start the refresh timer if it is null
 					refresh = new Timer(false);
 					Date date = new Date(System.currentTimeMillis()
