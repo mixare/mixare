@@ -87,11 +87,11 @@ public abstract class LocalMarker implements Marker {
 		super();
 
 		this.active = false;
-		this.setTitle(title);
-		this.setmGeoLoc(new PhysicalPlace(latitude,longitude,altitude));
+		this.title = title;
+		this.mGeoLoc = (new PhysicalPlace(latitude,longitude,altitude));
 		if (link != null && link.length() > 0) {
-			setURL("webpage:" + URLDecoder.decode(link));
-			this.setUnderline(true);
+			this.URL = ("webpage:" + URLDecoder.decode(link));
+			this.underline = true;
 		}
 		this.colour = colour;
 		this.ID = id + "##" + type + "##" + title;
