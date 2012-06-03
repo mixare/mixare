@@ -200,6 +200,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				Log.d(TAG + " WorkFlow",
 						"MixView - Received Refresh Screen Request .. about to refresh");
 				repaint();
+				setZoomLevel();
 				refreshDownload();
 			}
 
@@ -219,6 +220,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().getMixContext().doResume(this);
 
 			repaint();
+			setZoomLevel();
 			getDataView().doStart();
 			getDataView().clearEvents();
 
@@ -366,9 +368,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		getDataView().clearEvents();
 		setDataView(null); //It's smelly code, but enforce garbage collector 
 							//to release data.
-		setDataView(new DataView(mixViewData.getMixContext()));
+		setDataView(new DataView(getMixViewData().getMixContext()));
 		setdWindow(new PaintScreen());
-		//setZoomLevel(); //@TODO Caller has to set the zoom. This function repaints only.
+		
 	}
 	
 	/**
@@ -441,6 +443,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				try {
 					maintainCamera();
 					maintainAugmentR();
+					maintainZoomBar();
 					repaint();
 					setZoomLevel();
 				}
@@ -680,8 +683,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			float myout = calcZoomLevel();
 
 			getMixViewData().setZoomLevel(String.valueOf(myout));
-			getMixViewData().setZoomProgress(getMixViewData().getMyZoomBar()
-					.getProgress());
+			getMixViewData().setZoomProgress(progress);
 
 			t.setText("Radius: " + String.valueOf(myout));
 			t.show();
@@ -697,12 +699,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			SharedPreferences.Editor editor = settings.edit();
 			/* store the zoom range of the zoom bar selected by the user */
-			editor.putInt("zoomLevel", getMixViewData().getMyZoomBar().getProgress());
+			editor.putInt("zoomLevel", seekBar.getProgress());
 			editor.commit();
 			getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
 			// zoomChanging= false;
 
-			getMixViewData().getMyZoomBar().getProgress();
+			getMixViewData().getMyZoomBar().setProgress(seekBar.getProgress());
 
 			t.cancel();
 			//repaint after zoom level changed.
@@ -963,13 +965,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return getMixViewData().getZoomProgress();
 	}
 
-	private void setZoomLevel() {
+	public void setZoomLevel() {
 		float myout = calcZoomLevel();
 
 		getDataView().setRadius(myout);
+		getMixViewData().setZoomLevel(String.valueOf(myout));
 		//caller has the to control of zoombar visibility, not setzoom
 		//mixViewData.getMyZoomBar().setVisibility(View.INVISIBLE);
-		mixViewData.setZoomLevel(String.valueOf(myout));
+		//mixViewData.setZoomLevel(String.valueOf(myout));
 		//setZoomLevel, caller has to call refreash download if needed.
 //		mixViewData.setDownloadThread(new Thread(mixViewData.getMixContext().getDownloadManager()));
 //		mixViewData.getDownloadThread().start();
@@ -977,7 +980,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		getMixViewData().getMixContext().getDownloadManager().switchOn();
 
-	};
+	}
 
 }
 
