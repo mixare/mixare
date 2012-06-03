@@ -48,79 +48,61 @@ import android.location.Location;
 public abstract class LocalMarker implements Marker {
 
 	private String ID;
-	protected String title;
-	protected boolean underline = false;
+	private String title;
+	private boolean underline = false;
 	private String URL;
-	protected PhysicalPlace mGeoLoc;
-	// distance from user to mGeoLoc in meters
+	private PhysicalPlace mGeoLoc;
+	/* distance from user to mGeoLoc in meters */
 	protected double distance;
-	// The marker color
+	/* Marker's color */
 	private int colour;
 	
 	private boolean active;
 
 	// Draw properties
+	/* Marker's Visibility to user */
 	protected boolean isVisible;
 //	private boolean isLookingAt;
 //	private boolean isNear;
 //	private float deltaCenter;
 	public MixVector cMarker = new MixVector();
+	
 	protected MixVector signMarker = new MixVector();
-//	private MixVector oMarker = new MixVector();
 
 	protected MixVector locationVector = new MixVector();
+	
 	private MixVector origin = new MixVector(0, 0, 0);
+	
 	private MixVector upV = new MixVector(0, 1, 0);
+	
 	private ScreenLine pPt = new ScreenLine();
 
 	public Label txtLab = new Label();
+	
 	protected TextObj textBlock;
 
-	public LocalMarker(String id, String title, double latitude, double longitude, double altitude, String link, int type, int colour) {
+	public LocalMarker(final String id,  String title, final double latitude,
+			 double longitude, final double altitude,final String link,
+			int type, final int colour) {
 		super();
 
 		this.active = false;
-		this.title = title;
-		this.mGeoLoc = new PhysicalPlace(latitude,longitude,altitude);
+		this.setTitle(title);
+		this.setmGeoLoc(new PhysicalPlace(latitude,longitude,altitude));
 		if (link != null && link.length() > 0) {
-			URL = "webpage:" + URLDecoder.decode(link);
-			this.underline = true;
+			setURL("webpage:" + URLDecoder.decode(link));
+			this.setUnderline(true);
 		}
 		this.colour = colour;
-
 		this.ID = id + "##" + type + "##" + title;
-
 	}
 
 
-	public String getTitle(){
-		return title;
-	}
-
-	public String getURL(){
-		return URL;
-	}
-
-	public double getLatitude() {
-		return mGeoLoc.getLatitude();
-	}
-
-	public double getLongitude() {
-		return mGeoLoc.getLongitude();
-	}
-
-	public double getAltitude() {
-		return mGeoLoc.getAltitude();
-	}
-
-	public MixVector getLocationVector() {
-		return locationVector;
-	}
 	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
 
 		// Temp properties
-		MixVector tmpa = new MixVector(originalPoint);
-		MixVector tmpc = new MixVector(upV);
+		final MixVector tmpa = new MixVector(originalPoint);
+		final MixVector tmpc = new MixVector(upV);
 		tmpa.add(locationVector); //3 
 		tmpc.add(locationVector); //3
 		tmpa.sub(viewCam.lco); //4
@@ -128,14 +110,18 @@ public abstract class LocalMarker implements Marker {
 		tmpa.prod(viewCam.transform); //5
 		tmpc.prod(viewCam.transform); //5
 
-		MixVector tmpb = new MixVector();
+		final MixVector tmpb = new MixVector();
 		viewCam.projectPoint(tmpa, tmpb, addX, addY); //6
 		cMarker.set(tmpb); //7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); //6
 		signMarker.set(tmpb); //7
 	}
 
-	private void calcV(Camera viewCam) {
+	/**
+	 * Checks if Marker is within Z angle of Camera.
+	 * It sets the visibility upon that.
+	 */
+	private void calcV() {
 		isVisible = false;
 //		isLookingAt = false;
 //		deltaCenter = Float.MAX_VALUE;
@@ -151,16 +137,16 @@ public abstract class LocalMarker implements Marker {
 		// Note: this could be improved with calls to 
 		// http://www.geonames.org/export/web-services.html#astergdem 
 		// to estimate the correct height with DEM models like SRTM, AGDEM or GTOPO30
-		if(mGeoLoc.getAltitude()==0.0)
-			mGeoLoc.setAltitude(curGPSFix.getAltitude());
+		if(getmGeoLoc().getAltitude()==0.0)
+			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
 
 		// compute the relative position vector from user position to POI location
-		PhysicalPlace.convLocToVec(curGPSFix, mGeoLoc, locationVector);
+		PhysicalPlace.convLocToVec(curGPSFix, getmGeoLoc(), locationVector);
 	}
 
 	public void calcPaint(Camera viewCam, float addX, float addY) {
 		cCMarker(origin, viewCam, addX, addY);
-		calcV(viewCam);
+		calcV();
 	}
 
 //	private void calcPaint(Camera viewCam) {
@@ -173,7 +159,7 @@ public abstract class LocalMarker implements Marker {
 		if (!isActive() && !this.isVisible)
 			return false;
 
-		float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
+		final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 				signMarker.x, signMarker.y);
 		//TODO adapt the following to the variable radius!
 		pPt.x = x - signMarker.x;
@@ -182,7 +168,7 @@ public abstract class LocalMarker implements Marker {
 		pPt.x += txtLab.getX();
 		pPt.y += txtLab.getY();
 
-		float objX = txtLab.getX() - txtLab.getWidth() / 2;
+		final float objX = txtLab.getX() - txtLab.getWidth() / 2;
 		float objY = txtLab.getY() - txtLab.getHeight() / 2;
 		float objW = txtLab.getWidth();
 		float objH = txtLab.getHeight();
@@ -229,15 +215,15 @@ public abstract class LocalMarker implements Marker {
 		double d = distance;
 		DecimalFormat df = new DecimalFormat("@#");
 		if(d<1000.0) {
-			textStr = title + " ("+ df.format(d) + "m)";			
+			textStr = getTitle() + " ("+ df.format(d) + "m)";			
 		}
 		else {
 			d=d/1000.0;
-			textStr = title + " (" + df.format(d) + "km)";
+			textStr = getTitle() + " (" + df.format(d) + "km)";
 		}
 
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1,
-				250, dw, underline);
+				250, dw, isUnderline());
 
 		if (isVisible) {
 
@@ -259,11 +245,37 @@ public abstract class LocalMarker implements Marker {
 		boolean evtHandled = false;
 
 		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, URL);
+			evtHandled = state.handleEvent(ctx, getURL());
 		}
 		return evtHandled;
 	}
 
+	/* ****** Getters / setters **********/
+	
+	public String getTitle(){
+		return title;
+	}
+
+	public String getURL(){
+		return URL;
+	}
+
+	public double getLatitude() {
+		return getmGeoLoc().getLatitude();
+	}
+
+	public double getLongitude() {
+		return getmGeoLoc().getLongitude();
+	}
+
+	public double getAltitude() {
+		return getmGeoLoc().getAltitude();
+	}
+
+	public MixVector getLocationVector() {
+		return locationVector;
+	}
+	
 	public double getDistance() {
 		return distance;
 	}
@@ -310,9 +322,10 @@ public abstract class LocalMarker implements Marker {
 
 	abstract public int getMaxObjects();
 	
+	//abstract maybe!!
 	public void setImage(Bitmap image){
 	}
-	
+	//Abstract!!
 	public Bitmap getImage(){
 		return null;
 	}
@@ -338,5 +351,53 @@ public abstract class LocalMarker implements Marker {
 
 	public void setExtras(String name, ParcelableProperty parcelableProperty){
 		//nothing to add
+	}
+
+
+	/**
+	 * @param String the title to set
+	 */
+	protected void setTitle(String title) {
+		this.title = title;
+	}
+
+
+	/**
+	 * @return the underline
+	 */
+	protected boolean isUnderline() {
+		return underline;
+	}
+
+
+	/**
+	 * @param boolean the underline to set
+	 */
+	protected void setUnderline(boolean underline) {
+		this.underline = underline;
+	}
+
+
+	/**
+	 * @param String the uRL to set
+	 */
+	protected void setURL(String uRL) {
+		URL = uRL;
+	}
+
+
+	/**
+	 * @return the mGeoLoc
+	 */
+	protected PhysicalPlace getmGeoLoc() {
+		return mGeoLoc;
+	}
+
+
+	/**
+	 * @param PhysicalPlace the mGeoLoc to set
+	 */
+	protected void setmGeoLoc(PhysicalPlace mGeoLoc) {
+		this.mGeoLoc = mGeoLoc;
 	}
 }
