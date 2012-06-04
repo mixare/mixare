@@ -18,14 +18,6 @@
  */
 package org.mixare;
 
-/**
- * This class is the main application which uses the other classes for different
- * functionalities.
- * It sets up the camera screen and the augmented screen which is in front of the
- * camera screen.
- * It also handles the main sensor events, touch events and location events.
- */
-
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
 import java.util.ArrayList;
@@ -77,6 +69,13 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+/**
+ * This class is the main application which uses the other classes for different
+ * functionalities.
+ * It sets up the camera screen and the augmented screen which is in front of the
+ * camera screen.
+ * It also handles the main sensor events, touch events and location events.
+ */
 public class MixView extends Activity implements SensorEventListener, OnTouchListener {
 
 	private CameraSurface camScreen;
@@ -91,15 +90,26 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	//----------
     private MixViewDataHolder mixViewData  ;
 	
-	// TAG for logging
+	/** TAG for logging */
 	public static final String TAG = "Mixare";
 
 	// why use Memory to save a state? MixContext? activity lifecycle?
 	//private static MixView CONTEXT;
 
-	/* string to name & access the preference file in the internal storage */
+	/** string to name & access the preference file in the internal storage */
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
 
+	/**
+	 * Main application Launcher.
+	 * Does:
+	 * - Lock Screen.
+	 * - Initiate Camera View
+	 * - Initiate view {@link org.mixare.DataView#draw(PaintScreen) DataView}
+	 * - Initiate ZoomBar {@link android.widget.SeekBar SeekBar widget}
+	 * - Display License Agreement if app first used.
+	 * 
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -155,6 +165,19 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return mixViewData;
 	}
 
+	/**
+	 * Part of Android LifeCycle that gets called when "Activity" MixView is being
+	 * navigated away.
+	 * <br/>
+	 * Does:
+	 * - Release Screen Lock 
+	 * - Unregister Sensors. {@link android.hardware.SensorManager SensorManager}
+	 * - Unregister Location Manager. {@link org.mixare.mgr.location.LocationFinder LocationFinder}
+	 * - Switch off Download Thread. {@link org.mixare.mgr.downloader.DownloadManager DownloadManager}
+	 * - Cancel view refresh Timer.  
+	 * <br/>
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -192,10 +215,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * Mixare - Receives results from other launched activities
-	 * Base on the result returned, it either refreshes screen or not.
+	 * Mixare Activities Pipe message communication.
+	 * Receives results from other launched activities
+	 * and base on the result returned, it either refreshes screen or not.
 	 * Default value for refreshing is false
+	 * <br/>
+	 * {@inheritDoc}
 	 */
 	protected void onActivityResult(final int requestCode,
 			final int resultCode, Intent data) {
@@ -215,7 +240,21 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			// do nothing do to mix of return results.
 		}
 	}
-	
+	/**
+	 * Part of Android LifeCycle that gets called when "MixView" resumes.
+	 * <br/>
+	 * Does:
+	 * - Acquire Screen Lock
+	 * - Refreshes Data and Downloads
+	 * - Initiate four Matrixes that holds user's rotation view.
+	 * - Re-register Sensors. {@link android.hardware.SensorManager SensorManager}
+	 * - Re-register Location Manager. {@link org.mixare.mgr.location.LocationFinder LocationFinder}
+	 * - Switch on Download Thread. {@link org.mixare.mgr.downloader.DownloadManager DownloadManager}
+	 * - restart view refresh Timer. 
+	 * <br/>
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -226,7 +265,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			killOnError();
 			getMixViewData().getMixContext().doResume(this);
 
-			repaint();
+			//repaint(); //repaint when requested
 			setZoomLevel();
 			getDataView().doStart();
 			getDataView().clearEvents();
@@ -361,9 +400,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 	
 	/**
-	 * {@inheritDoc}
 	 * Customize Activity after switching back to it.
 	 * Currently it maintain and ensures view creation.
+	 * <br/>
+	 * {@inheritDoc}
 	 */
 	protected void onRestart (){
 		super.onRestart();
@@ -400,6 +440,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 	/* ********* Operators ***********/ 
 
+	/**
+	 * View Repainting.
+	 * It deletes viewed data and initiate new one. {@link org.mixare.DataView DataView}
+	 */
 	public void repaint() {
 		//clear stored data
 		getDataView().clearEvents();
@@ -464,6 +508,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 //		}
 	}
 	
+	/**
+	 * Refreshes Viewed Data.
+	 */
 	public void refresh(){
 		dataView.refresh();
 	}
@@ -509,7 +556,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		alert.show();
 	}
 
-	
+	/**
+	 * Calculate Zoom Level base 80.
+	 * Mixare support zooming between 0-80 and default value of 20,
+	 * {@link android.widget.SeekBar SeekBar} on the other hand, is 0-100 base.
+	 * This method handles the Zoom level conversion between Mixare ZoomLevel and SeekBar.
+	 * 
+	 * @return int Zoom Level base 80 
+	 */
 	public float calcZoomLevel(){
 
 		int myZoomLevel = getMixViewData().getMyZoomBar().getProgress();
