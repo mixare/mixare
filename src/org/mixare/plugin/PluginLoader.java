@@ -19,8 +19,10 @@
 package org.mixare.plugin;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
@@ -85,6 +87,7 @@ public class PluginLoader {
 			if (sinfo != null) {
 				Intent serviceIntent = new Intent();
 				serviceIntent.setClassName(sinfo.packageName, sinfo.name);
+				activity.stopService(serviceIntent);
 				activity.startService(serviceIntent);
 				activity.bindService(serviceIntent, (ServiceConnection)pluginType.getPluginConnection(),
 						Context.BIND_AUTO_CREATE);
@@ -97,9 +100,12 @@ public class PluginLoader {
 	 * Unbinds all plugins from the activity
 	 */
 	public void unBindServices(){
-		for(PluginConnection pluginConnection : pluginMap.values()){
-			if(pluginConnection instanceof ServiceConnection){
-				activity.unbindService((ServiceConnection)pluginConnection);
+		Iterator<Entry<String, PluginConnection>> it = pluginMap.entrySet().iterator();
+		while(it.hasNext()){
+			Entry<String, PluginConnection> pairs = (Entry<String, PluginConnection>)it.next();
+			if(pairs.getValue() instanceof ServiceConnection){
+				activity.unbindService((ServiceConnection)pairs.getValue());
+				it.remove();
 			}
 		}
 	}
