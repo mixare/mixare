@@ -627,7 +627,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		switch (item.getItemId()) {
 		/* Data sources */
 		case 1:
-			if (!getDataView().isLauncherStarted()) {
+			if (!getDataView().getIsLauncherStarted()) {
 				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
 			} else {
