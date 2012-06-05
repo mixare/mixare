@@ -21,8 +21,10 @@ package org.mixare.mgr.downloader;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.mixare.MixContext;
 import org.mixare.MixView;
@@ -34,12 +36,12 @@ import android.util.Log;
 
 class DownloadMgrImpl implements Runnable, DownloadManager {
 
-	private boolean stop = false;
+	private static boolean stop = false;
 	private MixContext ctx;
 	private DownloadManagerState state = DownloadManagerState.Confused;
 	private LinkedBlockingQueue<ManagedDownloadRequest> todoList = new LinkedBlockingQueue<ManagedDownloadRequest>();
 	private ConcurrentHashMap<String, DownloadResult> doneList = new ConcurrentHashMap<String, DownloadResult>();
-	private Executor executor = Executors.newSingleThreadExecutor();
+	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
 
 	public DownloadMgrImpl(MixContext ctx) {
@@ -57,20 +59,23 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	 */
 	public void run() {
 		ManagedDownloadRequest mRequest;
-		DownloadResult result;
+		DownloadResult result = null;
 		stop = false;
 		while (!stop) {
 			state=DownloadManagerState.OnLine;
 			// Wait for proceed
 			while (!stop) {
 				try {
-					mRequest = todoList.take();
+					mRequest = todoList.poll(10, TimeUnit.SECONDS );
 					state=DownloadManagerState.Downloading;
 					result = processRequest(mRequest);
 				} catch (InterruptedException e) {
 					result = new DownloadResult();
 					result.setError(e, null);
+				}catch (Exception ex){
+					//do nothing terminating
 				}
+				if (result != null)
 				doneList.put(result.getIdOfDownloadRequest(), result);
 				state=DownloadManagerState.OnLine;
 			}
@@ -79,9 +84,12 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	}
 
 	private DownloadResult processRequest(ManagedDownloadRequest mRequest) {
-		DownloadRequest request = mRequest.getOriginalRequest();
-		final DownloadResult result = new DownloadResult();
-		try {
+		DownloadResult result = null;
+		DownloadRequest request = null;
+		if (!stop){
+			try{
+		 request = mRequest.getOriginalRequest();
+		 result = new DownloadResult();
 			if (request == null) {
 				throw new Exception("Request is null");
 			}
@@ -105,7 +113,15 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			result.setError(ex, request);
 			Log.w(MixContext.TAG, "ERROR ON DOWNLOAD REQUEST", ex);
 		}
+	}
 		return result;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 */
+	public void shutDown(){
+		executor.shutdown();
 	}
 
 	/*
