@@ -22,14 +22,11 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
 import org.mixare.MixContext;
-import org.mixare.MixView;
 
 import android.R;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.widget.RemoteViews;
 
 public class NotificationMgrImpl implements NotificationManager{
 

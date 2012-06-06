@@ -31,6 +31,7 @@ public class PluginLoaderActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		PluginLoader.getInstance().setActivity(this);
+		PluginLoader.getInstance().unBindServices();
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
 		DataSourceStorage.init(this);
 
@@ -59,9 +60,10 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			// Remove the exitRunnable callback from the handler queue
-			exitHandler.removeCallbacks(exitRunnable);
-			// Run the exit code manually
+			if(exitHandler != null){
+				//only call this when the default splashscreen is used
+				exitHandler.removeCallbacks(exitRunnable);
+			}
 			exitSplash();
 		}
 		return true;
