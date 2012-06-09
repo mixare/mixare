@@ -87,6 +87,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private AugmentedView augScreen;
 
 	private boolean isInited;
+	private static boolean isBackground;
 	private static PaintScreen dWindow;
 	private static DataView dataView;
 	private boolean fError;
@@ -108,12 +109,15 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		super.onCreate(savedInstanceState);
 		//MixView.CONTEXT = this;
 		try {
-						
+			isBackground = false;			
 			handleIntent(getIntent());
 
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			getMixViewData().setmWakeLock(pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag"));
-
+			
+			getMixViewData()
+			.setSensorMgr((SensorManager) getSystemService(SENSOR_SERVICE));
+			
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -148,7 +152,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 
 	public MixViewDataHolder getMixViewData() {
-		if (mixViewData==null){
+		if (mixViewData==null && isBackground == false ){
 			// TODO: VERY inportant, only one!
 			mixViewData = new MixViewDataHolder(new MixContext(this));
 		}
@@ -170,7 +174,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				getMixViewData().getSensorMgr().unregisterListener(this);
 				getMixViewData().setSensorGrav(null);
 				getMixViewData().setSensorMag(null);
-				getMixViewData().setSensorMgr(null);
+//				getMixViewData().setSensorMgr(null);
 				
 				getMixViewData().getMixContext().getLocationFinder().switchOff();
 				getMixViewData().getMixContext().getDownloadManager().switchOff();
@@ -217,7 +221,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		isBackground = false;
 		try {
 			this.getMixViewData().getmWakeLock().acquire();
 
@@ -276,8 +280,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				getMixViewData().getHistR()[i] = new Matrix();
 			}
 
-			getMixViewData()
-					.setSensorMgr((SensorManager) getSystemService(SENSOR_SERVICE));
 
 			getMixViewData().addListSensors(getMixViewData().getSensorMgr().getSensorList(
 					Sensor.TYPE_ACCELEROMETER));
@@ -377,15 +379,23 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 * Deallocate memory and stops threads.
 	 * Please don't rely on this function as it's killable, 
 	 * and might not be called at all.
-	 * ** for now It shuts off DownloadManager.
 	 */
 	protected void onDestroy(){
 		try{
 			
 			getMixViewData().getMixContext().getDownloadManager().shutDown();
-		
+			getMixViewData().getSensorMgr().unregisterListener(this);
+			wait(200);
+			isBackground = true; //used to enforce garbage MixViewDataHolder
+			getMixViewData().setSensorMgr(null);
+			mixViewData = null;
+			finalize();
 		}catch(Exception e){
 			//do nothing we are shutting down
+		} catch (Throwable e) {
+			//finalize error. (this function does nothing but call native API and release 
+			//any synchronization-locked messages and threads deadlocks.
+			Log.e(TAG, e.getMessage());
 		}finally{
 			super.onDestroy();
 		}
@@ -880,7 +890,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().getSearchNotificationTxt().setVisibility(View.GONE);
 			getMixViewData().setSearchNotificationTxt(null);
 		}
-		return false;
+		return true;
 	}
 
 

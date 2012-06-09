@@ -219,6 +219,9 @@ class LocationMgrImpl implements LocationFinder {
 	@Override
 	public void switchOff() {
 		if (lm != null) {
+			for(LocationResolver locationResolver: locationResolvers){
+				lm.removeUpdates(locationResolver);
+			}
 			lm.removeUpdates(getObserver());
 			state = LocationFinderState.Inactive;
 		}
