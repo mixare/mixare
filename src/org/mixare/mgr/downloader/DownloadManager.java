@@ -89,5 +89,11 @@ public interface DownloadManager {
 	 * @return
 	 */
 	DownloadManagerState getState();
+	
+	/**
+	 * Shuts down Thread.
+	 * This is final. 
+	 */
+	void shutDown();
 
 }
