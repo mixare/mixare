@@ -139,11 +139,8 @@ class LocationMgrImpl implements LocationFinder {
 	public Location getCurrentLocation() {
 		if (curLoc == null) {
 			MixView mixView = mixContext.getActualMixView();
-			Toast.makeText(
-					mixView,
-					mixView.getResources().getString(
-							R.string.location_not_found), Toast.LENGTH_LONG)
-					.show();
+			mixContext.getNotificationManager().
+			addNotification(mixContext.getString(R.string.location_not_found));
 			throw new RuntimeException("No GPS Found");
 		}
 		synchronized (curLoc) {
@@ -256,9 +253,8 @@ class LocationMgrImpl implements LocationFinder {
 				mixContext.getActualMixView().runOnUiThread(new Runnable() {					
 					@Override
 					public void run() {
-						Toast.makeText(mixContext.getActualMixView(), 
-								mixContext.getActualMixView().getResources().getString(
-								R.string.location_not_found), Toast.LENGTH_LONG);
+						mixContext.getNotificationManager().
+						addNotification(mixContext.getString(R.string.location_not_found));
 					}
 				});
 				
