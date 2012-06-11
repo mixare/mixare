@@ -229,6 +229,9 @@ public class DataView {
 						}
 					}, date, refreshDelay);
 				}
+			}else{
+				dataHandler.addMarkers(markers);
+				dataHandler.onLocationChanged(curFix);
 			}
 		}
 
@@ -313,14 +316,11 @@ public class DataView {
 					//jLayer = (DataHandler) dRes.obj;
 					Log.i(MixView.TAG,"Adding Markers");
 					markers.addAll(dRes.getMarkers());
-
-					// Notification
-					Toast.makeText(
-							mixContext,
-							mixContext.getResources().getString(
-									R.string.download_received)
-									+ " " + dRes.getDataSource().getName(),
-							Toast.LENGTH_SHORT).show();
+					
+					//Notification
+					mixContext.getNotificationManager().addNotification(mixContext.getResources().getString(
+							R.string.download_received)
+							+ " " + dRes.getDataSource().getName());
 				}
 			}
 		}
@@ -468,11 +468,8 @@ public class DataView {
 			
 			@Override
 			public void run() {
-				Toast.makeText(
-						mixContext,
-						mixContext.getResources()
-								.getString(R.string.refreshing),
-						Toast.LENGTH_SHORT).show();
+				mixContext.getNotificationManager().
+				addNotification(mixContext.getString(R.string.refreshing));
 			}
 		});
 	}

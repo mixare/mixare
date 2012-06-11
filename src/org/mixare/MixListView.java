@@ -178,7 +178,8 @@ public class MixListView extends ListActivity {
 			}
 		}
 		if (listViewMenu.size() == 0) {
-			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
+			dataView.getContext().getNotificationManager().
+			addNotification(getString(R.string.search_failed_notification));
 		}
 		else {
 			jLayer.setMarkerList(searchResultMarkers);
@@ -199,8 +200,10 @@ public class MixListView extends ListActivity {
 	public void clickOnListView(int position){
 		/*if no website is available for this item*/
 		String selectedURL = position < selectedItemURL.size() ? selectedItemURL.get(position) : null;
-		if (selectedURL == null || selectedURL.length() <= 0)
-			Toast.makeText( this, getString(R.string.no_website_available), Toast.LENGTH_LONG ).show();			
+		if (selectedURL == null || selectedURL.length() <= 0){
+			dataView.getContext().getNotificationManager().
+			addNotification(getString(R.string.no_website_available));		
+		}
 		else if("search".equals(selectedURL)){
 			dataView.setFrozen(false);
 			dataView.getDataHandler().setMarkerList(originalMarkerList);

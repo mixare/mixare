@@ -171,6 +171,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				getMixViewData().getMixContext().getLocationFinder().switchOff();
 				getMixViewData().getMixContext().getDownloadManager().switchOff();
 
+				getMixViewData().getMixContext().getNotificationManager().setEnabled(false);
+				getMixViewData().getMixContext().getNotificationManager().clear();
 				if (getDataView() != null) {
 					getDataView().cancelRefreshTimer();
 				}
@@ -225,6 +227,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getDataView().doStart();
 			getDataView().clearEvents();
 
+			getMixViewData().getMixContext().getNotificationManager().setEnabled(true);
 			getMixViewData().getMixContext().getDataSourceManager().refreshDataSources();
 
 			float angleX, angleY;
@@ -593,8 +596,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
 			} else {
-				Toast.makeText(this, getString(R.string.no_website_available),
-						Toast.LENGTH_LONG).show();
+				dataView.getContext().getNotificationManager().
+				addNotification(getString(R.string.no_website_available));
 			}
 			break;
 		/* List view */
@@ -609,8 +612,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 			/* if the list is empty */
 			else {
-				Toast.makeText(this, R.string.empty_list, Toast.LENGTH_LONG)
-						.show();
+				dataView.getContext().getNotificationManager().
+				addNotification(getString(R.string.empty_list));
 			}
 			break;
 		/* Map View */
@@ -677,7 +680,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	/* ******** Operators - Sensors ****** */
 
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-		Toast t;
 
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
@@ -686,14 +688,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().setZoomLevel(String.valueOf(myout));
 			getMixViewData().setZoomProgress(progress);
 
-			t.setText("Radius: " + String.valueOf(myout));
-			t.show();
+			dataView.getContext().getNotificationManager().
+			addNotification("Radius: " + String.valueOf(myout));
 		}
 
 		public void onStartTrackingTouch(SeekBar seekBar) {
-			Context ctx = seekBar.getContext();
-			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			// zoomChanging= true;
+			dataView.getContext().getNotificationManager().addNotification("Radius: ");
 		}
 
 		public void onStopTrackingTouch(SeekBar seekBar) {
@@ -707,7 +707,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 			getMixViewData().getMyZoomBar().setProgress(seekBar.getProgress());
 
-			t.cancel();
+			dataView.getContext().getNotificationManager().clear();
 			//repaint after zoom level changed.
 			repaint();
 			setZoomLevel();
@@ -835,9 +835,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				&& accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE
 				&& getMixViewData().getCompassErrorDisplayed() == 0) {
 			for (int i = 0; i < 2; i++) {
-				Toast.makeText(getMixViewData().getMixContext(),
-						"Compass data unreliable. Please recalibrate compass.",
-						Toast.LENGTH_LONG).show();
+				dataView.getContext().getNotificationManager().
+				addNotification("Compass data unreliable. Please recalibrate compass.");
 			}
 			getMixViewData().setCompassErrorDisplayed(getMixViewData()
 					.getCompassErrorDisplayed() + 1);
@@ -916,9 +915,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getDataView().setFrozen(true);
 			jLayer.setMarkerList(searchResults);
 		} else
-			Toast.makeText(this,
-					getString(R.string.search_failed_notification),
-					Toast.LENGTH_LONG).show();
+			dataView.getContext().getNotificationManager().
+			addNotification(getString(R.string.search_failed_notification));
 	}
 
 	/* ******* Getter and Setters ********** */

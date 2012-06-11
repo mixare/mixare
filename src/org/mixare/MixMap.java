@@ -195,7 +195,8 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 		/*if the list is empty*/
 		else{
-			Toast.makeText( this, R.string.empty_list, Toast.LENGTH_LONG ).show();			
+			dataView.getContext().getNotificationManager().
+			addNotification(getString(R.string.empty_list));
 		}
 	}
 	
@@ -270,7 +271,8 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void startPointMsg(){
-		Toast.makeText(getMapContext(), R.string.map_current_location_click, Toast.LENGTH_LONG).show();
+		dataView.getContext().getNotificationManager().
+		addNotification(getString(R.string.map_current_location_click));
 	}
 
 	/* ************ Handlers *************/
@@ -304,7 +306,8 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			}
 		}
 		if(markerList.size()==0){
-			Toast.makeText( this, getString(R.string.search_failed_notification), Toast.LENGTH_LONG ).show();
+			dataView.getContext().getNotificationManager().
+			addNotification(getString(R.string.search_failed_notification));
 		}
 		else{
 			jLayer.setMarkerList(markerList);
