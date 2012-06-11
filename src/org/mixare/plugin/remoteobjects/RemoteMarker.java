@@ -27,6 +27,7 @@ import org.mixare.lib.marker.draw.ClickHandler;
 import org.mixare.lib.marker.draw.DrawCommand;
 import org.mixare.lib.marker.draw.ParcelableProperty;
 import org.mixare.lib.marker.draw.PrimitiveProperty;
+import org.mixare.lib.marker.draw.PrimitiveProperty.primitive;
 import org.mixare.lib.render.Camera;
 import org.mixare.lib.render.MixVector;
 import org.mixare.lib.service.IMarkerService;
@@ -269,8 +270,15 @@ public class RemoteMarker implements Marker{
 	public boolean fClick(float x, float y, MixContextInterface ctx, MixStateInterface state) {
 		ClickHandler clickHandler;
 		try {
+			//sending optional information.
+			iMarkerService.setExtrasPrim(markerName, "x", new PrimitiveProperty(primitive.FLOAT.name(), (Float)x));
+			iMarkerService.setExtrasPrim(markerName, "y", new PrimitiveProperty(primitive.FLOAT.name(), (Float)y));
+
 			clickHandler = iMarkerService.fClick(markerName);
-			return clickHandler.handleClick(x, y, ctx, state);
+			if(clickHandler != null){
+				return clickHandler.handleClick(x, y, ctx, state);
+			}
+			return false;
 		} catch (RemoteException e) {
 			throw new PluginNotFoundException();
 		}
