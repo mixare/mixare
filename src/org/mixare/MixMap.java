@@ -72,7 +72,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	
 	public static final String PREFS_NAME = "MixMapPrefs";
 
-	private MixContext mixContext;
+//	private MixContext mixContext;
 	private MapView mapView;
 
 	//static MixMap map; 
@@ -83,16 +83,22 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 	@Override
 	protected boolean isRouteDisplayed() {
-		return false;
+		return false; //? Do we need this?
 	}
 
+	/**
+	 * First Launched Method onCreate()
+	 * Does:
+	 * - initiate View 
+	 * - Retrieve markers 
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataView = MixView.getDataView();
-		setMixContext(dataView.getContext());
+		//setMixContext(dataView.getContext());//Dead cycle hear (MixContext should not only rely on MixView
 		setMarkerList(dataView.getDataHandler().getMarkerList());
-		//map = this; //savedInstanceState will save the instance for you.
 
 		setMapContext(this);
 		setMapView(new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA"));
@@ -114,7 +120,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			searchNotificationTxt.setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(R.string.search_active_2));
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
-
 			searchNotificationTxt.setOnTouchListener(this);
 			addContentView(searchNotificationTxt, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		}
@@ -140,67 +145,64 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	/* ********* Operators ***********/ 
-	public void setStartPoint() {
-		Location location = getMixContext().getLocationFinder().getCurrentLocation();
-		MapController controller;
+	private void setStartPoint() {
+		Location location = getDataView().getContext().getLocationFinder().getCurrentLocation();
 
 		double latitude = location.getLatitude()*1E6;
 		double longitude = location.getLongitude()*1E6;
 
-		controller = getMapView().getController();
+		MapController controller = getMapView().getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
 		controller.setCenter(startPoint);
-		controller.setZoom(15);
+		controller.setZoom(15);//TODO set zoom base on user's radius 
 	}
 
-	public void createOverlay(){
+	private void createOverlay(){
 		setMapOverlays(getMapView().getOverlays());
-		OverlayItem item; 
 		setDrawable(this.getResources().getDrawable(R.drawable.icon_map));
-		MixOverlay mixOverlay = new MixOverlay(this, getDrawable());
+		final MixOverlay mixOverlay = new MixOverlay(this, getDrawable());
 
 		for(Marker marker:markerList) {
 			if(marker.isActive()) {
-				GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
-				item = new OverlayItem(point, "", "");
+				final GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
+				final OverlayItem item = new OverlayItem(point, "", "");
 				mixOverlay.addOverlay(item);
 			}
 		}
 		//Solved issue 39: only one overlay with all marker instead of one overlay for each marker
 		getMapOverlays().add(mixOverlay);
 
-		MixOverlay myOverlay;
 		setDrawable(this.getResources().getDrawable(R.drawable.loc_icon));
-		myOverlay = new MixOverlay(this, getDrawable());
+		final MixOverlay myOverlay = new MixOverlay(this, getDrawable());
 
-		item = new OverlayItem(startPoint, "Your Position", "");
+		final OverlayItem item = new OverlayItem(startPoint, "Your Position", "");
 		myOverlay.addOverlay(item);
 		getMapOverlays().add(myOverlay); 
 	}
 	
-	public void createWalkingPath(){
+	private void createWalkingPath(){
 		if(isPathVisible()){
-			mapOverlays=mapView.getOverlays();
-			Overlay item = new MixPath(walkingPath);
-			mapOverlays.add(item);
+			mapOverlays = getMapView().getOverlays();
+			final Overlay item = new MixPath(walkingPath);
+			mapOverlays.add(item);//TODO user specified paths
 		}
 	}
 
-	public void createListView(){
+	private void createListView(){
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
-			Intent intent1 = new Intent(MixMap.this, MixListView.class); 
-			startActivityForResult(intent1, 42);
+			Intent intent1 = new Intent(this, MixListView.class); 
+			startActivityForResult(intent1, 42);//TODO receive result if any!
 		}
 		/*if the list is empty*/
 		else{
-			dataView.getContext().getNotificationManager().
+			getDataView().getContext().getNotificationManager().
 			addNotification(getString(R.string.empty_list));
 		}
 	}
 	
 	private void togglePath(){
 		final String property = "pathVisible";
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		boolean result = settings.getBoolean(property, true);
 		editor.putBoolean(property, !result);
@@ -214,24 +216,25 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		int base = Menu.FIRST;
 		/*define the first*/
 
-		MenuItem item1 =menu.add(base, base, base, getString(R.string.map_menu_normal_mode)); 
-		MenuItem item2 =menu.add(base, base+1, base+1, getString(R.string.map_menu_satellite_mode));
-		MenuItem item3 =menu.add(base, base+2, base+2, getString(R.string.map_my_location)); 
-		MenuItem item4 =menu.add(base, base+3, base+3, getString(R.string.menu_item_2)); 
-		MenuItem item5 =menu.add(base, base+4, base+4, getString(R.string.map_menu_cam_mode)); 
-		MenuItem item6 =null;
+		final MenuItem item1 =menu.add(base, base, base, getString(R.string.map_menu_normal_mode)); 
+		final MenuItem item2 =menu.add(base, base+1, base+1, getString(R.string.map_menu_satellite_mode));
+		final MenuItem item3 =menu.add(base, base+2, base+2, getString(R.string.map_my_location)); 
+		final MenuItem item4 =menu.add(base, base+3, base+3, getString(R.string.menu_item_2)); 
+		MenuItem item5 =null;
 		if(isPathVisible()){
-			item6 =menu.add(base, base+5, base+5, getString(R.string.map_toggle_path_off)); 
+			item5 =menu.add(base, base+4, base+4, getString(R.string.map_toggle_path_off)); 
 		}else{
-			item6 =menu.add(base, base+5, base+5, getString(R.string.map_toggle_path_on));
+			item5 =menu.add(base, base+4, base+4, getString(R.string.map_toggle_path_on));
 		}
+		final MenuItem item6 =menu.add(base, base+5, base+5, getString(R.string.map_menu_cam_mode)); 
+		
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_gallery);
 		item2.setIcon(android.R.drawable.ic_menu_mapmode);
 		item3.setIcon(android.R.drawable.ic_menu_mylocation);
 		item4.setIcon(android.R.drawable.ic_menu_view);
-		item5.setIcon(android.R.drawable.ic_menu_camera);
-		item6.setIcon(android.R.drawable.ic_menu_directions);
+		item5.setIcon(android.R.drawable.ic_menu_directions);
+		item6.setIcon(android.R.drawable.ic_menu_camera);
 		return true;
 	}
 
@@ -257,19 +260,23 @@ public class MixMap extends MapActivity implements OnTouchListener{
 			break;
 			/*back to Camera View*/
 		case 5:
+			togglePath();
+			//refresh:
+			startActivity(getIntent()); //what Activity are we launching?
 			closeMapViewActivity();
 			break;
 		case 6:
-			togglePath();
-			//refresh:
-			startActivity(getIntent()); 
 			closeMapViewActivity();
+			break;
+		default:
+				break;//do nothing
+
 		}
 		return true;
 	}
 
 	public void startPointMsg(){
-		dataView.getContext().getNotificationManager().
+		getDataView().getContext().getNotificationManager().
 		addNotification(getString(R.string.map_current_location_click));
 	}
 
@@ -297,7 +304,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		markerList = new ArrayList<Marker>();
 
 		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-			Marker ma = jLayer.getMarker(i);
+			final Marker ma = jLayer.getMarker(i);
 
 			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
 				markerList.add(ma);
@@ -317,6 +324,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
+	/*
+	 * TODO Fix onTouch function MixMap
+	 * (non-Javadoc)
+	 * @see android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)
+	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
@@ -362,22 +374,22 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		this.drawable = drawable;
 	}
 
-	/**
-	 * @return the mixContext
-	 */
-	private MixContext getMixContext() {
-		return mixContext;
-	}
+//	/**
+//	 * @return the mixContext
+//	 */
+//	private MixContext getMixContext() {
+//		return mixContext;
+//	}
+//
+//	/**
+//	 * @param mixContext the mixContext to set
+//	 */
+//	private void setMixContext(MixContext mixContext) {
+//		this.mixContext = mixContext;
+//	}
 
 	/**
-	 * @param mixContext the mixContext to set
-	 */
-	private void setMixContext(MixContext mixContext) {
-		this.mixContext = mixContext;
-	}
-
-	/**
-	 * @return the mapView
+	 * @return MapView the mapView
 	 */
 	private MapView getMapView() {
 		return mapView;
@@ -390,10 +402,19 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		this.mapView = mapView;
 	}
 	
+	/**
+	 * Sets List of markers
+	 * TODO use collection instead
+	 * @param List<Marker> maList
+	 */
 	public void setMarkerList(List<Marker> maList){
 		markerList = maList;
 	}
 
+	/**
+	 * Returns current DataView
+	 * @return DataView current DataView
+	 */
 	public DataView getDataView(){
 		return dataView;
 	}
@@ -417,6 +438,10 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		walkingPath.add(geoPoint);
 	}
 
+	/**
+	 * Checks stored user preference 
+	 * @return boolean false if specified, true otherwise (default)
+	 */
 	private boolean isPathVisible(){
 		final String property = "pathVisible";
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -504,18 +529,18 @@ class MixPath extends Overlay{
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(3);
 
-        Path path = new Path();
+        final Path usrPath = new Path();
        
         Point start = new Point();
         projection.toPixels(geoPoints.get(0), start);        
-        path.moveTo(start.x, start.y);
+        usrPath.moveTo(start.x, start.y);
                
         for(GeoPoint gp : geoPoints){
         	Point p = new Point();
             projection.toPixels(gp, p);        
-            path.lineTo(p.x, p.y);
+            usrPath.lineTo(p.x, p.y);
         }
         
-        canvas.drawPath(path, mPaint);
+        canvas.drawPath(usrPath, mPaint);
     }
 }
