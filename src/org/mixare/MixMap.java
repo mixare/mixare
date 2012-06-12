@@ -45,7 +45,6 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -151,11 +150,15 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		double latitude = location.getLatitude()*1E6;
 		double longitude = location.getLongitude()*1E6;
 
-		MapController controller = getMapView().getController();
+		final MapController controller = getMapView().getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
 		controller.setCenter(startPoint);
-		controller.setZoom(15);//TODO set zoom base on user's radius 
+		//set Zoom Level base on user radius
+		final float mapZoomLevel = (getDataView().getRadius()/2f);
+		controller.setZoom(MixUtils.earthEquatorToZoomLevel((mapZoomLevel < 2f)? 2f: mapZoomLevel));
 	}
+	
+	
 
 	private void createOverlay(){
 		setMapOverlays(getMapView().getOverlays());
