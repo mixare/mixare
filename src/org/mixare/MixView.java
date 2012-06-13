@@ -974,9 +974,9 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			doMixSearch(query);
-		}
+			intent.setClass(this, MixListView.class);
+			startActivity(intent);
+			}
 	}
 
 	@Override
@@ -985,31 +985,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		handleIntent(intent);
 	}
 
-	private void doMixSearch(String query) {
-		DataHandler jLayer = getDataView().getDataHandler();
-		if (!getDataView().isFrozen()) {
-			MixListView.originalMarkerList = jLayer.getMarkerList();
-			MixMap.originalMarkerList = jLayer.getMarkerList();
-		}
-
-		ArrayList<Marker> searchResults = new ArrayList<Marker>();
-		Log.d("SEARCH-------------------0", "" + query);
-		if (jLayer.getMarkerCount() > 0) {
-			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-				Marker ma = jLayer.getMarker(i);
-				if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1) {
-					searchResults.add(ma);
-					/* the website for the corresponding title */
-				}
-			}
-		}
-		if (searchResults.size() > 0) {
-			getDataView().setFrozen(true);
-			jLayer.setMarkerList(searchResults);
-		} else
-			dataView.getContext().getNotificationManager().
-			addNotification(getString(R.string.search_failed_notification));
-	}
 
 	/* ******* Getter and Setters ********** */
 
