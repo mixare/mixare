@@ -121,8 +121,9 @@ public class MixListView extends ListActivity {
 
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			doMixSearch(query);
+			intent.setClass(this, MixListView.class);
+			startActivity(intent);
+			finish(); //TODO reoginize launching
 		}
 	}
 
