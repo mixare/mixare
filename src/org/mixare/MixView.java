@@ -697,6 +697,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			 */
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
 				Intent intent1 = new Intent(MixView.this, MixListView.class); 
+				intent1.setAction(Intent.ACTION_VIEW);
 				startActivityForResult(intent1, 42);
 			}
 			/* if the list is empty */

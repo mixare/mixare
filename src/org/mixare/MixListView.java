@@ -62,9 +62,9 @@ public class MixListView extends ListActivity {
 	private ListItemAdapter adapter;
 	private static Context ctx;
 	*/
-	private static String searchQuery = "";
-	private static SpannableString underlinedTitle;
-	public static List<Marker> searchResultMarkers;
+	//private static String searchQuery = "";
+//	private static SpannableString underlinedTitle;
+//	public static List<Marker> searchResultMarkers;
 	public static List<Marker> originalMarkerList;
 
 	public Vector<String> getDataSourceMenu() {
@@ -84,54 +84,39 @@ public class MixListView extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		dataView = MixView.getDataView();	
-
+		dataView = MixView.getDataView();
 		selectedItemURL = new Vector<String>();
 		listViewMenu = new Vector<SpannableString>();
 		DataHandler jLayer = dataView.getDataHandler();
-		if (dataView.isFrozen() && jLayer.getMarkerCount() > 0){
-			selectedItemURL.add("search");
-		}
-		/*add all marker items to a title and a URL Vector*/
-		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-			Marker ma = jLayer.getMarker(i);
-			if(ma.isActive()) {
-				if (ma.getURL()!=null) {
-					/* Underline the title if website is available*/
-					underlinedTitle = new SpannableString(ma.getTitle());
-					underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
-					listViewMenu.add(underlinedTitle);
-				} else {
-					listViewMenu.add(new SpannableString(ma.getTitle()));
+		if (Intent.ACTION_SEARCH.equals(this.getIntent().getAction())){
+			String query = this.getIntent().getStringExtra(SearchManager.QUERY);
+			doMixSearch(query);
+		}else{
+			
+			/*add all marker items to a title and a URL Vector*/
+			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
+				Marker ma = jLayer.getMarker(i);
+				if(ma.isActive()) {
+					if (ma.getURL()!=null) {
+						/* Underline the title if website is available*/
+						SpannableString underlinedTitle = new SpannableString(ma.getTitle());
+						underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
+						listViewMenu.add(underlinedTitle);
+					} else {
+						listViewMenu.add(new SpannableString(ma.getTitle()));
+					}
+					/*the website for the corresponding title*/
+					if (ma.getURL()!=null)
+						selectedItemURL.add(ma.getURL());
+					/*if no website is available for a specific title*/
+					else
+						selectedItemURL.add("");
+
 				}
-				/*the website for the corresponding title*/
-				if (ma.getURL()!=null)
-					selectedItemURL.add(ma.getURL());
-				/*if no website is available for a specific title*/
-				else
-					selectedItemURL.add("");
 			}
-
-
-			if (dataView.isFrozen()) {
-
-				TextView searchNotificationTxt = new TextView(this);
-				searchNotificationTxt.setVisibility(View.VISIBLE);
-				searchNotificationTxt.setText(getString(R.string.search_active_1)+" "+ DataSourceList.getDataSourcesStringList() + getString(R.string.search_active_2));
-				searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
-
-				searchNotificationTxt.setPadding(10, 2, 0, 0);
-				searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
-				searchNotificationTxt.setTextColor(Color.WHITE);
-
-				getListView().addHeaderView(searchNotificationTxt);
-
-			}
-
-			setListAdapter(new ArrayAdapter<SpannableString>(this, android.R.layout.simple_list_item_1,listViewMenu));
-			getListView().setTextFilterEnabled(true);
-
 		}
+		setListAdapter(new ArrayAdapter<SpannableString>(this, android.R.layout.simple_list_item_1,listViewMenu));
+		getListView().setTextFilterEnabled(true);
 	}
 
 	private void handleIntent(Intent intent) {
@@ -149,41 +134,33 @@ public class MixListView extends ListActivity {
 
 	private void doMixSearch(String query) {
 		DataHandler jLayer = dataView.getDataHandler();
-		if (!dataView.isFrozen()) {
-			originalMarkerList = jLayer.getMarkerList();
-			MixMap.originalMarkerList = jLayer.getMarkerList();
-		}
-		originalMarkerList = jLayer.getMarkerList();
-		searchResultMarkers = new ArrayList<Marker>();
-		Log.d("SEARCH-------------------0", ""+query);
-		setSearchQuery(query);
 
-		selectedItemURL = new Vector<String>();
-		listViewMenu = new Vector<SpannableString>();
+		originalMarkerList = jLayer.getMarkerList();
+		
+		Log.d("SEARCH-------------------0", ""+query);
 		for(int i = 0; i < jLayer.getMarkerCount();i++){
 			Marker ma = jLayer.getMarker(i);
 
-			if (ma.getTitle().toLowerCase().indexOf(searchQuery.toLowerCase()) != -1) {
-				searchResultMarkers.add(ma);
-				listViewMenu.add(new SpannableString(ma.getTitle()));
-				/*the website for the corresponding title*/
-				if (ma.getURL() != null)
-					selectedItemURL.add(ma.getURL());
-				/*if no website is available for a specific title*/
-				else
-					selectedItemURL.add("");
+			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1) {
+				if (ma.getURL()!=null) {
+					/* Underline the title if website is available*/
+					SpannableString underlinedTitle = new SpannableString(ma.getTitle());
+					underlinedTitle.setSpan(new UnderlineSpan(), 0, underlinedTitle.length(), 0);
+					listViewMenu.add(underlinedTitle);
+				} else {
+					listViewMenu.add(new SpannableString(ma.getTitle()));
+				}
 			}
+			/*the website for the corresponding title*/
+			if (ma.getURL()!=null)
+				selectedItemURL.add(ma.getURL());
+			/*if no website is available for a specific title*/
+			else
+				selectedItemURL.add("");
 		}
 		if (listViewMenu.size() == 0) {
 			dataView.getContext().getNotificationManager().
 			addNotification(getString(R.string.search_failed_notification));
-		}
-		else {
-			jLayer.setMarkerList(searchResultMarkers);
-			dataView.setFrozen(true);
-			finish();
-			Intent intent1 = new Intent(this, MixListView.class); 
-			startActivityForResult(intent1, 42);
 		}
 	}
 
@@ -255,13 +232,13 @@ public class MixListView extends ListActivity {
 		startActivityForResult(intent2, 20);
 	}
 
-	public static String getSearchQuery(){
-		return searchQuery;
-	}
-
-	public static void setSearchQuery(String query){
-		searchQuery = query;
-	}
+//	public static String getSearchQuery(){
+//		return searchQuery;
+//	}
+//
+//	public static void setSearchQuery(String query){
+//		searchQuery = query;
+//	}
 }
 
 /**

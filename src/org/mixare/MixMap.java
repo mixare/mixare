@@ -194,6 +194,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private void createListView(){
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
 			Intent intent1 = new Intent(this, MixListView.class); 
+			intent1.setAction(Intent.ACTION_VIEW);
 			startActivityForResult(intent1, 42);//TODO receive result if any!
 		}
 		/*if the list is empty*/
@@ -287,8 +288,10 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			doMixSearch(query);
+//			String query = intent.getStringExtra(SearchManager.QUERY);
+//			doMixSearch(query);
+			intent.setClass(this, MixListView.class);
+			startActivity(intent);
 		}
 	}
 
@@ -298,34 +301,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		handleIntent(intent);
 	}
 
-	private void doMixSearch(String query) {
-		DataHandler jLayer = dataView.getDataHandler();
-		if (!dataView.isFrozen()) {
-			originalMarkerList = jLayer.getMarkerList();
-			MixListView.originalMarkerList = jLayer.getMarkerList();
-		}
-		markerList = new ArrayList<Marker>();
-
-		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-			final Marker ma = jLayer.getMarker(i);
-
-			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
-				markerList.add(ma);
-			}
-		}
-		if(markerList.size()==0){
-			dataView.getContext().getNotificationManager().
-			addNotification(getString(R.string.search_failed_notification));
-		}
-		else{
-			jLayer.setMarkerList(markerList);
-			dataView.setFrozen(true);
-
-			finish();
-			Intent intent1 = new Intent(this, MixMap.class); 
-			startActivityForResult(intent1, 42);
-		}
-	}
 
 	/*
 	 * TODO Fix onTouch function MixMap
