@@ -389,7 +389,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			
 			getMixViewData().getMixContext().getDownloadManager().shutDown();
 			getMixViewData().getSensorMgr().unregisterListener(this);
-			wait(200);
 			isBackground = true; //used to enforce garbage MixViewDataHolder
 			getMixViewData().setSensorMgr(null);
 			mixViewData = null;
