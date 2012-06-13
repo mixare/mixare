@@ -40,8 +40,10 @@ class DataSourceMgrImpl implements DataSourceManager {
 	public boolean isAtLeastOneDatasourceSelected() {
 		boolean atLeastOneDatasourceSelected = false;
 		for (DataSource ds : this.allDataSources) {
-			if (ds.getEnabled())
+			if (ds.getEnabled()){
 				atLeastOneDatasourceSelected = true;
+				break; //if condition met, break from loop.
+			}
 		}
 		return atLeastOneDatasourceSelected;
 	}

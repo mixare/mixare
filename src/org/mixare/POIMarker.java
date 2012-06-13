@@ -97,14 +97,14 @@ public class POIMarker extends LocalMarker {
 		double d = distance;
 		DecimalFormat df = new DecimalFormat("@#");
 		if (d < 1000.0) {
-			textStr = title + " (" + df.format(d) + "m)";
+			textStr = getTitle() + " (" + df.format(d) + "m)";
 		} else {
 			d = d / 1000.0;
-			textStr = title + " (" + df.format(d) + "km)";
+			textStr = getTitle() + " (" + df.format(d) + "km)";
 		}
 
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
-				dw, underline);
+				dw, isUnderline());
 
 		if (isVisible) {
 			// based on the distance set the colour
