@@ -2,7 +2,6 @@ package org.mixare.mgr.location;
 
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 /**
@@ -16,10 +15,8 @@ public class LocationResolver implements LocationListener{
 
 	private String provider;
 	private LocationMgrImpl locationMgrImpl;
-	private LocationManager lm;
 	
-	public LocationResolver(LocationManager lm, String provider, LocationMgrImpl locationMgrImpl){
-		this.lm = lm;
+	public LocationResolver(String provider, LocationMgrImpl locationMgrImpl){
 		this.provider = provider;
 		this.locationMgrImpl = locationMgrImpl;
 	}

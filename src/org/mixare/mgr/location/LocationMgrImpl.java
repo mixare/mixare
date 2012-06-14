@@ -98,7 +98,7 @@ class LocationMgrImpl implements LocationFinder {
 		Timer timer = new Timer();
 		for (String p : lm.getAllProviders()) {
 			if(lm.isProviderEnabled(p)){
-				LocationResolver lr = new LocationResolver(lm, p, this);
+				LocationResolver lr = new LocationResolver(p, this);
 				locationResolvers.add(lr);
 				lm.requestLocationUpdates(p, 0, 0, lr);
 			}
