@@ -26,7 +26,6 @@ public class LocationResolver implements LocationListener{
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		lm.removeUpdates(this);
 		locationMgrImpl.locationCallback(provider);
 	}
 
