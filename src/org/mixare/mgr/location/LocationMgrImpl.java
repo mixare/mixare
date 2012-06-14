@@ -24,7 +24,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mixare.MixContext;
-import org.mixare.MixView;
 import org.mixare.R;
 import org.mixare.mgr.downloader.DownloadManager;
 
@@ -33,7 +32,6 @@ import android.hardware.GeomagneticField;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.widget.Toast;
 
 /**
  * This class is repsonsible for finding the location, and sending it back to
@@ -138,7 +136,6 @@ class LocationMgrImpl implements LocationFinder {
 	 */
 	public Location getCurrentLocation() {
 		if (curLoc == null) {
-			MixView mixView = mixContext.getActualMixView();
 			mixContext.getNotificationManager().
 			addNotification(mixContext.getString(R.string.location_not_found));
 			throw new RuntimeException("No GPS Found");

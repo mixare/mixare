@@ -35,17 +35,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.mixare.R.drawable;
-import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
 import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.gui.PaintScreen;
-import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Matrix;
-import org.mixare.plugin.PluginLoader;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,7 +76,6 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MixView extends Activity implements SensorEventListener, OnTouchListener {
 

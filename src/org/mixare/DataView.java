@@ -46,7 +46,6 @@ import org.mixare.mgr.downloader.DownloadResult;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * This class is able to update the markers and the radar. It also handles some

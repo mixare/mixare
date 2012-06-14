@@ -18,12 +18,10 @@
  */
 package org.mixare;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import org.mixare.data.DataHandler;
-import org.mixare.data.DataSourceList;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.marker.Marker;
 
@@ -44,7 +42,6 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * This class holds vectors with informaction about sources, their description
