@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,6 +24,7 @@ public class PluginLoaderActivity extends Activity {
 
 	private static final int SPLASHTIME = 2000; // 2 seconds
 	public static final int SCANNER_REQUEST_CODE = 0;
+	private static final String CLOSE_ACTIVITY_CALL = "closed";
 	protected Handler exitHandler = null;
 	protected Runnable exitRunnable = null;
 
@@ -32,6 +34,8 @@ public class PluginLoaderActivity extends Activity {
 		super.onCreate(savedInstanceState);		
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().unBindServices();
+		PluginLoader.newInstance();
+		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
 		DataSourceStorage.init(this);
 
@@ -77,8 +81,9 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(data != null && data.getExtras() != null && data.getExtras().getString("closed") != null){
+		if(data != null && data.getExtras() != null && data.getExtras().getString(CLOSE_ACTIVITY_CALL) != null){
 			//back button was pressed, close mixare now.
+			Log.e("PluginLoaderActivity", "Closing the pluginLoaderActivity, closed call was requested");
 			finish();
 			return;
 		}	
@@ -97,7 +102,7 @@ public class PluginLoaderActivity extends Activity {
 	}
 
 	private boolean arePendingActivitiesFinished() {
-		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
+		return (PluginLoader.getInstance().getPendingActivitiesOnResult() <= 0);
 	}
 
 	private void processDataSourceFromPlugin(Intent data) {

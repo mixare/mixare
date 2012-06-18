@@ -303,7 +303,7 @@ public class RemoteMarker implements Marker{
 	@Override
 	public int compareTo(Marker another) {
 		Marker rm = (Marker)another;
-		return this.getID().compareTo(rm.getID());
+		return new Double(this.getDistance()).compareTo(new Double(rm.getDistance()));
 	}
 
 }

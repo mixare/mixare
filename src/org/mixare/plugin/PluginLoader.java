@@ -38,6 +38,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.os.RemoteException;
+import android.util.Log;
 
 /**
  * Searches, loads and executes available plugins that are installed on the device.
@@ -60,6 +61,10 @@ public class PluginLoader {
 		return instance;
 	}
 
+	public static void newInstance() {
+		instance = new PluginLoader();
+	}
+	
 	public void setActivity(Activity activity) {
 		this.activity = activity;
 	}
@@ -104,8 +109,12 @@ public class PluginLoader {
 		while(it.hasNext()){
 			Entry<String, PluginConnection> pairs = (Entry<String, PluginConnection>)it.next();
 			if(pairs.getValue() instanceof ServiceConnection){
-				activity.unbindService((ServiceConnection)pairs.getValue());
-				it.remove();
+				try{
+					activity.unbindService((ServiceConnection)pairs.getValue());
+					it.remove();
+				}catch(IllegalArgumentException iae){
+					Log.e("PluginLoader", "Service: "+ pairs.getKey() + " is not registered");
+				}
 			}
 		}
 	}
@@ -164,5 +173,4 @@ public class PluginLoader {
 			increasePendingActivitiesOnResult();
 		}
 	}
-
 }
