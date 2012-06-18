@@ -35,7 +35,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.widget.Toast;
 
 /**
  * Cares about location management and about the data (source, inputstream)

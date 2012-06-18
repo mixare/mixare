@@ -67,4 +67,34 @@ public class MixUtils {
 
 		return angle;
 	}
+
+	/**
+	 * Calculate Zoom level based on the relation between distance and earth equator.
+	 * The equation used is 
+	 * <pre>
+	 * log2(E/D)+1
+	 * </pre>
+	 * - Where E is 40075 (Earth Equator in KM)
+	 * - D is the distance to be covered
+	 * 
+	 * Max will be 21 KM ZoomLevelRate, which is about 0.01 distance.
+	 * Min will be 1 KM ZoomLevelRate, which is about 40000 distance.
+	 * 
+	 * If you want to calculate ZoomLevel rate against radius, divide radius by 2
+	 * before calling this function.
+	 * This is Helpful when dealing with maps base 2 factor.
+	 * @param float distance
+	 * @return int zoomLevel rate base 2
+	 */
+	public static synchronized  int earthEquatorToZoomLevel (final float distance){
+		final float E = 40075f; //Earth Equator in KM
+		int zoom =1;
+		try{
+			zoom = (int) Math.round(Math.log(E/distance)/Math.log(2.0))+1;
+			zoom = (zoom < 1)? 1: zoom;
+		}catch (Exception e){
+			zoom = 15;
+		}
+		return (zoom > 21? 21:zoom);
+	}
 }
