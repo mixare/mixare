@@ -83,7 +83,6 @@ public class PluginLoaderActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(data != null && data.getExtras() != null && data.getExtras().getString(CLOSE_ACTIVITY_CALL) != null){
 			//back button was pressed, close mixare now.
-			Log.e("PluginLoaderActivity", "Closing the pluginLoaderActivity, closed call was requested");
 			finish();
 			return;
 		}	
