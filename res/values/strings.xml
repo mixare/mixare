@@ -17,11 +17,12 @@
     
     <string name="CIRCLE_MARKER">Circles</string>
     <string name="NAVIGATION_MARKER">Arrows</string>
+    <string name="IMAGE_MARKER">Images</string>
     
     <string name="empty_list">Sorry, \nThere is no location information \navailable within this radius.\nPlease try to search in a wider range.</string>
-	<string name="option_not_available">Sorry, We are working on it... \nThis option will be available soon!</string>
+	<string name="option_not_available">Sorry, We are working on it&#8230; \nThis option will be available soon!</string>
 
-	<string name="license">Copyright (C) 2010- Peer internet solutions 
+	<string name="license">Copyright &#169; 2010- Peer internet solutions 
 		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
 		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
 		or at your option) any later version. 
@@ -56,7 +57,7 @@
 	<string name="connection_error_dialog_button2">Open Settings</string>
 	<string name="connection_error_dialog_button3">Close App</string>
 
-	<string name="connection_GPS_dialog_text">The GPS location can not be updated... \nIf you continue it could be that the Information 
+	<string name="connection_GPS_dialog_text">The GPS location can not be updated&#8230; \nIf you continue it could be that the Information 
 		\nwill not be displayed in the right place.</string>
 	<string name="connection_GPS_dialog_button1">Continue</string>
 	<string name="connection_GPS_dialog_button2">Close</string>

@@ -21,6 +21,7 @@ package org.mixare.data;
 
 import org.mixare.R;
 import org.mixare.data.convert.DataConvertor;
+import org.mixare.data.convert.PanoramioDataProcessor;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -46,7 +47,7 @@ public class DataSource extends Activity {
 	private String url;
 
 	public enum TYPE {
-		WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, ARENA
+		WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, ARENA, PANORAMIO
 	};
 
 	public enum DISPLAY {
@@ -215,6 +216,15 @@ public class DataSource extends Activity {
 			case OSM:
 				ret += DataConvertor.getOSMBoundingBox(lat, lon, radius);
 				break;
+			case PANORAMIO:
+				final float minLong = (float) (lon - radius/100.0);
+				final float minLat = (float) (lat - radius/100.0);
+				final float maxLong = (float) (lon + radius/100.0);
+				final float maxLat = (float) (lat + radius/100.0);
+				ret += "?set=public&from=0&to="+PanoramioDataProcessor.MAX_JSON_OBJECTS+
+						"&minx="+minLong+"&miny="+minLat+
+						"&maxx="+maxLong+"&maxy="+maxLat+
+						"&size=thumbnail&mapfilter=true";
 			}
 
 		}
