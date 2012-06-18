@@ -224,7 +224,6 @@ public class DataView {
 
 						@Override
 						public void run() {
-							callRefreshToast();
 							refresh();
 						}
 					}, date, refreshDelay);
@@ -460,6 +459,7 @@ public class DataView {
 	 * Re-downloads the markers, and draw them on the map.
 	 */
 	public void refresh(){
+		callRefreshToast();
 		state.nextLStatus = MixState.NOT_STARTED;
 	}
 	
