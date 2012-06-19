@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.mixare.MixContext;
+import org.mixare.MixState;
 import org.mixare.MixView;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
@@ -67,6 +68,10 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			while (!stop) {
 				try {
 					mRequest = todoList.poll(10, TimeUnit.SECONDS );
+					if(mRequest == null){
+						ctx.getActualMixView().refresh();
+						return;
+					}
 					state=DownloadManagerState.Downloading;
 					result = processRequest(mRequest);
 				} catch (InterruptedException e) {
@@ -214,6 +219,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	}
 
 	public void switchOff() {
+		state = DownloadManagerState.OffLine;
 		stop=true;
 	}
 

@@ -40,7 +40,20 @@ public class MixUtils {
 			return ((int) (meters / 1000f)) + "km";
 		}
 	}
-
+	
+	/**
+	 * Helper method that shorten title and format string to display distance
+	 * @param String title
+	 * @param double distance
+	 * @return String formated Title representation
+	 */
+	public static synchronized String shortenTitle( String title, final double distance){
+		if (title.length() > 10) {
+			title = title.substring(0, 10) + "...";
+		}
+		
+			return  String.valueOf(title + formatDist((float) distance));
+	}
 	static String formatDec(float val, int dec) {
 		int factor = (int) Math.pow(10, dec);
 
@@ -67,4 +80,5 @@ public class MixUtils {
 
 		return angle;
 	}
+
 }
