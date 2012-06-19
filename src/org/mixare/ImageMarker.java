@@ -35,7 +35,7 @@ public class ImageMarker extends LocalMarker {
 	public ImageMarker(String id, String title, double latitude,
 			double longitude, double altitude, String link, int type, int colour) {
 		super(id, title, latitude, longitude, altitude, link, type, colour);
-		this.image = Bitmap.createBitmap(10, 10, Config.ARGB_4444); //TODO set default Image if image not Available
+		this.setImage(Bitmap.createBitmap(10, 10, Config.ARGB_4444)); //TODO set default Image if image not Available
 	}
 	
 	public ImageMarker (String id, String title, double latitude,
@@ -47,15 +47,15 @@ public class ImageMarker extends LocalMarker {
 		try {
 			
 			final java.net.URL imageURI = new java.net.URL (ImageUrl);
-			this.image = BitmapFactory.decodeStream(imageURI.openConnection().getInputStream());
+			this.setImage(BitmapFactory.decodeStream(imageURI.openConnection().getInputStream()));
 			
 		}  catch (MalformedURLException e) {
 			Log.e("Mixare - local ImageMarker", e.getMessage());
 		} catch (IOException e) {
 			Log.e("Mixare - local ImageMarker", e.getMessage());
 		}finally {
-			if (null == this.image){
-				this.image = Bitmap.createBitmap(10, 10, Config.ARGB_4444);
+			if (null == this.getImage()){
+				this.setImage(Bitmap.createBitmap(10, 10, Config.ARGB_4444));
 			}
 		}
 	}
@@ -73,28 +73,11 @@ public class ImageMarker extends LocalMarker {
 	 * @param PaintScreen View Screen that title screen will be drawn into
 	 */
 	public void drawTitle(final PaintScreen dw) {
-		final float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
-
-		// TODO: change textblock only when distance changes
-		String textStr = "";
-		double d = distance;
-		final DecimalFormat df = new DecimalFormat("@#");
-		String imageTitle = "";
-		if (title.length() > 10) {
-			imageTitle = title.substring(0, 10) + "...";
-		} else {
-			imageTitle = title;
-		}
-		if (d < 1000.0) {
-			textStr = imageTitle + " (" + df.format(d) + "m)";
-		} else {
-			d = d / 1000.0;
-			textStr = imageTitle + " (" + df.format(d) + "km)";
-		}
-		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
-				dw, underline);
-
 		if (isVisible) {
+			final float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
+			String textStr = MixUtils.shortenTitle(title,distance);
+			textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
+					dw, underline);
 			// dw.setColor(DataSource.getColor(type));
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 					getSignMarker().x, getSignMarker().y);
@@ -111,12 +94,12 @@ public class ImageMarker extends LocalMarker {
 	 * @param PaintScreen Screen that Image will be drawn into
 	 */
 	public void drawImage(final PaintScreen dw) {
-		final DrawImage Image = new DrawImage(isActive(), cMarker, image);
+		final DrawImage Image = new DrawImage(isVisible, cMarker, image);
 		Image.draw(dw);
 //		if (isVisible) {
 //			dw.setStrokeWidth(dw.getHeight() / 100f);
 //			dw.setFill(false);
-//			dw.setColor(Color.WHITE);
+//			dw.setColor(android.graphics.Color.WHITE);
 //			dw.paintBitmap(getImage(), (float) (getSignMarker().x - (getImage().getWidth() / 2f)),
 //					(float) (getSignMarker().y - (getImage().getHeight() / 2f)));
 //
@@ -131,6 +114,20 @@ public class ImageMarker extends LocalMarker {
 	@Override
 	public int getMaxObjects() {
 		return maxObjects;
+	}
+
+	/**
+	 * @return the image
+	 */
+	public Bitmap getImage() {
+		return image;
+	}
+
+	/**
+	 * @param image the image to set
+	 */
+	public void setImage(Bitmap image) {
+		this.image = image;
 	}
 
 }
