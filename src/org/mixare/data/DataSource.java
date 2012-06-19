@@ -272,6 +272,9 @@ public class DataSource extends Activity {
 		case ARENA:
 			ret = R.drawable.arena;
 			break;
+		case PANORAMIO:
+			ret = R.drawable.icon_panoramio;
+			break;
 		default:
 			ret = R.drawable.ic_launcher;
 			break;
