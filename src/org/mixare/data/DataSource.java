@@ -247,6 +247,9 @@ public class DataSource extends Activity {
 		case ARENA:
 			ret = Color.RED;
 			break;
+		case PANORAMIO:
+			ret = Color.GREEN;
+			break;
 		default:
 			ret = Color.WHITE;
 			break;
