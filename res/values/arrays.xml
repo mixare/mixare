@@ -15,6 +15,6 @@
 	    <item>Twitter|http://search.twitter.com/search.json|2|0|true</item>
 	    <item>OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true</item>
 	    <item>Own URL|http://mixare.org/geotest.php|4|0|false</item>
-	    <item>Panoramio|http://www.panoramio.com/map/get_panoramas.php|6|0|false</item>
+	    <item>Panoramio|http://www.panoramio.com/map/get_panoramas.php|6|2|false</item>
 	</string-array>
 </resources>

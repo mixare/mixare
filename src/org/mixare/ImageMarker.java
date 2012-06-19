@@ -3,14 +3,8 @@
  */
 package org.mixare;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 
 import org.mixare.lib.MixUtils;
@@ -22,8 +16,8 @@ import org.mixare.lib.marker.draw.DrawImage;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.util.Log;
+
 
 
 /**
@@ -34,11 +28,9 @@ import android.util.Log;
 public class ImageMarker extends LocalMarker {
 
 	/** Int MaxObjects that can be create of this marker */
-	private static final int maxObjects = 30;
-	private static final int IO_BUFFER_SIZE = 1024;
-	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
+	public static final int maxObjects = 30;
 	/** BitMap Image storage */
-	private final Bitmap image;
+	private Bitmap image;
 	
 	public ImageMarker(String id, String title, double latitude,
 			double longitude, double altitude, String link, int type, int colour) {
@@ -46,6 +38,32 @@ public class ImageMarker extends LocalMarker {
 		this.image = Bitmap.createBitmap(10, 10, Config.ARGB_4444); //TODO set default Image if image not Available
 	}
 	
+	public ImageMarker (String id, String title, double latitude,
+			double longitude, double altitude, final String pageLink, 
+			final int type, final int colour,final String imageOwner,
+			final String ImageUrl) {
+		super(id, title, latitude, longitude, altitude, pageLink, type, colour);
+		
+		try {
+			
+			final java.net.URL imageURI = new java.net.URL (ImageUrl);
+			this.image = BitmapFactory.decodeStream(imageURI.openConnection().getInputStream());
+			
+		}  catch (MalformedURLException e) {
+			Log.e("Mixare - local ImageMarker", e.getMessage());
+		} catch (IOException e) {
+			Log.e("Mixare - local ImageMarker", e.getMessage());
+		}finally {
+			if (null == this.image){
+				this.image = Bitmap.createBitmap(10, 10, Config.ARGB_4444);
+			}
+		}
+	}
+	
+	public void draw(final PaintScreen dw){
+		drawImage(dw);
+		drawTitle(dw);
+	}
 
 	/**
 	 * Draw a title for image. It displays full title if title's length is less
@@ -105,68 +123,7 @@ public class ImageMarker extends LocalMarker {
 //		}
 	}
 	
-	public Bitmap getBitmapFromURL(final String src) {
 
-//		InputStream input = null;
-//		BufferedOutputStream out = null;
-//		Bitmap myBitmap = null;
-//		try {
-//			final URI url = new URI(src);
-//			final HttpURLConnection connection = (HttpURLConnection) url
-//					.openConnection();
-//			connection.setDoInput(true);
-//			connection.connect();
-//			input = new BufferedInputStream(connection.getInputStream(),
-//					IO_BUFFER_SIZE);
-//			if (FLAG_DECODE_PHOTO_STREAM_WITH_SKIA) {
-//				myBitmap = BitmapFactory.decodeStream(input);
-//			} else {
-//				final ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-//				out = new BufferedOutputStream(dataStream, IO_BUFFER_SIZE);
-//				copy(input, out);
-//				out.flush();
-//
-//				final byte[] data = dataStream.toByteArray();
-//				myBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-//			}
-//		} catch (final IOException e) {
-//			Log.e("Mixare - LocalImageMarker", e.getMessage());
-//			//return null;
-//		} finally {
-//			closeStream(input);
-//			closeStream(out);
-//		}
-		return image;
-	}
-
-	/**
-	 * Closes the specified stream.
-	 * 
-	 * @param stream The stream to close.
-	 */
-	private static void closeStream(final Closeable stream) {
-		if (stream != null) {
-			try {
-				stream.close();
-			} catch (final IOException e) {
-				android.util.Log
-						.e("Mixare - LocalImageMarker", "Could not close stream", e);
-			}
-		}
-	}
-
-	private static void copy(final InputStream input,
-			final BufferedOutputStream out) {
-		final byte[] b = new byte[IO_BUFFER_SIZE];
-		int read;
-		try {
-			while ((read = input.read(b)) != -1) {
-				out.write(b, 0, read);
-			}
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
 	private MixVector getSignMarker() {
 		return this.signMarker;
 	}

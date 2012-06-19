@@ -21,8 +21,9 @@ import android.util.Log;
  */
 public class PanoramioDataProcessor extends DataHandler implements DataProcessor{
 
-	public static final int MAX_JSON_OBJECTS = 30;
 	
+	public static final int MAX_JSON_OBJECTS = ImageMarker.maxObjects;
+
 	@Override
 	public String[] getUrlMatch() {
 		String[] str = {"Panoramio"};
@@ -59,7 +60,6 @@ public class PanoramioDataProcessor extends DataHandler implements DataProcessor
 			if (jo.has("photo_id") && jo.has("latitude") && jo.has("longitude")
 					&& jo.has("photo_file_url")) {
 
-				jo.getString("photo_url");
 				// For Panoramio elevation, generate a random number ranged [30 -
 				// 120]
 				// @TODO find better way
@@ -71,9 +71,11 @@ public class PanoramioDataProcessor extends DataHandler implements DataProcessor
 						jo.getDouble("latitude"), 
 						jo.getDouble("longitude"),
 						(elevation.nextInt(90) + 30), // @TODO elevation level for Panoramio
-						jo.getString("photo_file_url"),
+						jo.getString("photo_url"),
 						taskId,
-						colour));
+						colour,
+						jo.getString("owner_name"),
+						jo.getString("photo_file_url")));
 			}
 		}
 		return markers;
