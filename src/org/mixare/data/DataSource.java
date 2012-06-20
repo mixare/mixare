@@ -272,6 +272,13 @@ public class DataSource extends Activity {
 		case ARENA:
 			ret = R.drawable.arena;
 			break;
+		case PANORAMIO:
+			ret = R.drawable.ic_launcher;
+			/*commented out until possible license issues are resolved. 
+			* Please see https://github.com/DevBinnooh/mixare/commit/5183ad260540fefdd7f8cf9fe52dfeb5f9f70289 
+			* for the discussion. */
+			//ret = R.drawable.icon_panoramio;
+			break;
 		default:
 			ret = R.drawable.ic_launcher;
 			break;

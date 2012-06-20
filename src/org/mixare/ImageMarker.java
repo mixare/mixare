@@ -5,7 +5,6 @@ package org.mixare;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.text.DecimalFormat;
 
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
@@ -96,14 +95,6 @@ public class ImageMarker extends LocalMarker {
 	public void drawImage(final PaintScreen dw) {
 		final DrawImage Image = new DrawImage(isVisible, cMarker, image);
 		Image.draw(dw);
-//		if (isVisible) {
-//			dw.setStrokeWidth(dw.getHeight() / 100f);
-//			dw.setFill(false);
-//			dw.setColor(android.graphics.Color.WHITE);
-//			dw.paintBitmap(getImage(), (float) (getSignMarker().x - (getImage().getWidth() / 2f)),
-//					(float) (getSignMarker().y - (getImage().getHeight() / 2f)));
-//
-//		}
 	}
 	
 
