@@ -18,6 +18,7 @@
  */
 package org.mixare.mgr.datasource;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -87,8 +88,22 @@ class DataSourceMgrImpl implements DataSourceManager {
 
 	private void requestData(DataSource datasource, double lat, double lon,
 			double alt, float radius, String locale) {
+		
+		/* BLUR the lat and lon at the second decimal position. 
+		 * It means roughly 250 meters.
+		 * It depends on the position on earth and is slightly different for latitude
+		 * and longitude, but should work well enough.
+		 * 
+		 * TODO: add a preference to let the user activate this behavior
+		 */
+		BigDecimal blurredLat = new BigDecimal(lat);
+		blurredLat = blurredLat.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
+		BigDecimal blurredLng = new BigDecimal(lon);
+		blurredLng = blurredLng.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+
 		DownloadRequest request = new DownloadRequest(datasource,
-				datasource.createRequestParams(lat, lon, alt, radius, locale));
+				datasource.createRequestParams(blurredLat.doubleValue(), blurredLng.doubleValue(), alt, radius, locale));
 		ctx.getDownloadManager().submitJob(request);
 
 	}
