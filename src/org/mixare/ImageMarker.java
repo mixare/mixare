@@ -1,5 +1,20 @@
-/**
+/*
+ * Copyright (C) 2012 
  * 
+ * This file is part of mixare.
+ * 
+ * This program is free software: you can redistribute it and/or modify it 
+ * under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License along with 
+ * this program. If not, see <http://www.gnu.org/licenses/>
  */
 package org.mixare;
 
@@ -20,7 +35,12 @@ import android.util.Log;
 
 
 /**
- * TODO
+ * Local Image Marker that handles drawing images locally 
+ * (extents {@link org.mixare.LocalMarker LocalMarker})
+ * 
+ * Note: LinkURL is the url when marker is clicked on.
+ * Note: ImageURL is the url that links to solid image.
+ * 
  * @author devBinnooh
  * @author A.Egal
  */
@@ -31,12 +51,44 @@ public class ImageMarker extends LocalMarker {
 	/** BitMap Image storage */
 	private Bitmap image;
 	
+	/**
+	 * Constructor with the given params.
+	 * Note Image will be set to default (empty square).
+	 * Please Set the image {@link org.mixare.ImageMarker#setImage(Bitmap)},
+	 * or Call this class with Image URL.
+	 * 
+	 * @see org.mixare.ImageMarker#ImageMarker(String, String, double, double, double, String, int, int, String, String)
+	 * @param String Marker's id
+	 * @param String Marker's title
+	 * @param double latitude
+	 * @param double longitude
+	 * @param double altitude
+	 * @param String link
+	 * @param int Datasource type
+	 * @param int Color int representation {@link android.graphics.Color Color}
+	 */
 	public ImageMarker(String id, String title, double latitude,
 			double longitude, double altitude, String link, int type, int colour) {
 		super(id, title, latitude, longitude, altitude, link, type, colour);
 		this.setImage(Bitmap.createBitmap(10, 10, Config.ARGB_4444)); //TODO set default Image if image not Available
 	}
 	
+	/**
+	 * Constructor with the given params.
+	 * Marker will handle retrieving the image from Image URL,
+	 * Please ensure that it links to an Image.
+	 * 
+	 * @param String Marker's id
+	 * @param String Marker's title
+	 * @param double latitude
+	 * @param double longitude
+	 * @param double altitude
+	 * @param String link
+	 * @param int Datasource type
+	 * @param int Color int representation {@link android.graphics.Color Color}
+	 * @param String ImageOwner's name
+	 * @param String Image's url
+	 */
 	public ImageMarker (String id, String title, double latitude,
 			double longitude, double altitude, final String pageLink, 
 			final int type, final int colour,final String imageOwner,
@@ -59,6 +111,10 @@ public class ImageMarker extends LocalMarker {
 		}
 	}
 	
+	/**
+	 * Image Marker Draw Function.
+	 * {@inheritDoc}
+	 */
 	public void draw(final PaintScreen dw){
 		drawImage(dw);
 		drawTitle(dw);
@@ -77,7 +133,7 @@ public class ImageMarker extends LocalMarker {
 			String textStr = MixUtils.shortenTitle(title,distance);
 			textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
 					dw, underline);
-			// dw.setColor(DataSource.getColor(type));
+			 dw.setColor(this.getColour());
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 					getSignMarker().x, getSignMarker().y);
 			txtLab.prepare(textBlock);
@@ -108,14 +164,14 @@ public class ImageMarker extends LocalMarker {
 	}
 
 	/**
-	 * @return the image
+	 * @return Bitmap image
 	 */
 	public Bitmap getImage() {
 		return image;
 	}
 
 	/**
-	 * @param image the image to set
+	 * @param Bitmap the image to set
 	 */
 	public void setImage(Bitmap image) {
 		this.image = image;
