@@ -32,18 +32,23 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
+		DataSourceStorage.init(this);
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().unBindServices();
 		PluginLoader.newInstance();
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
-		DataSourceStorage.init(this);
 
 		if (arePendingActivitiesFinished()) {
 			startDefaultSplashScreen();
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+	
 	private void startDefaultSplashScreen() {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -53,7 +58,7 @@ public class PluginLoaderActivity extends Activity {
 		// Runnable exiting the splash screen and launching the menu
 		exitRunnable = new Runnable() {
 			public void run() {
-				exitSplash();
+				startMixare();
 			}
 		};
 		// Run the exitRunnable in in _splashTime ms
@@ -68,14 +73,9 @@ public class PluginLoaderActivity extends Activity {
 				//only call this when the default splashscreen is used
 				exitHandler.removeCallbacks(exitRunnable);
 			}
-			exitSplash();
+			startMixare();
 		}
 		return true;
-	}
-
-	private void exitSplash() {
-		loadPlugins();
-		startMixare();
 	}
 
 	@Override
@@ -95,6 +95,9 @@ public class PluginLoaderActivity extends Activity {
 	}
 
 	private void startMixare() {
+		if(!PluginLoader.getInstance().isPluginLoaded(PluginType.MARKER)){
+			loadPlugins();
+		}
 		if (arePendingActivitiesFinished()) {
 			startActivityForResult(new Intent(this, MixView.class),0);
 		}

@@ -20,14 +20,12 @@ package org.mixare.mgr.downloader;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.mixare.MixContext;
-import org.mixare.MixState;
 import org.mixare.MixView;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
@@ -211,7 +209,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	 * @see org.mixare.mgr.downloader.DownloadManager#goOnline()
 	 */
 	public void switchOn() {
-		if (DownloadManagerState.OffLine.equals(getState())){
+		if (DownloadManagerState.OffLine.equals(getState()) || stop==true){
 		    executor.execute(this);
 		}else{
 			Log.i(MixView.TAG, "DownloadManager already started");
@@ -219,15 +217,13 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	}
 
 	public void switchOff() {
-		state = DownloadManagerState.OffLine;
 		stop=true;
+		state=DownloadManagerState.OffLine;
 	}
 
 	@Override
 	public DownloadManagerState getState() {
 		return state;
 	}
-
-	
 
 }

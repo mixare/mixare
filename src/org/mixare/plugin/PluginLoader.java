@@ -18,6 +18,7 @@
  */
 package org.mixare.plugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +53,8 @@ public class PluginLoader {
 	
 	private Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
 	
+	private List<PluginType> loadedPlugins = new ArrayList<PluginType>();
+	
 	private int pendingActivitiesOnResult = 0;
 	
 	public static PluginLoader getInstance() {
@@ -80,6 +83,7 @@ public class PluginLoader {
 				PackageManager.GET_RESOLVED_FILTER);
 		
 		initService(list, activity, pluginType);
+		loadedPlugins.add(pluginType);
 	}
 	
 	/**
@@ -92,7 +96,6 @@ public class PluginLoader {
 			if (sinfo != null) {
 				Intent serviceIntent = new Intent();
 				serviceIntent.setClassName(sinfo.packageName, sinfo.name);
-				activity.stopService(serviceIntent);
 				activity.startService(serviceIntent);
 				activity.bindService(serviceIntent, (ServiceConnection)pluginType.getPluginConnection(),
 						Context.BIND_AUTO_CREATE);
@@ -140,16 +143,20 @@ public class PluginLoader {
 	public Marker getMarkerInstance(String markername, int id, String title,
 			double latitude, double longitude, double altitude, String link,
 			int type, int color) throws PluginNotFoundException, RemoteException {
-		
-		MarkerServiceConnection msc = (MarkerServiceConnection)pluginMap.get(PluginType.MARKER.toString());
-		IMarkerService iMarkerService = msc.getMarkerServices().get(markername);		
-		
-		if (iMarkerService == null) {
-			throw new PluginNotFoundException();
+			try{
+			MarkerServiceConnection msc = (MarkerServiceConnection)pluginMap.get(PluginType.MARKER.toString());
+			IMarkerService iMarkerService = msc.getMarkerServices().get(markername);		
+			
+			if (iMarkerService == null) {
+				throw new PluginNotFoundException();
+			}
+			RemoteMarker rm = new RemoteMarker(iMarkerService);
+			rm.buildMarker(id, title, latitude, longitude, altitude, link, type, color);
+			return rm;
+		}catch(NullPointerException ne){
+			System.exit(0);
+			return null;
 		}
-		RemoteMarker rm = new RemoteMarker(iMarkerService);
-		rm.buildMarker(id, title, latitude, longitude, altitude, link, type, color);
-		return rm; 
 	}
 	
 	public PluginConnection getPluginConnection(String name){
@@ -172,5 +179,9 @@ public class PluginLoader {
 		if(pluginType.getLoader() == Loader.Activity){
 			increasePendingActivitiesOnResult();
 		}
+	}
+	
+	public boolean isPluginLoaded(PluginType pluginType){
+		return loadedPlugins.contains(pluginType);
 	}
 }

@@ -77,9 +77,9 @@ class WebPageMgrImpl implements WebContentManager {
 			public void onPageFinished(WebView view, String url) {
 				if (url.endsWith("return")) {
 					d.dismiss();
-					mixContext.getActualMixView().repaint();
 					mixContext.getActualMixView().setZoomLevel();
 					mixContext.getActualMixView().refreshDownload();
+					mixContext.getActualMixView().refresh();
 				} else {
 					super.onPageFinished(view, url);
 				}
