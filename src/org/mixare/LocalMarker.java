@@ -48,10 +48,10 @@ import android.location.Location;
 public abstract class LocalMarker implements Marker {
 
 	private String ID;
-	private String title;
-	private boolean underline = false;
+	protected String title;
+	protected boolean underline = false;
 	private String URL;
-	private PhysicalPlace mGeoLoc;
+	protected PhysicalPlace mGeoLoc;
 	/* distance from user to mGeoLoc in meters */
 	protected double distance;
 	/* Marker's color */
