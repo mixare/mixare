@@ -22,8 +22,8 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION;
 
 import org.mixare.MixContext;
+import org.mixare.R;
 
-import android.R;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -53,7 +53,7 @@ public class NotificationMgrImpl implements NotificationManager{
 			PendingIntent pendingIntent
 		     = PendingIntent.getActivity(ctx, 0, new Intent(), FLAG_ACTIVITY_NO_ANIMATION);
 			
-			Notification notif = new Notification(R.drawable.stat_notify_more, tickerText,
+			Notification notif = new Notification(R.drawable.icon_datasource, tickerText,
 		            System.currentTimeMillis());
 			notif.setLatestEventInfo(ctx, tickerText, tickerText, pendingIntent);
 		    nm.notify(notifyId, notif);
