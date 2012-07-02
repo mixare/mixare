@@ -116,6 +116,7 @@ class WebPageMgrImpl implements WebContentManager {
                             if (resolveInfo.activityInfo.packageName
                                             .equals(webBrowser.activityInfo.packageName)) {
                                     found = true;
+                                    break;
                             }
                     }
                     if(!found){
