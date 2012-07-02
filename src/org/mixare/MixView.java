@@ -1066,7 +1066,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	/**
 	 * @return the dataView
 	 */
-	static DataView getDataView() {
+	public static DataView getDataView() {
 		return dataView;
 	}
 

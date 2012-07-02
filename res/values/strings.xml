@@ -106,5 +106,6 @@
 	<string name="set_osm_max_object">Maximum POIs per URL</string>
 	<string name="location_not_found">Location not found, make sure you enabled Wifi location or GPS in the settings.</string>
 	<string name="refreshing">Refreshing</string>
+	<string name="select_plugin">Select Plugin</string>
 
 </resources>
