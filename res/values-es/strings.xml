@@ -14,7 +14,7 @@
     
 
     <string name="empty_list">Lo sentimos, \nNo existe información \nDisponible para este radio.\nPor favor trata de buscar en un radio más grande</string>
-	<string name="option_not_available">Lo sentimos, estamos trabajando en ello... \nEsta opción estará disponible pronto!</string>
+	<string name="option_not_available">Lo sentimos, estamos trabajando en ello... \n¡Esta opción estará disponible pronto!</string>
 	
 	<string name="license">Copyright (C) 2010- Peer internet solutions 
 		\n\nEste programa es software libre: usted puede redistribuirlo y/o modificarlo 
@@ -41,7 +41,7 @@
 	<string name="menu_item_7">Licencia</string>
 	
 	
-	<string name="connection_error_dialog">Ha ocurrido un error de conexión! \nPor favor chequea si estas conectado a Internet.</string>
+	<string name="connection_error_dialog">¡Ha ocurrido un error de conexión! \nPor favor chequea si estás conectado a Internet.</string>
 	<string name="connection_error_dialog_button1">Repetir</string>
 	<string name="connection_error_dialog_button2">Abrir opciones</string>
 	<string name="connection_error_dialog_button3">Cerrar la app</string>
@@ -53,7 +53,7 @@
 	
 	<string name="no_website_available">Lo sentimos, no hay más información \ndisponible.</string>
 	
-	<string name="license_title">Licenciae</string>
+	<string name="license_title">Licencia</string>
 	<string name="close_button">Cerrar</string>
 	<string name="general_info_title">Información general</string>
 	
@@ -62,11 +62,11 @@
 	<string name="latitude">Latitud: </string>
 	<string name="altitude">Altitud: </string>
 	<string name="speed">Velocidad: </string>
-	<string name="accuracy">Presición: </string>
+	<string name="accuracy">Precisión: </string>
 	<string name="gps_last_fix">Última posición: </string>
 	
 	<string name="map_menu_normal_mode">Mapa</string>
-	<string name="map_menu_satellite_mode">Satelite</string>
+	<string name="map_menu_satellite_mode">Satélite</string>
 	<string name="map_menu_cam_mode">Cámara</string>
 	<string name="map_my_location">Mi localización</string>
 	
