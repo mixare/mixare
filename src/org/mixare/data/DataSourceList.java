@@ -54,15 +54,12 @@ public class DataSourceList extends ListActivity {
 	private static final int MENU_CREATE_ID = Menu.FIRST;
 	private static final int MENU_EDIT_ID = Menu.FIRST + 1;
 	private static final int MENU_DELETE_ID = Menu.FIRST + 2;
-	private static final int MENU_SELECT_PLUGIN_ID = Menu.FIRST + 3;
 
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Override
@@ -112,6 +109,7 @@ public class DataSourceList extends ListActivity {
 
 		return ret;
 	}
+	
 	private class DataSourceAdapter extends BaseAdapter implements
 	OnCheckedChangeListener {
 
@@ -216,7 +214,6 @@ public class DataSourceList extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(MENU_CREATE_ID, MENU_CREATE_ID, MENU_CREATE_ID, R.string.data_source_add);
-		menu.add(MENU_SELECT_PLUGIN_ID,MENU_SELECT_PLUGIN_ID,MENU_SELECT_PLUGIN_ID, R.string.select_plugin);
 		return super.onCreateOptionsMenu(menu);
 
 	}
@@ -227,17 +224,6 @@ public class DataSourceList extends ListActivity {
 		case MENU_CREATE_ID:
 			Intent addDataSource = new Intent(this, DataSource.class);
 			startActivity(addDataSource);
-			break;
-		case MENU_SELECT_PLUGIN_ID:
-			DataView dataView = MixView.getDataView();
-			
-			String newUrl = "http://www.mixare.org/plugins/mixare-appview.php";
-			try {
-				dataView.getContext().getWebContentManager().loadWebPage(newUrl , this);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			break;
 		}
 		return super.onMenuItemSelected(featureId, item);

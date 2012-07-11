@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.mixare.MainActivity;
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.service.IMarkerService;
 import org.mixare.plugin.connection.ActivityConnection;
@@ -42,7 +43,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- * Searches, loads and executes available plugins that are installed on the device.
+ * loads and executes available plugins that are installed on the device.
  * @author A.Egal
  */
 public class PluginLoader {
@@ -51,7 +52,9 @@ public class PluginLoader {
 	
 	private Activity activity;
 	
-	private Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
+
+	
+//	private Map<String, PluginConnection> pluginMap = new HashMap<String, PluginConnection>();
 	
 	private List<PluginType> loadedPlugins = new ArrayList<PluginType>();
 	
@@ -76,30 +79,30 @@ public class PluginLoader {
 	 * loads all plugins from a plugin type.
 	 */
 	public void loadPlugin(PluginType pluginType) {
-		PackageManager packageManager = activity.getPackageManager();
-		Intent baseIntent = new Intent(pluginType.getActionName());
-		baseIntent.setFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
-		List<ResolveInfo> list = packageManager.queryIntentServices(baseIntent,
-				PackageManager.GET_RESOLVED_FILTER);
+		List<Plugin> plugins = new ArrayList<Plugin>();
+		for (Plugin plugin : MainActivity.getPlugins()) {
+			if (plugin.getPluginType().equals(pluginType) && plugin.getPluginStatus().equals(PluginStatus.Activated)) {
+				plugins.add(plugin);
+			}
+		}
 		
-		initService(list, activity, pluginType);
+		initService(plugins);
 		loadedPlugins.add(pluginType);
 	}
 	
 	/**
 	 * Initializes the services from the loaded plugins and stores them in the pluginmap
 	 */
-	private void initService(List<ResolveInfo> list, Activity activity, PluginType pluginType){
+	private void initService(List<Plugin> list){
 		for (int i = 0; i < list.size(); ++i) {
-			ResolveInfo info = list.get(i);
-			ServiceInfo sinfo = info.serviceInfo;
+			ServiceInfo sinfo = list.get(i).getServiceInfo();
 			if (sinfo != null) {
 				Intent serviceIntent = new Intent();
 				serviceIntent.setClassName(sinfo.packageName, sinfo.name);
 				activity.startService(serviceIntent);
-				activity.bindService(serviceIntent, (ServiceConnection)pluginType.getPluginConnection(),
+				activity.bindService(serviceIntent, (ServiceConnection)list.get(i).getPluginConnection(),
 						Context.BIND_AUTO_CREATE);
-				checkForPendingActivity(pluginType);
+				checkForPendingActivity(list.get(i).getPluginType());
 			}
 		}
 	}
@@ -107,17 +110,24 @@ public class PluginLoader {
 	/**
 	 * Unbinds all plugins from the activity
 	 */
-	public void unBindServices(){
-		Iterator<Entry<String, PluginConnection>> it = pluginMap.entrySet().iterator();
-		while(it.hasNext()){
-			Entry<String, PluginConnection> pairs = (Entry<String, PluginConnection>)it.next();
-			if(pairs.getValue() instanceof ServiceConnection){
-				try{
-					activity.unbindService((ServiceConnection)pairs.getValue());
-					it.remove();
-				}catch(IllegalArgumentException iae){
-					Log.e("PluginLoader", "Service: "+ pairs.getKey() + " is not registered");
+	public void unBindServices() {
+		try {
+			for (Plugin plugin : MainActivity.getPlugins()) {
+				if (plugin.getPluginConnection() instanceof ServiceConnection) {
+					try {
+						activity.unbindService((ServiceConnection) plugin.getPluginConnection());
+						plugin.setPluginConnection(null);
+					} catch (IllegalArgumentException iae) {
+	//					Log.e("PluginLoader", "Service: " + plugin.getLable()
+	//							+ " is not registered");
+					}
 				}
+			}
+		} catch (Exception e) {
+			try {
+				Log.e("test", String.valueOf(MainActivity.getPlugins().size()));
+			} catch (Exception e2) {
+				Log.e("test", "sadf");
 			}
 		}
 	}
@@ -127,8 +137,16 @@ public class PluginLoader {
 	 */
 	public void startPlugin(PluginType pluginType, String pluginName){
 		if(pluginType.getLoader() == Loader.Activity){
-			ActivityConnection activityConnection = (ActivityConnection)pluginMap.get(pluginName);
-			activityConnection.startActivityForResult(activity);
+			ActivityConnection activityConnection = null;
+			for (Plugin plugin : MainActivity.getPlugins()) {
+				if (plugin.getServiceInfo().name.equals(pluginName)) {
+					activityConnection = (ActivityConnection) plugin.getPluginConnection();
+					break;
+				}
+			}
+			if (activityConnection != null) {
+				activityConnection.startActivityForResult(activity);
+			}
 		}
 		else{
 			throw new PluginNotFoundException("Cannot directly start a non-activity plugin," +
@@ -137,30 +155,41 @@ public class PluginLoader {
 	}
 	
 	protected void addFoundPluginToMap(String pluginName, PluginConnection pluginConnection){
-		pluginMap.put(pluginName, pluginConnection);
+		for (Plugin plugin : MainActivity.getPlugins()) {
+			if (plugin.getServiceInfo().name.equals(pluginName)) {
+				plugin.setPluginConnection(pluginConnection);
+				break;
+			}
+		}
 	}
 	
 	public Marker getMarkerInstance(String markername, int id, String title,
 			double latitude, double longitude, double altitude, String link,
-			int type, int color) throws PluginNotFoundException, RemoteException {
-			try{
-			MarkerServiceConnection msc = (MarkerServiceConnection)pluginMap.get(PluginType.MARKER.toString());
-			IMarkerService iMarkerService = msc.getMarkerServices().get(markername);		
-			
+			int type, int color) throws PluginNotFoundException,
+			RemoteException {
+		
+		try {
+			MarkerServiceConnection msc = null;
+			for (Plugin plugin : MainActivity.getPlugins()) {
+				if (plugin.getPluginType().equals(PluginType.MARKER)) {
+					msc = (MarkerServiceConnection) plugin.getPluginConnection();
+					break;
+				}
+			}
+			IMarkerService iMarkerService = msc.getMarkerServices().get(
+					markername);
+
 			if (iMarkerService == null) {
 				throw new PluginNotFoundException();
 			}
 			RemoteMarker rm = new RemoteMarker(iMarkerService);
-			rm.buildMarker(id, title, latitude, longitude, altitude, link, type, color);
+			rm.buildMarker(id, title, latitude, longitude, altitude, link,
+					type, color);
 			return rm;
-		}catch(NullPointerException ne){
+		} catch (NullPointerException ne) {
 			System.exit(0);
 			return null;
 		}
-	}
-	
-	public PluginConnection getPluginConnection(String name){
-		return pluginMap.get(name);
 	}
 	
 	public int getPendingActivitiesOnResult(){
@@ -181,7 +210,7 @@ public class PluginLoader {
 		}
 	}
 	
-	public boolean isPluginLoaded(PluginType pluginType){
+	public boolean isPluginTypeLoaded(PluginType pluginType){
 		return loadedPlugins.contains(pluginType);
 	}
 }

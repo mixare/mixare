@@ -32,6 +32,8 @@ import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.render.Matrix;
 import org.mixare.lib.reality.Filter;
+import org.mixare.plugin.Plugin;
+import org.mixare.plugin.PluginListActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -185,8 +187,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 */
 	@Override
 	protected void onPause() {
+//		Log.d("test", "onPause");
 		super.onPause();
-
 		try {
 			this.getMixViewData().getmWakeLock().release();
 
@@ -220,6 +222,16 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			doError(ex);
 		}
 	}
+	
+	private void restartFirstActivity() {
+		Intent i = getBaseContext().getPackageManager()
+				.getLaunchIntentForPackage(getBaseContext().getPackageName());
+
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		finish();
+		startActivity(i);
+	}
 
 	/**
 	 * Mixare Activities Pipe message communication.
@@ -234,6 +246,37 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		//Log.d(TAG + " WorkFlow", "MixView - onActivityResult Called");
 		// check if the returned is request to refresh screen (setting might be
 		// changed)
+		
+		if (requestCode == 35) {
+			if (resultCode == 1) {
+				final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+				dialog.setTitle(R.string.launch_plugins);
+				dialog.setMessage(R.string.plugins_changed);
+				dialog.setCancelable(false);
+				
+				// Allways activate new plugins
+				
+//				final CheckBox checkBox = new CheckBox(ctx);
+//				checkBox.setText(R.string.remember_this_decision);
+//				dialog.setView(checkBox);		
+				
+				dialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface d, int whichButton) {
+						restartFirstActivity();
+//						onDestroy();
+					}
+				});
+
+				dialog.setNegativeButton(R.string.no,new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface d, int whichButton) {
+						d.dismiss();
+					}
+				});
+
+				dialog.show();
+			}
+		}
 		try {
 			if (data.getBooleanExtra("RefreshScreen", false)) {
 				Log.d(TAG + " WorkFlow",
@@ -242,10 +285,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				setZoomLevel();
 				refreshDownload();
 			}
-
 		} catch (Exception ex) {
 			// do nothing do to mix of return results.
 		}
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 	/**
@@ -265,6 +308,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 */
 	@Override
 	protected void onResume() {
+//		Log.d("test", "onResume");
 		super.onResume();
 		isBackground = false;
 		try {
@@ -432,13 +476,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 * {@inheritDoc}
 	 */
 	protected void onRestart() {
+//		Log.d("test", "onRestart");
 		super.onRestart();
 		maintainCamera();
 		maintainAugmentR();
 		maintainZoomBar();
-
 	}
-
 	
 	/**
 	 * {@inheritDoc}
@@ -447,6 +490,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	 * and might not be called at all.
 	 */
 	protected void onDestroy(){
+//		Log.d("test", "onDestroy");
 		try{
 			
 			getMixViewData().getMixContext().getDownloadManager().shutDown();
@@ -464,6 +508,12 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}finally{
 			super.onDestroy();
 		}
+	}
+
+	@Override
+	protected void onStart() {
+//		Log.d("test", "onStart");
+		super.onStart();
 	}
 	
 	/* ********* Operators ***********/ 
@@ -687,19 +737,22 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				getString(R.string.menu_item_6));
 		MenuItem item7 = menu.add(base, base + 6, base + 6,
 				getString(R.string.menu_item_7));
+		MenuItem item8 = menu.add(base, base + 7, base + 7,
+				getString(R.string.menu_item_8));
 
 		/* assign icons to the menu items */
 		item1.setIcon(drawable.icon_datasource);
-		item2.setIcon(android.R.drawable.ic_menu_view);
-		item3.setIcon(android.R.drawable.ic_menu_mapmode);
-		item4.setIcon(android.R.drawable.ic_menu_zoom);
-		item5.setIcon(android.R.drawable.ic_menu_search);
-		item6.setIcon(android.R.drawable.ic_menu_info_details);
-		item7.setIcon(android.R.drawable.ic_menu_share);
+		item2.setIcon(drawable.icon_datasource);
+		item3.setIcon(android.R.drawable.ic_menu_view);
+		item4.setIcon(android.R.drawable.ic_menu_mapmode);
+		item5.setIcon(android.R.drawable.ic_menu_zoom);
+		item6.setIcon(android.R.drawable.ic_menu_search);
+		item7.setIcon(android.R.drawable.ic_menu_info_details);
+		item8.setIcon(android.R.drawable.ic_menu_share);
 
 		return true;
 	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -709,18 +762,29 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
 			} else {
-				dataView.getContext().getNotificationManager().
-				addNotification(getString(R.string.no_website_available));
+				dataView.getContext().getNotificationManager()
+					.addNotification(getString(R.string.no_website_available));
+			}
+			break;
+			/* Plugin View */
+		case 2:
+			if (!getDataView().getIsLauncherStarted()) {
+				Intent intent = new Intent(MixView.this,
+						PluginListActivity.class);
+				startActivityForResult(intent, 35);
+			} else {
+				dataView.getContext().getNotificationManager()
+					.addNotification(getString(R.string.no_website_available));
 			}
 			break;
 		/* List view */
-		case 2:
+		case 3:
 			/*
 			 * if the list of titles to show in alternative list view is not
 			 * empty
 			 */
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
-				Intent intent1 = new Intent(MixView.this, MixListView.class); 
+				Intent intent1 = new Intent(MixView.this, MarkerListView.class); 
 				intent1.setAction(Intent.ACTION_VIEW);
 				startActivityForResult(intent1, 42);
 			}
@@ -731,22 +795,22 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 			break;
 		/* Map View */
-		case 3:
+		case 4:
 			Intent intent2 = new Intent(MixView.this, MixMap.class);
 			startActivityForResult(intent2, 20);
 			break;
 		/* zoom level */
-		case 4:
+		case 5:
 			getMixViewData().getMyZoomBar().setVisibility(View.VISIBLE);
 			getMixViewData().setZoomProgress(
 					getMixViewData().getMyZoomBar().getProgress());
 			break;
 		/* Search */
-		case 5:
+		case 6:
 			onSearchRequested();
 			break;
 		/* GPS Information */
-		case 6:
+		case 7:
 			Location currentGPSInfo = getMixViewData().getMixContext()
 					.getLocationFinder().getCurrentLocation();
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -773,7 +837,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			alert.show();
 			break;
 		/* Case 6: license agreements */
-		case 7:
+		case 8:
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
 			builder1.setMessage(getString(R.string.license));
 			/* Retry */
@@ -835,7 +899,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public void onSensorChanged(SensorEvent evt) {
 		try {
 
-			
+//			Log.d("test", "onSensorChanged");
 			if (getMixViewData().getSensorGyro() != null) {
 				
 				if (evt.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
@@ -854,7 +918,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				getMixViewData().setAngle(
 						getMixViewData().getMagFilter().complementaryFilter(
 								getMixViewData().getGrav(),
-								getMixViewData().getGyro(), 150,
+								getMixViewData().getGyro(), 30,
 								getMixViewData().getAngle()));
 				
 				SensorManager.getRotationMatrix(
@@ -1025,7 +1089,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			intent.setClass(this, MixListView.class);
+			intent.setClass(this, MarkerListView.class);
 			startActivity(intent);
 			}
 	}

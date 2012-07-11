@@ -26,12 +26,13 @@
 	</string>
 	
 	<string name="menu_item_1">Données</string>
-	<string name="menu_item_2">Vue liste</string>
-	<string name="menu_item_3">Vue carte</string>
-	<string name="menu_item_4">Niveau de zoom</string>
-	<string name="menu_item_5">Recherche</string>
-	<string name="menu_item_6">Info</string>
-	<string name="menu_item_7">License</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">Vue liste</string>
+	<string name="menu_item_4">Vue carte</string>
+	<string name="menu_item_5">Niveau de zoom</string>
+	<string name="menu_item_6">Recherche</string>
+	<string name="menu_item_7">Info</string>
+	<string name="menu_item_8">License</string>
 	
 	
 	<string name="connection_error_dialog">Désolé, une erreur de connexion est survenue! \nS\'il vous plaît vérifier si vous êtes connecté à Internet.</string>

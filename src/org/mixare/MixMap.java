@@ -100,7 +100,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		setMarkerList(dataView.getDataHandler().getMarkerList());
 
 		setMapContext(this);
-		setMapView(new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA"));
+		setMapView(new MapView(this, "0zMCXwuwyQLKoOtdQc8VelAT_ipCTDn-h8R-p6A"));
 		getMapView().setBuiltInZoomControls(true);
 		getMapView().setClickable(true);
 		getMapView().setSatellite(true);
@@ -193,7 +193,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 	private void createListView(){
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
-			Intent intent1 = new Intent(this, MixListView.class); 
+			Intent intent1 = new Intent(this, MarkerListView.class); 
 			intent1.setAction(Intent.ACTION_VIEW);
 			startActivityForResult(intent1, 42);//TODO receive result if any!
 		}
@@ -217,22 +217,35 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		/* define the first */
 		int base = Menu.FIRST;
-		/*define the first*/
 
-		final MenuItem item1 =menu.add(base, base, base, getString(R.string.map_menu_normal_mode)); 
-		final MenuItem item2 =menu.add(base, base+1, base+1, getString(R.string.map_menu_satellite_mode));
-		final MenuItem item3 =menu.add(base, base+2, base+2, getString(R.string.map_my_location)); 
-		final MenuItem item4 =menu.add(base, base+3, base+3, getString(R.string.menu_item_2)); 
-		MenuItem item5 =null;
-		if(isPathVisible()){
-			item5 =menu.add(base, base+4, base+4, getString(R.string.map_toggle_path_off)); 
-		}else{
-			item5 =menu.add(base, base+4, base+4, getString(R.string.map_toggle_path_on));
+		/* Street View */
+		final MenuItem item1 = menu.add(base, base, base,
+				getString(R.string.map_menu_normal_mode));
+		/* Satellite View */
+		final MenuItem item2 = menu.add(base, base + 1, base + 1,
+				getString(R.string.map_menu_satellite_mode));
+		/* My Location */
+		final MenuItem item3 = menu.add(base, base + 2, base + 2,
+				getString(R.string.map_my_location));
+		/* List View */
+		final MenuItem item4 = menu.add(base, base + 3, base + 3,
+				getString(R.string.menu_item_3));
+		/* Show Path */
+		MenuItem item5 = null;
+		if (isPathVisible()) {
+			item5 = menu.add(base, base + 4, base + 4,
+					getString(R.string.map_toggle_path_off));
+		} else {
+			item5 = menu.add(base, base + 4, base + 4,
+					getString(R.string.map_toggle_path_on));
 		}
-		final MenuItem item6 =menu.add(base, base+5, base+5, getString(R.string.map_menu_cam_mode)); 
-		
-		/*assign icons to the menu items*/
+		/* Camera */
+		final MenuItem item6 = menu.add(base, base + 5, base + 5,
+				getString(R.string.map_menu_cam_mode));
+
+		/* assign icons to the menu items */
 		item1.setIcon(android.R.drawable.ic_menu_gallery);
 		item2.setIcon(android.R.drawable.ic_menu_mapmode);
 		item3.setIcon(android.R.drawable.ic_menu_mylocation);
@@ -243,37 +256,37 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-		/*Satellite View*/
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		/* street View */
 		case 1:
 			getMapView().setSatellite(false);
 			break;
-			/*street View*/
-		case 2:		
+		/* Satellite View */
+		case 2:
 			getMapView().setSatellite(true);
 			break;
-			/*go to users location*/
+		/* go to users location */
 		case 3:
 			setStartPoint();
 			break;
-			/*List View*/
+		/* List View */
 		case 4:
 			createListView();
-			//finish(); don't close map if list view created
+			// finish(); don't close map if list view created
 			break;
-			/*back to Camera View*/
+		/* back to Camera View */
 		case 5:
 			togglePath();
-			//refresh:
-			startActivity(getIntent()); //what Activity are we launching?
+			// refresh:
+			startActivity(getIntent()); // what Activity are we launching?
 			closeMapViewActivity();
 			break;
 		case 6:
 			closeMapViewActivity();
 			break;
 		default:
-				break;//do nothing
+			break;// do nothing
 
 		}
 		return true;
@@ -290,7 +303,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 //			String query = intent.getStringExtra(SearchManager.QUERY);
 //			doMixSearch(query);
-			intent.setClass(this, MixListView.class);
+			intent.setClass(this, MarkerListView.class);
 			startActivity(intent);
 		}
 	}

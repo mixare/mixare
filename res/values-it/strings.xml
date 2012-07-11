@@ -33,12 +33,13 @@
 	</string>
 	
 	<string name="menu_item_1">Scelta delle fonti</string>
-	<string name="menu_item_2">Lista dei risultati</string>
-	<string name="menu_item_3">Mappa</string>
-	<string name="menu_item_4">Raggio visualizzato</string>
-	<string name="menu_item_5">Ricerca</string>
-	<string name="menu_item_6">Info</string>
-	<string name="menu_item_7">Licenza</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">Lista dei risultati</string>
+	<string name="menu_item_4">Mappa</string>
+	<string name="menu_item_5">Raggio visualizzato</string>
+	<string name="menu_item_6">Ricerca</string>
+	<string name="menu_item_7">Info</string>
+	<string name="menu_item_8">Licenza</string>
 
 	<string name="cancel">Annulla</string>
 

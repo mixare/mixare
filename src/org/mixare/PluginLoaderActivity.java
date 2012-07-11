@@ -1,12 +1,18 @@
 package org.mixare;
 
+import java.util.List;
+
 import org.mixare.data.DataSourceStorage;
+import org.mixare.plugin.Plugin;
 import org.mixare.plugin.PluginLoader;
+import org.mixare.plugin.PluginStatus;
 import org.mixare.plugin.PluginType;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -31,7 +37,19 @@ public class PluginLoaderActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
+		super.onCreate(savedInstanceState);
+
+		Bundle extras = getIntent().getExtras();
+		if (extras != null){
+			try {
+				if (extras.containsKey("AppName")) {
+					getInstalledPluginsByName(extras.getString("AppName"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		DataSourceStorage.init(this);
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().unBindServices();
@@ -42,11 +60,6 @@ public class PluginLoaderActivity extends Activity {
 		if (arePendingActivitiesFinished()) {
 			startDefaultSplashScreen();
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
 	}
 	
 	private void startDefaultSplashScreen() {
@@ -95,11 +108,12 @@ public class PluginLoaderActivity extends Activity {
 	}
 
 	private void startMixare() {
-		if(!PluginLoader.getInstance().isPluginLoaded(PluginType.MARKER)){
+		if(!PluginLoader.getInstance().isPluginTypeLoaded(PluginType.MARKER)){
 			loadPlugins();
 		}
 		if (arePendingActivitiesFinished()) {
 			startActivityForResult(new Intent(this, MixView.class),0);
+//			finish();
 		}
 	}
 
@@ -142,5 +156,29 @@ public class PluginLoaderActivity extends Activity {
 		PluginLoader.getInstance().loadPlugin(PluginType.MARKER);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_2);
 		PluginLoader.getInstance().loadPlugin(PluginType.DATAHANDLER);
+	}
+
+	/**
+	 * Fills a list with installed Plugins
+	 */
+	private void getInstalledPluginsByName(String name) {
+		PluginType[] allPluginTypes = PluginType.values();
+		for (PluginType pluginType : allPluginTypes) {
+			PackageManager packageManager = getPackageManager();
+			Intent baseIntent = new Intent(pluginType.getActionName());
+			List<ResolveInfo> list = packageManager.queryIntentServices(
+					baseIntent, PackageManager.GET_RESOLVED_FILTER);
+
+			for (ResolveInfo resolveInfo : list) {
+				String lable = (String) resolveInfo.loadLabel(packageManager);
+				if (lable.equalsIgnoreCase(name)) {
+					Plugin plugin = new Plugin(PluginStatus.Activated,
+						resolveInfo.serviceInfo,
+						lable,
+						resolveInfo.loadIcon(packageManager), pluginType);
+					MainActivity.getPlugins().add(plugin);
+				}
+			}
+		}
 	}
 }
