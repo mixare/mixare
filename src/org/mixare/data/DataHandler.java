@@ -57,9 +57,10 @@ public class DataHandler {
 	}
 	
 	public void updateDistances(Location location) {
-		for(Marker ma: markerList) {
-			float[] dist=new float[3];
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
+		for (Marker ma : markerList) {
+			float[] dist = new float[3];
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(),
+					location.getLatitude(), location.getLongitude(), dist);
 			ma.setDistance(dist[0]);
 		}
 	}
@@ -88,19 +89,19 @@ public class DataHandler {
 		}
 	}
 	
-	/**
-	 * @deprecated Nobody should get direct access to the list
-	 */
-	public List<Marker> getMarkerList() {
-		return markerList;
-	}
-	
-	/**
-	 * @deprecated Nobody should get direct access to the list
-	 */
-	public void setMarkerList(List<Marker> markerList) {
-		this.markerList = markerList;
-	}
+//	/**
+//	 * @deprecated Nobody should get direct access to the list
+//	 */
+//	public List<Marker> getMarkerList() {
+//		return markerList;
+//	}
+//	
+//	/**
+//	 * @deprecated Nobody should get direct access to the list
+//	 */
+//	public void setMarkerList(List<Marker> markerList) {
+//		this.markerList = markerList;
+//	}
 
 	public int getMarkerCount() {
 		return markerList.size();

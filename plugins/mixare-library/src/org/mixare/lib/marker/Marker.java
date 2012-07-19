@@ -44,6 +44,8 @@ public interface Marker extends Comparable<Marker>{
 	double getLongitude();
 
 	double getAltitude();
+	
+	void setAltitude(double altitude);
 
 	MixVector getLocationVector();
 

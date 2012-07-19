@@ -24,6 +24,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mixare.MixContext;
 import org.mixare.MixView;
 import org.mixare.POIMarker;
 import org.mixare.data.DataHandler;
@@ -83,12 +84,13 @@ public class MixareDataProcessor extends DataHandler implements DataProcessor{
 				
 				ma = new POIMarker(
 						id,
-						HtmlUnescape.unescapeHTML(jo.getString("title"), 0), 
+						HtmlUnescape.unescapeHTML(jo.getString("title")), 
 						jo.getDouble("lat"), 
 						jo.getDouble("lng"), 
 						jo.getDouble("elevation"), 
 						link, 
 						taskId, colour);
+				((POIMarker) ma).setIsDirectionMarker(true);
 				markers.add(ma);
 			}
 		}

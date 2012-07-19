@@ -32,6 +32,7 @@ import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.render.Matrix;
 import org.mixare.lib.reality.Filter;
+import org.mixare.mgr.HttpTools;
 import org.mixare.plugin.Plugin;
 import org.mixare.plugin.PluginListActivity;
 
@@ -191,7 +192,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		super.onPause();
 		try {
 			this.getMixViewData().getmWakeLock().release();
-
+			camScreen.surfaceDestroyed(null);
 			try {
 				getMixViewData().getSensorMgr().unregisterListener(this,
 						getMixViewData().getSensorGrav());
@@ -313,10 +314,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		isBackground = false;
 		try {
 			this.getMixViewData().getmWakeLock().acquire();
-
+			SurfaceView adf = new SurfaceView(getMixViewData().getMixContext());
+			camScreen.surfaceCreated(adf.getHolder());
 			killOnError();
 			getMixViewData().getMixContext().doResume(this);
 
+			HttpTools.setContext(getMixViewData().getMixContext());
+			
 			//repaint(); //repaint when requested
 			setZoomLevel();
 			getDataView().doStart();
@@ -924,7 +928,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				SensorManager.getRotationMatrix(
 						getMixViewData().getRTmp(),
 						getMixViewData().getI(), 
-						getMixViewData().getAngle(),
+						getMixViewData().getGrav(),
 						getMixViewData().getMag());
 			} else {
 				if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -965,21 +969,24 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			getMixViewData().getFinalR().prod(getMixViewData().getM3());
 			getMixViewData().getFinalR().prod(getMixViewData().getM2());
 			getMixViewData().getFinalR().invert();
-
+			
 			getMixViewData().getHistR()[getMixViewData().getrHistIdx()]
 					.set(getMixViewData().getFinalR());
+			
+			int histRLenght = getMixViewData().getHistR().length;
+			
 			getMixViewData().setrHistIdx(getMixViewData().getrHistIdx() + 1);
-			if (getMixViewData().getrHistIdx() >= getMixViewData().getHistR().length)
+			if (getMixViewData().getrHistIdx() >= histRLenght)
 				getMixViewData().setrHistIdx(0);
 
 			getMixViewData().getSmoothR().set(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
 					0f);
-			for (int i = 0; i < getMixViewData().getHistR().length; i++) {
+			for (int i = 0; i < histRLenght; i++) {
 				getMixViewData().getSmoothR().add(
 						getMixViewData().getHistR()[i]);
 			}
 			getMixViewData().getSmoothR().mult(
-					1 / (float) getMixViewData().getHistR().length);
+					1 / (float) histRLenght);
 
 			getMixViewData().getMixContext().updateSmoothRotation(
 					getMixViewData().getSmoothR());

@@ -39,10 +39,10 @@ public abstract class PluginConnection {
 	}
 	
 	protected void storeFoundPlugin(){
-		PluginLoader.getInstance().addFoundPluginToMap(pluginType.toString(), this);
+		PluginLoader.getInstance().addFoundPlugin(pluginType.toString(), this);
 	}
 	
 	protected void storeFoundPlugin(String pluginName){
-		PluginLoader.getInstance().addFoundPluginToMap(pluginName, this);
+		PluginLoader.getInstance().addFoundPlugin(pluginName, this);
 	}
 }

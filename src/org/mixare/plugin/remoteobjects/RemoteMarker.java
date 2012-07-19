@@ -306,4 +306,8 @@ public class RemoteMarker implements Marker{
 		return new Double(this.getDistance()).compareTo(new Double(rm.getDistance()));
 	}
 
+	@Override
+	public void setAltitude(double altitude) {
+	}
+
 }

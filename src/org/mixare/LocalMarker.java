@@ -21,6 +21,8 @@ package org.mixare;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 
+import org.mixare.data.convert.Elevation;
+import org.mixare.data.convert.OsmDataProcessor;
 import org.mixare.lib.MixContextInterface;
 import org.mixare.lib.MixStateInterface;
 import org.mixare.lib.MixUtils;
@@ -37,6 +39,7 @@ import org.mixare.lib.render.MixVector;
 
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 
 /**
  * The class represents a marker and contains its information.
@@ -132,14 +135,24 @@ public abstract class LocalMarker implements Marker {
 	}
 
 	public void update(Location curGPSFix) {
-		// An elevation of 0.0 probably means that the elevation of the
-		// POI is not known and should be set to the users GPS height
-		// Note: this could be improved with calls to 
-		// http://www.geonames.org/export/web-services.html#astergdem 
-		// to estimate the correct height with DEM models like SRTM, AGDEM or GTOPO30
-		if(getmGeoLoc().getAltitude()==0.0)
+		// Checks if programm should get Altitude from http://api.geonames.org/astergdem
+		String type = this.getClass().getName();
+		if (POIMarker.class.getName() == type) {
+			// Set direction Marker to user height
+			if (((POIMarker) this).isDirectionMarker()) {
+				getmGeoLoc().setAltitude(curGPSFix.getAltitude());
+			}
+		} else if (type == NavigationMarker.class.getName()) {
 			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
-
+		} else if (type != NavigationMarker.class.getName()) {
+			if (this.getURL() != null && this.getmGeoLoc().getAltitude() == 0.0) {
+				this.getmGeoLoc().setAltitude(
+						Double.valueOf(Elevation.getElevation().calcElevation(
+								curGPSFix.getLatitude(),
+								curGPSFix.getLongitude())));
+			}
+		}
+		
 		// compute the relative position vector from user position to POI location
 		PhysicalPlace.convLocToVec(curGPSFix, getmGeoLoc(), locationVector);
 	}
@@ -153,7 +166,7 @@ public abstract class LocalMarker implements Marker {
 //		cCMarker(origin, viewCam, 0, 0);
 //	}
 
-	private boolean isClickValid(float x, float y) {
+	public boolean isClickValid(float x, float y) {
 		
 		//if the marker is not active (i.e. not shown in AR view) we don't have to check it for clicks
 		if (!isActive() && !this.isVisible)
@@ -172,7 +185,7 @@ public abstract class LocalMarker implements Marker {
 		float objY = txtLab.getY() - txtLab.getHeight() / 2;
 		float objW = txtLab.getWidth();
 		float objH = txtLab.getHeight();
-
+		
 		if (pPt.x > objX && pPt.x < objX + objW && pPt.y > objY
 				&& pPt.y < objY + objH) {
 			return true;
@@ -245,7 +258,8 @@ public abstract class LocalMarker implements Marker {
 		boolean evtHandled = false;
 
 		if (isClickValid(x, y)) {
-			evtHandled = state.handleEvent(ctx, getURL());
+			if (getURL() != null)
+				evtHandled = state.handleEvent(ctx, getURL());
 		}
 		return evtHandled;
 	}
@@ -284,6 +298,9 @@ public abstract class LocalMarker implements Marker {
 		this.distance = distance;
 	}
 
+	public void setAltitude(double altitude) {
+		getmGeoLoc().setAltitude(altitude);
+	}
 
 	public String getID() {
 		return ID;

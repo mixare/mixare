@@ -14,8 +14,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
-        android:text=""
         android:clickable="false"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -26,5 +26,25 @@
         android:layout_below="@+id/markerTitle"
         android:clickable="false"
         android:text="" />
+    
+    <ImageButton
+        android:id="@+id/centerMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/markerTitle"
+        android:layout_marginRight="14dp"
+        android:padding="1dp"
+        android:src="@android:drawable/ic_menu_mapmode" />
+
+    <ImageButton
+        android:id="@+id/showWebView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/centerMap"
+        android:layout_toLeftOf="@+id/centerMap"
+        android:padding="1dp"
+        android:src="@android:drawable/ic_menu_view"
+        android:visibility="gone" />
 
 </RelativeLayout>

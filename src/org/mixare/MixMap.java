@@ -26,6 +26,7 @@ import org.mixare.data.DataSourceList;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.marker.Marker;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,7 +65,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
 
-	private static List<Marker> markerList;
+//	private static List<Marker> markerList;
 	private static DataView dataView;
 	private static GeoPoint startPoint;
 	private static List<GeoPoint> walkingPath = new ArrayList<GeoPoint>();
@@ -77,9 +78,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	//static MixMap map; 
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
-	public static List<Marker> originalMarkerList;
+//	public static List<Marker> originalMarkerList;
 
-
+	// the search keyword
+	protected String searchKeyword = "";
+	
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false; //? Do we need this?
@@ -97,7 +100,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		super.onCreate(savedInstanceState);
 		dataView = MixView.getDataView();
 		//setMixContext(dataView.getContext());//Dead cycle hear (MixContext should not only rely on MixView
-		setMarkerList(dataView.getDataHandler().getMarkerList());
+//		setMarkerList(dataView.getDataHandler().getMarkerList());
 
 		setMapContext(this);
 		setMapView(new MapView(this, "0zMCXwuwyQLKoOtdQc8VelAT_ipCTDn-h8R-p6A"));
@@ -108,6 +111,9 @@ public class MixMap extends MapActivity implements OnTouchListener{
 
 		this.setContentView(getMapView());
 
+		searchKeyword = this.getIntent().getStringExtra("search");
+		
+		getMapView().getOverlays().clear();
 		setStartPoint();
 		createOverlay();
 		createWalkingPath();
@@ -142,36 +148,63 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private void closeMapViewActivity() {
 		closeMapViewActivity(false);
 	}
-
+	
 	/* ********* Operators ***********/ 
-	private void setStartPoint() {
-		Location location = getDataView().getContext().getLocationFinder().getCurrentLocation();
-
-		double latitude = location.getLatitude()*1E6;
-		double longitude = location.getLongitude()*1E6;
-
-		final MapController controller = getMapView().getController();
-		startPoint = new GeoPoint((int)latitude, (int)longitude);
-		controller.setCenter(startPoint);
+	private void setCenterMap(double latitude, double longitude) {
+		startPoint = new GeoPoint((int) (latitude * 1E6), (int) (longitude * 1E6));
 		//set Zoom Level base on user radius
-		final float mapZoomLevel = (getDataView().getRadius()/2f);
-		controller.setZoom(MixUtils.earthEquatorToZoomLevel((mapZoomLevel < 2f)? 2f: mapZoomLevel));
+		float mapZoomLevel = (getDataView().getRadius()/2f);
+		mapZoomLevel = MixUtils.earthEquatorToZoomLevel((mapZoomLevel < 2f)? 2f: mapZoomLevel);
+		
+		Intent intent = this.getIntent();
+		if (intent.getBooleanExtra("center", false)) {
+			latitude = intent.getDoubleExtra("latitude", 0.0);
+			longitude = intent.getDoubleExtra("longitude", 0.0);
+			mapZoomLevel = 16f;
+		}
+		GeoPoint centerPoint = new GeoPoint((int) (latitude * 1E6), (int) (longitude * 1E6));
+		final MapController controller = getMapView().getController();
+		controller.setCenter(centerPoint);
+
+		controller.setZoom((int) mapZoomLevel);
 	}
 	
-	
+	private void setStartPoint() {
+		Location location = getDataView().getContext().getLocationFinder()
+				.getCurrentLocation();
+
+		double latitude = location.getLatitude();
+		double longitude = location.getLongitude();
+		setCenterMap(latitude, longitude);
+	}
 
 	private void createOverlay(){
 		setMapOverlays(getMapView().getOverlays());
-		setDrawable(this.getResources().getDrawable(R.drawable.icon_map));
-		final MixOverlay mixOverlay = new MixOverlay(this, getDrawable());
+		setDrawable(this.getResources().getDrawable(R.drawable.icon_map_link));
+		MixOverlay mixOverlay = new MixOverlay(this, getDrawable());
 
-		for(Marker marker:markerList) {
-			if(marker.isActive()) {
-				final GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
-				final OverlayItem item = new OverlayItem(point, "", "");
-				mixOverlay.addOverlay(item);
-			}
-		}
+		Marker marker;
+		int limit = dataView.getDataHandler().getMarkerCount();
+        for (int i = 0; i < limit; i++) {
+            marker = dataView.getDataHandler().getMarker(i);
+            if (searchKeyword != null) {
+                if (!searchKeyword.isEmpty()) {
+                    if (marker.getTitle().toLowerCase().indexOf(searchKeyword.toLowerCase().trim()) == -1) {
+                        marker = null;
+                        continue;
+                    }
+                }
+            }
+            final GeoPoint point = new GeoPoint((int)(marker.getLatitude()*1E6), (int)(marker.getLongitude()*1E6));
+            final OverlayItem item = new OverlayItem(point, marker.getTitle(), marker.getURL());
+            if(marker.getURL() == null || marker.getURL().isEmpty()) {
+                Drawable dw = this.getResources().getDrawable(R.drawable.icon_map_nolink);
+                dw.setBounds(-dw.getIntrinsicWidth()/2, -dw.getIntrinsicHeight(), dw.getIntrinsicWidth() /2, 0);
+                item.setMarker(dw);
+            }
+            mixOverlay.addOverlay(item);
+        }
+		
 		//Solved issue 39: only one overlay with all marker instead of one overlay for each marker
 		getMapOverlays().add(mixOverlay);
 
@@ -323,7 +356,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
-		dataView.getDataHandler().setMarkerList(originalMarkerList);
+//		dataView.getDataHandler().setMarkerList(originalMarkerList);
 
 		searchNotificationTxt.setVisibility(View.INVISIBLE);
 		searchNotificationTxt = null;
@@ -365,20 +398,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		this.drawable = drawable;
 	}
 
-//	/**
-//	 * @return the mixContext
-//	 */
-//	private MixContext getMixContext() {
-//		return mixContext;
-//	}
-//
-//	/**
-//	 * @param mixContext the mixContext to set
-//	 */
-//	private void setMixContext(MixContext mixContext) {
-//		this.mixContext = mixContext;
-//	}
-
 	/**
 	 * @return MapView the mapView
 	 */
@@ -391,15 +410,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	 */
 	private void setMapView(MapView mapView) {
 		this.mapView = mapView;
-	}
-	
-	/**
-	 * Sets List of markers
-	 * TODO use collection instead
-	 * @param List<Marker> maList
-	 */
-	public void setMarkerList(List<Marker> maList){
-		markerList = maList;
 	}
 
 	/**
@@ -470,13 +480,21 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 	protected boolean onTap(int index){
 		if (size() == 1)
 			mixMap.startPointMsg();
-		else if (mixMap.getDataView().getDataHandler().getMarker(index).getURL() !=  null) {
-			String url = mixMap.getDataView().getDataHandler().getMarker(index).getURL();
-			Log.d("MapView", "opern url: "+url);
+		else {
+			String url = overlayItems.get(index).getSnippet();
+			
 			try {
 				if (url != null && url.startsWith("webpage")) {
 					String newUrl = MixUtils.parseAction(url);
+//					Log.d("test", "open: " + newUrl);
 					mixMap.getDataView().getContext().getWebContentManager().loadWebPage(newUrl, mixMap.getMapContext());
+				} else {
+					OverlayItem item = overlayItems.get(index);
+					AlertDialog.Builder dialog = new AlertDialog.Builder(mixMap);
+					dialog.setTitle(item.getTitle());
+					dialog.setMessage(item.getSnippet());
+					dialog.show();
+					return true;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

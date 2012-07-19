@@ -19,6 +19,9 @@
 package org.mixare.lib;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
+
+import android.util.Log;
 
 public class HtmlUnescape {
 
@@ -70,22 +73,9 @@ public class HtmlUnescape {
 		htmlEntities.put("&euro;", "\u20a0");
 	}
 
-	public static String unescapeHTML(String source, int start) {
-		int i, j;
-
-		i = source.indexOf("&", start);
-		if (i > -1) {
-			j = source.indexOf(";", i);
-			if (j > i) {
-				String entityToLookFor = source.substring(i, j + 1);
-				String value = (String) htmlEntities.get(entityToLookFor);
-				if (value != null) {
-					source = new StringBuffer().append(source.substring(0, i))
-							.append(value).append(source.substring(j + 1))
-							.toString();
-					return unescapeHTML(source, i + 1); // recursive call
-				}
-			}
+	public static String unescapeHTML(String source) {
+		for (Entry<String, String> entities : htmlEntities.entrySet()) {
+			source = source.replaceAll(entities.getKey(), entities.getValue());
 		}
 		return source;
 	}

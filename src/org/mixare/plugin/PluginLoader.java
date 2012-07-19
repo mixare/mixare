@@ -154,7 +154,7 @@ public class PluginLoader {
 		}	
 	}
 	
-	protected void addFoundPluginToMap(String pluginName, PluginConnection pluginConnection){
+	protected void addFoundPlugin(String pluginName, PluginConnection pluginConnection){
 		for (Plugin plugin : MainActivity.getPlugins()) {
 			if (plugin.getServiceInfo().name.equals(pluginName)) {
 				plugin.setPluginConnection(pluginConnection);

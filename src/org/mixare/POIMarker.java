@@ -42,13 +42,21 @@ public class POIMarker extends LocalMarker {
 
 	public static final int MAX_OBJECTS = 20;
 	public static final int OSM_URL_MAX_OBJECTS = 5;
+	private boolean isDirectionMarker = false;
 
 	public POIMarker(String id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
 		super(id, title, latitude, longitude, altitude, URL, type, color);
-
 	}
 
+	public boolean isDirectionMarker() {
+		return isDirectionMarker;
+	}
+	
+	public void setIsDirectionMarker(boolean direction) {
+		this.isDirectionMarker = direction;
+	}
+	
 	@Override
 	public void update(Location curGPSFix) {
 		super.update(curGPSFix);
@@ -94,15 +102,19 @@ public class POIMarker extends LocalMarker {
 
 		String textStr = "";
 
-		double d = distance;
-		DecimalFormat df = new DecimalFormat("@#");
-		if (d < 1000.0) {
-			textStr = getTitle() + " (" + df.format(d) + "m)";
+		if (!isDirectionMarker) {
+			double d = distance;
+//			DecimalFormat df = new DecimalFormat("@#");
+			textStr = getTitle() + "(" + MixUtils.formatDist((float) d) + ")";
+//			if (d < 1000.0) {
+//				textStr = getTitle() + " (" + df.format(d) + "m)";
+//			} else {
+//				d = d / 1000.0;
+//				textStr = getTitle() + " (" + df.format(d) + "km)";
+//			}
 		} else {
-			d = d / 1000.0;
-			textStr = getTitle() + " (" + df.format(d) + "km)";
+			textStr = getTitle();
 		}
-
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
 				dw, isUnderline());
 
