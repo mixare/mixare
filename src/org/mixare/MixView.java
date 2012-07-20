@@ -66,6 +66,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -716,6 +717,8 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		FrameLayout frameLayout = new FrameLayout(this);
 
 		frameLayout.setMinimumWidth(3000);
+		LayoutParams pa = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		frameLayout.setLayoutParams(pa);
 		frameLayout.addView(getMixViewData().getMyZoomBar());
 		frameLayout.setPadding(10, 0, 10, 10);
 		return frameLayout;
@@ -861,7 +864,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	}
 
 	/* ******** Operators - Sensors ****** */
-
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 
 		public void onProgressChanged(SeekBar seekBar, int progress,
@@ -997,6 +999,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 	@Override
 	public boolean onTouchEvent(MotionEvent me) {
+		if (getMixViewData().getMyZoomBar().getVisibility() == View.VISIBLE) {
+			getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
+		}
+		
 		try {
 			killOnError();
 
@@ -1018,6 +1024,14 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		try {
 			killOnError();
+			
+			if (getMixViewData().getMyZoomBar().getVisibility() == View.VISIBLE) {
+				getMixViewData().getMyZoomBar().setVisibility(View.INVISIBLE);
+				if (keyCode == KeyEvent.KEYCODE_MENU) {
+					return super.onKeyDown(keyCode, event);
+				}
+				return true;
+			}
 
 			if (keyCode == KeyEvent.KEYCODE_BACK) {
 				if (getDataView().isDetailsView()) {
