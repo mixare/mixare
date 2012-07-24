@@ -79,6 +79,8 @@
 
 	<string name="map_menu_normal_mode">Map</string>
 	<string name="map_menu_satellite_mode">Satellite</string>
+	<string name="map_menu_map_osm">Open Street Map</string>
+	<string name="map_menu_map_google">Google Maps</string>
 	<string name="map_menu_cam_mode">Camera</string>
 	<string name="map_my_location">My Location</string>
 	<string name="map_toggle_path_on">Show Path</string>

@@ -19,7 +19,7 @@
 package org.mixare.mgr.location;
 
 import org.mixare.MixContext;
-import org.mixare.MixMap;
+import org.mixare.GoogleMap;
 import org.mixare.mgr.downloader.DownloadManager;
 
 import com.google.android.maps.GeoPoint;
@@ -80,7 +80,7 @@ class LocationObserver implements LocationListener {
 	}
 
 	private void addWalkingPathPosition(Location location) {
-		MixMap.addWalkingPathPosition(new GeoPoint((int) (location.getLatitude() * 1E6),(int) (location.getLongitude() * 1E6)));
+		GoogleMap.addWalkingPathPosition(new GeoPoint((int) (location.getLatitude() * 1E6),(int) (location.getLongitude() * 1E6)));
 	}
 	
 	public void onProviderDisabled(String provider) {
