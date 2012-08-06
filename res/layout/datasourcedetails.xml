@@ -1,26 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ScrollView01"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical" >
 
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent">
-    <TextView android:id="@+id/nameLabel" android:layout_height="wrap_content" android:text="Name" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
-    <EditText android:id="@+id/name" android:layout_height="wrap_content" android:layout_width="match_parent">
-        <requestFocus></requestFocus>
-    </EditText> 
-    <TextView android:id="@+id/urlLabel" android:layout_height="wrap_content" android:text="Url" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
-    <EditText android:id="@+id/url" android:layout_height="wrap_content" android:layout_width="match_parent" android:inputType="textUri" android:text="http://"></EditText>
-    <TextView android:id="@+id/typeLabel" android:layout_height="wrap_content" android:text="Data source" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
-    <Spinner android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/type" android:entries="@array/datasourcetypelist"></Spinner>
-    <TextView android:id="@+id/displaytypeLabel" android:layout_height="wrap_content" android:text="Display as" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
-    <Spinner android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/displaytype" android:entries="@array/displaytypelist"></Spinner>
-     
-</LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/nameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <requestFocus>
+            </requestFocus>
+        </EditText>
+
+        <TextView
+            android:id="@+id/urlLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Url"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"
+            android:text="http://" >
+        </EditText>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/typeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Data source"
+                android:paddingRight="20dp"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+
+            <ImageButton
+                android:id="@+id/imageButton1"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:padding="0dp"
+                android:onClick="onDataSourceInfoClick"
+                android:scaleType="centerInside"
+                android:src="@android:drawable/ic_dialog_info" />
+        </LinearLayout>
+
+        <Spinner
+            android:id="@+id/type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/datasourcetypelist" >
+        </Spinner>
+
+        <TextView
+            android:id="@+id/displaytypeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Display as"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <Spinner
+            android:id="@+id/displaytype"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/displaytypelist" >
+        </Spinner>
+    </LinearLayout>
 </ScrollView>

@@ -17,14 +17,14 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package org.mixare;
+package org.mixare.marker;
 
 import java.text.DecimalFormat;
 
-import org.mixare.LocalMarker;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.marker.LocalMarker;
 
 import android.graphics.Color;
 import android.graphics.Path;
@@ -42,13 +42,21 @@ public class POIMarker extends LocalMarker {
 
 	public static final int MAX_OBJECTS = 20;
 	public static final int OSM_URL_MAX_OBJECTS = 5;
+	private boolean isDirectionMarker = false;
 
 	public POIMarker(String id, String title, double latitude, double longitude,
 			double altitude, String URL, int type, int color) {
 		super(id, title, latitude, longitude, altitude, URL, type, color);
-
 	}
 
+	public boolean isDirectionMarker() {
+		return isDirectionMarker;
+	}
+	
+	public void setIsDirectionMarker(boolean direction) {
+		this.isDirectionMarker = direction;
+	}
+	
 	@Override
 	public void update(Location curGPSFix) {
 		super.update(curGPSFix);
@@ -66,7 +74,7 @@ public class POIMarker extends LocalMarker {
 			dw.setStrokeWidth(maxHeight / 100f);
 			dw.setFill(false);
 
-				dw.setColor(getColour());
+				dw.setColor(getColor());
 			
 			// draw circle with radius depending on distance
 			// 0.44 is approx. vertical fov in radians
@@ -94,15 +102,19 @@ public class POIMarker extends LocalMarker {
 
 		String textStr = "";
 
-		double d = distance;
-		DecimalFormat df = new DecimalFormat("@#");
-		if (d < 1000.0) {
-			textStr = getTitle() + " (" + df.format(d) + "m)";
+		if (!isDirectionMarker) {
+			double d = distance;
+//			DecimalFormat df = new DecimalFormat("@#");
+			textStr = getTitle() + "(" + MixUtils.formatDist((float) d) + ")";
+//			if (d < 1000.0) {
+//				textStr = getTitle() + " (" + df.format(d) + "m)";
+//			} else {
+//				d = d / 1000.0;
+//				textStr = getTitle() + " (" + df.format(d) + "km)";
+//			}
 		} else {
-			d = d / 1000.0;
-			textStr = getTitle() + " (" + df.format(d) + "km)";
+			textStr = getTitle();
 		}
-
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
 				dw, isUnderline());
 
@@ -134,7 +146,7 @@ public class POIMarker extends LocalMarker {
 				signMarker.x, signMarker.y);
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
-		dw.setColor(getColour());
+		dw.setColor(getColor());
 		float radius = maxHeight / 1.5f;
 		dw.setStrokeWidth(dw.getHeight() / 100f);
 		dw.setFill(false);

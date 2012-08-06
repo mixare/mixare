@@ -32,6 +32,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.ImageMarker;
+import org.mixare.LocalMarker;
+import org.mixare.MixContext;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.lib.HtmlUnescape;
@@ -41,51 +43,44 @@ import android.util.Log;
 /**
  * Data Processor that Handles Panoramio API results.
  * 
- * <b>
- * Note: Images and data MUST link to Panoramio photo page.
- * (NOT THE IMAGE IT SELF)
- * <b>
- * Note: Photos provided by Panoramio are under the copyright of 
- * their owners" under Panoramio photos. Please, check the 
- * Panoramio API - Terms of Use for detailed requirements
- * </b>
+ * <b> Note: Images and data MUST link to Panoramio photo page. (NOT THE IMAGE
+ * IT SELF) <b> Note: Photos provided by Panoramio are under the copyright of
+ * their owners" under Panoramio photos. Please, check the Panoramio API - Terms
+ * of Use for detailed requirements </b>
  * 
  * @see http://www.panoramio.com/api/data/api.html
  * @author devBinnooh
- *
+ * 
  */
-public class PanoramioDataProcessor extends DataHandler implements DataProcessor{
+public class PanoramioDataProcessor extends DataHandler implements
+		DataProcessor {
 
-	
 	public static final int MAX_JSON_OBJECTS = ImageMarker.maxObjects;
 
 	/**
-	 * Panoramio URL match
-	 * {@inheritDoc}
+	 * Panoramio URL match {@inheritDoc}
 	 */
 	@Override
 	public String[] getUrlMatch() {
-		String[] str = {"Panoramio"};
+		String[] str = { "Panoramio" };
 		return str;
 	}
 
 	/**
-	 * Panoramio data match
-	 * {@inheritDoc}
+	 * Panoramio data match {@inheritDoc}
 	 */
 	@Override
 	public String[] getDataMatch() {
-		String[] str = {"photos"};
+		String[] str = { "photos" };
 		return str;
 	}
 
 	/**
-	 * Panoramio
-	 * {@inheritDoc}
+	 * Panoramio {@inheritDoc}
 	 */
 	@Override
 	public boolean matchesRequiredType(String type) {
-		if(type.equals(DataSource.TYPE.PANORAMIO.name())){
+		if (type.equals(DataSource.TYPE.PANORAMIO.name())) {
 			return true;
 		}
 		return false;
@@ -94,7 +89,8 @@ public class PanoramioDataProcessor extends DataHandler implements DataProcessor
 	/**
 	 * Reads and creates Markers based on Panoramio API returned results.
 	 * Example JSON:
-	 *  <pre>
+	 * 
+	 * <pre>
 	 *  {
 	 *  "count": 773840,"photos": [
 	 *  	{
@@ -111,9 +107,10 @@ public class PanoramioDataProcessor extends DataHandler implements DataProcessor
 	 *  		"owner_name": "Snemann",
 	 *  		"owner_url": "http://www.panoramio.com/user/39160",
 	 *  }, ...
-	 *  </pre>
-	 *  
-	 * @param String rawData 
+	 * </pre>
+	 * 
+	 * @param String
+	 *            rawData
 	 * @param int taskId
 	 * @param int color
 	 * @return List<Marker> List of Markers
@@ -125,33 +122,88 @@ public class PanoramioDataProcessor extends DataHandler implements DataProcessor
 		final JSONObject root = convertToJSON(rawData);
 		JSONArray dataArray = root.getJSONArray("photos");
 		int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
-		
+
 		Log.i("Mixare", "Processing Panoramio Results ...");
-		
+
 		for (int i = 0; i < top; i++) {
 			JSONObject jo = dataArray.getJSONObject(i);
-			
+
 			if (jo.has("photo_id") && jo.has("latitude") && jo.has("longitude")
 					&& jo.has("photo_file_url")) {
 
-				// For Panoramio elevation, generate a random number ranged [30 -
+				// For Panoramio elevation, generate a random number ranged [30
+				// -
 				// 120]
 				// @TODO find better way
 				// http://www.geonames.org/export/web-services.html#astergdem
 				// http://asterweb.jpl.nasa.gov/gdem.asp
-				final Random elevation = new Random();
-				markers.add(new ImageMarker(jo.getString("photo_id"),
-						HtmlUnescape.unescapeHTML(jo.getString("photo_title"), 0),
-						jo.getDouble("latitude"), 
-						jo.getDouble("longitude"),
-						(elevation.nextInt(90) + 30), // @TODO elevation level for Panoramio
-						jo.getString("photo_url"),
-						taskId,
-						colour,
-						jo.getString("owner_name"),
+				// final Random elevation = new Random();
+				Double lat = jo.getDouble("latitude");
+				Double lng = jo.getDouble("longitude");
+				// Elevation elevationObj = new Elevation();
+				Double elevation = 0.0;
+				String title = HtmlUnescape.unescapeHTML(jo
+						.getString("photo_title"));
+				String imageOwner = jo.getString("owner_name");
+				if (title.trim().isEmpty()) {
+					title = "Photo of " + imageOwner;
+				}
+				markers.add(new ImageMarker(jo.getString("photo_id"), title,
+						lat, lng,
+						elevation,
+						// (elevation.nextInt(90) + 30), // @TODO elevation
+						// level for Panoramio
+						jo.getString("photo_url"), taskId, colour, imageOwner,
 						jo.getString("photo_file_url")));
 			}
 		}
+
+		// maximum amount of markers to send in one loop
+		int maxMarkers = 20;
+
+		// arrays holding latitude and longitude values
+		Double[] lats;
+		Double[] lngs;
+
+		// calculate send counts
+		double a = Math.ceil(Double.valueOf(top) / Double.valueOf(maxMarkers));
+		for (int i = 0; i < a; i++) {
+			// calculate loop counts
+			int looper = maxMarkers;
+			if (((i + 1) * maxMarkers) > top) {
+				looper = top - maxMarkers * i;
+			}
+
+			int z = (i * maxMarkers);
+			lats = new Double[looper];
+			lngs = new Double[looper];
+			// Fill array
+			int k = 0;
+			for (int j = z; j < z + looper; j++) {
+				lats[k] = markers.get(j).getLatitude();
+				lngs[k] = markers.get(j).getLongitude();
+				k++;
+			}
+
+			// request
+			String[] content = Elevation.getElevation().calcElevations(lats,
+					lngs);
+
+			if (content.length != looper) {
+				Log.d("test", "looper(" + looper + ") != length("
+						+ content.length + ")");
+			}
+
+			k = 0;
+			for (int j = z; j < z + looper; j++) {
+				// Fill request data to array
+				Marker ma = markers.get(j);
+				ma.setAltitude(Double.valueOf(content[k]));
+				markers.set(j, ma);
+				k++;
+			}
+		}
+
 		return markers;
 	}
 

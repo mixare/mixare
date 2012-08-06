@@ -33,12 +33,13 @@
 	</string>
 
 	<string name="menu_item_1">المصادر</string>
-	<string name="menu_item_2">اللائحه</string>
-	<string name="menu_item_3">الخريطة</string>
-	<string name="menu_item_4">القطر</string>
-	<string name="menu_item_5">بحث</string>
-	<string name="menu_item_6">معلومات</string>
-	<string name="menu_item_7">الترخيص</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">اللائحه</string>
+	<string name="menu_item_4">الخريطة</string>
+	<string name="menu_item_5">القطر</string>
+	<string name="menu_item_6">بحث</string>
+	<string name="menu_item_7">معلومات</string>
+	<string name="menu_item_8">الترخيص</string>
 
 	<string name="cancel">إلغاء</string>
 

@@ -335,7 +335,6 @@ public class DataView {
 		String dirTxt = "";
 		int bearing = (int) state.getCurBearing();
 		int range = (int) (state.getCurBearing() / (360f / 16f));
-		// TODO: get strings from the values xml file
 		if (range == 15 || range == 0)
 			dirTxt = getContext().getString(R.string.N);
 		else if (range == 1 || range == 2)

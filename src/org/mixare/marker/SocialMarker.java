@@ -17,8 +17,9 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package org.mixare;
+package org.mixare.marker;
 
+import org.mixare.MixView;
 import org.mixare.lib.gui.PaintScreen;
 
 import android.location.Location;

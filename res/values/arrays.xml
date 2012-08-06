@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="datasourcetypelist">
+	    <item>@string/WIKIPEDIA</item>
+	    <item>@string/TWITTER</item>
 		<item>@string/OSM</item>
-		<item>@string/MIXARE</item>
+	    <item>@string/MIXARE</item>
+		<item>@string/ARENA</item>
+		<item>@string/PANORAMIO</item>
 	</string-array>
 	<string-array name="displaytypelist">
 		<item>@string/CIRCLE_MARKER</item>
 		<item>@string/NAVIGATION_MARKER</item>
 		<item>@string/IMAGE_MARKER</item>
 	</string-array>
-	<!-- 	name | url | typeEnum | displayEnum | isDefaultenabled -->
-	<string-array name="defaultdatasources">
-	    <item>Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true</item>
-	    <item>Twitter|http://search.twitter.com/search.json|2|0|true</item>
-	    <item>OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true</item>
-	    <item>Own URL|http://mixare.org/geotest.php|4|0|false</item>
-	    <item>Panoramio|http://www.panoramio.com/map/get_panoramas.php|6|2|false</item>
+	<string-array name="maps">
+	    <item>@string/map_menu_map_google</item>
+	    <item>@string/map_menu_map_osm</item>
 	</string-array>
 </resources>

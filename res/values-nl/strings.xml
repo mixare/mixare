@@ -39,12 +39,13 @@
 	<string name="no">Nee</string>
 	
 	<string name="menu_item_1">Databron</string>
-	<string name="menu_item_2">Lijst view</string>
-	<string name="menu_item_3">Map view</string>
-	<string name="menu_item_4">Zoom level</string>
-	<string name="menu_item_5">Zoeken</string>
-	<string name="menu_item_6">Info</string>
-	<string name="menu_item_7">Licentie</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">Lijst view</string>
+	<string name="menu_item_4">Map view</string>
+	<string name="menu_item_5">Zoom level</string>
+	<string name="menu_item_6">Zoeken</string>
+	<string name="menu_item_7">Info</string>
+	<string name="menu_item_8">Licentie</string>
 
 	<string name="cancel">Onderbreek</string>
 

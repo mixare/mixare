@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare;
+package org.mixare.marker;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -36,7 +36,7 @@ import android.util.Log;
 
 /**
  * Local Image Marker that handles drawing images locally 
- * (extents {@link org.mixare.LocalMarker LocalMarker})
+ * (extents {@link org.mixare.marker.LocalMarker LocalMarker})
  * 
  * Note: LinkURL is the url when marker is clicked on.
  * Note: ImageURL is the url that links to solid image.
@@ -54,10 +54,10 @@ public class ImageMarker extends LocalMarker {
 	/**
 	 * Constructor with the given params.
 	 * Note Image will be set to default (empty square).
-	 * Please Set the image {@link org.mixare.ImageMarker#setImage(Bitmap)},
+	 * Please Set the image {@link org.mixare.marker.ImageMarker#setImage(Bitmap)},
 	 * or Call this class with Image URL.
 	 * 
-	 * @see org.mixare.ImageMarker#ImageMarker(String, String, double, double, double, String, int, int, String, String)
+	 * @see org.mixare.marker.ImageMarker#ImageMarker(String, String, double, double, double, String, int, int, String, String)
 	 * @param String Marker's id
 	 * @param String Marker's title
 	 * @param double latitude
@@ -133,7 +133,7 @@ public class ImageMarker extends LocalMarker {
 			String textStr = MixUtils.shortenTitle(title,distance);
 			textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
 					dw, underline);
-			 dw.setColor(this.getColour());
+			 dw.setColor(this.getColor());
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
 					getSignMarker().x, getSignMarker().y);
 			txtLab.prepare(textBlock);

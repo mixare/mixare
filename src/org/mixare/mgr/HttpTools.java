@@ -18,8 +18,6 @@
  */
 package org.mixare.mgr;
 
-
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -45,6 +43,7 @@ import org.mixare.MixContext;
 import org.mixare.mgr.downloader.DownloadRequest;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -52,7 +51,11 @@ import android.os.Build;
 import android.util.Log;
 
 public final class HttpTools {
+	private static Context ctx;
 	
+	public static void setContext(Context context) {
+		ctx = context;
+	}
 	
 	/**
 	 * Prefered To use InputStream managed!
@@ -62,19 +65,36 @@ public final class HttpTools {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getPageContent(DownloadRequest request, ContentResolver cr) throws Exception {
+	public static String getPageContent(DownloadRequest request) throws Exception {
 		String pageContent;
 		InputStream is = null;
+//		Log.d("test", request.getSource().getUrl() + request.getParams());
 		if(!request.getSource().getUrl().startsWith("file://")){
-			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams(), cr);
+			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl() + request.getParams());
 		}else{
-			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl(), cr);
+			is = HttpTools.getHttpGETInputStream(request.getSource().getUrl());
 		}
 		pageContent = HttpTools.getHttpInputString(is);
 		HttpTools.returnHttpInputStream(is);
 		return pageContent;
 	}
 	
+	/**
+	 * Prefered To use InputStream managed!
+	 * 
+	 * @param request
+	 * @param cr
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getPageContent(String request) throws Exception {
+		String pageContent;
+		InputStream is = null;
+		is = HttpTools.getHttpGETInputStream(request);
+		pageContent = HttpTools.getHttpInputString(is);
+		HttpTools.returnHttpInputStream(is);
+		return pageContent;
+	}
 	
 	public static String getHttpInputString(InputStream is) {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
@@ -97,13 +117,11 @@ public final class HttpTools {
 		return sb.toString();
 	}
 
-	
-	
 	/**
 	 * Input Stream with unsafe close 
 	 */
 	@Deprecated
-	public static InputStream getHttpGETInputStream(String urlStr, ContentResolver cr ) throws Exception {
+	public static InputStream getHttpGETInputStream(String urlStr) throws Exception {
 		InputStream is = null;
 		URLConnection conn = null;
 
@@ -116,7 +134,7 @@ public final class HttpTools {
 			return new FileInputStream(urlStr.replace("file://", ""));
 
 		if (urlStr.startsWith("content://"))
-			return getContentInputStream(urlStr, null, cr);
+			return getContentInputStream(urlStr, null);
 
 		if (urlStr.startsWith("https://")) {
 			HttpsURLConnection
@@ -173,14 +191,14 @@ public final class HttpTools {
 	 * Input Stream with unsafe close 
 	 */
 	@Deprecated	
-	public static InputStream getHttpPOSTInputStream(String urlStr, String params,ContentResolver cr )
+	public static InputStream getHttpPOSTInputStream(String urlStr, String params)
 			throws Exception {
 		InputStream is = null;
 		OutputStream os = null;
 		HttpURLConnection conn = null;
 
 		if (urlStr.startsWith("content://"))
-			return getContentInputStream(urlStr, params,cr);
+			return getContentInputStream(urlStr, params);
 
 		try {
 			URL url = new URL(urlStr);
@@ -217,7 +235,7 @@ public final class HttpTools {
 			}
 
 			if (conn != null && conn.getResponseCode() == 405) {
-				return getHttpGETInputStream(urlStr,cr);
+				return getHttpGETInputStream(urlStr);
 			} else {
 				throw ex;
 			}
@@ -228,24 +246,28 @@ public final class HttpTools {
 	 * Input Stream with unsafe close 
 	 */
 	@Deprecated
-	public static InputStream getContentInputStream(String urlStr, String params,ContentResolver cr)
+	public static InputStream getContentInputStream(String urlStr, String params)
 			throws Exception {
 		//ContentResolver cr = mixView.getContentResolver();
+		ContentResolver cr = ctx.getContentResolver();
 		Cursor cur = cr.query(Uri.parse(urlStr), null, params, null, null);
 
 		cur.moveToFirst();
 		int mode = cur.getInt(cur.getColumnIndex("MODE"));
 
-		if (mode == 1) {
-			String result = cur.getString(cur.getColumnIndex("RESULT"));
-			cur.deactivate();
-
-			return new ByteArrayInputStream(result.getBytes());
-		} else {
-			cur.deactivate();
-
+		try {
+			if (mode == 1) {
+				String result = cur.getString(cur.getColumnIndex("RESULT"));
+				return new ByteArrayInputStream(result.getBytes());
+			} else {
+				throw new Exception("Invalid content:// mode " + mode);
+			}
+		} catch (Exception e) {
 			throw new Exception("Invalid content:// mode " + mode);
+		} finally {
+			cur.close();
 		}
+		
 	}
 
 	/**

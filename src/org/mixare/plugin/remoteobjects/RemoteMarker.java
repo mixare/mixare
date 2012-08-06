@@ -106,7 +106,7 @@ public class RemoteMarker implements Marker{
 	}
 
 	@Override
-	public int getColour() {
+	public int getColor() {
 		try {
 			return iMarkerService.getColour(markerName);
 		} catch (RemoteException e) {
@@ -304,6 +304,10 @@ public class RemoteMarker implements Marker{
 	public int compareTo(Marker another) {
 		Marker rm = (Marker)another;
 		return new Double(this.getDistance()).compareTo(new Double(rm.getDistance()));
+	}
+
+	@Override
+	public void setAltitude(double altitude) {
 	}
 
 }

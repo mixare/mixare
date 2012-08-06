@@ -122,7 +122,7 @@ public abstract class PluginMarker{
 		this.active = active;
 	}
 
-	public int getColour() {
+	public int getColor() {
 		return colour;
 	}
 
@@ -155,6 +155,7 @@ public abstract class PluginMarker{
 	public abstract DrawCommand[] remoteDraw();
 	
 	public void update(Location curGPSFix) {
+		// TODO:
 		// An elevation of 0.0 probably means that the elevation of the
 		// POI is not known and should be set to the users GPS height
 		// Note: this could be improved with calls to

@@ -23,6 +23,7 @@ import org.mixare.data.DataSource;
 public class DownloadRequest {
 	private DataSource source;
 	private String params;
+	private int retry = 0;
 	
 	public DownloadRequest(DataSource source) {
 		this(source, "");
@@ -57,11 +58,23 @@ public class DownloadRequest {
 		this.params = params;
 	}
 	
-	public String toString(){
-		return " type: "
-				+ getSource().getType() + ", params: "
-				+ getParams() + ", url: "
-				+ getSource().getUrl();
+	/**
+	 * Increases the count of retry's for this request
+	 */
+	public void increasRetry() {
+		retry++;
+	}
+	
+	/**
+	 * @return Returns the count of retry's for this request
+	 */
+	public int getRetry() {
+		return retry;
+	}
+	
+	public String toString() {
+		return " type: " + getSource().getType() + ", params: " + getParams()
+				+ ", url: " + getSource().getUrl();
 	}
 
 }

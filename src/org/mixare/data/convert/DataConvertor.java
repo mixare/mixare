@@ -65,7 +65,7 @@ public class DataConvertor {
 			dataProcessor = new MixareDataProcessor(); //using this as default if nothing is found.
 		}
 		try {
-			return dataProcessor.load(rawResult, ds.getTaskId(), ds.getColor());
+			return dataProcessor.load(rawResult, ds.getDataSourceId(), ds.getColor());
 		} catch (JSONException e) {
 			/* Find Other Away to notify Error, for now Hide this error
 			 MixView.CONTEXT.runOnUiThread(new Runnable() {

@@ -44,6 +44,8 @@ public interface Marker extends Comparable<Marker>{
 	double getLongitude();
 
 	double getAltitude();
+	
+	void setAltitude(double altitude);
 
 	MixVector getLocationVector();
 
@@ -65,7 +67,7 @@ public interface Marker extends Comparable<Marker>{
 
 	void setActive(boolean active);
 
-	int getColour();
+	int getColor();
 	
 	public void setTxtLab(Label txtLab);
 

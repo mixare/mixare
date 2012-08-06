@@ -14,6 +14,10 @@
     
     <string name="OSM">Openstreetmap</string>
     <string name="MIXARE">Mixare</string>
+    <string name="TWITTER">Twitter</string>
+    <string name="PANORAMIO">Panoramio</string>
+    <string name="WIKIPEDIA">Wikipedia</string>
+    <string name="ARENA">Arena</string>
     
     <string name="CIRCLE_MARKER">Circles</string>
     <string name="NAVIGATION_MARKER">Arrows</string>
@@ -34,18 +38,19 @@
 	</string>
 	
 	<string name="launch_plugins">Launch plugins?</string>
-	<string name="plugin_message">Some plugins where found, do you want to enable them?</string>
+	<string name="plugin_message">Some plugins have changed, do you want to see the List of Plugins?</string>
 	<string name="remember_this_decision">Remember this decision</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 		
 	<string name="menu_item_1">Data Source</string>
-	<string name="menu_item_2">List view</string>
-	<string name="menu_item_3">Map view</string>
-	<string name="menu_item_4">Zoom level</string>
-	<string name="menu_item_5">Search</string>
-	<string name="menu_item_6">Info</string>
-	<string name="menu_item_7">License</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">List view</string>
+	<string name="menu_item_4">Map view</string>
+	<string name="menu_item_5">Zoom level</string>
+	<string name="menu_item_6">Search</string>
+	<string name="menu_item_7">Info</string>
+	<string name="menu_item_8">License</string>
 
 	<string name="cancel">Cancel</string>
 
@@ -78,6 +83,8 @@
 
 	<string name="map_menu_normal_mode">Map</string>
 	<string name="map_menu_satellite_mode">Satellite</string>
+	<string name="map_menu_map_osm">Open Street Map</string>
+	<string name="map_menu_map_google">Google Maps</string>
 	<string name="map_menu_cam_mode">Camera</string>
 	<string name="map_my_location">My Location</string>
 	<string name="map_toggle_path_on">Show Path</string>
@@ -106,5 +113,31 @@
 	<string name="set_osm_max_object">Maximum POIs per URL</string>
 	<string name="location_not_found">Location not found, make sure you enabled Wifi location or GPS in the settings.</string>
 	<string name="refreshing">Refreshing</string>
+	<string name="select_plugin">Find new Plugins</string>
 
+	<string name="plugins_changed">Activation of Plugins changed. Mixare has to restart to change plugins. Would you like to do that now?</string>
+	<string name="select_all">Select all</string>
+	<string name="deselect_all">Deselect all</string>
+	<string name="reload_plugins">Reload Plugins</string>
+	
+	<string name="bootstrap1">Splashscreen</string>
+	<string name="bootstrap2">Bootstrap</string>
+	<string name="marker">Marker</string>
+	<string name="dataselector">Dataselector</string>
+	<string name="datahandler">Datahandler</string>
+	
+	<string name="list_view_total_markers">Total markers: </string>
+	<string name="list_view_marker_in_section">Markers:</string>
+	<string name="list_view_search_no_result">No result found</string>
+	<string name="list_view_no_plugins_available">No plugins installed</string>
+	<string name="list_view_search_hint">Search</string>
+	
+	<string name="add_datasource">Add Datasource</string>
+	<string name="datasource_list">Datasources</string>
+	<string name="plugin_list">Plugins</string>
+	<string name="mix_list_view">Markerlist</string>
+	
+	<string name="list_view_section"></string>
+	<string name="list_view_entry"></string>
+	<string name="list_view_webview_id"></string>
 </resources>

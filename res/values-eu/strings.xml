@@ -33,12 +33,13 @@
 	</string>
 	
 	<string name="menu_item_1">Datu-iturburua</string>
-	<string name="menu_item_2">Zerrenda ikuspegia</string>
-	<string name="menu_item_3">Mapa ikuspegia</string>
-	<string name="menu_item_4">Zoom maila</string>
-	<string name="menu_item_5">Bilatu</string>
-	<string name="menu_item_6">Informazioa</string>
-	<string name="menu_item_7">Lizentzia</string>
+	<string name="menu_item_2">Plugins</string>
+	<string name="menu_item_3">Zerrenda ikuspegia</string>
+	<string name="menu_item_4">Mapa ikuspegia</string>
+	<string name="menu_item_5">Zoom maila</string>
+	<string name="menu_item_6">Bilatu</string>
+	<string name="menu_item_7">Informazioa</string>
+	<string name="menu_item_8">Lizentzia</string>
 	
 	<string name="cancel">Utzi</string>
 	

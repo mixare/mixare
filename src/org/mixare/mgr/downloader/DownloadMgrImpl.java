@@ -101,8 +101,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 				throw new Exception("Datasource in not WellFormed");
 			}
 
-			String pageContent = HttpTools.getPageContent(request,
-					ctx.getContentResolver());
+			String pageContent = HttpTools.getPageContent(request);
 
 			if (pageContent != null) {
 				// try loading Marker data
@@ -111,6 +110,7 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 						request.getSource());
 				result.setAccomplish(mRequest.getUniqueKey(), markers,
 						request.getSource());
+//				Log.d("test", request.getSource().getType().name());
 			}
 		} catch (Exception ex) {
 			result.setError(ex, request);

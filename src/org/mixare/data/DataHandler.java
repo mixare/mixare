@@ -43,13 +43,13 @@ public class DataHandler {
 	
 	public void addMarkers(List<Marker> markers) {
 
-		Log.v(MixView.TAG, "Marker before: "+markerList.size());
+//		Log.v(MixView.TAG, "Marker before: "+markerList.size());
 		for(Marker ma:markers) {
 			if(!markerList.contains(ma))
 				markerList.add(ma);
 		}
 		
-		Log.d(MixView.TAG, "Marker count: "+markerList.size());
+//		Log.d(MixView.TAG, "Marker count: "+markerList.size());
 	}
 	
 	public void sortMarkerList() {
@@ -57,9 +57,10 @@ public class DataHandler {
 	}
 	
 	public void updateDistances(Location location) {
-		for(Marker ma: markerList) {
-			float[] dist=new float[3];
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
+		for (Marker ma : markerList) {
+			float[] dist = new float[3];
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(),
+					location.getLatitude(), location.getLongitude(), dist);
 			ma.setDistance(dist[0]);
 		}
 	}
@@ -88,19 +89,19 @@ public class DataHandler {
 		}
 	}
 	
-	/**
-	 * @deprecated Nobody should get direct access to the list
-	 */
-	public List<Marker> getMarkerList() {
-		return markerList;
-	}
-	
-	/**
-	 * @deprecated Nobody should get direct access to the list
-	 */
-	public void setMarkerList(List<Marker> markerList) {
-		this.markerList = markerList;
-	}
+//	/**
+//	 * @deprecated Nobody should get direct access to the list
+//	 */
+//	public List<Marker> getMarkerList() {
+//		return markerList;
+//	}
+//	
+//	/**
+//	 * @deprecated Nobody should get direct access to the list
+//	 */
+//	public void setMarkerList(List<Marker> markerList) {
+//		this.markerList = markerList;
+//	}
 
 	public int getMarkerCount() {
 		return markerList.size();

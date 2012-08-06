@@ -26,10 +26,12 @@ import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceStorage;
 import org.mixare.mgr.downloader.DownloadRequest;
 
+import android.util.Log;
+
 class DataSourceMgrImpl implements DataSourceManager {
 
-	private final ConcurrentLinkedQueue<DataSource> allDataSources=new ConcurrentLinkedQueue<DataSource>(); 
-	
+	private final ConcurrentLinkedQueue<DataSource> allDataSources = new ConcurrentLinkedQueue<DataSource>();
+
 	private final MixContext ctx;
 
 	public DataSourceMgrImpl(MixContext ctx) {
@@ -38,17 +40,13 @@ class DataSourceMgrImpl implements DataSourceManager {
 
 	@Override
 	public boolean isAtLeastOneDatasourceSelected() {
-		boolean atLeastOneDatasourceSelected = false;
 		for (DataSource ds : this.allDataSources) {
-			if (ds.getEnabled()){
-				atLeastOneDatasourceSelected = true;
-				break; //if condition met, break from loop.
+			if (ds.getEnabled()) {
+				return true;
 			}
 		}
-		return atLeastOneDatasourceSelected;
+		return false;
 	}
-
-
 
 	public void setAllDataSourcesforLauncher(DataSource datasource) {
 		this.allDataSources.clear(); // TODO WHY? CLEAN ALL
@@ -58,25 +56,19 @@ class DataSourceMgrImpl implements DataSourceManager {
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 
-		DataSourceStorage.getInstance(ctx).fillDefaultDataSources();
-
-		int size = DataSourceStorage.getInstance().getSize();
+		int size;
+		size = DataSourceStorage.getInstance(ctx).getSize();
 
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
-			String fields[] = DataSourceStorage.getInstance().getFields(i);
-			this.allDataSources.add(new DataSource(fields[0], fields[1],
-					fields[2], fields[3], fields[4]));
+			this.allDataSources.add(DataSourceStorage.getInstance()
+					.getDataSource(i));
 		}
 	}
 
 	public void requestDataFromAllActiveDataSource(double lat, double lon,
 			double alt, float radius) {
 		for (DataSource ds : allDataSources) {
-			/*
-			 * when type is OpenStreetMap iterate the URL list and for selected
-			 * URL send data request
-			 */
 			if (ds.getEnabled()) {
 				requestData(ds, lat, lon, alt, radius, Locale.getDefault()
 						.getLanguage());
@@ -92,5 +84,4 @@ class DataSourceMgrImpl implements DataSourceManager {
 		ctx.getDownloadManager().submitJob(request);
 
 	}
-
 }
