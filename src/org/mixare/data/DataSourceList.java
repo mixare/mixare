@@ -59,7 +59,6 @@ public class DataSourceList extends SherlockListActivity {
 	private static final int MENU_MORE_ID = Menu.FIRST + 3;
 	private static final int MENU_RESTORE_ID = Menu.FIRST + 4;
 
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +95,15 @@ public class DataSourceList extends SherlockListActivity {
 		}
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Returned from AddDataSourceActivity
+		if (requestCode == 545) {
+			dataSourceAdapter.notifyDataSetChanged();
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
 	//TODO: check if it's really needed
 	public static String getDataSourcesStringList() {
 		String ret="";
@@ -234,15 +242,6 @@ public class DataSourceList extends SherlockListActivity {
 		return true;
 	}
 	
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_MENU){
-			
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
@@ -252,7 +251,7 @@ public class DataSourceList extends SherlockListActivity {
 		case MENU_CREATE_ID:
 			Intent addSource = new Intent(DataSourceList.this,
 					AddDataSource.class);
-			startActivity(addSource);
+			startActivityForResult(addSource, 545);
 			break;
 		case MENU_RESTORE_ID:
 			// TODO: Restore Default Sources
@@ -283,13 +282,10 @@ public class DataSourceList extends SherlockListActivity {
 		DataSource ds = (DataSource) dataSourceAdapter.getItem((int) idOfMenu);
 		switch (item.getItemId()) {
 		case MENU_EDIT_ID:
-			if (ds.isEditable()) {
-				Intent editDataSource = new Intent(this, AddDataSource.class);
-				editDataSource.putExtra("DataSourceId", (int) idOfMenu);
-				startActivity(editDataSource);
-			} else {
-				Toast.makeText(this, getString(R.string.data_source_edit_err), Toast.LENGTH_SHORT).show();
-			}
+			Intent editDataSource = new Intent(this, AddDataSource.class);
+			editDataSource.putExtra("isEditable", ds.isEditable());
+			editDataSource.putExtra("DataSourceId", (int) idOfMenu);
+			startActivity(editDataSource);
 			break;
 		case MENU_DELETE_ID:
 			if (ds.isEditable()) {
@@ -301,5 +297,4 @@ public class DataSourceList extends SherlockListActivity {
 		}
 		return super.onContextItemSelected(item);
 	}
-
 }

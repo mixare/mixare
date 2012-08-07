@@ -54,7 +54,26 @@ public class DataSource {
 	private TYPE type;
 	private DISPLAY display;
 	private boolean editable;
+	private BLUR blur;
 
+	/**
+	 * Recreate's a previously existing DataSource
+	 * 
+	 * @param id
+	 *            The id the DataSource previously had
+	 * @param name
+	 *            The name of the DataSource
+	 * @param url
+	 *            The URL of the DataSource
+	 * @param typeString
+	 *            The type of the DataSource using DataSource.TYPE, it has to be
+	 *            a integer in a String
+	 * @param display
+	 *            The type of the DataSource using DataSource.DISPLAY, it has to
+	 *            be a integer in a String
+	 * @param enabled
+	 *            Whether the DataSource is enabled or not
+	 */
 	public DataSource(int id, String name, String url, String typeString,
 			String displayString, String enabledString, boolean editable) {
 		DataSource.DataSourceId = id + 1;
@@ -65,8 +84,23 @@ public class DataSource {
 		this.display = DISPLAY.values()[Integer.parseInt(displayString)];
 		this.enabled = Boolean.parseBoolean(enabledString);
 		this.editable = editable;
+		this.blur = BLUR.NONE;
 	}
-	
+
+	/**
+	 * Create's a new DataSource
+	 * 
+	 * @param name
+	 *            The name of the DataSource
+	 * @param url
+	 *            The URL of the DataSource
+	 * @param type
+	 *            The type of the DataSource using DataSource.TYPE
+	 * @param display
+	 *            The type of the DataSource using DataSource.DISPLAY
+	 * @param enabled
+	 *            Whether the DataSource is enabled or not
+	 */
 	public DataSource(String name, String url, TYPE type, DISPLAY display,
 			boolean enabled) {
 		this.id = DataSourceId;
@@ -76,13 +110,8 @@ public class DataSource {
 		this.display = display;
 		this.enabled = enabled;
 		this.editable = true;
+		this.blur = BLUR.NONE;
 		increasId();
-	}
-
-	public DataSource(String name, String url, int typeInt, int displayInt,
-			boolean enabled) {
-		this(name, url, TYPE.values()[typeInt], DISPLAY.values()[displayInt],
-				enabled);
 	}
 
 	/* Methods */
@@ -99,7 +128,7 @@ public class DataSource {
 						+ geoNamesRadius + "&maxRows=50" + "&lang=" + locale
 						+ "&username=mixare";
 				break;
-				
+
 			case TWITTER:
 				ret += "?geocode=" + lat + "%2C" + lon + "%2C"
 						+ Math.max(radius, 1.0) + "km";
@@ -161,10 +190,27 @@ public class DataSource {
 	@Override
 	public String toString() {
 		return "DataSource [name=" + name + ", url=" + url + ", enabled="
-				+ enabled + ", type=" + type + ", display=" + display + "]";
+				+ enabled + ", type=" + type + ", display=" + display
+				+ ", blur=" + blur + "]";
 	}
 
 	/* Getter and Setter */
+
+	public BLUR getBlur() {
+		return this.blur;
+	}
+
+	public int getBlurId() {
+		return this.blur.ordinal();
+	}
+
+	public void setBlur(BLUR blur) {
+		this.blur = blur;
+	}
+	
+	public void setBlur(int id) {
+		this.blur = BLUR.values()[id];
+	}
 
 	public int getColor() {
 		int ret;
@@ -222,7 +268,7 @@ public class DataSource {
 	public int getDataSourceId() {
 		return this.id;
 	}
-	
+
 	public int getDisplayId() {
 		return this.display.ordinal();
 	}
@@ -234,9 +280,25 @@ public class DataSource {
 	public DISPLAY getDisplay() {
 		return this.display;
 	}
+	
+	public void setDisplay(int id) {
+		this.display = DISPLAY.values()[id];
+	}
+	
+	public void setDisplay(DISPLAY display) {
+		this.display = display;
+	}
 
 	public TYPE getType() {
 		return this.type;
+	}
+	
+	public void setType(int id) {
+		this.type = TYPE.values()[id];
+	}
+	
+	public void setType(TYPE type) {
+		this.type = type;
 	}
 
 	public boolean getEnabled() {
@@ -250,14 +312,24 @@ public class DataSource {
 	public String getName() {
 		return this.name;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public String getUrl() {
 		return this.url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public boolean isEditable() {
 		return editable;
 	}
+
+	/* ENUM */
 	
 	public enum TYPE {
 		WIKIPEDIA, TWITTER, OSM, MIXARE, ARENA, PANORAMIO
@@ -266,4 +338,8 @@ public class DataSource {
 	public enum DISPLAY {
 		CIRCLE_MARKER, NAVIGATION_MARKER, IMAGE_MARKER
 	};
+
+	public enum BLUR {
+		NONE, ADD_RANDOM, TRUNCATE
+	}
 }

@@ -13,6 +13,11 @@
 		<item>@string/NAVIGATION_MARKER</item>
 		<item>@string/IMAGE_MARKER</item>
 	</string-array>
+	<string-array name="blurgps">
+	    <item>@string/none</item>
+	    <item>@string/add_random</item>
+	    <item>@string/truncate</item>
+	</string-array>
 	<string-array name="maps">
 	    <item>@string/map_menu_map_google</item>
 	    <item>@string/map_menu_map_osm</item>

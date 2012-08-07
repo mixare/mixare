@@ -8,6 +8,7 @@
         <display>0</display>
         <visible>true</visible>
         <editable>false</editable>
+        <blur>0</blur>
     </datasource>
     <datasource id="1" >
         <name>Twitter</name>
@@ -16,6 +17,7 @@
         <display>0</display>
         <visible>true</visible>
         <editable>false</editable>
+        <blur>0</blur>
     </datasource>
     <datasource id="2" >
         <name>OpenStreetmap</name>
@@ -24,6 +26,7 @@
         <display>1</display>
         <visible>true</visible>
         <editable>false</editable>
+        <blur>0</blur>
     </datasource>
     <datasource id="3" >
         <name>Own URL</name>
@@ -32,6 +35,7 @@
         <display>0</display>
         <visible>true</visible>
         <editable>false</editable>
+        <blur>0</blur>
     </datasource>
     <datasource id="4" >
         <name>Panoramio</name>
@@ -40,5 +44,6 @@
         <display>2</display>
         <visible>true</visible>
         <editable>false</editable>
+        <blur>0</blur>
     </datasource>
 </datasources>

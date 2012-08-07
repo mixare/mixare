@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,6 +58,7 @@ public class DataSourceStorage {
 	private static Context ctx;
 	public static DataSourceStorage instance;
 	private static String xmlPreferencesKey = "xmlDataSources";
+	private static List<DataSource> dataSourceList = new ArrayList<DataSource>();
 
 	/**
 	 * Private constructor to ensure that only one instance can be created
@@ -67,6 +70,7 @@ public class DataSourceStorage {
 	private DataSourceStorage(Context ctx) {
 		DataSourceStorage.ctx = ctx;
 		settings = ctx.getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
+		fillListFromXml();
 	}
 
 	/**
@@ -82,8 +86,6 @@ public class DataSourceStorage {
 	/**
 	 * @return Returns the instance of a DataSourceStorage or null if no
 	 *         instance was created yet
-	 * @throws Exception
-	 *             Throws Exception if instance is null
 	 */
 	public static DataSourceStorage getInstance() {
 		if (instance == null) {
@@ -122,6 +124,7 @@ public class DataSourceStorage {
 	 * 	<type></type>
 	 * 	<display></display>
 	 * 	<visible></visible>
+	 * 	<blur></blur>
 	 * </datasource>
 	 * </pre>
 	 * 
@@ -139,11 +142,13 @@ public class DataSourceStorage {
 	 *            The Displaytype of the DataSource
 	 * @param visible
 	 *            The Visibility of the DataSource
+	 * @param blur
+	 *            How the GPS location should be blurred
 	 * @return The XML Element of the DataSource
 	 */
 	private Element createDataSourceElement(Document doc, String id,
 			String name, String url, String type, String display,
-			boolean visible, boolean editable) {
+			boolean visible, boolean editable, String blur) {
 		// Set rootElement to "DataSource"
 		Element rootElement = doc.createElement("datasource");
 
@@ -181,88 +186,38 @@ public class DataSourceStorage {
 				.appendChild(doc.createTextNode(String.valueOf(editable)));
 		rootElement.appendChild(editableElement);
 
+		// create "Display" Element and add it to rootElement
+		Element blurElement = doc.createElement("blur");
+		blurElement.appendChild(doc.createTextNode(blur));
+		rootElement.appendChild(blurElement);
+		
 		return rootElement;
 	}
 
 	/**
-	 * Saves a DataSource to the SharedPreferences
+	 * Adds a DataSource to the list
 	 * 
 	 * @param dataSource
-	 *            The DataSource to save
+	 *            The DataSource to add
 	 */
 	public void add(DataSource dataSource) {
-		// Get XML from SharedPreferences
-		String xml = settings
-				.getString(DataSourceStorage.xmlPreferencesKey, "");
-		try {
-			// Create a Document out of the XML String or a new one
-			Document doc = convertToXmlDocument(xml);
-			if (doc == null) {
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-						.newInstance();
-				DocumentBuilder documentBuilder = documentBuilderFactory
-						.newDocumentBuilder();
-				doc = documentBuilder.newDocument();
-				doc.appendChild(doc.createElement("datasources"));
-			}
-
-			Element documentRoot = doc.getDocumentElement();
-
-			// Check if this DataSource has already been added
-			NodeList nList = documentRoot.getElementsByTagName("datasource");
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					if (Integer.valueOf(eElement.getAttribute("id")) == dataSource
-							.getDataSourceId()) {
-						return;
-					}
-				}
-			}
-
-			// Create the XML Element for the new DataSource
-			Element dataSourceElement = createDataSourceElement(doc,
-					String.valueOf(dataSource.getDataSourceId()),
-					dataSource.getName(), dataSource.getUrl(),
-					String.valueOf(dataSource.getTypeId()),
-					String.valueOf(dataSource.getDisplayId()),
-					dataSource.getEnabled(), dataSource.isEditable());
-
-			// Append
-			documentRoot.appendChild(dataSourceElement);
-
-			// Convert Document to String
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-					"yes");
-			StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			xml = writer.getBuffer().toString().replaceAll("\n|\r", "");
-
-			// Save it to the SharedPreferences
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(xmlPreferencesKey, xml);
-			editor.commit();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
+		dataSourceList.add(dataSource);
+		save();
 	}
 
 	/**
-	 * Removes the saved DataSources from the SharedPreferences
+	 * Removes the saved DataSources from the SharedPreferences and the internal List
 	 */
 	public void clear() {
 		SharedPreferences.Editor dataSourceEditor = settings.edit();
 		dataSourceEditor.clear();
 		dataSourceEditor.commit();
+		
+		dataSourceList.clear();
 	}
 
 	/**
-	 * Saves the default DataSources from the Resources to the SharedPreferences
+	 * Saves the default DataSources from the Resources to the SharedPreferences and adds them to the internal list
 	 */
 	public void fillDefaultDataSources() {
 		String defaultXml = inputStreamToString(ctx.getResources()
@@ -271,8 +226,89 @@ public class DataSourceStorage {
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(DataSourceStorage.xmlPreferencesKey, defaultXml);
 		editor.commit();
+		
+		fillListFromXml();
 	}
 
+	/**
+	 * Recreate's the dataSourceList out of the XML
+	 */
+	private void fillListFromXml() {
+		int xmlLength = getDataSourceLengthFromXml();
+		dataSourceList.clear();
+		for (int i = 0; i < xmlLength; i++) {
+			dataSourceList.add(getDataSourceFromXml(i));
+		}
+	}
+	
+	/**
+	 * @return The XML out of the SharedPreferences or the Resources
+	 */
+	private String getXml() {
+		String defaultXml = inputStreamToString(ctx.getResources()
+				.openRawResource(R.raw.defaultdatasources));
+
+		return settings.getString(xmlPreferencesKey, defaultXml);
+	}
+	
+	/**
+	 * Calculates the length of available DataSources in the XML
+	 * @return How many DataSources exist
+	 */
+	private int getDataSourceLengthFromXml(){
+		try {
+			String xml = getXml();
+			Document doc = convertToXmlDocument(xml);
+			return doc.getElementsByTagName("datasource").getLength();
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+	
+	/**
+	 * Create's a DataSource out of the XML
+	 * @param id The id of the DataSource to recreate
+	 * @return The recreated DataSource
+	 */
+	private DataSource getDataSourceFromXml(int id) {
+		try {
+			Log.d("DataSourceStorage", "getDataSource: " + id + ", getSize(): "
+					+ getSize());
+
+			String xml = getXml();
+
+			Document doc = convertToXmlDocument(xml);
+
+			Log.d("DataSourceStorage", "xml: " + xml);
+			NodeList nList = doc.getElementsByTagName("datasource");
+
+			// Loop over all datasource elements
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					if (Integer.valueOf(eElement.getAttribute("id")) == id) {
+						DataSource ds = new DataSource(
+								Integer.valueOf(eElement.getAttribute("id")),
+								getTagValue("name",eElement), 
+								getTagValue("url", eElement),
+								getTagValue("type", eElement), 
+								getTagValue("display", eElement), 
+								getTagValue("visible", eElement),
+								Boolean.parseBoolean(
+										getTagValue("editable",eElement)));
+						ds.setBlur(DataSource.BLUR.values()[Integer
+								.parseInt(getTagValue("blur", eElement))]);
+						return ds;
+					}
+				}
+			}
+		} catch (Exception e) {
+			Log.d("DataSourceStorage", "getDataSource: " + id + " for Failed");
+		}
+		return null;
+	}
+	
 	/**
 	 * Converts a InputStream to a String
 	 * 
@@ -309,63 +345,11 @@ public class DataSourceStorage {
 	 * @return The DataSource at the specified index
 	 */
 	public DataSource getDataSource(int id) {
-		try {
-			Log.d("DataSourceStorage", "getDataSource: " + id + ", getSize(): "
-					+ getSize());
-
-			String defaultXml = null;
-			try {
-				defaultXml = inputStreamToString(ctx.getResources()
-						.openRawResource(R.raw.defaultdatasources));
-			} catch (NotFoundException nfe) {
-				Log.d("DataSourceStorage", "getDataSource: " + id
-						+ " openRawResource Failed");
-			}
-
-			String xml = null;
-			try {
-				xml = settings.getString(xmlPreferencesKey, defaultXml);
-			} catch (ClassCastException e) {
-				Log.d("DataSourceStorage", "getDataSource: " + id
-						+ " getString Failed");
-			}
-
-			Document doc = convertToXmlDocument(xml);
-
-			Log.d("DataSourceStorage", "xml: " + xml);
-			NodeList nList = null;
-			try {
-				nList = doc.getElementsByTagName("datasource");
-			} catch (Exception e) {
-				Log.d("DataSourceStorage", "getDataSource: " + id
-						+ " getString Failed");
-			}
-
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					if (Integer.valueOf(eElement.getAttribute("id")) == id) {
-						return new DataSource(Integer.valueOf(eElement
-								.getAttribute("id")), getTagValue("name",
-								eElement), getTagValue("url", eElement),
-								getTagValue("type", eElement), getTagValue(
-										"display", eElement), getTagValue(
-										"visible", eElement),
-								Boolean.parseBoolean(getTagValue("editable",
-										eElement)));
-					}
-				}
-			}
-		} catch (Exception e) {
-			Log.d("DataSourceStorage", "getDataSource: " + id + " for Failed");
-		}
-		return null;
+		return dataSourceList.get(id);
 	}
 
 	/**
-	 * Retrievs a Value of a Tag out of an Xml Element
+	 * Retrieves a Value of a Tag out of an Xml Element
 	 * 
 	 * @param sTag
 	 *            The Tag to look for
@@ -404,16 +388,58 @@ public class DataSourceStorage {
 	 * @return How many DataSources are added
 	 */
 	public int getSize() {
-		try {
-			String xml = settings.getString(
-					xmlPreferencesKey,
-					inputStreamToString(ctx.getResources().openRawResource(
-							R.raw.defaultdatasources)));
+		return dataSourceList.size();
+	}
 
-			Document doc = convertToXmlDocument(xml);
-			return doc.getElementsByTagName("datasource").getLength();
+	/**
+	 * Create's a XML String and saves it to the SharedPreferences
+	 */
+	public void save() {
+		int length = dataSourceList.size();
+		try {
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder documentBuilder = documentBuilderFactory
+					.newDocumentBuilder();
+			Document doc = documentBuilder.newDocument();
+			documentBuilderFactory = null;
+			documentBuilder = null;
+			doc.appendChild(doc.createElement("datasources"));
+			Element documentRoot = doc.getDocumentElement();
+			
+			for (int i = 0; i < length; i++) {
+				// Create the XML Element for the new DataSource
+				Element dataSourceElement = createDataSourceElement(doc,
+						String.valueOf(dataSourceList.get(i).getDataSourceId()),
+						dataSourceList.get(i).getName(), 
+						dataSourceList.get(i).getUrl(),
+						String.valueOf(dataSourceList.get(i).getTypeId()),
+						String.valueOf(dataSourceList.get(i).getDisplayId()),
+						dataSourceList.get(i).getEnabled(), 
+						dataSourceList.get(i).isEditable(),
+						String.valueOf(dataSourceList.get(i).getBlurId()));
+				
+				documentRoot.appendChild(dataSourceElement);
+			}
+			
+			// Convert Document to String
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+					"yes");
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			String xml = writer.getBuffer().toString().replaceAll("\n|\r", "");
+
+			tf = null;
+			transformer = null;
+			
+			// Save it to the SharedPreferences
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(xmlPreferencesKey, xml);
+			editor.commit();
 		} catch (Exception e) {
-			return 0;
+			// TODO: handle exception
 		}
 	}
 }

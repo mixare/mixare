@@ -39,8 +39,10 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +58,9 @@ public class AddDataSource extends SherlockActivity {
 	EditText urlField;
 	Spinner typeSpinner;
 	Spinner displaySpinner;
+	Spinner blurSpinner;
+	
+	Bundle extras;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,9 +71,11 @@ public class AddDataSource extends SherlockActivity {
 		urlField = (EditText) findViewById(R.id.url);
 		typeSpinner = (Spinner) findViewById(R.id.type);
 		displaySpinner = (Spinner) findViewById(R.id.displaytype);
+		blurSpinner = (Spinner) findViewById(R.id.blurtype);
 		
-		Bundle extras = getIntent().getExtras();
+		extras = getIntent().getExtras();
 		if (extras != null) {
+			// Get DataSource
 			if (extras.containsKey("DataSourceId")) {
 				DataSource ds = DataSourceStorage.getInstance().getDataSource(
 						extras.getInt("DataSourceId"));
@@ -76,6 +83,20 @@ public class AddDataSource extends SherlockActivity {
 				urlField.setText(ds.getUrl(), TextView.BufferType.EDITABLE);
 				typeSpinner.setSelection(ds.getTypeId());
 				displaySpinner.setSelection(ds.getDisplayId());
+				blurSpinner.setSelection(ds.getBlurId());
+			}
+			
+			// Check whether DataSource can be edited or not
+			if (extras.containsKey("isEditable")) {
+				boolean activated = extras.getBoolean("isEditable");
+				nameField.setActivated(activated);
+				nameField.setFocusable(activated);
+				urlField.setActivated(activated);
+				urlField.setFocusable(activated);
+				typeSpinner.setActivated(activated);
+				typeSpinner.setClickable(activated);
+				displaySpinner.setActivated(activated);
+				displaySpinner.setClickable(activated);
 			}
 		}
 		
@@ -92,9 +113,30 @@ public class AddDataSource extends SherlockActivity {
 				.getSelectedItemPosition());
 		int displayId = (int) displaySpinner.getItemIdAtPosition(displaySpinner
 				.getSelectedItemPosition());
+		int blurId = (int) blurSpinner.getItemIdAtPosition(blurSpinner
+				.getSelectedItemPosition());
 		
 		if (!name.isEmpty() && !url.isEmpty()) {
-			DataSource ds = new DataSource(name, url, typeId, displayId, true);
+			if (extras != null) {
+				if (extras.containsKey("DataSourceId")) {
+					// DataSource allready exists
+					DataSource ds = DataSourceStorage.getInstance().getDataSource(
+							extras.getInt("DataSourceId"));
+					ds.setName(name);
+					ds.setUrl(url);
+					ds.setType(typeId);
+					ds.setDisplay(displayId);
+					ds.setBlur(blurId);
+					
+					DataSourceStorage.getInstance(getApplicationContext()).save();
+					return true;
+				}
+			}
+			// New DataSource
+			DataSource ds = new DataSource(name, url,
+					DataSource.TYPE.values()[typeId],
+					DataSource.DISPLAY.values()[displayId], true);
+			ds.setBlur(DataSource.BLUR.values()[blurId]);
 			DataSourceStorage.getInstance().add(ds);
 			return true;
 		} else {
