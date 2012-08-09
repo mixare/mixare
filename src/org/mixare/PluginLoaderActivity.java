@@ -34,7 +34,7 @@ public class PluginLoaderActivity extends Activity {
 	private static final String CLOSE_ACTIVITY_CALL = "closed";
 	protected Handler exitHandler = null;
 	protected Runnable exitRunnable = null;
-
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -103,6 +103,7 @@ public class PluginLoaderActivity extends Activity {
 		
 		if (requestCode == 0) {
 			finish();
+			return;
 		}
 
 		processDataSourceFromPlugin(data);
@@ -118,7 +119,7 @@ public class PluginLoaderActivity extends Activity {
 		}
 		if (arePendingActivitiesFinished()) {
 			startActivityForResult(new Intent(this, MixView.class),0);
-//			finish();
+			finish();
 		}
 	}
 

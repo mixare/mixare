@@ -38,6 +38,7 @@ import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.ScreenLine;
 import org.mixare.lib.marker.Marker;
+import org.mixare.lib.marker.draw.PrimitiveProperty.primitive;
 import org.mixare.lib.render.Camera;
 import org.mixare.mgr.downloader.DownloadManager;
 import org.mixare.mgr.downloader.DownloadRequest;
@@ -82,7 +83,8 @@ public class DataView {
 	private float radius = 20;
 
 	/** timer to refresh the browser */
-	private Timer refreshTimer = null; //there is method called refresh, this is different
+	private Timer refreshTimer = null; // there is method called refresh, this
+										// is different
 	private final long refreshDelay = 45 * 1000; // refresh every 45 seconds
 
 	private boolean isLauncherStarted;
@@ -94,14 +96,25 @@ public class DataView {
 	private ScreenLine rrl = new ScreenLine();
 	private float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
-	
+
 	private List<Marker> markers;
+	private String[] directions;
 
 	/**
 	 * Constructor
 	 */
 	public DataView(MixContext ctx) {
 		this.mixContext = ctx;
+		
+		directions = new String[8];
+		directions[0] = getContext().getString(R.string.N);
+		directions[1] = getContext().getString(R.string.NE);
+		directions[2] = getContext().getString(R.string.E);
+		directions[3] = getContext().getString(R.string.SE);
+		directions[4] = getContext().getString(R.string.S);
+		directions[5] = getContext().getString(R.string.SW);
+		directions[6] = getContext().getString(R.string.W);
+		directions[7] = getContext().getString(R.string.NW);
 	}
 
 	public MixContext getContext() {
@@ -164,7 +177,7 @@ public class DataView {
 			rrl.rotate(-Camera.DEFAULT_VIEW_ANGLE / 2);
 			rrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
 		} catch (Exception ex) {
-			//ex.printStackTrace();
+			// ex.printStackTrace();
 			Log.e("Mixare", ex.getMessage());
 		}
 		frozen = false;
@@ -179,17 +192,18 @@ public class DataView {
 				request.getSource());
 		mixContext.getDownloadManager().submitJob(request);
 		state.nextLStatus = MixState.PROCESSING;
-		}
+	}
 
-
-//	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
-//		DownloadRequest request = new DownloadRequest();
-//		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
-//		request.source = datasource;
-//		
-//		mixContext.getDownloadManager().submitJob(request);
-//		state.nextLStatus = MixState.PROCESSING;
-//	}
+	// public void requestData(DataSource datasource, double lat, double lon,
+	// double alt, float radius, String locale) {
+	// DownloadRequest request = new DownloadRequest();
+	// request.params = datasource.createRequestParams(lat, lon, alt, radius,
+	// locale);
+	// request.source = datasource;
+	//
+	// mixContext.getDownloadManager().submitJob(request);
+	// state.nextLStatus = MixState.PROCESSING;
+	// }
 
 	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
@@ -201,8 +215,7 @@ public class DataView {
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
 			loadDrawLayer();
 			markers = new ArrayList<Marker>();
-		}
-		else if (state.nextLStatus == MixState.PROCESSING) {
+		} else if (state.nextLStatus == MixState.PROCESSING) {
 			DownloadManager dm = mixContext.getDownloadManager();
 			DownloadResult dRes = null;
 
@@ -211,12 +224,13 @@ public class DataView {
 			if (dm.isDone()) {
 				retry = 0;
 				state.nextLStatus = MixState.DONE;
-				
+
 				dataHandler = new DataHandler();
 				dataHandler.addMarkers(markers);
 				dataHandler.onLocationChanged(curFix);
-								
-				if (refreshTimer == null) { // start the refresh timer if it is null
+
+				if (refreshTimer == null) { // start the refresh timer if it is
+											// null
 					refreshTimer = new Timer(false);
 					Date date = new Date(System.currentTimeMillis()
 							+ refreshDelay);
@@ -228,7 +242,7 @@ public class DataView {
 						}
 					}, date, refreshDelay);
 				}
-			}else{
+			} else {
 				dataHandler.addMarkers(markers);
 				dataHandler.onLocationChanged(curFix);
 			}
@@ -280,7 +294,7 @@ public class DataView {
 	/**
 	 * Part of draw function, loads the layer.
 	 */
-	private void loadDrawLayer(){
+	private void loadDrawLayer() {
 		if (mixContext.getStartUrl().length() > 0) {
 			requestData(mixContext.getStartUrl());
 			isLauncherStarted = true;
@@ -290,15 +304,17 @@ public class DataView {
 			double lat = curFix.getLatitude(), lon = curFix.getLongitude(), alt = curFix
 					.getAltitude();
 			state.nextLStatus = MixState.PROCESSING;
-			mixContext.getDataSourceManager().requestDataFromAllActiveDataSource(lat, lon, alt,	radius);
+			mixContext.getDataSourceManager()
+					.requestDataFromAllActiveDataSource(lat, lon, alt, radius);
 		}
 
 		// if no datasources are activated
 		if (state.nextLStatus == MixState.NOT_STARTED)
 			state.nextLStatus = MixState.DONE;
 	}
-	
-	private List<Marker> downloadDrawResults(DownloadManager dm, DownloadResult dRes){
+
+	private List<Marker> downloadDrawResults(DownloadManager dm,
+			DownloadResult dRes) {
 		List<Marker> markers = new ArrayList<Marker>();
 		while ((dRes = dm.getNextResult()) != null) {
 			if (dRes.isError() && retry < 3) {
@@ -309,48 +325,50 @@ public class DataView {
 				// Toast.makeText(mixContext, dRes.errorMsg,
 				// Toast.LENGTH_SHORT).show();
 			}
-			
-			if(!dRes.isError()) {
-				if(dRes.getMarkers() != null){
-					//jLayer = (DataHandler) dRes.obj;
-					Log.i(MixView.TAG,"Adding Markers");
+
+			if (!dRes.isError()) {
+				if (dRes.getMarkers() != null) {
+					// jLayer = (DataHandler) dRes.obj;
+					Log.i(MixView.TAG, "Adding Markers");
 					markers.addAll(dRes.getMarkers());
-					
-					//Notification
-					mixContext.getNotificationManager().addNotification(mixContext.getResources().getString(
-							R.string.download_received)
-							+ " " + dRes.getDataSource().getName());
+
+					// Notification
+					mixContext.getNotificationManager().addNotification(
+							mixContext.getResources().getString(
+									R.string.download_received)
+									+ " " + dRes.getDataSource().getName());
 				}
 			}
 		}
 		return markers;
 	}
-	
 
 	/**
 	 * Handles drawing radar and direction.
-	 * @param PaintScreen screen that radar will be drawn to
+	 * 
+	 * @param PaintScreen
+	 *            screen that radar will be drawn to
 	 */
 	private void drawRadar(PaintScreen dw) {
 		String dirTxt = "";
 		int bearing = (int) state.getCurBearing();
 		int range = (int) (state.getCurBearing() / (360f / 16f));
 		if (range == 15 || range == 0)
-			dirTxt = getContext().getString(R.string.N);
+			dirTxt = directions[0];
 		else if (range == 1 || range == 2)
-			dirTxt = getContext().getString(R.string.NE);
+			dirTxt = directions[1];
 		else if (range == 3 || range == 4)
-			dirTxt = getContext().getString(R.string.E);
+			dirTxt = directions[2];
 		else if (range == 5 || range == 6)
-			dirTxt = getContext().getString(R.string.SE);
+			dirTxt = directions[3];
 		else if (range == 7 || range == 8)
-			dirTxt = getContext().getString(R.string.S);
+			dirTxt = directions[4];
 		else if (range == 9 || range == 10)
-			dirTxt = getContext().getString(R.string.SW);
+			dirTxt = directions[5];
 		else if (range == 11 || range == 12)
-			dirTxt = getContext().getString(R.string.W);
+			dirTxt = directions[6];
 		else if (range == 13 || range == 14)
-			dirTxt = getContext().getString(R.string.NW);
+			dirTxt = directions[7];
 
 		radarPoints.view = this;
 		dw.paintObj(radarPoints, rx, ry, -state.getCurBearing(), 1);
@@ -391,8 +409,8 @@ public class DataView {
 		case KEYCODE_CAMERA:
 			frozen = !frozen;
 			break; // freeze the overlay with the camera button
-		default: //if key is set, then ignore event
-				break;
+		default: // if key is set, then ignore event
+			break;
 		}
 	}
 
@@ -404,7 +422,8 @@ public class DataView {
 			// the following will traverse the markers in ascending order (by
 			// distance) the first marker that
 			// matches triggers the event.
-			//TODO handle collection of markers. (what if user wants the one at the back)
+			// TODO handle collection of markers. (what if user wants the one at
+			// the back)
 			for (int i = 0; i < dataHandler.getMarkerCount() && !evtHandled; i++) {
 				Marker pm = dataHandler.getMarker(i);
 
@@ -414,7 +433,8 @@ public class DataView {
 		return evtHandled;
 	}
 
-	private void radarText(PaintScreen dw, String txt, float x, float y, boolean bg) {
+	private void radarText(PaintScreen dw, String txt, float x, float y,
+			boolean bg) {
 		float padw = 4, padh = 2;
 		float w = dw.getTextWidth(txt) + padw * 2;
 		float h = dw.getTextAsc() + dw.getTextDesc() + padh * 2;
@@ -453,22 +473,22 @@ public class DataView {
 			refreshTimer.cancel();
 		}
 	}
-	
+
 	/**
 	 * Re-downloads the markers, and draw them on the map.
 	 */
-	public void refresh(){
+	public void refresh() {
 		callRefreshToast();
 		state.nextLStatus = MixState.NOT_STARTED;
 	}
-	
-	private void callRefreshToast(){
+
+	private void callRefreshToast() {
 		mixContext.getActualMixView().runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				mixContext.getNotificationManager().
-				addNotification(mixContext.getString(R.string.refreshing));
+				mixContext.getNotificationManager().addNotification(
+						mixContext.getString(R.string.refreshing));
 			}
 		});
 	}

@@ -89,13 +89,13 @@ public class AddDataSource extends SherlockActivity {
 			// Check whether DataSource can be edited or not
 			if (extras.containsKey("isEditable")) {
 				boolean activated = extras.getBoolean("isEditable");
-				nameField.setActivated(activated);
+//				nameField.setActivated(activated);
 				nameField.setFocusable(activated);
-				urlField.setActivated(activated);
+//				urlField.setActivated(activated);
 				urlField.setFocusable(activated);
-				typeSpinner.setActivated(activated);
+//				typeSpinner.setActivated(activated);
 				typeSpinner.setClickable(activated);
-				displaySpinner.setActivated(activated);
+//				displaySpinner.setActivated(activated);
 				displaySpinner.setClickable(activated);
 			}
 		}

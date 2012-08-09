@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 
+import org.mixare.MixView;
 import org.mixare.data.convert.Elevation;
 import org.mixare.data.convert.OsmDataProcessor;
 import org.mixare.lib.MixContextInterface;
@@ -142,22 +143,22 @@ public abstract class LocalMarker implements Marker {
 
 	public void update(Location curGPSFix) {
 		// Checks if programm should get Altitude from http://api.geonames.org/astergdem
-//		String type = this.getClass().getName();
-//		if (POIMarker.class.getName() == type) {
-//			// Set direction Marker to user height
-//			if (((POIMarker) this).isDirectionMarker()) {
-//				getmGeoLoc().setAltitude(curGPSFix.getAltitude());
-//			}
-//		} else if (type == NavigationMarker.class.getName()) {
-//			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
-//		} else if (type != NavigationMarker.class.getName()) {
-//			if (this.getURL() != null && this.getmGeoLoc().getAltitude() == 0.0) {
-//				this.getmGeoLoc().setAltitude(
-//						Double.valueOf(Elevation.getElevation().calcElevation(
-//								curGPSFix.getLatitude(),
-//								curGPSFix.getLongitude())));
-//			}
-//		}
+		String type = this.getClass().getName();
+		if (POIMarker.class.getName() == type) {
+			// Set direction Marker to user height
+			if (((POIMarker) this).isDirectionMarker()) {
+				getmGeoLoc().setAltitude(curGPSFix.getAltitude());
+			}
+		} else if (type == NavigationMarker.class.getName()) {
+			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
+		} else if (type != NavigationMarker.class.getName()) {
+			if (this.getURL() != null && this.getmGeoLoc().getAltitude() == 0.0) {
+				this.getmGeoLoc().setAltitude(
+						Double.valueOf(Elevation.getElevation().calcElevation(
+								curGPSFix.getLatitude(),
+								curGPSFix.getLongitude())));
+			}
+		}
 		
 		// compute the relative position vector from user position to POI location
 		PhysicalPlace.convLocToVec(curGPSFix, getmGeoLoc(), locationVector);
@@ -202,7 +203,9 @@ public abstract class LocalMarker implements Marker {
 
 	public void draw(PaintScreen dw) {
 		drawCircle(dw);
-		drawTextBlock(dw);
+		if (MixView.drawTextBlock) {
+			drawTextBlock(dw);
+		}
 	}
 
 	public void drawCircle(PaintScreen dw) {

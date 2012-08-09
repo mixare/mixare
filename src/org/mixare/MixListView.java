@@ -58,19 +58,17 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class MixListView extends SherlockActivity {
-
-	private Context ctx;
-	private DataView dataView;
-	private SectionAdapter sectionAdapter;
-	private ListView listView;
 	private static final int MENU_MAPVIEW_ID = 0;
 	private static final int MENU_SEARCH_ID = 1;
+	private Context ctx;
+	private SectionAdapter sectionAdapter;
+	private ListView listView;
+	private DataView dataView;
 	private EditText editText;
 	private MenuItem search;
-
 	/* The sections for the list in meter */
-	private int[] sections = { 250, 500, 1000, 1500, 3500, 5000, 10000, 20000,
-			50000 };
+	private static final int[] sections = { 250, 500, 1000, 1500, 3500, 5000,
+			10000, 20000, 50000 };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +81,12 @@ public class MixListView extends SherlockActivity {
 
 		List<Item> list;
 		if (Intent.ACTION_SEARCH.equals(this.getIntent().getAction())) {
+			// Get search query from IntentExtras
 			String query = this.getIntent().getStringExtra(SearchManager.QUERY);
 			list = createList(query);
 			editText.setText(query);
 		} else {
+			// MixListView is started directly
 			list = createList();
 		}
 
@@ -100,15 +100,18 @@ public class MixListView extends SherlockActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		// Open mapView
 		menu.add(MENU_MAPVIEW_ID, MENU_MAPVIEW_ID, MENU_MAPVIEW_ID, "MapView")
 				.setIcon(android.R.drawable.ic_menu_mapmode)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
+		// The editText to use for search
 		editText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
 				LayoutParams.WRAP_CONTENT));
 		editText.setHint(getString(R.string.list_view_search_hint));
+		// Show the keyboard
 		editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -121,6 +124,7 @@ public class MixListView extends SherlockActivity {
 				}
 			}
 		});
+		// Search at typing
 		editText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
@@ -134,11 +138,13 @@ public class MixListView extends SherlockActivity {
 
 			@Override
 			public void afterTextChanged(Editable edit) {
-				String query = edit.toString();
-				sectionAdapter.changeList(createList(query));
+				// Recreate the list
+				sectionAdapter.changeList(createList(edit.toString()));
 			}
 		});
 
+		// Create a ActionBarItem which adds a editText to the ActionBar used
+		// for search
 		search = menu.add(MENU_SEARCH_ID, MENU_SEARCH_ID, MENU_SEARCH_ID,
 				getString(R.string.list_view_search_hint));
 		search.setIcon(android.R.drawable.ic_menu_search);
@@ -153,13 +159,16 @@ public class MixListView extends SherlockActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
+			// ActionBarIcon pressed
 			finish();
 			break;
 		case MENU_MAPVIEW_ID:
+			// Start MixMap to choose which Map to start
 			Intent map = new Intent(MixListView.this, MixMap.class);
 			startActivity(map);
 			break;
 		case MENU_SEARCH_ID:
+			// give focus to searchTextBox to open Keyboard
 			editText.requestFocus();
 		}
 		return true;
@@ -167,6 +176,7 @@ public class MixListView extends SherlockActivity {
 
 	@Override
 	public boolean onSearchRequested() {
+		// Open searchBox and request focus to open Keyboard
 		search.expandActionView();
 		editText.requestFocus();
 		return false;
@@ -238,15 +248,18 @@ public class MixListView extends SherlockActivity {
 		if (lastSectionId != -1) {
 			((SectionItem) list.get(lastSectionId)).setMarkerCount(markerCount);
 		}
-		
+
 		if (list.size() == 0) {
-			SectionItem noResultFound = new SectionItem(getString(R.string.list_view_search_no_result));
+			SectionItem noResultFound = new SectionItem(
+					getString(R.string.list_view_search_no_result));
 			list.add(noResultFound);
 			sectionCount++;
 		}
 
-		getSupportActionBar().setSubtitle(getString(R.string.list_view_total_markers) + (list.size() - sectionCount));
-		
+		getSupportActionBar().setSubtitle(
+				getString(R.string.list_view_total_markers)
+						+ (list.size() - sectionCount));
+
 		return list;
 	}
 
@@ -402,8 +415,8 @@ public class MixListView extends SherlockActivity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-
 			Item i = getItem(position);
+			Log.d("test", "getView: " + position);
 			if (i != null) {
 				if (i.isSection()) {
 					SectionViewHolder sectionViewHolder;
@@ -413,6 +426,7 @@ public class MixListView extends SherlockActivity {
 					} catch (Exception e) {
 					}
 
+//					Log.d("test", "getView: " + position + " tag: " + tag + " section");
 					if (tag == null) {
 						convertView = getLayoutInflater().inflate(
 								R.layout.list_item_section, null);
@@ -444,7 +458,7 @@ public class MixListView extends SherlockActivity {
 						tag = convertView.getTag(R.string.list_view_entry);
 					} catch (Exception e) {
 					}
-
+//					Log.d("test", "getView: " + position + " tag: " + tag + " entry");
 					if (tag == null) {
 						convertView = getLayoutInflater().inflate(
 								R.layout.marker_list, null);
@@ -474,9 +488,7 @@ public class MixListView extends SherlockActivity {
 					if (markerInfo.getUrl() != null) {
 						spannableString.setSpan(new UnderlineSpan(), 0,
 								spannableString.length(), 0);
-						convertView.setTag(R.string.list_view_webview_id,
-								position);
-						convertView.setOnClickListener(onClickListenerWebView);
+						convertView.setOnClickListener(new OnClickListenerWebView(position));
 					} else {
 						convertView.setOnClickListener(null);
 					}
@@ -492,7 +504,19 @@ public class MixListView extends SherlockActivity {
 
 			return convertView;
 		}
-
+		
+		private class SectionViewHolder {
+			TextView title;
+			TextView markerCount;
+		}
+		
+		private class ViewHolder {
+			View sideBar;
+			TextView title;
+			TextView desc;
+			ImageButton centerMap;
+		}
+		
 		public int getCount() {
 			return items.size();
 		};
@@ -518,11 +542,15 @@ public class MixListView extends SherlockActivity {
 		/**
 		 * Handles the click on the list row to open the WebView
 		 */
-		OnClickListener onClickListenerWebView = new OnClickListener() {
+		private class OnClickListenerWebView implements OnClickListener {
+			private int position;
+			public OnClickListenerWebView (int position) {
+				this.position = position;
+			}
+			
 			@Override
 			public void onClick(View v) {
-				int tag = (Integer) v.getTag(R.string.list_view_webview_id);
-				MarkerInfo markerInfo = ((EntryItem) getItem(tag))
+				MarkerInfo markerInfo = ((EntryItem) getItem(position))
 						.getMarkerInfo();
 
 				String selectedURL = markerInfo.getUrl();
@@ -539,17 +567,5 @@ public class MixListView extends SherlockActivity {
 				}
 			}
 		};
-
-		private class SectionViewHolder {
-			TextView title;
-			TextView markerCount;
-		}
-
-		private class ViewHolder {
-			View sideBar;
-			TextView title;
-			TextView desc;
-			ImageButton centerMap;
-		}
 	}
 }

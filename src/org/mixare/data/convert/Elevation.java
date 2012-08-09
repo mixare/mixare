@@ -24,6 +24,7 @@ import org.mixare.mgr.HttpTools;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.util.Log;
 
 public class Elevation {
@@ -32,6 +33,8 @@ public class Elevation {
 	String url = "http://api.geonames.org/";
 	String username = "mixare";
 
+	// TODO: better thread management
+	
 	/**
 	 * Allowing static access to the class
 	 * 
@@ -69,7 +72,11 @@ public class Elevation {
 		String requestUrl = url + "srtm3?lats=" + latString.toString()
 				+ "&lngs=" + lngString.toString() + "&username=" + username;
 //		Log.d("test", requestUrl);
-		
+		boolean closeLooper = false;
+		if (Looper.myLooper() == null) {
+			Looper.prepare();
+			closeLooper = true;
+		}
 		Downloader downloader = new Downloader();
 		String content = "";
 		try {
@@ -77,6 +84,9 @@ public class Elevation {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		if (closeLooper) {
+			Looper.myLooper().quit();
 		}
 		return content.split("\n");
 	}
@@ -93,6 +103,7 @@ public class Elevation {
 	public String calcElevation(double lat, double lng) {
 		String requestUrl = url + "astergdem?lat=" + lat + "&lng=" + lng
 				+ "&username=" + username;
+		Looper.prepare();
 		Downloader downloader = new Downloader();
 		String content = "";
 		try {
@@ -101,6 +112,7 @@ public class Elevation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Looper.myLooper().quit();
 		return content;
 	}
 

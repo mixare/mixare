@@ -58,6 +58,9 @@
 	<string name="data_source_delete_err">This data source cannot be deleted.</string>
 
 	<string name="connection_error_dialog">Sorry, a connection Error occured! \nPlease check if you are connected to the Internet.</string>
+	<string name="gps_error_dialog">GPS ERROR</string>
+	<string name="unsupportet_hardware_dialog">Mixare had a problem with finding the matching sensors. Make sure your phone has the needed sensors.</string>
+	<string name="general_error_dialog">Mixare had a problem. Please report this error.</string>
 	<string name="connection_error_dialog_button1">Retry</string>
 	<string name="connection_error_dialog_button2">Open Settings</string>
 	<string name="connection_error_dialog_button3">Close App</string>

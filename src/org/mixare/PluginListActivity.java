@@ -82,10 +82,12 @@ public class PluginListActivity extends SherlockActivity {
 		case MENU_SELECT_PLUGIN_ID:
 			DataView dataView = MixView.getDataView();
 
-			String url = "http://www.mixare.org/plugins/mixare-appview.php";
 			try {
-				dataView.getContext().getWebContentManager()
-						.loadWebPage(url, this);
+				dataView.getContext()
+						.getWebContentManager()
+						.loadWebPage(
+								"http://www.mixare.org/plugins/mixare-appview.php",
+								this);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -338,30 +340,23 @@ public class PluginListActivity extends SherlockActivity {
 
 		OnCheckedChangeListener checkedChangeListener = new OnCheckedChangeListener() {
 			/**
-			 * Activates Plugins with same Label
+			 * Activates Plugins
 			 */
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				int position = (Integer) buttonView.getTag();
-				String lable = ((EntryItem) items.get(position)).getPlugin()
-						.getLable();
-
-				for (Item item : items) {
-					if (!item.isSection()) {
-						Plugin plugin = ((EntryItem) item).getPlugin();
-						if (plugin.getLable().equals(lable)) {
-							if (isChecked) {
-								plugin.setPluginStatus(PluginStatus.Activated);
-							} else {
-								plugin.setPluginStatus(PluginStatus.Deactivated);
-							}
-						}
-						((EntryItem) item).setPlugin(plugin);
+				Item item = items.get(position);
+				if (!item.isSection()) {
+					Plugin plugin = ((EntryItem) item).getPlugin();
+					if (isChecked) {
+						plugin.setPluginStatus(PluginStatus.Activated);
+					} else {
+						plugin.setPluginStatus(PluginStatus.Deactivated);
 					}
+					((EntryItem) item).setPlugin(plugin);
 				}
-
-				notifyDataSetChanged();
+				items.set(position, item);
 			}
 		};
 

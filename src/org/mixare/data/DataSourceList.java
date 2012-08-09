@@ -56,7 +56,6 @@ public class DataSourceList extends SherlockListActivity {
 	private static final int MENU_CREATE_ID = Menu.FIRST;
 	private static final int MENU_EDIT_ID = Menu.FIRST + 1;
 	private static final int MENU_DELETE_ID = Menu.FIRST + 2;
-	private static final int MENU_MORE_ID = Menu.FIRST + 3;
 	private static final int MENU_RESTORE_ID = Menu.FIRST + 4;
 
 	/** Called when the activity is first created. */
@@ -71,12 +70,17 @@ public class DataSourceList extends SherlockListActivity {
 	protected void onResume() {
 		super.onResume();
 
+		init();
+	}
+	
+	private void init() {
+
 		int size = DataSourceStorage.getInstance().getSize();
-		
 		// copy the value from shared preference to adapter
 		dataSourceAdapter = new DataSourceAdapter();
 		for (int i = 0; i < size; i++) {
-			dataSourceAdapter.addItem(DataSourceStorage.getInstance().getDataSource(i));
+			dataSourceAdapter.addItem(DataSourceStorage.getInstance()
+					.getDataSource(i));
 		}
 		setListAdapter(dataSourceAdapter);
 		ListView lv = getListView();
@@ -121,110 +125,9 @@ public class DataSourceList extends SherlockListActivity {
 
 		return ret;
 	}
+
+	/* Options Menu */
 	
-	private class DataSourceAdapter extends BaseAdapter implements
-			OnCheckedChangeListener {
-
-		private List<DataSource> mDataSource = new ArrayList<DataSource>();
-		private LayoutInflater mInflater;
-
-		public DataSourceAdapter() {
-			mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		}
-
-		public boolean getItemEnabled(int k) {
-			return mDataSource.get(k).getEnabled();
-		}
-
-		public String getItemName(int k) {
-			return mDataSource.get(k).getName();
-		}
-
-		public void addItem(final DataSource item) {
-			mDataSource.add(item);
-			notifyDataSetChanged();
-		}
-
-		public void deleteItem(final int id) {
-			if (mDataSource.get(id).getEnabled()) {
-				mDataSource.get(id).setEnabled(false);
-				notifyDataSetChanged();
-			}
-			mDataSource.remove(id);
-			notifyDataSetChanged();
-		}
-
-		@Override
-		public int getCount() {
-			return mDataSource.size();
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			ViewHolder holder = null;
-
-			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.datasourcelist, null);
-				holder = new ViewHolder();
-				holder.text = (TextView) convertView
-						.findViewById(R.id.list_text);
-				holder.description = (TextView) convertView
-						.findViewById(R.id.description_text);
-				holder.checkbox = (CheckBox) convertView
-						.findViewById(R.id.list_checkbox);
-				holder.checkbox.setTag(position);
-				holder.checkbox.setOnCheckedChangeListener(this);
-				holder.datasource_icon = (ImageView) convertView
-						.findViewById(R.id.datasource_icon);
-
-				convertView.setTag(holder);
-			} else {
-				holder = (ViewHolder) convertView.getTag();
-			}
-
-			DataSource ds = mDataSource.get(position);
-			if (ds != null) {
-				holder.text.setText(ds.getName());
-				holder.description.setText(ds.getUrl());
-
-				holder.datasource_icon.setImageResource(ds.getDataSourceIcon());
-				holder.checkbox.setChecked(ds.getEnabled());
-			} else {
-				Log.d("test", position + "");
-			}
-			return convertView;
-		}
-
-		@Override
-		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {
-			int position = (Integer) buttonView.getTag();
-			if (isChecked) {
-				buttonView.setChecked(true);
-			} else {
-				buttonView.setChecked(false);
-			}
-			mDataSource.get(position).setEnabled(isChecked);
-		}
-
-		private class ViewHolder {
-			TextView text;
-			TextView description;
-			CheckBox checkbox;
-			ImageView datasource_icon;
-		}
-
-		@Override
-		public Object getItem(int index) {
-			return mDataSource.get(index);
-		}
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		menu.add(MENU_CREATE_ID, MENU_CREATE_ID, Menu.NONE, "Add")
@@ -254,12 +157,15 @@ public class DataSourceList extends SherlockListActivity {
 			startActivityForResult(addSource, 545);
 			break;
 		case MENU_RESTORE_ID:
-			// TODO: Restore Default Sources
+			DataSourceStorage.getInstance(getApplicationContext()).fillDefaultDataSources();
+			init();
 			break;
 		}
 		return true;
 	}
 
+	/* Context Menu */
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -296,5 +202,104 @@ public class DataSourceList extends SherlockListActivity {
 			break;
 		}
 		return super.onContextItemSelected(item);
+	}
+
+	/* DataSourceAdapter */
+	
+	private class DataSourceAdapter extends BaseAdapter implements
+			OnCheckedChangeListener {
+
+		private List<DataSource> mDataSource = new ArrayList<DataSource>();
+
+		public boolean getItemEnabled(int k) {
+			return mDataSource.get(k).getEnabled();
+		}
+
+		public String getItemName(int k) {
+			return mDataSource.get(k).getName();
+		}
+
+		public void addItem(final DataSource item) {
+			mDataSource.add(item);
+			notifyDataSetChanged();
+		}
+
+		public void deleteItem(final int id) {
+			if (mDataSource.get(id).getEnabled()) {
+				mDataSource.get(id).setEnabled(false);
+				notifyDataSetChanged();
+			}
+			mDataSource.remove(id);
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public int getCount() {
+			return mDataSource.size();
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public Object getItem(int index) {
+			return mDataSource.get(index);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder = null;
+
+			if (convertView == null) {
+				LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = mInflater.inflate(R.layout.datasourcelist, null);
+				
+				holder = new ViewHolder();
+				holder.text = (TextView) convertView
+						.findViewById(R.id.list_text);
+				holder.description = (TextView) convertView
+						.findViewById(R.id.description_text);
+				holder.checkbox = (CheckBox) convertView
+						.findViewById(R.id.list_checkbox);
+				holder.checkbox.setTag(position);
+				holder.checkbox.setOnCheckedChangeListener(this);
+				holder.datasource_icon = (ImageView) convertView
+						.findViewById(R.id.datasource_icon);
+
+				convertView.setTag(holder);
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+
+			DataSource ds = mDataSource.get(position);
+			if (ds != null) {
+				holder.text.setText(ds.getName());
+				holder.description.setText(ds.getUrl());
+				holder.datasource_icon.setImageResource(ds.getDataSourceIcon());
+				holder.checkbox.setChecked(ds.getEnabled());
+			}
+			return convertView;
+		}
+
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			int position = (Integer) buttonView.getTag();
+			if (isChecked) {
+				buttonView.setChecked(true);
+			} else {
+				buttonView.setChecked(false);
+			}
+			mDataSource.get(position).setEnabled(isChecked);
+		}
+
+		private class ViewHolder {
+			TextView text;
+			TextView description;
+			CheckBox checkbox;
+			ImageView datasource_icon;
+		}
 	}
 }

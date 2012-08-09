@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.mixare.R.drawable;
 import org.mixare.data.DataSourceList;
@@ -42,6 +43,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +58,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -94,6 +98,15 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 	private static DataView dataView;
 	private boolean fError;
 
+	/* Different error messages */
+	protected static final int UNSUPPORTET_HARDWARE = 0;
+	protected static final int GPS_ERROR = 1;
+	protected static final int GENERAL_ERROR = 2;
+	protected static final int NO_NETWORK_ERROR = 4;
+	
+	// test
+	public static boolean drawTextBlock = true;
+	
 	//----------
     private MixViewDataHolder mixViewData  ;
 	
@@ -124,7 +137,7 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 		try {
 			isBackground = false;			
 			handleIntent(getIntent());
-
+			
 			final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			getMixViewData().setmWakeLock(
 					pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
@@ -135,7 +148,9 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 			
 			killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
-//            getSupportActionBar().hide();
+			if (getSupportActionBar() != null) {
+				getSupportActionBar().hide();
+			}
 
 			maintainCamera();
 			maintainAugmentR();
@@ -167,7 +182,7 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 			}
 
 		} catch (Exception ex) {
-			doError(ex);
+			doError(ex, GENERAL_ERROR);
 		}
 	}
 
@@ -192,7 +207,6 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 	 */
 	@Override
 	protected void onPause() {
-		// Log.d("test", "onPause");
 		super.onPause();
 		try {
 			this.getMixViewData().getmWakeLock().release();
@@ -228,7 +242,7 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 				finish();
 			}
 		} catch (Exception ex) {
-			doError(ex);
+			doError(ex, GENERAL_ERROR);
 		}
 	}
 
@@ -262,7 +276,7 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 				
 				dialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface d, int whichButton) {
-						startActivity(new Intent(getMixViewData().getMixContext().getBaseContext(),
+						startActivity(new Intent(getMixViewData().getMixContext().getApplicationContext(),
 								PluginLoaderActivity.class));
 						finish();
 					}
@@ -308,13 +322,10 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 	 */
 	@Override
 	protected void onResume() {
-//		Log.d("test", "onResume");
 		super.onResume();
 		isBackground = false;
 		try {
 			this.getMixViewData().getmWakeLock().acquire();
-			SurfaceView adf = new SurfaceView(getMixViewData().getMixContext());
-			camScreen.surfaceCreated(adf.getHolder());
 			killOnError();
 			getMixViewData().getMixContext().doResume(this);
 
@@ -409,13 +420,20 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 						(float) -FloatMath.sin(angleY), 0f,
 						(float) FloatMath.cos(angleY));
 			} catch (Exception ex) {
-				Log.d("mixare", "GPS Initialize Error", ex);
+				doError(ex, GPS_ERROR);
 			}
 
+			if (!isNetworkAvailable()) {
+				Log.d("test", "no network");
+				doError(null, NO_NETWORK_ERROR);
+			} else {
+				Log.d("test", "network");
+			}
+			
 			getMixViewData().getMixContext().getDownloadManager().switchOn();
 			getMixViewData().getMixContext().getLocationFinder().switchOn();
 		} catch (Exception ex) {
-			doError(ex);
+			doError(ex, GENERAL_ERROR);
 			try {
 				if (getMixViewData().getSensorMgr() != null) {
 					getMixViewData().getSensorMgr().unregisterListener(this,
@@ -479,7 +497,6 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 	 * {@inheritDoc}
 	 */
 	protected void onRestart() {
-//		Log.d("test", "onRestart");
 		super.onRestart();
 		maintainCamera();
 		maintainAugmentR();
@@ -493,7 +510,6 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 	 * and might not be called at all.
 	 */
 	protected void onDestroy(){
-//		Log.d("test", "onDestroy");
 		try{
 			
 			getMixViewData().getMixContext().getDownloadManager().shutDown();
@@ -501,6 +517,13 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 			isBackground = true; //used to enforce garbage MixViewDataHolder
 			getMixViewData().setSensorMgr(null);
 			mixViewData = null;
+			/*
+			 * Invoked when the garbage collector has detected that this
+			 * instance is no longer reachable. The default implementation does
+			 * nothing, but this method can be overridden to free resources.
+			 * 
+			 * Do we have to create our own finalize?
+			 */
 			finalize();
 		}catch(Exception e){
 			//do nothing we are shutting down
@@ -511,12 +534,6 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 		}finally{
 			super.onDestroy();
 		}
-	}
-
-	@Override
-	protected void onStart() {
-//		Log.d("test", "onStart");
-		super.onStart();
 	}
 	
 	/* ********* Operators ***********/ 
@@ -594,43 +611,72 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 		dataView.refresh();
 	}
 
-	public void setErrorDialog() {
+	public void setErrorDialog(int error) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.connection_error_dialog));
 		builder.setCancelable(false);
+		switch (error) {
+		case NO_NETWORK_ERROR:
+			builder.setMessage(getString(R.string.connection_error_dialog));
+			break;
+		case GPS_ERROR:
+			builder.setMessage(getString(R.string.gps_error_dialog));
+			break;
+		case GENERAL_ERROR:
+			builder.setMessage(getString(R.string.general_error_dialog));
+			break;
+		case UNSUPPORTET_HARDWARE:
+			builder.setMessage(getString(R.string.unsupportet_hardware_dialog));
+			break;
+		}
 
 		/*Retry*/
 		builder.setPositiveButton(R.string.connection_error_dialog_button1, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				fError=false;
-				//TODO improve
-				try {
-					maintainCamera();
-					maintainAugmentR();
-					maintainZoomBar();
-					repaint();
-					setZoomLevel();
-					refreshDownload();
-				}
-				catch(Exception ex){
-					//Don't call doError, it will be a recursive call.
-					//doError(ex);
-				}
+				// "restart" mixare
+				startActivity(new Intent(getMixViewData().getMixContext().getApplicationContext(),
+						PluginLoaderActivity.class));
+				finish();
 			}
 		});
-		/*Open settings*/
-		builder.setNeutralButton(R.string.connection_error_dialog_button2, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				Intent intent1 = new Intent(Settings.ACTION_WIRELESS_SETTINGS); 
-				startActivityForResult(intent1, 42);
-			}
-		});
+		if (error == GPS_ERROR) {
+			/* Open settings */
+			builder.setNeutralButton(R.string.connection_error_dialog_button2,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							try {
+								Intent intent1 = new Intent(
+										Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+								startActivityForResult(intent1, 42);
+							} catch (Exception e) {
+								Log.d(TAG, "No Location Settings");
+							}
+						}
+					});
+		} else if (error == NO_NETWORK_ERROR) {
+			builder.setNeutralButton(R.string.connection_error_dialog_button2,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							try {
+								Intent intent1 = new Intent(
+										Settings.ACTION_DATA_ROAMING_SETTINGS);
+								ComponentName cName = new ComponentName(
+										"com.android.phone",
+										"com.android.phone.Settings");
+								intent1.setComponent(cName);
+								startActivityForResult(intent1, 42);
+							} catch (Exception e) {
+								Log.d(TAG, "No Network Settings");
+							}
+						}
+					});
+		}
 		/*Close application*/
 		builder.setNegativeButton(R.string.connection_error_dialog_button3, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				System.exit(0); //wouldn't be better to use finish (to stop the app normally?)
+				finish();
 			}
 		});
+		
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
@@ -722,6 +768,17 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 		return frameLayout;
 	}
 
+	/**
+	 * Checks whether a network is available or not
+	 * @return True if connected, false if not
+	 */
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+	}
+	
 	/* ********* Operator - Menu ***** */
 
 	@Override
@@ -745,6 +802,8 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 		MenuItem item8 = menu.add(base, base + 7, base + 7,
 				getString(R.string.menu_item_8));
 
+		MenuItem item9 = menu.add(base, base + 8, base + 8, "drawText");
+		
 		/* assign icons to the menu items */
 		item1.setIcon(drawable.icon_datasource);
 		item2.setIcon(drawable.icon_datasource);
@@ -856,7 +915,8 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 			alert1.setTitle(getString(R.string.license_title));
 			alert1.show();
 			break;
-
+		case 9:
+			doError(null, new Random().nextInt(3));
 		}
 		return true;
 	}
@@ -902,8 +962,6 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
-
-//			Log.d("test", "onSensorChanged");
 			if (getMixViewData().getSensorGyro() != null) {
 				
 				if (evt.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
@@ -1082,14 +1140,14 @@ public class MixView extends SherlockActivity implements SensorEventListener, On
 
 	/* ************ Handlers ************ */
 
-	public void doError(Exception ex1) {
+	public void doError(Exception ex1, int error) {
 		if (!fError) {
 			fError = true;
 
-			setErrorDialog();
+			setErrorDialog(error);
 
-			ex1.printStackTrace();
 			try {
+				ex1.printStackTrace();
 			} catch (Exception ex2) {
 				ex2.printStackTrace();
 			}
@@ -1192,7 +1250,6 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 
 	CameraSurface(Context context) {
 		super(context);
-
 		try {
 			app = (MixView) context;
 
@@ -1344,13 +1401,13 @@ class AugmentedView extends View {
 
 	public AugmentedView(Context context) {
 		super(context);
-
+		
 		try {
 			app = (MixView) context;
 
 			app.killOnError();
 		} catch (Exception ex) {
-			app.doError(ex);
+			app.doError(ex, app.GENERAL_ERROR);
 		}
 	}
 
@@ -1407,7 +1464,7 @@ class AugmentedView extends View {
 
 			MixView.getDataView().draw(MixView.getdWindow());
 		} catch (Exception ex) {
-			app.doError(ex);
+			app.doError(ex, app.GENERAL_ERROR);
 		}
 	}
 }

@@ -250,13 +250,13 @@ public class DataSource {
 			ret = R.drawable.arena;
 			break;
 		case PANORAMIO:
-			ret = R.drawable.ic_launcher;
+//			ret = R.drawable.ic_launcher;
 			/*
-			 * commented out until possible license issues are resolved. Please
-			 * see https://github.com/DevBinnooh/mixare/commit/5183
-			 * ad260540fefdd7f8cf9fe52dfeb5f9f70289 for the discussion.
+			 * Logo from http://www.tilo-hensel.de/free-glossy-community-icons
+			 * Created by Tilo Hensel licensed under
+			 * http://creativecommons.org/licenses/by-nc-sa/3.0/
 			 */
-			// ret = R.drawable.icon_panoramio;
+			 ret = R.drawable.panoramio;
 			break;
 		default:
 			ret = R.drawable.ic_launcher;

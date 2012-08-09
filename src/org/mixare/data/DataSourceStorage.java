@@ -257,8 +257,7 @@ public class DataSourceStorage {
 	 */
 	private int getDataSourceLengthFromXml(){
 		try {
-			String xml = getXml();
-			Document doc = convertToXmlDocument(xml);
+			Document doc = convertToXmlDocument(getXml());
 			return doc.getElementsByTagName("datasource").getLength();
 		} catch (Exception e) {
 			return 0;
@@ -272,14 +271,7 @@ public class DataSourceStorage {
 	 */
 	private DataSource getDataSourceFromXml(int id) {
 		try {
-			Log.d("DataSourceStorage", "getDataSource: " + id + ", getSize(): "
-					+ getSize());
-
-			String xml = getXml();
-
-			Document doc = convertToXmlDocument(xml);
-
-			Log.d("DataSourceStorage", "xml: " + xml);
+			Document doc = convertToXmlDocument(getXml());
 			NodeList nList = doc.getElementsByTagName("datasource");
 
 			// Loop over all datasource elements
@@ -304,7 +296,7 @@ public class DataSourceStorage {
 				}
 			}
 		} catch (Exception e) {
-			Log.d("DataSourceStorage", "getDataSource: " + id + " for Failed");
+			Log.d("DataSourceStorage", "getDataSource: " + id + " Failed");
 		}
 		return null;
 	}
@@ -378,6 +370,7 @@ public class DataSourceStorage {
 					.newDocumentBuilder();
 			// Document doc = builder.parse(is);d
 			doc = builder.parse(new InputSource(new StringReader(rawData)));
+			builder = null;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
