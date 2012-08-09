@@ -73,7 +73,19 @@ class LocationMgrImpl implements LocationFinder {
 	 * )
 	 */
 	public void findLocation() {
-
+		try {
+			requestBestLocationUpdates();
+			//temporary set the current location, until a good provider is found
+			curLoc = lm.getLastKnownLocation(lm.getBestProvider(new Criteria(), true));
+			if (curLoc == null) {
+				setHardFix();
+			}
+		} catch (Exception ex2) {
+			setHardFix();
+		}
+	}
+	
+	private void setHardFix() {
 		// fallback for the case where GPS and network providers are disabled
 		Location hardFix = new Location("reverseGeocoded");
 
@@ -81,17 +93,9 @@ class LocationMgrImpl implements LocationFinder {
 		hardFix.setLatitude(46.480302);
 		hardFix.setLongitude(11.296005);
 		hardFix.setAltitude(300);
-
-		try {
-			requestBestLocationUpdates();
-			//temporary set the current location, until a good provider is found
-			curLoc = lm.getLastKnownLocation(lm.getBestProvider(new Criteria(), true));
-		} catch (Exception ex2) {
-			// ex2.printStackTrace();
-			curLoc = hardFix;
-			mixContext.doPopUp(R.string.connection_GPS_dialog_text);
-
-		}
+		
+		curLoc = hardFix;
+		mixContext.doPopUp(R.string.connection_GPS_dialog_text);
 	}
 
 	private void requestBestLocationUpdates() {
@@ -136,9 +140,10 @@ class LocationMgrImpl implements LocationFinder {
 	 */
 	public Location getCurrentLocation() {
 		if (curLoc == null) {
-			mixContext.getNotificationManager().
-			addNotification(mixContext.getString(R.string.location_not_found));
-			throw new RuntimeException("No GPS Found");
+			findLocation();
+//			mixContext.getNotificationManager().
+//			addNotification(mixContext.getString(R.string.location_not_found));
+//			throw new RuntimeException("No GPS Found");
 		}
 		synchronized (curLoc) {
 			return curLoc;
@@ -225,7 +230,7 @@ class LocationMgrImpl implements LocationFinder {
 	public LocationFinderState getStatus() {
 		return state;
 	}
-
+	
 	private synchronized LocationObserver getObserver() {
 		return lob;
 	}

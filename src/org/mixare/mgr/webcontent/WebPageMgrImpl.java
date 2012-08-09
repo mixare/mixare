@@ -69,7 +69,11 @@ class WebPageMgrImpl implements WebContentManager {
 
 		webview.setWebViewClient(new WebViewClient() {
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
+				if (!processUrl(url, mixContext.getActualMixView())) { // if the url could not be processed by
+					 // another intent
+					d.show();
+					view.loadUrl(url);
+				}
 				return true;
 			}
 
