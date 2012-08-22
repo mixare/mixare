@@ -5,10 +5,10 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <org.mixare.sectionedlist.SectionListView
+    <ListView
         android:id="@+id/section_list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
-    </org.mixare.sectionedlist.SectionListView>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </FrameLayout>

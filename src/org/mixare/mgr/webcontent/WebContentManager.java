@@ -27,7 +27,7 @@ public interface WebContentManager {
 
 	/**
 	 * Shows a webpage with the given url if a markerobject is selected
-	 * (markerlistview, mixoverlay).
+	 * (mixlistview, mixoverlay).
 	 */
 	void loadWebPage(String url, Context context) throws Exception;
 

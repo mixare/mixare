@@ -106,7 +106,7 @@ public class RemoteMarker implements Marker{
 	}
 
 	@Override
-	public int getColour() {
+	public int getColor() {
 		try {
 			return iMarkerService.getColour(markerName);
 		} catch (RemoteException e) {

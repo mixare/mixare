@@ -17,12 +17,15 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package org.mixare;
+package org.mixare.map;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mixare.data.DataSourceList;
+import org.mixare.DataView;
+import org.mixare.MixListView;
+import org.mixare.MixView;
+import org.mixare.R;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.marker.Marker;
 
@@ -39,17 +42,19 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
@@ -59,7 +64,8 @@ import com.google.android.maps.Projection;
  * This class creates the map view and its overlay. It also adds an overlay with
  * the markers to the map.
  */
-public class GoogleMap extends MapActivity implements OnTouchListener {
+public class GoogleMap extends SherlockGoogleMapActivity implements
+		OnTouchListener, ActionBar.OnNavigationListener {
 
 	private static List<Overlay> mapOverlays;
 	private Drawable drawable;
@@ -81,9 +87,27 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 	// the search keyword
 	protected String searchKeyword = "";
 
+	// Array which holds the available maps
+	private String[] maps;
+
+	/* Menu ID's */
+	// Center my Position
+	private static final int MENU_CENTER_POSITION_ID = Menu.FIRST;
+	// Whether to display Satellite or Map
+	private static final int MENU_CHANGE_MODE_ID = Menu.FIRST + 1;
+	// Go to MixListView
+	private static final int MENU_LIST_VIEW = Menu.FIRST + 2;
+	// Go to AugmentedView
+	private static final int MENU_CAMERA_VIEW = Menu.FIRST + 3;
+	// Toggle show Path
+	private static final int MENU_SHOW_PATH = Menu.FIRST + 4;
+
+	/**
+	 * Needs to be overridden because it's abstract
+	 */
 	@Override
 	protected boolean isRouteDisplayed() {
-		return false; // ? Do we need this?
+		return false;
 	}
 
 	/**
@@ -94,9 +118,6 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		dataView = MixView.getDataView();
-		// setMixContext(dataView.getContext());//Dead cycle hear (MixContext
-		// should not only rely on MixView
-		// setMarkerList(dataView.getDataHandler().getMarkerList());
 
 		setMapContext(this);
 		setMapView(new MapView(this, "0zMCXwuwyQLKoOtdQc8VelAT_ipCTDn-h8R-p6A"));
@@ -123,26 +144,39 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 			setZoomLevelBasedOnRadius();
 		}
 
-		if (dataView.isFrozen()) {
-			searchNotificationTxt = new TextView(this);
-			searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
-			searchNotificationTxt.setPadding(10, 2, 0, 0);
-			searchNotificationTxt.setText(getString(R.string.search_active_1)
-					+ " " + DataSourceList.getDataSourcesStringList()
-					+ getString(R.string.search_active_2));
-			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
-			searchNotificationTxt.setTextColor(Color.WHITE);
-			searchNotificationTxt.setOnTouchListener(this);
-			addContentView(searchNotificationTxt, new LayoutParams(
-					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		}
+		maps = getResources().getStringArray(R.array.maps);
+
+		Context context = getSupportActionBar().getThemedContext();
+		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
+				context, R.array.maps, R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setSelectedNavigationItem(getOwnListPosition());
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		// if (dataView.isFrozen()) {
+		// searchNotificationTxt = new TextView(this);
+		// searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
+		// searchNotificationTxt.setPadding(10, 2, 0, 0);
+		// searchNotificationTxt.setText(getString(R.string.search_active_1)
+		// + " " + DataSourceList.getDataSourcesStringList()
+		// + getString(R.string.search_active_2));
+		// searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
+		// searchNotificationTxt.setTextColor(Color.WHITE);
+		// searchNotificationTxt.setOnTouchListener(this);
+		// addContentView(searchNotificationTxt, new LayoutParams(
+		// LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		// }
 	}
 
 	/**
-	 * Closes MapView Activity and returns that request to NOT refresh screen by
-	 * default.
+	 * Closes MapView Activity and returns to MixView with or without the
+	 * request to refresh the screen.
 	 * 
-	 * @param boolean do refresh? true or false
+	 * @param boolean True to refresh screen false not to
 	 */
 	private void closeMapViewActivity(boolean doRefreshScreen) {
 		Intent closeMapView = new Intent();
@@ -152,6 +186,20 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 	}
 
 	/* ********* Operators ********** */
+	/**
+	 * Gets the own position in maps Array
+	 * @return The index in the maps array
+	 */
+	private int getOwnListPosition() {
+		for (int i = 0; i < maps.length; i++) {
+			if(maps[i].equals(getString(R.string.map_menu_map_google))) {
+				return i;
+			}
+		}
+		
+		return 0;
+	}
+	
 	private void setCenter(double latitude, double longitude) {
 		GeoPoint centerPoint = new GeoPoint((int) (latitude * 1E6),
 				(int) (longitude * 1E6));
@@ -236,7 +284,7 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 
 	private void createListView() {
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
-			Intent intent1 = new Intent(this, MarkerListView.class);
+			Intent intent1 = new Intent(this, MixListView.class);
 			intent1.setAction(Intent.ACTION_VIEW);
 			startActivityForResult(intent1, 42);// TODO receive result if any!
 		}
@@ -263,82 +311,74 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 		/* define the first */
 		int base = Menu.FIRST;
 
-		/* MapMode */
-		final MenuItem item1;
+		// TODO: Get Strings out of values
+		menu.add(MENU_CENTER_POSITION_ID, MENU_CENTER_POSITION_ID, Menu.NONE,
+				"Center").setIcon(android.R.drawable.ic_menu_mylocation)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		SubMenu subMenu1 = menu.addSubMenu("More");
+
 		if (getMapView().isSatellite()) {
-			item1 = menu.add(base, base, base,
-					getString(R.string.map_menu_normal_mode));
+			subMenu1.add(MENU_CHANGE_MODE_ID, MENU_CHANGE_MODE_ID, Menu.NONE,
+					"Change to Map");
 		} else {
-			item1 = menu.add(base, base, base,
-					getString(R.string.map_menu_satellite_mode));
+			subMenu1.add(MENU_CHANGE_MODE_ID, MENU_CHANGE_MODE_ID, Menu.NONE,
+					"Change to Satellite");
 		}
-		/* OSM */
-		final MenuItem item2 = menu.add(base, base + 1, base + 1,
-				getString(R.string.map_menu_map_osm));
-		/* My Location */
-		final MenuItem item3 = menu.add(base, base + 2, base + 2,
-				getString(R.string.map_my_location));
-		/* List View */
-		final MenuItem item4 = menu.add(base, base + 3, base + 3,
-				getString(R.string.menu_item_3));
-		/* Show Path */
-		MenuItem item5 = null;
-		if (isPathVisible()) {
-			item5 = menu.add(base, base + 4, base + 4,
-					getString(R.string.map_toggle_path_off));
-		} else {
-			item5 = menu.add(base, base + 4, base + 4,
-					getString(R.string.map_toggle_path_on));
-		}
-		/* Camera */
-		final MenuItem item6 = menu.add(base, base + 5, base + 5,
+
+		subMenu1.add(MENU_LIST_VIEW, MENU_LIST_VIEW, Menu.NONE, "ListView");
+
+		subMenu1.add(MENU_CAMERA_VIEW, MENU_CAMERA_VIEW, Menu.NONE,
 				getString(R.string.map_menu_cam_mode));
 
-		/* assign icons to the menu items */
-		item1.setIcon(android.R.drawable.ic_menu_gallery);
-		item2.setIcon(android.R.drawable.ic_menu_mapmode);
-		item3.setIcon(android.R.drawable.ic_menu_mylocation);
-		item4.setIcon(android.R.drawable.ic_menu_view);
-		item5.setIcon(android.R.drawable.ic_menu_directions);
-		item6.setIcon(android.R.drawable.ic_menu_camera);
+		if (isPathVisible()) {
+			subMenu1.add(MENU_SHOW_PATH, MENU_SHOW_PATH, Menu.NONE,
+					getString(R.string.map_toggle_path_off));
+		} else {
+			subMenu1.add(base, base + 4, base + 4,
+					getString(R.string.map_toggle_path_on));
+		}
+
+		MenuItem subMenu1Item = subMenu1.getItem();
+		subMenu1Item.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
+		subMenu1Item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		// Actionbar icon pressed
+		case android.R.id.home:
+			finish();
+			break;
 		/* MapMode */
-		case 1:
+		case MENU_CHANGE_MODE_ID:
 			if (getMapView().isSatellite()) {
 				getMapView().setSatellite(false);
 			} else {
 				getMapView().setSatellite(true);
 			}
-			break;
-		/* OSM */
-		case 2:
-			MixMap.changeMap(MixMap.MAPS.OSM);
-			Intent intent = new Intent(this, OsmMap.class);
-			startActivity(intent);
-			finish();
+			getSherlock().dispatchInvalidateOptionsMenu();
 			break;
 		/* go to users location */
-		case 3:
+		case MENU_CENTER_POSITION_ID:
 			setOwnLocationToCenter();
 			break;
 		/* List View */
-		case 4:
+		case MENU_LIST_VIEW:
 			createListView();
 			// finish(); don't close map if list view created
 			break;
 		/* back to Camera View */
-		case 5:
+		case MENU_SHOW_PATH:
 			togglePath();
 			// refresh:
 			startActivity(getIntent()); // what Activity are we launching?
 			closeMapViewActivity(false);
 			break;
-		case 6:
+		case MENU_CAMERA_VIEW:
 			closeMapViewActivity(false);
 			break;
 		default:
@@ -351,11 +391,26 @@ public class GoogleMap extends MapActivity implements OnTouchListener {
 
 	/* ************ Handlers ************ */
 
+	/**
+	 * Gets fired when the selected item of the ListNavigation changes. This
+	 * method changes to the specified map. (Google Map/OSM)
+	 */
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if (maps[itemPosition].equals(getString(R.string.map_menu_map_osm))) {
+			MixMap.changeMap(MixMap.MAPS.OSM);
+			Intent intent = new Intent(this, OsmMap.class);
+			startActivity(intent);
+			finish();
+		}
+		return true;
+	}
+
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			// String query = intent.getStringExtra(SearchManager.QUERY);
 			// doMixSearch(query);
-			intent.setClass(this, MarkerListView.class);
+			intent.setClass(this, MixListView.class);
 			startActivity(intent);
 		}
 	}

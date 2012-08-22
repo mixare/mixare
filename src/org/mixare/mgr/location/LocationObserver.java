@@ -19,7 +19,7 @@
 package org.mixare.mgr.location;
 
 import org.mixare.MixContext;
-import org.mixare.GoogleMap;
+import org.mixare.map.GoogleMap;
 import org.mixare.mgr.downloader.DownloadManager;
 
 import com.google.android.maps.GeoPoint;

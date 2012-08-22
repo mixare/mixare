@@ -16,27 +16,35 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare;
+package org.mixare.map;
 
 import java.util.ArrayList;
 
-import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.mapgenerator.tiledownloader.MapnikTileDownloader;
 import org.mapsforge.android.maps.overlay.ArrayItemizedOverlay;
 import org.mapsforge.android.maps.overlay.ItemizedOverlay;
 import org.mapsforge.android.maps.overlay.OverlayItem;
 import org.mapsforge.core.model.GeoPoint;
+import org.mixare.MixListView;
+import org.mixare.MixView;
+import org.mixare.R;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.marker.Marker;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 
 /**
  * This class creates a OSM View and handles an overlay of POI's
@@ -44,13 +52,25 @@ import android.view.MenuItem;
  * @author KlemensE
  * 
  */
-public class OsmMap extends MapActivity {
+public class OsmMap extends SherlockOsmMapActivity implements
+		OnNavigationListener {
 
 	private MapView mapView;
+
+	// Array which holds the available maps
+	private String[] maps;
 
 	// the search keyword
 	protected String searchKeyword = "";
 
+	/* Menu ID's */
+	// Center my Position
+	private static final int MENU_CENTER_POSITION_ID = Menu.FIRST;
+	// Go to MixListView
+	private static final int MENU_LIST_VIEW = Menu.FIRST + 1;
+	// Go to AugmentedView
+	private static final int MENU_CAMERA_VIEW = Menu.FIRST + 2;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,6 +84,7 @@ public class OsmMap extends MapActivity {
 		// Add mapView to View
 		setContentView(getMapView());
 
+		// Retrieve the search query
 		Intent intent = this.getIntent();
 		searchKeyword = intent.getStringExtra("search");
 
@@ -78,10 +99,36 @@ public class OsmMap extends MapActivity {
 			setOwnLocationToCenter();
 			setZoomLevelBasedOnRadius();
 		}
+
+		maps = getResources().getStringArray(R.array.maps);
+
+		Context context = getSupportActionBar().getThemedContext();
+		ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
+				context, R.array.maps, R.layout.sherlock_spinner_item);
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setListNavigationCallbacks(list, this);
+		getSupportActionBar().setSelectedNavigationItem(getOwnListPosition());
 	}
 
 	/* Operators */
 
+	/**
+	 * Gets the own position in maps Array
+	 * @return The index in the maps array
+	 */
+	private int getOwnListPosition() {
+		for (int i = 0; i < maps.length; i++) {
+			if(maps[i].equals(getString(R.string.map_menu_map_osm))) {
+				return i;
+			}
+		}
+		
+		return 0;
+	}
+	
 	/**
 	 * Receives the Location and sets the MapCenter to your position
 	 */
@@ -133,6 +180,7 @@ public class OsmMap extends MapActivity {
 
 	/**
 	 * Sets the Zoomlevel of the Map based on the Radius using
+	 * 
 	 * @see MixUtils.earthEquatorToZoomLevel(float)
 	 */
 	private void setZoomLevelBasedOnRadius() {
@@ -148,14 +196,21 @@ public class OsmMap extends MapActivity {
 	 */
 	private void createOverlay() {
 		// create a default marker for the overlay
-		Drawable defaultMarker = getResources().getDrawable(
+		Drawable markerLink = getResources().getDrawable(
 				R.drawable.icon_map_link);
-		defaultMarker.setBounds(-defaultMarker.getIntrinsicWidth() / 2,
-				-defaultMarker.getIntrinsicHeight(),
-				defaultMarker.getIntrinsicWidth() / 2, 0);
+		markerLink.setBounds(-markerLink.getIntrinsicWidth() / 2,
+				-markerLink.getIntrinsicHeight(),
+				markerLink.getIntrinsicWidth() / 2, 0);
 
+		// Create marker if no link is specified
+		Drawable markerNoLink = this.getResources().getDrawable(
+				R.drawable.icon_map_nolink);
+		markerNoLink.setBounds(-markerNoLink.getIntrinsicWidth() / 2,
+				-markerNoLink.getIntrinsicHeight(),
+				markerNoLink.getIntrinsicWidth() / 2, 0);
+		
 		// create an ItemizedOverlay with the default marker
-		OsmOverlay itemizedOverlay = new OsmOverlay(defaultMarker, this);
+		OsmOverlay itemizedOverlay = new OsmOverlay(markerLink, this);
 
 		Marker marker;
 		int limit = MixView.getDataView().getDataHandler().getMarkerCount();
@@ -186,11 +241,7 @@ public class OsmMap extends MapActivity {
 					marker.getURL());
 			// If no URL is specified change the icon
 			if (marker.getURL() == null || marker.getURL().isEmpty()) {
-				Drawable dw = this.getResources().getDrawable(
-						R.drawable.icon_map_nolink);
-				dw.setBounds(-dw.getIntrinsicWidth() / 2,
-						-dw.getIntrinsicHeight(), dw.getIntrinsicWidth() / 2, 0);
-				item.setMarker(dw);
+				item.setMarker(markerNoLink);
 			}
 			// Add the item to the overlay
 			itemizedOverlay.addItem(item);
@@ -211,52 +262,61 @@ public class OsmMap extends MapActivity {
 		getMapView().getOverlays().add(myOverlay);
 	}
 
+	/**
+	 * Gets fired when the selected item of the ListNavigation changes. This
+	 * method changes to the specified map. (Google Map/OSM)
+	 */
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		if (maps[itemPosition].equals(getString(R.string.map_menu_map_google))) {
+			MixMap.changeMap(MixMap.MAPS.GOOGLE);
+			Intent intent = new Intent(this, GoogleMap.class);
+			startActivity(intent);
+			finish();
+		}
+		return true;
+	}
+
 	/* ********* Operator - Menu ***** */
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		/* define the first */
-		int base = Menu.FIRST;
+		menu.add(MENU_CENTER_POSITION_ID, MENU_CENTER_POSITION_ID, Menu.NONE,
+				"Center").setIcon(android.R.drawable.ic_menu_mylocation)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-		/* Google Maps */
-		final MenuItem item1 = menu.add(base, base, base,
-				getString(R.string.map_menu_map_google));
-		/* My Location */
-		final MenuItem item2 = menu.add(base, base + 1, base + 1,
-				getString(R.string.map_my_location));
-		/* List View */
-		final MenuItem item3 = menu.add(base, base + 2, base + 2,
-				getString(R.string.menu_item_3));
-		/* Camera */
-		final MenuItem item4 = menu.add(base, base + 3, base + 3,
-				getString(R.string.map_menu_cam_mode));
+		SubMenu subMenu1 = menu.addSubMenu("More");
 
-		/* assign icons to the menu items */
-		item1.setIcon(android.R.drawable.ic_menu_mapmode);
-		item2.setIcon(android.R.drawable.ic_menu_mylocation);
-		item3.setIcon(android.R.drawable.ic_menu_view);
-		item4.setIcon(android.R.drawable.ic_menu_camera);
+		subMenu1.add(MENU_LIST_VIEW, MENU_LIST_VIEW, Menu.NONE,
+				getString(R.string.menu_item_3))
+				.setIcon(android.R.drawable.ic_menu_view);
+
+		subMenu1.add(MENU_CAMERA_VIEW, MENU_CAMERA_VIEW, Menu.NONE,
+				getString(R.string.map_menu_cam_mode))
+				.setIcon(android.R.drawable.ic_menu_camera);
+
+		MenuItem subMenu1Item = subMenu1.getItem();
+		subMenu1Item.setIcon(R.drawable.abs__ic_menu_moreoverflow_holo_dark);
+		subMenu1Item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		/* Google Maps */
-		case 1:
-			MixMap.changeMap(MixMap.MAPS.GOOGLE);
-			Intent intent = new Intent(this, GoogleMap.class);
-			startActivity(intent);
+		/* Actionbar icon pressed */
+		case android.R.id.home:
 			finish();
 			break;
 		/* go to users location */
-		case 2:
+		case MENU_CENTER_POSITION_ID:
 			setOwnLocationToCenter();
 			break;
 		/* List View */
-		case 4:
+		case MENU_LIST_VIEW:
 			if (MixView.getDataView().getDataHandler().getMarkerCount() > 0) {
-				Intent intent1 = new Intent(this, MarkerListView.class);
+				Intent intent1 = new Intent(this, MixListView.class);
 				intent1.setAction(Intent.ACTION_VIEW);
 				startActivityForResult(intent1, 42);
 			}
@@ -267,12 +327,11 @@ public class OsmMap extends MapActivity {
 			}
 			break;
 		/* back to Camera View */
-		case 6:
+		case MENU_CAMERA_VIEW:
 			closeMapViewActivity(false);
 			break;
 		default:
 			break;// do nothing
-
 		}
 
 		return true;

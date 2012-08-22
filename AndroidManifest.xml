@@ -1,93 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="26" android:versionName="0.9.2" package="org.mixare" android:installLocation="auto">
+<manifest package="org.mixare"
+    android:installLocation="auto"
+    android:versionCode="26"
+    android:versionName="0.9.2" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="10"/>
+    <uses-sdk
+        android:minSdkVersion="3"
+        android:targetSdkVersion="10" />
 
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
-	<uses-feature android:required="false" android:name="android.hardware.camera.flash"></uses-feature>
-	<uses-feature android:required="false" android:name="android.hardware.camera.front"></uses-feature>
-	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-	
-	<supports-screens android:anyDensity="true" android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true"></supports-screens>
-	
-	
-    <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
-    	<uses-library android:name="com.google.android.maps" />
-        
-    	<activity android:name=".MainActivity" android:icon="@drawable/ic_launcher"
-				  android:label="@string/app_name" android:screenOrientation="landscape" >
+
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" >
+    </uses-feature>
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" >
+    </uses-feature>
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" >
+    </uses-feature>
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" >
+    </supports-screens>
+
+    <application
+        android:name="Mixare"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" 
+        android:theme="@style/Theme.Sherlock">
+        <uses-library android:name="com.google.android.maps" />
+
+        <activity android:name=".MainActivity"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>     	    
-    	</activity>
-    	
-        <activity android:label="@string/app_name" android:name=".MixView" 
-        android:screenOrientation="landscape"  
-        android:launchMode="singleTop" >
-            
-            <intent-filter>  
-                  <action android:name="android.intent.action.VIEW" />
-				  <category android:name="android.intent.category.DEFAULT" />
-				  <category android:name="android.intent.category.BROWSABLE" />
-				  <data android:scheme="http" android:mimeType="application/mixare-json"/>
-				  <data android:scheme="content" android:mimeType="application/mixare-json"/>
-				  <data android:scheme="file" android:mimeType="application/mixare-json"/>
             </intent-filter>
-            
-            <intent-filter>
-        	    <action android:name="android.intent.action.SEARCH"/>
-        	</intent-filter>
-        	<meta-data android:name="android.app.searchable"
-                   	android:resource="@xml/searchable"/>
-            <meta-data android:name="android.app.default_searchable"
-               		android:value=".MixView" />
         </activity>
         
-		<activity android:name="PluginLoaderActivity">
-		    <intent-filter> 
-         		<action android:name="android.intent.action.MAIN" />
-     		</intent-filter>
-		</activity>
-		
-		<activity android:name="MarkerListView" 
-			android:screenOrientation="user" 
-            android:theme="@style/SectionListViewTheme"
-			android:launchMode="singleTop">
-			<intent-filter>
-	            <action android:name="android.intent.action.SEARCH" />
-	        </intent-filter>
-	        <meta-data android:name="android.app.searchable"
-                   	android:resource="@xml/searchable"/>
-		</activity>
-		<activity android:name=".MixMap"></activity>
-		<activity android:name=".GoogleMap" 
-			android:screenOrientation="user" 
-			android:launchMode="singleTop">
-			<intent-filter>
-	            <action android:name="android.intent.action.SEARCH" />
-	        </intent-filter>
-	        <meta-data android:name="android.app.searchable"
-                   	android:resource="@xml/searchable"/>
-		</activity>
-		<activity android:name=".OsmMap"
-		    android:screenOrientation="user"
-		    android:launchMode="singleTop">
-		</activity>				
-		 <activity android:name=".data.DataSource" />
-		 <activity android:name=".data.DataSourceList" />
-		 <activity android:name=".plugin.PluginListActivity"></activity>
-		 <activity
-            android:name="org.mixare.plugin.PluginListActivity"
+        <activity android:name=".MixView"
             android:label="@string/app_name"
-            android:theme="@style/SectionListViewTheme" >
-        </activity>
-		 
-</application>
+            android:launchMode="singleTop"
+            android:hardwareAccelerated="true"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-</manifest> 
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:mimeType="application/mixare-json"
+                    android:scheme="http" />
+                <data
+                    android:mimeType="application/mixare-json"
+                    android:scheme="content" />
+                <data
+                    android:mimeType="application/mixare-json"
+                    android:scheme="file" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".MixView" />
+        </activity>
+        
+        <activity android:name="PluginLoaderActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="MixListView"
+            android:launchMode="singleTop"
+            android:screenOrientation="user"
+            android:label="@string/mix_list_view" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        
+        <activity android:name=".map.MixMap" >
+        </activity>
+        
+        <activity android:name=".map.GoogleMap"
+            android:launchMode="singleTop"
+            android:screenOrientation="user" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        
+        <activity android:name=".map.OsmMap"
+            android:launchMode="singleTop"
+            android:screenOrientation="user" >
+        </activity>
+        
+        <activity android:name=".data.AddDataSource" android:label="@string/add_datasource">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="com.actionbarsherlock.sample.demos.EXAMPLE"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:name=".data.DataSourceList" 
+            android:label="@string/datasource_list" />
+        
+        <activity android:name=".PluginListActivity" 
+            android:label="@string/plugin_list">
+        </activity>
+        
+    </application>
+</manifest>

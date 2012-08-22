@@ -14,6 +14,10 @@
     
     <string name="OSM">Openstreetmap</string>
     <string name="MIXARE">Mixare</string>
+    <string name="TWITTER">Twitter</string>
+    <string name="PANORAMIO">Panoramio</string>
+    <string name="WIKIPEDIA">Wikipedia</string>
+    <string name="ARENA">Arena</string>
     
     <string name="CIRCLE_MARKER">Circles</string>
     <string name="NAVIGATION_MARKER">Arrows</string>
@@ -34,7 +38,7 @@
 	</string>
 	
 	<string name="launch_plugins">Launch plugins?</string>
-	<string name="plugin_message">Some plugins have changed, do you want to see the changes?</string>
+	<string name="plugin_message">Some plugins have changed, do you want to see the List of Plugins?</string>
 	<string name="remember_this_decision">Remember this decision</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
@@ -121,4 +125,19 @@
 	<string name="marker">Marker</string>
 	<string name="dataselector">Dataselector</string>
 	<string name="datahandler">Datahandler</string>
+	
+	<string name="list_view_total_markers">Total markers: </string>
+	<string name="list_view_marker_in_section">Markers:</string>
+	<string name="list_view_search_no_result">No result found</string>
+	<string name="list_view_no_plugins_available">No plugins installed</string>
+	<string name="list_view_search_hint">Search</string>
+	
+	<string name="add_datasource">Add Datasource</string>
+	<string name="datasource_list">Datasources</string>
+	<string name="plugin_list">Plugins</string>
+	<string name="mix_list_view">Markerlist</string>
+	
+	<string name="list_view_section"></string>
+	<string name="list_view_entry"></string>
+	<string name="list_view_webview_id"></string>
 </resources>

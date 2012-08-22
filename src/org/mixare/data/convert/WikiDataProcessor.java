@@ -26,7 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.MixContext;
 import org.mixare.MixView;
-import org.mixare.POIMarker;
+import org.mixare.marker.POIMarker;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.lib.HtmlUnescape;

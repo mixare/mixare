@@ -27,7 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.json.JSONException;
 import org.mixare.MixView;
-import org.mixare.NavigationMarker;
+import org.mixare.marker.NavigationMarker;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.lib.marker.Marker;

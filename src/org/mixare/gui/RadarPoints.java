@@ -64,7 +64,7 @@ public class RadarPoints implements ScreenObj {
 				dw.setFill(true);
 				
 				// For OpenStreetMap the color is changing based on the URL
-					dw.setColor(pm.getColour());
+					dw.setColor(pm.getColor());
 				
 				dw.paintRect(x + RADIUS - 1, y + RADIUS - 1, 2, 2);
 			}

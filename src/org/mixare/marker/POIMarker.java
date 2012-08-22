@@ -17,14 +17,14 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package org.mixare;
+package org.mixare.marker;
 
 import java.text.DecimalFormat;
 
-import org.mixare.LocalMarker;
 import org.mixare.lib.MixUtils;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.gui.TextObj;
+import org.mixare.marker.LocalMarker;
 
 import android.graphics.Color;
 import android.graphics.Path;
@@ -74,7 +74,7 @@ public class POIMarker extends LocalMarker {
 			dw.setStrokeWidth(maxHeight / 100f);
 			dw.setFill(false);
 
-				dw.setColor(getColour());
+				dw.setColor(getColor());
 			
 			// draw circle with radius depending on distance
 			// 0.44 is approx. vertical fov in radians
@@ -146,7 +146,7 @@ public class POIMarker extends LocalMarker {
 				signMarker.x, signMarker.y);
 		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
-		dw.setColor(getColour());
+		dw.setColor(getColor());
 		float radius = maxHeight / 1.5f;
 		dw.setStrokeWidth(dw.getHeight() / 100f);
 		dw.setFill(false);

@@ -30,7 +30,8 @@ public class Plugin {
 	private PluginType pluginType;
 	private PluginConnection pluginConnection;
 
-	public Plugin(PluginStatus pluginStatus, ServiceInfo serviceInfo, String lable, Drawable logo, PluginType pluginType) {
+	public Plugin(PluginStatus pluginStatus, ServiceInfo serviceInfo,
+			String lable, Drawable logo, PluginType pluginType) {
 		this.setPluginStatus(pluginStatus);
 		this.setServiceInfo(serviceInfo);
 		this.setLable(lable);
@@ -46,7 +47,7 @@ public class Plugin {
 	public void setPluginStatus(PluginStatus pluginStatus) {
 		this.pluginStatus = pluginStatus;
 	}
-	
+
 	public ServiceInfo getServiceInfo() {
 		return serviceInfo;
 	}
@@ -70,28 +71,30 @@ public class Plugin {
 	public void setLogo(Drawable logo) {
 		this.logo = logo;
 	}
-	
+
 	public PluginType getPluginType() {
 		return pluginType;
 	}
-	
+
 	public void setPluginType(PluginType pluginType) {
 		this.pluginType = pluginType;
 	}
-	
+
 	public PluginConnection getPluginConnection() {
 		if (pluginConnection == null) {
 			pluginConnection = pluginType.getPluginConnection();
 		}
 		return pluginConnection;
 	}
-	
+
 	public void setPluginConnection(PluginConnection pluginConnection) {
 		this.pluginConnection = pluginConnection;
 	}
 
 	public Plugin clone() {
-		Plugin plugin = new Plugin(this.getPluginStatus(), this.getServiceInfo(), this.getLable(), this.getLogo(), this.getPluginType());
+		Plugin plugin = new Plugin(this.getPluginStatus(),
+				this.getServiceInfo(), this.getLable(), this.getLogo(),
+				this.getPluginType());
 		plugin.setPluginConnection(this.getPluginConnection());
 		return plugin;
 	}
@@ -101,11 +104,15 @@ public class Plugin {
 		if (this == o) {
 			return true;
 		}
-		
-		if ( o == null || o.getClass() != this.getClass() ) return false;
-		
+
+		if (o == null || o.getClass() != this.getClass())
+			return false;
+
 		Plugin plugin = (Plugin) o;
-		
-		return this.getLable() == plugin.getLable() && this.getPluginType() == plugin.getPluginType() && this.getServiceInfo() == this.getServiceInfo() && this.getPluginStatus() == plugin.getPluginStatus();
+
+		return this.getLable() == plugin.getLable()
+				&& this.getPluginType() == plugin.getPluginType()
+				&& this.getServiceInfo() == this.getServiceInfo()
+				&& this.getPluginStatus() == plugin.getPluginStatus();
 	}
 }

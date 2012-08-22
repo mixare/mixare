@@ -76,7 +76,7 @@ public class PluginLoader {
 	}
 	
 	/**
-	 * loads all plugins from a plugin type.
+	 * loads all plugins from a plugin type if they are enabled
 	 */
 	public void loadPlugin(PluginType pluginType) {
 		List<Plugin> plugins = new ArrayList<Plugin>();

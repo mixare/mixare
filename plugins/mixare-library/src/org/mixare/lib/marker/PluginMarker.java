@@ -122,7 +122,7 @@ public abstract class PluginMarker{
 		this.active = active;
 	}
 
-	public int getColour() {
+	public int getColor() {
 		return colour;
 	}
 

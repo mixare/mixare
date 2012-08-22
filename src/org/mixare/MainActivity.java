@@ -2,11 +2,9 @@ package org.mixare;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mixare.plugin.Plugin;
-import org.mixare.plugin.PluginListActivity;
 import org.mixare.plugin.PluginStatus;
 import org.mixare.plugin.PluginType;
 
@@ -16,18 +14,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.CheckBox;
 
 /**
  * This is the main activity of mixare, that will be opened if mixare is
  * launched through the android.intent.action.MAIN the main tasks of this
- * activity is to search plugins and show a prompt dialog where the user can decide to launch the
- * plugins, or not to launch the plugins.
+ * activity is to search plugins and show a prompt dialog where the user can
+ * decide to launch the plugins, or not to launch the plugins.
  * 
  * @author A.Egal
  */
@@ -50,9 +45,10 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		plugins = new ArrayList<Plugin>();
 		ctx = this;
-		
-		if (havePluginsChanged() || arePluginsDeinstalled()) {
-			SharedPreferences.Editor prefEditor= getSharedPreferences(usedPluginsPrefs, MODE_PRIVATE).edit();
+		// TODO: change message if Plugins only have been deinstalled
+		if (areNewPluginsAvailable() || arePluginsDeinstalled()) {
+			SharedPreferences.Editor prefEditor = getSharedPreferences(
+					usedPluginsPrefs, MODE_PRIVATE).edit();
 			prefEditor.clear();
 			prefEditor.commit();
 			showDialog();
@@ -64,10 +60,12 @@ public class MainActivity extends Activity {
 
 	/**
 	 * Checks the preferences for Plugins that got deinstalled
+	 * 
 	 * @return True if a plugin got deinstalled
 	 */
 	public boolean arePluginsDeinstalled() {
-		SharedPreferences prefs = getSharedPreferences(usedPluginsPrefs, MODE_PRIVATE);
+		SharedPreferences prefs = getSharedPreferences(usedPluginsPrefs,
+				MODE_PRIVATE);
 		for (Entry<String, ?> entry : prefs.getAll().entrySet()) {
 			String[] array = entry.getKey().split(":");
 			if (array.length == 2) {
@@ -75,9 +73,11 @@ public class MainActivity extends Activity {
 				for (Plugin plugin : MainActivity.getPlugins()) {
 					String pluginType = plugin.getPluginType().name();
 					String pluginServiceName = plugin.getServiceInfo().name;
+
 					if (pluginType.equalsIgnoreCase(array[0])) {
 						if (pluginServiceName.equalsIgnoreCase(array[1])) {
 							found = true;
+							break;
 						}
 					}
 				}
@@ -87,10 +87,9 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
-		
 		return false;
 	}
-	
+
 	/**
 	 * Shows a dialog
 	 */
@@ -132,7 +131,7 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * Diables all new Found Plugins
+	 * Disables all new found Plugins
 	 */
 	private void disableNewFoundPlugins() {
 		for (Plugin plugin : MainActivity.getPlugins()) {
@@ -166,14 +165,9 @@ public class MainActivity extends Activity {
 	 * 
 	 * @return Whether new Plugins are available or not
 	 */
-	private boolean havePluginsChanged() {
+	private boolean areNewPluginsAvailable() {
 		getInstalledPlugins();
-		checkPluginPreferences();
-		
-//		SharedPreferences.Editor sharedEditor = getSharedPreferences(
-//				usedPluginsPrefs, MODE_PRIVATE).edit();
-//		sharedEditor.clear();
-//		sharedEditor.commit();
+
 		savePluginState();
 
 		for (Plugin plugin : MainActivity.getPlugins()) {
@@ -186,34 +180,11 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * Check if installed Plugins are allready known and set them to their
-	 * previous Status
-	 */
-	private void checkPluginPreferences() {
-		SharedPreferences sharedPreferences = getSharedPreferences(
-				usedPluginsPrefs, MODE_PRIVATE);
-		for (int i = 0; i < MainActivity.getPlugins().size(); i++) {
-			String name = MainActivity.getPlugins().get(i).getPluginType()
-					.name()
-					+ ":"
-					+ MainActivity.getPlugins().get(i).getServiceInfo().name;
-
-			if (sharedPreferences.contains(name)) {
-				if (sharedPreferences.getBoolean(name, true)) {
-					MainActivity.getPlugins().get(i)
-							.setPluginStatus(PluginStatus.Activated);
-				} else {
-					MainActivity.getPlugins().get(i)
-							.setPluginStatus(PluginStatus.Deactivated);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Fills a list with installed Plugins
+	 * Fills a list with installed Plugins and checks if they are already known
 	 */
 	private void getInstalledPlugins() {
+		SharedPreferences sharedPreferences = getSharedPreferences(
+				usedPluginsPrefs, MODE_PRIVATE);
 		PluginType[] allPluginTypes = PluginType.values();
 		for (PluginType pluginType : allPluginTypes) {
 			PackageManager packageManager = getPackageManager();
@@ -226,15 +197,35 @@ public class MainActivity extends Activity {
 						resolveInfo.serviceInfo,
 						(String) resolveInfo.loadLabel(packageManager),
 						resolveInfo.loadIcon(packageManager), pluginType);
+
+				String name = plugin.getPluginType().name() + ":"
+						+ plugin.getServiceInfo().name;
+
+				if (sharedPreferences.contains(name)) {
+					if (sharedPreferences.getBoolean(name, true)) {
+						plugin.setPluginStatus(PluginStatus.Activated);
+					} else {
+						plugin.setPluginStatus(PluginStatus.Deactivated);
+					}
+				}
 				this.addPlugin(plugin);
 			}
 		}
 	}
 
+	/**
+	 * Adds a Plugin to the Plugin Array
+	 * 
+	 * @param plugin
+	 *            The Plugin to add
+	 */
 	public void addPlugin(Plugin plugin) {
 		MainActivity.plugins.add(plugin);
 	}
 
+	/**
+	 * @return Returns the list of Plugins
+	 */
 	public static List<Plugin> getPlugins() {
 		if (plugins == null) {
 			plugins = new ArrayList<Plugin>();

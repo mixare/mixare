@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare;
+package org.mixare.marker;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 
@@ -58,7 +59,7 @@ public abstract class LocalMarker implements Marker {
 	/* distance from user to mGeoLoc in meters */
 	protected double distance;
 	/* Marker's color */
-	private int colour;
+	private int color;
 	
 	private boolean active;
 
@@ -86,17 +87,22 @@ public abstract class LocalMarker implements Marker {
 
 	public LocalMarker(final String id,  String title, final double latitude,
 			 double longitude, final double altitude,final String link,
-			int type, final int colour) {
+			int type, final int color) {
 		super();
 
 		this.active = false;
 		this.title = title;
 		this.mGeoLoc = (new PhysicalPlace(latitude,longitude,altitude));
 		if (link != null && link.length() > 0) {
-			this.URL = ("webpage:" + URLDecoder.decode(link));
+			try {
+				this.URL = ("webpage:" + URLDecoder.decode(link, "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			this.underline = true;
 		}
-		this.colour = colour;
+		this.color = color;
 		this.ID = id + "##" + type + "##" + title;
 	}
 
@@ -136,22 +142,22 @@ public abstract class LocalMarker implements Marker {
 
 	public void update(Location curGPSFix) {
 		// Checks if programm should get Altitude from http://api.geonames.org/astergdem
-		String type = this.getClass().getName();
-		if (POIMarker.class.getName() == type) {
-			// Set direction Marker to user height
-			if (((POIMarker) this).isDirectionMarker()) {
-				getmGeoLoc().setAltitude(curGPSFix.getAltitude());
-			}
-		} else if (type == NavigationMarker.class.getName()) {
-			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
-		} else if (type != NavigationMarker.class.getName()) {
-			if (this.getURL() != null && this.getmGeoLoc().getAltitude() == 0.0) {
-				this.getmGeoLoc().setAltitude(
-						Double.valueOf(Elevation.getElevation().calcElevation(
-								curGPSFix.getLatitude(),
-								curGPSFix.getLongitude())));
-			}
-		}
+//		String type = this.getClass().getName();
+//		if (POIMarker.class.getName() == type) {
+//			// Set direction Marker to user height
+//			if (((POIMarker) this).isDirectionMarker()) {
+//				getmGeoLoc().setAltitude(curGPSFix.getAltitude());
+//			}
+//		} else if (type == NavigationMarker.class.getName()) {
+//			getmGeoLoc().setAltitude(curGPSFix.getAltitude());
+//		} else if (type != NavigationMarker.class.getName()) {
+//			if (this.getURL() != null && this.getmGeoLoc().getAltitude() == 0.0) {
+//				this.getmGeoLoc().setAltitude(
+//						Double.valueOf(Elevation.getElevation().calcElevation(
+//								curGPSFix.getLatitude(),
+//								curGPSFix.getLongitude())));
+//			}
+//		}
 		
 		// compute the relative position vector from user position to POI location
 		PhysicalPlace.convLocToVec(curGPSFix, getmGeoLoc(), locationVector);
@@ -347,11 +353,11 @@ public abstract class LocalMarker implements Marker {
 		return null;
 	}
 
-	//get Colour for OpenStreetMap based on the URL number
-	public int getColour() {
-		return colour;
+	//get Color for OpenStreetMap based on the URL number
+	public int getColor() {
+		return color;
 	}
-
+	
 	@Override
 	public void setTxtLab(Label txtLab) {
 		this.txtLab = txtLab;

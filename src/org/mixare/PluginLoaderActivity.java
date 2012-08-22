@@ -2,6 +2,7 @@ package org.mixare;
 
 import java.util.List;
 
+import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceStorage;
 import org.mixare.plugin.Plugin;
 import org.mixare.plugin.PluginLoader;
@@ -98,7 +99,11 @@ public class PluginLoaderActivity extends Activity {
 			//back button was pressed, close mixare now.
 			finish();
 			return;
-		}	
+		}
+		
+		if (requestCode == 0) {
+			finish();
+		}
 
 		processDataSourceFromPlugin(data);
 		procesCustomSplashScreen(data);
@@ -129,10 +134,8 @@ public class PluginLoaderActivity extends Activity {
 			// clear all datasources for a reinit
 			for (int i = 0; i < url.length; i++) {
 				DataSourceStorage.getInstance().clear();
-				DataSourceStorage.getInstance().add("DataSource0",
-						"Barcode source|" + url[i] + "|5|2|true");
-				DataSourceStorage.getInstance().setCustomDataSourceSelected(
-						true);
+				DataSource newDs = new DataSource("Barcode source", url[i], 5, 2, true);
+				DataSourceStorage.getInstance().add(newDs);
 			}
 		}
 	}
