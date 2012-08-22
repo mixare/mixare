@@ -34,7 +34,7 @@
 	</string>
 	
 	<string name="launch_plugins">Launch plugins?</string>
-	<string name="plugin_message">Some plugins have changed, do you want to see the change?</string>
+	<string name="plugin_message">Some plugins have changed, do you want to see the changes?</string>
 	<string name="remember_this_decision">Remember this decision</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
