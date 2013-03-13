@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mixare</groupId>
+    <artifactId>mixare</artifactId>
+    <packaging>apk</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Mixare</name>
+    <description>The Mixare android implementation</description>
+    <dependencies>
+        <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.0.3_r3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android.maps</groupId>
+            <artifactId>maps</artifactId>
+            <version>15_r2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mixare</groupId>
+            <artifactId>mixarelib</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>apklib</type>
+        </dependency>
+        <dependency>
+            <groupId>com.actionbarsherlock</groupId>
+            <artifactId>actionbarsherlock</artifactId>
+            <version>4.2.0</version>
+            <type>apklib</type>
+        </dependency>
+
+    <dependency>
+      <groupId>org.mapsforge</groupId>
+      <artifactId>mapsforge</artifactId>
+      <version>0.3.1-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../others/mapsforge/0.3.1/mapsforge-map-0.3.1-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+    </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                    <artifactId>android-maven-plugin</artifactId>
+                    <version>3.5.1</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <release>false</release>
+                    <sdk>
+                        <platform>4.0.3</platform>
+                    </sdk>
+                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,22 @@
+language: java
+
+before_install:
+ # Install base Android SDK
+ - sudo apt-get update -qq
+ - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
+ - wget http://dl.google.com/android/android-sdk_r21.0.1-linux.tgz
+ - tar xzf android-sdk_r21.0.1-linux.tgz
+ - export ANDROID_HOME=`pwd`/android-sdk-linux
+ - export PATH=${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${PATH}
+ # only update the sdk for the tools and platform-tools (1,2) and whatever api level (run "android list sdk" to get the full list)
+ - android update sdk --all --no-ui --filter 1,2,6,11,44
+ # Install specific AddOns
+ - git clone git://github.com/mosabua/maven-android-sdk-deployer.git
+ - cd maven-android-sdk-deployer/platforms
+ - mvn install -P 4.0.3 --quiet
+ - cd ../add-ons
+ - mvn install -P 4.0.3 --quiet
+ - cd ../..
+ - echo -e "\n---------------- ENVIROMENT DONE! ---------------- \n"
+script: mvn install
+

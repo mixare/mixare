@@ -1,0 +1,1 @@
+wget https://mapsforge.googlecode.com/files/mapsforge-map-0.3.0-jar-with-dependencies.jar

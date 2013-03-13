@@ -75,7 +75,7 @@ public class ArenaProcessor extends PluginDataProcessor {
 				Bitmap image = getBitmapFromURL(jo.getString("object_url"));
 				
 				InitialMarkerData ma = new InitialMarkerData(jo.getInt("id"),
-						HtmlUnescape.unescapeHTML(jo.getString("title"), 0),
+						HtmlUnescape.unescapeHTML(jo.getString("title")),
 						jo.getDouble("lat"), jo.getDouble("lng"),
 						jo.getDouble("elevation"), link, taskId, colour);
 				ma.setMarkerName("imagemarker");
