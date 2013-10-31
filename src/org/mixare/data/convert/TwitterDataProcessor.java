@@ -40,7 +40,12 @@ import android.util.Log;
  */
 public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 
-	public static final int MAX_JSON_OBJECTS = 1000;
+	private static final int MAX_JSON_OBJECTS = 100; //max tweets visible 
+	
+	/*
+	 * Cache used due to possible frequents tweets update
+	 */
+	private static ArrayList<Marker> cache = new ArrayList<Marker>(); //markers cache
 	
 	@Override
 	public String[] getUrlMatch() {
@@ -63,11 +68,19 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 	}
 
 	@Override
+	/**
+	 * Updated to the new API JSON parameters names
+	 */
 	public List<Marker> load(String rawData, int taskId, int colour)
-			throws JSONException {
-		List<Marker> markers = new ArrayList<Marker>();
+			throws JSONException 
+	{
+		
+		if (cache.size()>MAX_JSON_OBJECTS) cache.clear(); //check if too many tweets
+		
+		List<Marker> markers = new ArrayList<Marker>();//temporary data structure (new tweets)
 		JSONObject root = convertToJSON(rawData);
-		JSONArray dataArray = root.getJSONArray("results");
+		JSONArray dataArray = root.getJSONArray("results");//new tweets (JSON)
+		
 		int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
 
 		for (int i = 0; i < top; i++) {
@@ -99,24 +112,32 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 						lon = Double.parseDouble(matcher.group(2));
 					}
 				}
-				if (lat != null) {
+				if (lat != null) 
+				{
 					Log.v(MixView.TAG, "processing Twitter JSON object");
-					String user=jo.getString("from_user");
-					String url="http://twitter.com/"+user;
+					
+					JSONObject user = jo.getJSONObject("user");
+					String screen_name = user.getString("screen_name");
+					String text = jo.getString("text");
+					String url="http://twitter.com/"+screen_name;//former user
 					
 					//no ID is needed, since identical tweet by identical user may be safely merged into one.
 					ma = new SocialMarker(
 							"",
-							user+": "+jo.getString("text"), 
+							screen_name+": "+text, 
 							lat, 
 							lon, 
 							0, url, 
-							taskId, colour);
+							taskId, 
+							colour);
+					
 					markers.add(ma);
+					cache.add(ma);
+					Log.d(MixView.TAG, "Found "+markers.size()+" new tweets, total tweets :"+cache.size());
 				}
 			}
 		}
-		return markers;
+		return cache;
 	}
 	
 	private JSONObject convertToJSON(String rawData){
@@ -125,6 +146,5 @@ public class TwitterDataProcessor extends DataHandler implements DataProcessor{
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
+	}	
 }
