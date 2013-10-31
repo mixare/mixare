@@ -25,6 +25,7 @@ import java.net.URL;
 import org.mixare.R;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.data.convert.PanoramioDataProcessor;
+import org.mixare.utils.TwitterClient;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -130,8 +131,9 @@ public class DataSource {
 				break;
 
 			case TWITTER:
-				ret += "?geocode=" + lat + "%2C" + lon + "%2C"
-						+ Math.max(radius, 1.0) + "km";
+				//set twitter client config 
+				TwitterClient.config(lat, lon, Math.max(radius, 1.0));
+				ret += "?geocode=" + lat + "%2C" + lon + "%2C"+ Math.max(radius, 1.0) + "km";
 				break;
 
 			case MIXARE:
