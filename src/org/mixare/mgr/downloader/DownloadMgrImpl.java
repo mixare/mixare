@@ -30,6 +30,7 @@ import org.mixare.MixView;
 import org.mixare.data.convert.DataConvertor;
 import org.mixare.lib.marker.Marker;
 import org.mixare.mgr.HttpTools;
+import org.mixare.utils.TwitterClient;
 
 import android.util.Log;
 
@@ -100,9 +101,18 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 			if (!request.getSource().isWellFormed()) {
 				throw new Exception("Datasource in not WellFormed");
 			}
+			
+			/*
+			 * patch for Twitter client inserted to catch data
+			 */
+			String pageContent = null;
+			if (request.getSource().getName().toUpperCase().equals("TWITTER"))
+			{
+				pageContent = TwitterClient.queryData();//JSON format
+			}
+			else pageContent = HttpTools.getPageContent(request);
 
-			String pageContent = HttpTools.getPageContent(request);
-
+			
 			if (pageContent != null) {
 				// try loading Marker data
 				List<Marker> markers = DataConvertor.getInstance().load(
@@ -110,7 +120,6 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 						request.getSource());
 				result.setAccomplish(mRequest.getUniqueKey(), markers,
 						request.getSource());
-//				Log.d("test", request.getSource().getType().name());
 			}
 		} catch (Exception ex) {
 			result.setError(ex, request);
@@ -225,5 +234,4 @@ class DownloadMgrImpl implements Runnable, DownloadManager {
 	public DownloadManagerState getState() {
 		return state;
 	}
-
 }

@@ -43,44 +43,47 @@ public class SocialMarker extends LocalMarker {
 
 	@Override
 	public void update(Location curGPSFix) {
-
-		//0.35 radians ~= 20 degree
-		//0.85 radians ~= 45 degree
-		//minAltitude = sin(0.35)
-		//maxAltitude = sin(0.85)
 		
 		// we want the social markers to be on the upper part of
 		// your surrounding sphere 
 		double altitude = curGPSFix.getAltitude()+Math.sin(0.35)*distance+Math.sin(0.4)*(distance/(MixView.getDataView().getRadius()*1000f/distance));
 		getmGeoLoc().setAltitude(altitude);
 		super.update(curGPSFix);
-
 	}
-
+	
 	@Override
 	public void draw(PaintScreen dw) {
-
 		drawTextBlock(dw);
-
+		drawCircle(dw);
+	}	
+	
+	@Override
+	public void drawCircle(PaintScreen dw) {
 		if (isVisible) {
-			float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
-			//Bitmap bitmap = BitmapFactory.decodeResource(MixContext.getResources(), DataSource.getDataSourceIcon());
-//			if(bitmap!=null) {
-//				dw.paintBitmap(bitmap, cMarker.x - maxHeight/1.5f, cMarker.y - maxHeight/1.5f);
-//			}
-//			else {
-				dw.setStrokeWidth(maxHeight / 10f);
-				dw.setFill(false);
-				//dw.setColor(DataSource.getColor(type));
-				dw.paintCircle(cMarker.x, cMarker.y, maxHeight / 1.5f);
-			//}
+			float maxHeight = dw.getHeight();
+			dw.setStrokeWidth(maxHeight / 100f);
+			dw.setFill(false);
+
+			dw.setColor(getColor());
+			
+			// draw circle with radius depending on distance
+			// 0.44 is approx. vertical fov in radians
+			double angle = 2.0 * Math.atan2(10, distance);
+			double radius = Math.max(
+					Math.min(angle / 0.44 * maxHeight, maxHeight),
+					maxHeight / 25f);
+
+			/*
+			 * distance 100 is the threshold to convert from circle to another
+			 * shape
+			 */
+			dw.paintCircle(cMarker.x, cMarker.y, (float) radius);
+
 		}
 	}
-
+	
 	@Override
 	public int getMaxObjects() {
 		return MAX_OBJECTS;
-	}
-
-	
+	}	
 }
