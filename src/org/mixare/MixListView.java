@@ -133,7 +133,6 @@ public class MixListView extends ListActivity {
 
 			setListAdapter(new ArrayAdapter<SpannableString>(this, android.R.layout.simple_list_item_1,listViewMenu));
 			getListView().setTextFilterEnabled(true);
-			break;
 
 		}
 	}

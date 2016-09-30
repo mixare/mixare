@@ -40,6 +40,7 @@ import org.mixare.data.DataSourceStorage;
 import org.mixare.lib.gui.PaintScreen;
 import org.mixare.lib.marker.Marker;
 import org.mixare.lib.render.Matrix;
+import org.mixare.plugin.PluginLoader;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -808,7 +809,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 					getDataView().setDetailsView(false);
 					return true;
 				} else {
-					//TODO handle keyback to finish app correctly
+					Intent close = new Intent();
+					close.putExtra("closed", "MixView");
+					setResult(0, close);
+					finish();
 					return super.onKeyDown(keyCode, event);
 				}
 			} else if (keyCode == KeyEvent.KEYCODE_MENU) {

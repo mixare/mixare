@@ -29,7 +29,7 @@ public class PluginLoaderActivity extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
 		DataSourceStorage.init(this);
@@ -75,6 +75,11 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(data != null && data.getExtras() != null && data.getExtras().getString("closed") != null){
+			//back button was pressed, close mixare now.
+			finish();
+			return;
+		}	
 
 		processDataSourceFromPlugin(data);
 		procesCustomSplashScreen(data);
@@ -85,8 +90,7 @@ public class PluginLoaderActivity extends Activity {
 
 	private void startMixare() {
 		if (arePendingActivitiesFinished()) {
-			startActivity(new Intent(this, MixView.class));
-			finish();
+			startActivityForResult(new Intent(this, MixView.class),0);
 		}
 	}
 
@@ -113,7 +117,6 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		PluginLoader.getInstance().unBindServices();
-		PluginLoader.getInstance().setActivity(null);
 		super.onDestroy();
 	}
 
