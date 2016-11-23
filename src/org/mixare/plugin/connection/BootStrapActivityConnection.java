@@ -41,7 +41,6 @@ public class BootStrapActivityConnection extends PluginConnection implements Act
 	
 	@Override
 	public void startActivityForResult(Activity activity) {
-		PluginLoader.getInstance().decreasePendingActivitiesOnResult();
 		if(activityIntent == null){
 			throw new PluginNotFoundException();
 		}
@@ -60,7 +59,6 @@ public class BootStrapActivityConnection extends PluginConnection implements Act
 			buildIntent();
 			String pluginName = iBootStrap.getPluginName();
 			storeFoundPlugin(pluginName);
-			PluginLoader.getInstance().increasePendingActivitiesOnResult();
 			PluginLoader.getInstance().startPlugin(getPluginType(), pluginName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);

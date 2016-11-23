@@ -24,7 +24,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.mixare.MixContext;
-import org.mixare.MixView;
 import org.mixare.R;
 import org.mixare.mgr.downloader.DownloadManager;
 
@@ -33,7 +32,6 @@ import android.hardware.GeomagneticField;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.widget.Toast;
 
 /**
  * This class is repsonsible for finding the location, and sending it back to
@@ -100,7 +98,7 @@ class LocationMgrImpl implements LocationFinder {
 		Timer timer = new Timer();
 		for (String p : lm.getAllProviders()) {
 			if(lm.isProviderEnabled(p)){
-				LocationResolver lr = new LocationResolver(lm, p, this);
+				LocationResolver lr = new LocationResolver(p, this);
 				locationResolvers.add(lr);
 				lm.requestLocationUpdates(p, 0, 0, lr);
 			}
@@ -138,12 +136,8 @@ class LocationMgrImpl implements LocationFinder {
 	 */
 	public Location getCurrentLocation() {
 		if (curLoc == null) {
-			MixView mixView = mixContext.getActualMixView();
-			Toast.makeText(
-					mixView,
-					mixView.getResources().getString(
-							R.string.location_not_found), Toast.LENGTH_LONG)
-					.show();
+			mixContext.getNotificationManager().
+			addNotification(mixContext.getString(R.string.location_not_found));
 			throw new RuntimeException("No GPS Found");
 		}
 		synchronized (curLoc) {
@@ -219,6 +213,9 @@ class LocationMgrImpl implements LocationFinder {
 	@Override
 	public void switchOff() {
 		if (lm != null) {
+			for(LocationResolver locationResolver: locationResolvers){
+				lm.removeUpdates(locationResolver);
+			}
 			lm.removeUpdates(getObserver());
 			state = LocationFinderState.Inactive;
 		}
@@ -256,9 +253,8 @@ class LocationMgrImpl implements LocationFinder {
 				mixContext.getActualMixView().runOnUiThread(new Runnable() {					
 					@Override
 					public void run() {
-						Toast.makeText(mixContext.getActualMixView(), 
-								mixContext.getActualMixView().getResources().getString(
-								R.string.location_not_found), Toast.LENGTH_LONG);
+						mixContext.getNotificationManager().
+						addNotification(mixContext.getString(R.string.location_not_found));
 					}
 				});
 				

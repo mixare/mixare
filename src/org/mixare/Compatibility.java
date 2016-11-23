@@ -58,18 +58,18 @@ public class Compatibility {
 
 	/** If it's running on a new phone, let's get the supported preview sizes, before it was fixed to 480 x 320*/
 	@SuppressWarnings("unchecked")
-	public static List<Camera.Size> getSupportedPreviewSizes(Camera.Parameters params) {
+	public static List<Camera.Size> getSupportedPreviewSizes(final Camera.Parameters params) {
 		List<Camera.Size> retList = null;
 
 		try {
-			Object retObj = mParameters_getSupportedPreviewSizes.invoke(params);
+			final Object retObj = mParameters_getSupportedPreviewSizes.invoke(params);
 			if (retObj != null) {
 				retList = (List<Camera.Size>)retObj;
 			}
 		}
 		catch (InvocationTargetException ite) {
 			/* unpack original exception when possible */
-			Throwable cause = ite.getCause();
+			final Throwable cause = ite.getCause();
 			if (cause instanceof RuntimeException) {
 				throw (RuntimeException) cause;
 			} else if (cause instanceof Error) {
@@ -87,8 +87,8 @@ public class Compatibility {
 	static public int getRotation(final Activity activity) {
 		int result = 1;
 		try {
-				Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-				Object retObj = mDefaultDisplay_getRotation.invoke(display);
+				final Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+				final Object retObj = mDefaultDisplay_getRotation.invoke(display);
 				if( retObj != null) {
 					result = (Integer) retObj;
 				}
