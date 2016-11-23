@@ -26,6 +26,8 @@ import org.mixare.mgr.downloader.DownloadManager;
 import org.mixare.mgr.downloader.DownloadManagerFactory;
 import org.mixare.mgr.location.LocationFinder;
 import org.mixare.mgr.location.LocationFinderFactory;
+import org.mixare.mgr.notification.NotificationManager;
+import org.mixare.mgr.notification.NotificationManagerFactory;
 import org.mixare.mgr.webcontent.WebContentManager;
 import org.mixare.mgr.webcontent.WebContentManagerFactory;
 
@@ -33,7 +35,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.widget.Toast;
 
 /**
  * Cares about location management and about the data (source, inputstream)
@@ -58,6 +59,9 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 
 	/** Responsible for Web Content */
 	private WebContentManager webContentManager;
+	
+	/** Responsible for Notification logging */
+	private NotificationManager notificationManager;
 
 	public MixContext(MixView appCtx) {
 		super(appCtx);
@@ -138,6 +142,14 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 		return webContentManager;
 	}
 
+	public NotificationManager getNotificationManager() {
+		if (this.notificationManager == null) {
+			notificationManager = NotificationManagerFactory
+					.makeNotificationManager(this);
+		}
+		return notificationManager;
+	}
+	
 	public MixView getActualMixView() {
 		synchronized (mixView) {
 			return this.mixView;
@@ -164,7 +176,7 @@ public class MixContext extends ContextWrapper implements MixContextInterface {
 	 * @param string message
 	 */
 	public void doPopUp(final String string){
-       Toast.makeText(this,string,Toast.LENGTH_LONG).show();
+		getNotificationManager().addNotification(string);
 	}
 
 	/**

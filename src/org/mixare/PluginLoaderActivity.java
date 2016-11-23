@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,22 +24,31 @@ public class PluginLoaderActivity extends Activity {
 
 	private static final int SPLASHTIME = 2000; // 2 seconds
 	public static final int SCANNER_REQUEST_CODE = 0;
+	private static final String CLOSE_ACTIVITY_CALL = "closed";
 	protected Handler exitHandler = null;
 	protected Runnable exitRunnable = null;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
+		DataSourceStorage.init(this);
+		PluginLoader.getInstance().setActivity(this);
+		PluginLoader.getInstance().unBindServices();
+		PluginLoader.newInstance();
 		PluginLoader.getInstance().setActivity(this);
 		PluginLoader.getInstance().loadPlugin(PluginType.BOOTSTRAP_PHASE_1);
-		DataSourceStorage.init(this);
 
 		if (arePendingActivitiesFinished()) {
 			startDefaultSplashScreen();
 		}
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+	
 	private void startDefaultSplashScreen() {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -48,7 +58,7 @@ public class PluginLoaderActivity extends Activity {
 		// Runnable exiting the splash screen and launching the menu
 		exitRunnable = new Runnable() {
 			public void run() {
-				exitSplash();
+				startMixare();
 			}
 		};
 		// Run the exitRunnable in in _splashTime ms
@@ -59,22 +69,23 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			// Remove the exitRunnable callback from the handler queue
-			exitHandler.removeCallbacks(exitRunnable);
-			// Run the exit code manually
-			exitSplash();
+			if(exitHandler != null){
+				//only call this when the default splashscreen is used
+				exitHandler.removeCallbacks(exitRunnable);
+			}
+			startMixare();
 		}
 		return true;
-	}
-
-	private void exitSplash() {
-		loadPlugins();
-		startMixare();
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(data != null && data.getExtras() != null && data.getExtras().getString(CLOSE_ACTIVITY_CALL) != null){
+			//back button was pressed, close mixare now.
+			finish();
+			return;
+		}	
 
 		processDataSourceFromPlugin(data);
 		procesCustomSplashScreen(data);
@@ -84,14 +95,16 @@ public class PluginLoaderActivity extends Activity {
 	}
 
 	private void startMixare() {
+		if(!PluginLoader.getInstance().isPluginLoaded(PluginType.MARKER)){
+			loadPlugins();
+		}
 		if (arePendingActivitiesFinished()) {
-			startActivity(new Intent(this, MixView.class));
-			finish();
+			startActivityForResult(new Intent(this, MixView.class),0);
 		}
 	}
 
 	private boolean arePendingActivitiesFinished() {
-		return (PluginLoader.getInstance().getPendingActivitiesOnResult() == 0);
+		return (PluginLoader.getInstance().getPendingActivitiesOnResult() <= 0);
 	}
 
 	private void processDataSourceFromPlugin(Intent data) {
@@ -113,7 +126,6 @@ public class PluginLoaderActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		PluginLoader.getInstance().unBindServices();
-		PluginLoader.getInstance().setActivity(null);
 		super.onDestroy();
 	}
 

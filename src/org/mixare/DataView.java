@@ -46,7 +46,6 @@ import org.mixare.mgr.downloader.DownloadResult;
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * This class is able to update the markers and the radar. It also handles some
@@ -70,7 +69,7 @@ public class DataView {
 	 */
 	private Camera cam;
 
-	private MixState state = new MixState();
+	private final MixState state = new MixState();
 
 	/** The view can be "frozen" for debug purposes */
 	private boolean frozen;
@@ -83,7 +82,7 @@ public class DataView {
 	private float radius = 20;
 
 	/** timer to refresh the browser */
-	private Timer refresh = null;
+	private Timer refreshTimer = null; //there is method called refresh, this is different
 	private final long refreshDelay = 45 * 1000; // refresh every 45 seconds
 
 	private boolean isLauncherStarted;
@@ -109,7 +108,7 @@ public class DataView {
 		return mixContext;
 	}
 
-	public boolean isLauncherStarted() {
+	public boolean getIsLauncherStarted() {
 		return isLauncherStarted;
 	}
 
@@ -117,7 +116,7 @@ public class DataView {
 		return frozen;
 	}
 
-	public void setFrozen(boolean frozen) {
+	public void setFrozen(final boolean frozen) {
 		this.frozen = frozen;
 	}
 
@@ -125,7 +124,7 @@ public class DataView {
 		return radius;
 	}
 
-	public void setRadius(float radius) {
+	public void setRadius(final float radius) {
 		this.radius = radius;
 	}
 
@@ -150,7 +149,7 @@ public class DataView {
 		return isInit;
 	}
 
-	public void init(int widthInit, int heightInit) {
+	public void init(final int widthInit, final int heightInit) {
 		try {
 			width = widthInit;
 			height = heightInit;
@@ -165,7 +164,8 @@ public class DataView {
 			rrl.rotate(-Camera.DEFAULT_VIEW_ANGLE / 2);
 			rrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			//ex.printStackTrace();
+			Log.e("Mixare", ex.getMessage());
 		}
 		frozen = false;
 		isInit = true;
@@ -216,26 +216,28 @@ public class DataView {
 				dataHandler.addMarkers(markers);
 				dataHandler.onLocationChanged(curFix);
 								
-				if (refresh == null) { // start the refresh timer if it is null
-					refresh = new Timer(false);
+				if (refreshTimer == null) { // start the refresh timer if it is null
+					refreshTimer = new Timer(false);
 					Date date = new Date(System.currentTimeMillis()
 							+ refreshDelay);
-					refresh.schedule(new TimerTask() {
+					refreshTimer.schedule(new TimerTask() {
 
 						@Override
 						public void run() {
-							callRefreshToast();
 							refresh();
 						}
 					}, date, refreshDelay);
 				}
+			}else{
+				dataHandler.addMarkers(markers);
+				dataHandler.onLocationChanged(curFix);
 			}
 		}
 
 		// Update markers
 		dataHandler.updateActivationStatus(mixContext);
 		for (int i = dataHandler.getMarkerCount() - 1; i >= 0; i--) {
-			Marker ma = dataHandler.getMarker(i);
+			final Marker ma = dataHandler.getMarker(i);
 			// if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma
 			// instanceof NavigationMarker || ma instanceof SocialMarker)) {
 			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
@@ -313,14 +315,11 @@ public class DataView {
 					//jLayer = (DataHandler) dRes.obj;
 					Log.i(MixView.TAG,"Adding Markers");
 					markers.addAll(dRes.getMarkers());
-
-					// Notification
-					Toast.makeText(
-							mixContext,
-							mixContext.getResources().getString(
-									R.string.download_received)
-									+ " " + dRes.getDataSource().getName(),
-							Toast.LENGTH_SHORT).show();
+					
+					//Notification
+					mixContext.getNotificationManager().addNotification(mixContext.getResources().getString(
+							R.string.download_received)
+							+ " " + dRes.getDataSource().getName());
 				}
 			}
 		}
@@ -451,8 +450,8 @@ public class DataView {
 	}
 
 	public void cancelRefreshTimer() {
-		if (refresh != null) {
-			refresh.cancel();
+		if (refreshTimer != null) {
+			refreshTimer.cancel();
 		}
 	}
 	
@@ -460,6 +459,7 @@ public class DataView {
 	 * Re-downloads the markers, and draw them on the map.
 	 */
 	public void refresh(){
+		callRefreshToast();
 		state.nextLStatus = MixState.NOT_STARTED;
 	}
 	
@@ -468,11 +468,8 @@ public class DataView {
 			
 			@Override
 			public void run() {
-				Toast.makeText(
-						mixContext,
-						mixContext.getResources()
-								.getString(R.string.refreshing),
-						Toast.LENGTH_SHORT).show();
+				mixContext.getNotificationManager().
+				addNotification(mixContext.getString(R.string.refreshing));
 			}
 		});
 	}

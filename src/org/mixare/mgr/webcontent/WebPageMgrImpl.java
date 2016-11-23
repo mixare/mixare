@@ -77,7 +77,9 @@ class WebPageMgrImpl implements WebContentManager {
 			public void onPageFinished(WebView view, String url) {
 				if (url.endsWith("return")) {
 					d.dismiss();
-					mixContext.getActualMixView().repaint();
+					mixContext.getActualMixView().setZoomLevel();
+					mixContext.getActualMixView().refreshDownload();
+					mixContext.getActualMixView().refresh();
 				} else {
 					super.onPageFinished(view, url);
 				}
@@ -99,32 +101,35 @@ class WebPageMgrImpl implements WebContentManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mixare.mgr.webcontent.WebContentManager#processUrl(java.lang.String, android.content.Context)
-	 */
-	public boolean processUrl(String url, Context ctx) {
-		// get available packages from the given url
-		List<ResolveInfo> resolveInfos = getAvailablePackagesForUrl(url, ctx);
-		// filter the webbrowser > because the webview will replace it, using
-		// google as simple url
-		List<ResolveInfo> webBrowsers = getAvailablePackagesForUrl(
-				"http://www.google.com", ctx);
-		for (ResolveInfo resolveInfo : resolveInfos) {
-			for (ResolveInfo webBrowser : webBrowsers) { // check if the found
-															// intent is not a
-															// webbrowser
-				if (!resolveInfo.activityInfo.packageName
-						.equals(webBrowser.activityInfo.packageName)) {
-					Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					intent.setClassName(resolveInfo.activityInfo.packageName,
-							resolveInfo.activityInfo.name);
-					ctx.startActivity(intent);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+     * @see org.mixare.mgr.webcontent.WebContentManager#processUrl(java.lang.String, android.content.Context)
+     */
+    public boolean processUrl(String url, Context ctx) {
+            // get available packages from the given url
+            List<ResolveInfo> resolveInfos = getAvailablePackagesForUrl(url, ctx);
+            // filter the webbrowser > because the webview will replace it, using
+            // google as simple url
+            List<ResolveInfo> webBrowsers = getAvailablePackagesForUrl(
+                            "http://www.google.com", ctx);
+            for (ResolveInfo resolveInfo : resolveInfos) {
+                    boolean found = false;
+                    for (ResolveInfo webBrowser : webBrowsers) {
+                            if (resolveInfo.activityInfo.packageName
+                                            .equals(webBrowser.activityInfo.packageName)) {
+                                    found = true;
+                            }
+                    }
+                    if(!found){
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(url));
+                            intent.setClassName(resolveInfo.activityInfo.packageName,
+                                            resolveInfo.activityInfo.name);
+                            ctx.startActivity(intent);
+                            return true;
+                    }
+            }
+            return false;
+    }
+
 
 	private List<ResolveInfo> getAvailablePackagesForUrl(String url, Context ctx) {
 		PackageManager packageManager = ctx.getPackageManager();

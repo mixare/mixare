@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
 			public void onClick(DialogInterface d, int whichButton) {
 				processCheckbox(true, checkBox);
 				startActivity(new Intent(ctx, PluginLoaderActivity.class));
+				d.dismiss();
 				finish();
 			}
 		});
@@ -73,6 +74,7 @@ public class MainActivity extends Activity {
 			public void onClick(DialogInterface d, int whichButton) {
 				processCheckbox(true, checkBox);
 				startActivity(new Intent(ctx, MixView.class));
+				d.dismiss();
 				finish();
 			}
 		});
