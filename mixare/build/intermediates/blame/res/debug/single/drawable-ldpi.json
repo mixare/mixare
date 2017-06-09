@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\wikipedia.png",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\drawable-ldpi\\wikipedia.png"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\osm.png",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\drawable-ldpi\\osm.png"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\ic_launcher.png",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\drawable-ldpi\\ic_launcher.png"
+    }
+]

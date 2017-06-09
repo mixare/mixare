@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.3"
+        sha1="d014c1ef9756846d4dd117181f165a3fc920097f">
+        <dex dex="C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_d7ca373a3371686ceeb1274927fce67ffff240bf\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.3"
+        sha1="47e8f08b7d9a292feb7ea9d3f20178e204d248bf">
+        <dex dex="C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_50da2ec8576690b884db7a1fb7557f360b3d3ed2\classes.dex" />
+    </item>
+
+</items>

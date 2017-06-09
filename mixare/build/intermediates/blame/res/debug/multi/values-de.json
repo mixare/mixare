@@ -1,0 +1,965 @@
+[
+    {
+        "outputFile": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-de\\values-de.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 31,
+                    "endOffset": 82
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 229,
+                        "endColumn": 31,
+                        "endOffset": 256
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 87,
+                    "endColumn": 31,
+                    "endOffset": 114
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 161,
+                        "endColumn": 31,
+                        "endOffset": 188
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 119,
+                    "endColumn": 33,
+                    "endOffset": 148
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 194,
+                        "endColumn": 33,
+                        "endOffset": 223
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 153,
+                    "endColumn": 33,
+                    "endOffset": 182
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 398,
+                        "endColumn": 33,
+                        "endOffset": 427
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 187,
+                    "endColumn": 31,
+                    "endOffset": 214
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 297,
+                        "endColumn": 31,
+                        "endOffset": 324
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 219,
+                    "endColumn": 33,
+                    "endOffset": 248
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 262,
+                        "endColumn": 33,
+                        "endOffset": 291
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 253,
+                    "endColumn": 33,
+                    "endOffset": 282
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 330,
+                        "endColumn": 33,
+                        "endOffset": 359
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 287,
+                    "endColumn": 31,
+                    "endOffset": 314
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 365,
+                        "endColumn": 31,
+                        "endOffset": 392
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 319,
+                    "endColumn": 50,
+                    "endOffset": 365
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 61,
+                        "startColumn": 1,
+                        "startOffset": 3139,
+                        "endColumn": 47,
+                        "endOffset": 3185
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 370,
+                    "endColumn": 49,
+                    "endOffset": 415
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 59,
+                        "startColumn": 1,
+                        "startOffset": 3041,
+                        "endColumn": 46,
+                        "endOffset": 3086
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 420,
+                    "endColumn": 43,
+                    "endOffset": 459
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 59,
+                        "endColumn": 43,
+                        "endOffset": 98
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 464,
+                    "endColumn": 50,
+                    "endOffset": 510
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 53,
+                        "startColumn": 1,
+                        "startOffset": 2766,
+                        "endColumn": 47,
+                        "endOffset": 2812
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 515,
+                    "endColumn": 68,
+                    "endOffset": 579
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 47,
+                        "startColumn": 1,
+                        "startOffset": 2460,
+                        "endColumn": 65,
+                        "endOffset": 2524
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 15,
+                    "startColumn": 4,
+                    "startOffset": 584,
+                    "endColumn": 67,
+                    "endOffset": 647
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 48,
+                        "startColumn": 1,
+                        "startOffset": 2527,
+                        "endColumn": 64,
+                        "endOffset": 2590
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 16,
+                    "startColumn": 4,
+                    "startOffset": 652,
+                    "endLine": 17,
+                    "endColumn": 75,
+                    "endOffset": 865
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 45,
+                        "startColumn": 1,
+                        "startOffset": 2243,
+                        "endLine": 46,
+                        "endColumn": 75,
+                        "endOffset": 2457
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 18,
+                    "startColumn": 4,
+                    "startOffset": 870,
+                    "endColumn": 170,
+                    "endOffset": 1036
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 40,
+                        "startColumn": 1,
+                        "startOffset": 1856,
+                        "endColumn": 167,
+                        "endOffset": 2022
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 1041,
+                    "endColumn": 76,
+                    "endOffset": 1113
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 41,
+                        "startColumn": 1,
+                        "startOffset": 2025,
+                        "endColumn": 73,
+                        "endOffset": 2097
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 20,
+                    "startColumn": 4,
+                    "startOffset": 1118,
+                    "endColumn": 73,
+                    "endOffset": 1187
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 42,
+                        "startColumn": 1,
+                        "startOffset": 2100,
+                        "endColumn": 70,
+                        "endOffset": 2169
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 21,
+                    "startColumn": 4,
+                    "startOffset": 1192,
+                    "endColumn": 69,
+                    "endOffset": 1257
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 43,
+                        "startColumn": 1,
+                        "startOffset": 2172,
+                        "endColumn": 66,
+                        "endOffset": 2237
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 22,
+                    "startColumn": 4,
+                    "startOffset": 1262,
+                    "endColumn": 94,
+                    "endOffset": 1352
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 73,
+                        "startColumn": 1,
+                        "startOffset": 3729,
+                        "endColumn": 91,
+                        "endOffset": 3819
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 23,
+                    "startColumn": 4,
+                    "startOffset": 1357,
+                    "endColumn": 92,
+                    "endOffset": 1445
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 72,
+                        "startColumn": 1,
+                        "startOffset": 3638,
+                        "endColumn": 89,
+                        "endOffset": 3726
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 24,
+                    "startColumn": 4,
+                    "startOffset": 1450,
+                    "endColumn": 96,
+                    "endOffset": 1542
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 71,
+                        "startColumn": 1,
+                        "startOffset": 3543,
+                        "endColumn": 93,
+                        "endOffset": 3635
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 25,
+                    "startColumn": 4,
+                    "startOffset": 1547,
+                    "endLine": 26,
+                    "endColumn": 72,
+                    "endOffset": 1736
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 441,
+                        "endLine": 17,
+                        "endColumn": 72,
+                        "endOffset": 631
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 27,
+                    "startColumn": 4,
+                    "startOffset": 1741,
+                    "endColumn": 56,
+                    "endOffset": 1793
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 56,
+                        "startColumn": 1,
+                        "startOffset": 2888,
+                        "endColumn": 53,
+                        "endOffset": 2940
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 28,
+                    "startColumn": 4,
+                    "startOffset": 1798,
+                    "endColumn": 71,
+                    "endOffset": 1865
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 54,
+                        "startColumn": 1,
+                        "startOffset": 2815,
+                        "endColumn": 68,
+                        "endOffset": 2882
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 29,
+                    "startColumn": 4,
+                    "startOffset": 1870,
+                    "endColumn": 61,
+                    "endOffset": 1927
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 62,
+                        "startColumn": 1,
+                        "startOffset": 3188,
+                        "endColumn": 58,
+                        "endOffset": 3245
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 30,
+                    "startColumn": 4,
+                    "startOffset": 1932,
+                    "endColumn": 50,
+                    "endOffset": 1978
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 58,
+                        "startColumn": 1,
+                        "startOffset": 2992,
+                        "endColumn": 47,
+                        "endOffset": 3038
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 31,
+                    "startColumn": 4,
+                    "startOffset": 1983,
+                    "endLine": 40,
+                    "endColumn": 10,
+                    "endOffset": 2707
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 1,
+                        "startOffset": 788,
+                        "endLine": 30,
+                        "endColumn": 10,
+                        "endOffset": 1524
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 41,
+                    "startColumn": 4,
+                    "startOffset": 2712,
+                    "endColumn": 48,
+                    "endOffset": 2756
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 52,
+                        "startColumn": 1,
+                        "startOffset": 2719,
+                        "endColumn": 45,
+                        "endOffset": 2763
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 42,
+                    "startColumn": 4,
+                    "startOffset": 2761,
+                    "endColumn": 50,
+                    "endOffset": 2807
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 57,
+                        "startColumn": 1,
+                        "startOffset": 2943,
+                        "endColumn": 47,
+                        "endOffset": 2989
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 43,
+                    "startColumn": 4,
+                    "startOffset": 2812,
+                    "endColumn": 68,
+                    "endOffset": 2876
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 69,
+                        "startColumn": 1,
+                        "startOffset": 3473,
+                        "endColumn": 65,
+                        "endOffset": 3537
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 44,
+                    "startColumn": 4,
+                    "startOffset": 2881,
+                    "endColumn": 52,
+                    "endOffset": 2929
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 66,
+                        "startColumn": 1,
+                        "startOffset": 3363,
+                        "endColumn": 49,
+                        "endOffset": 3411
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 45,
+                    "startColumn": 4,
+                    "startOffset": 2934,
+                    "endColumn": 54,
+                    "endOffset": 2984
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 64,
+                        "startColumn": 1,
+                        "startOffset": 3251,
+                        "endColumn": 51,
+                        "endOffset": 3301
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 46,
+                    "startColumn": 4,
+                    "startOffset": 2989,
+                    "endColumn": 60,
+                    "endOffset": 3045
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 65,
+                        "startColumn": 1,
+                        "startOffset": 3304,
+                        "endColumn": 57,
+                        "endOffset": 3360
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 47,
+                    "startColumn": 4,
+                    "startOffset": 3050,
+                    "endColumn": 57,
+                    "endOffset": 3103
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 67,
+                        "startColumn": 1,
+                        "startOffset": 3414,
+                        "endColumn": 54,
+                        "endOffset": 3467
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 48,
+                    "startColumn": 4,
+                    "startOffset": 3108,
+                    "endColumn": 51,
+                    "endOffset": 3155
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 32,
+                        "startColumn": 1,
+                        "startOffset": 1530,
+                        "endColumn": 48,
+                        "endOffset": 1577
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 49,
+                    "startColumn": 4,
+                    "startOffset": 3160,
+                    "endColumn": 53,
+                    "endOffset": 3209
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 33,
+                        "startColumn": 1,
+                        "startOffset": 1580,
+                        "endColumn": 50,
+                        "endOffset": 1629
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 50,
+                    "startColumn": 4,
+                    "startOffset": 3214,
+                    "endColumn": 45,
+                    "endOffset": 3255
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 34,
+                        "startColumn": 1,
+                        "startOffset": 1632,
+                        "endColumn": 42,
+                        "endOffset": 1673
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 51,
+                    "startColumn": 4,
+                    "startOffset": 3260,
+                    "endColumn": 46,
+                    "endOffset": 3302
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 35,
+                        "startColumn": 1,
+                        "startOffset": 1676,
+                        "endColumn": 43,
+                        "endOffset": 1718
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 52,
+                    "startColumn": 4,
+                    "startOffset": 3307,
+                    "endColumn": 45,
+                    "endOffset": 3348
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 36,
+                        "startColumn": 1,
+                        "startOffset": 1721,
+                        "endColumn": 42,
+                        "endOffset": 1762
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 53,
+                    "startColumn": 4,
+                    "startOffset": 3353,
+                    "endColumn": 44,
+                    "endOffset": 3393
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 37,
+                        "startColumn": 1,
+                        "startOffset": 1765,
+                        "endColumn": 41,
+                        "endOffset": 1805
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 54,
+                    "startColumn": 4,
+                    "startOffset": 3398,
+                    "endColumn": 46,
+                    "endOffset": 3440
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 38,
+                        "startColumn": 1,
+                        "startOffset": 1808,
+                        "endColumn": 43,
+                        "endOffset": 1850
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 55,
+                    "startColumn": 4,
+                    "startOffset": 3445,
+                    "endColumn": 121,
+                    "endOffset": 3562
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 50,
+                        "startColumn": 1,
+                        "startOffset": 2596,
+                        "endColumn": 118,
+                        "endOffset": 2713
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 56,
+                    "startColumn": 4,
+                    "startOffset": 3567,
+                    "endLine": 57,
+                    "endColumn": 71,
+                    "endOffset": 3714
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 1,
+                        "startOffset": 634,
+                        "endLine": 19,
+                        "endColumn": 71,
+                        "endOffset": 782
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 58,
+                    "startColumn": 4,
+                    "startOffset": 3719,
+                    "endColumn": 68,
+                    "endOffset": 3783
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 78,
+                        "startColumn": 1,
+                        "startOffset": 3983,
+                        "endColumn": 65,
+                        "endOffset": 4047
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 59,
+                    "startColumn": 4,
+                    "startOffset": 3788,
+                    "endColumn": 82,
+                    "endOffset": 3866
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 79,
+                        "startColumn": 1,
+                        "startOffset": 4050,
+                        "endColumn": 79,
+                        "endOffset": 4128
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 60,
+                    "startColumn": 4,
+                    "startOffset": 3871,
+                    "endColumn": 84,
+                    "endOffset": 3951
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 75,
+                        "startColumn": 1,
+                        "startOffset": 3825,
+                        "endColumn": 81,
+                        "endOffset": 3905
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 61,
+                    "startColumn": 4,
+                    "startOffset": 3956,
+                    "endColumn": 49,
+                    "endOffset": 4001
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 104,
+                        "endColumn": 49,
+                        "endOffset": 149
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 62,
+                    "startColumn": 4,
+                    "startOffset": 4006,
+                    "endColumn": 73,
+                    "endOffset": 4075
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 76,
+                        "startColumn": 1,
+                        "startOffset": 3908,
+                        "endColumn": 70,
+                        "endOffset": 3977
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 63,
+                    "startColumn": 4,
+                    "startOffset": 4080,
+                    "endColumn": 51,
+                    "endOffset": 4127
+                },
+                "from": {
+                    "file": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\values-de\\strings.xml",
+                    "position": {
+                        "startLine": 60,
+                        "startColumn": 1,
+                        "startOffset": 3089,
+                        "endColumn": 48,
+                        "endOffset": 3136
+                    }
+                }
+            }
+        ]
+    }
+]

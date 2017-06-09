@@ -1,0 +1,471 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Manifest Merging:
+-----------------
+Your project uses libraries that provide manifests, and your Eclipse
+project did not explicitly turn on manifest merging. In Android Gradle
+projects, manifests are always merged (meaning that contents from your
+libraries' manifests will be merged into the app manifest. If you had
+manually copied contents from library manifests into your app manifest
+you may need to remove these for the app to build correctly.
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+From mixare:
+* .gitignore
+* .idea\
+* .idea\compiler.xml
+* .idea\copyright\
+* .idea\copyright\profiles_settings.xml
+* .idea\encodings.xml
+* .idea\misc.xml
+* .idea\workspace.xml
+* COPYING
+* build.gradle
+* default.properties
+* docs\
+* docs\UML\
+* docs\UML\DataFlow.jpg
+* docs\UML\ManagersClassDiagram.mgc
+* docs\UML\ManagersClassDiagram.png
+* docs\UML\UML.jpg
+* gradle\
+* gradle\wrapper\
+* gradle\wrapper\gradle-wrapper.jar
+* gradle\wrapper\gradle-wrapper.properties
+* gradlew
+* gradlew.bat
+* mixare\
+* mixare\build.gradle
+* mixare\src\
+* mixare\src\main\
+* mixare\src\main\AndroidManifest.xml
+* mixare\src\main\java\
+* mixare\src\main\java\org\
+* mixare\src\main\java\org\mixare\
+* mixare\src\main\java\org\mixare\Compatibility.java
+* mixare\src\main\java\org\mixare\DataView.java
+* mixare\src\main\java\org\mixare\LocalMarker.java
+* mixare\src\main\java\org\mixare\MainActivity.java
+* mixare\src\main\java\org\mixare\MixContext.java
+* mixare\src\main\java\org\mixare\MixListView.java
+* mixare\src\main\java\org\mixare\MixMap.java
+* mixare\src\main\java\org\mixare\MixState.java
+* mixare\src\main\java\org\mixare\MixView.java
+* mixare\src\main\java\org\mixare\NavigationMarker.java
+* mixare\src\main\java\org\mixare\POIMarker.java
+* mixare\src\main\java\org\mixare\PluginLoaderActivity.java
+* mixare\src\main\java\org\mixare\SocialMarker.java
+* mixare\src\main\java\org\mixare\data\
+* mixare\src\main\java\org\mixare\data\DataHandler.java
+* mixare\src\main\java\org\mixare\data\DataSource.java
+* mixare\src\main\java\org\mixare\data\DataSourceList.java
+* mixare\src\main\java\org\mixare\data\DataSourceStorage.java
+* mixare\src\main\java\org\mixare\data\convert\
+* mixare\src\main\java\org\mixare\data\convert\DataConvertor.java
+* mixare\src\main\java\org\mixare\data\convert\DataProcessor.java
+* mixare\src\main\java\org\mixare\data\convert\MixareDataProcessor.java
+* mixare\src\main\java\org\mixare\data\convert\OsmDataProcessor.java
+* mixare\src\main\java\org\mixare\data\convert\TwitterDataProcessor.java
+* mixare\src\main\java\org\mixare\data\convert\WikiDataProcessor.java
+* mixare\src\main\java\org\mixare\gui\
+* mixare\src\main\java\org\mixare\gui\RadarPoints.java
+* mixare\src\main\java\org\mixare\mgr\
+* mixare\src\main\java\org\mixare\mgr\HttpTools.java
+* mixare\src\main\java\org\mixare\mgr\datasource\
+* mixare\src\main\java\org\mixare\mgr\datasource\DataSourceManager.java
+* mixare\src\main\java\org\mixare\mgr\datasource\DataSourceManagerFactory.java
+* mixare\src\main\java\org\mixare\mgr\datasource\DataSourceMgrImpl.java
+* mixare\src\main\java\org\mixare\mgr\downloader\
+* mixare\src\main\java\org\mixare\mgr\downloader\DownloadManager.java
+* mixare\src\main\java\org\mixare\mgr\downloader\DownloadManagerFactory.java
+* mixare\src\main\java\org\mixare\mgr\downloader\DownloadMgrImpl.java
+* mixare\src\main\java\org\mixare\mgr\downloader\DownloadRequest.java
+* mixare\src\main\java\org\mixare\mgr\downloader\DownloadResult.java
+* mixare\src\main\java\org\mixare\mgr\downloader\ManagedDownloadRequest.java
+* mixare\src\main\java\org\mixare\mgr\location\
+* mixare\src\main\java\org\mixare\mgr\location\LocationFinder.java
+* mixare\src\main\java\org\mixare\mgr\location\LocationFinderFactory.java
+* mixare\src\main\java\org\mixare\mgr\location\LocationMgrImpl.java
+* mixare\src\main\java\org\mixare\mgr\location\LocationObserver.java
+* mixare\src\main\java\org\mixare\mgr\location\LocationResolver.java
+* mixare\src\main\java\org\mixare\mgr\webcontent\
+* mixare\src\main\java\org\mixare\mgr\webcontent\WebContentManager.java
+* mixare\src\main\java\org\mixare\mgr\webcontent\WebContentManagerFactory.java
+* mixare\src\main\java\org\mixare\mgr\webcontent\WebPageMgrImpl.java
+* mixare\src\main\java\org\mixare\plugin\
+* mixare\src\main\java\org\mixare\plugin\PluginConnection.java
+* mixare\src\main\java\org\mixare\plugin\PluginLoader.java
+* mixare\src\main\java\org\mixare\plugin\PluginNotFoundException.java
+* mixare\src\main\java\org\mixare\plugin\PluginType.java
+* mixare\src\main\java\org\mixare\plugin\connection\
+* mixare\src\main\java\org\mixare\plugin\connection\ActivityConnection.java
+* mixare\src\main\java\org\mixare\plugin\connection\BootStrapActivityConnection.java
+* mixare\src\main\java\org\mixare\plugin\connection\DataHandlerServiceConnection.java
+* mixare\src\main\java\org\mixare\plugin\connection\MarkerServiceConnection.java
+* mixare\src\main\java\org\mixare\plugin\remoteobjects\
+* mixare\src\main\java\org\mixare\plugin\remoteobjects\RemoteDataHandler.java
+* mixare\src\main\java\org\mixare\plugin\remoteobjects\RemoteMarker.java
+* mixare\src\main\res\
+* mixare\src\main\res\drawable-hdpi\
+* mixare\src\main\res\drawable-hdpi\ic_launcher.png
+* mixare\src\main\res\drawable-hdpi\osm.png
+* mixare\src\main\res\drawable-hdpi\wikipedia.png
+* mixare\src\main\res\drawable-ldpi\
+* mixare\src\main\res\drawable-ldpi\ic_launcher.png
+* mixare\src\main\res\drawable-ldpi\osm.png
+* mixare\src\main\res\drawable-ldpi\wikipedia.png
+* mixare\src\main\res\drawable-mdpi\
+* mixare\src\main\res\drawable-mdpi\ic_launcher.png
+* mixare\src\main\res\drawable-mdpi\osm.png
+* mixare\src\main\res\drawable-mdpi\wikipedia.png
+* mixare\src\main\res\drawable\
+* mixare\src\main\res\drawable\arena.png
+* mixare\src\main\res\drawable\buzz.png
+* mixare\src\main\res\drawable\icon_datasource.png
+* mixare\src\main\res\drawable\icon_edit.png
+* mixare\src\main\res\drawable\icon_map.png
+* mixare\src\main\res\drawable\icon_white.png
+* mixare\src\main\res\drawable\icon_white1.png
+* mixare\src\main\res\drawable\loc_icon.png
+* mixare\src\main\res\drawable\logo.png
+* mixare\src\main\res\drawable\twitter.png
+* mixare\src\main\res\layout\
+* mixare\src\main\res\layout\datasourcedetails.xml
+* mixare\src\main\res\layout\datasourcelist.xml
+* mixare\src\main\res\layout\main.xml
+* mixare\src\main\res\layout\splashscreen.xml
+* mixare\src\main\res\layout\webview.xml
+* mixare\src\main\res\values-EG\
+* mixare\src\main\res\values-EG\strings.xml
+* mixare\src\main\res\values-de\
+* mixare\src\main\res\values-de\strings.xml
+* mixare\src\main\res\values-es\
+* mixare\src\main\res\values-es\strings.xml
+* mixare\src\main\res\values-eu\
+* mixare\src\main\res\values-eu\strings.xml
+* mixare\src\main\res\values-fr\
+* mixare\src\main\res\values-fr\strings.xml
+* mixare\src\main\res\values-it\
+* mixare\src\main\res\values-it\strings.xml
+* mixare\src\main\res\values-nl\
+* mixare\src\main\res\values-nl\strings.xml
+* mixare\src\main\res\values-pt\
+* mixare\src\main\res\values-pt\strings.xml
+* mixare\src\main\res\values\
+* mixare\src\main\res\values\arrays.xml
+* mixare\src\main\res\values\strings.xml
+* mixare\src\main\res\xml\
+* mixare\src\main\res\xml\searchable.xml
+* mixarelib\
+* mixarelib\build.gradle
+* mixarelib\lint.xml
+* mixarelib\src\
+* mixarelib\src\main\
+* mixarelib\src\main\AndroidManifest.xml
+* mixarelib\src\main\aidl\
+* mixarelib\src\main\aidl\org\
+* mixarelib\src\main\aidl\org\mixare\
+* mixarelib\src\main\aidl\org\mixare\lib\
+* mixarelib\src\main\aidl\org\mixare\lib\gui\
+* mixarelib\src\main\aidl\org\mixare\lib\gui\Label.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\gui\PaintScreen.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\gui\TextObj.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\marker\
+* mixarelib\src\main\aidl\org\mixare\lib\marker\InitialMarkerData.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\marker\draw\
+* mixarelib\src\main\aidl\org\mixare\lib\marker\draw\ClickHandler.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\marker\draw\DrawCommand.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\marker\draw\ParcelableProperty.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\marker\draw\PrimitiveProperty.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\render\
+* mixarelib\src\main\aidl\org\mixare\lib\render\Camera.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\render\MixVector.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\service\
+* mixarelib\src\main\aidl\org\mixare\lib\service\IBootStrap.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\service\IDataHandlerService.aidl
+* mixarelib\src\main\aidl\org\mixare\lib\service\IMarkerService.aidl
+* mixarelib\src\main\java\
+* mixarelib\src\main\java\org\
+* mixarelib\src\main\java\org\mixare\
+* mixarelib\src\main\java\org\mixare\lib\
+* mixarelib\src\main\java\org\mixare\lib\HtmlUnescape.java
+* mixarelib\src\main\java\org\mixare\lib\MixContextInterface.java
+* mixarelib\src\main\java\org\mixare\lib\MixStateInterface.java
+* mixarelib\src\main\java\org\mixare\lib\MixUtils.java
+* mixarelib\src\main\java\org\mixare\lib\data\
+* mixarelib\src\main\java\org\mixare\lib\data\PluginDataProcessor.java
+* mixarelib\src\main\java\org\mixare\lib\gui\
+* mixarelib\src\main\java\org\mixare\lib\gui\Label.java
+* mixarelib\src\main\java\org\mixare\lib\gui\PaintScreen.java
+* mixarelib\src\main\java\org\mixare\lib\gui\ScreenLine.java
+* mixarelib\src\main\java\org\mixare\lib\gui\ScreenObj.java
+* mixarelib\src\main\java\org\mixare\lib\gui\TextObj.java
+* mixarelib\src\main\java\org\mixare\lib\marker\
+* mixarelib\src\main\java\org\mixare\lib\marker\InitialMarkerData.java
+* mixarelib\src\main\java\org\mixare\lib\marker\Marker.java
+* mixarelib\src\main\java\org\mixare\lib\marker\PluginMarker.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\ClickHandler.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\DrawArrow.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\DrawCommand.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\DrawImage.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\DrawTextBox.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\ParcelableProperty.java
+* mixarelib\src\main\java\org\mixare\lib\marker\draw\PrimitiveProperty.java
+* mixarelib\src\main\java\org\mixare\lib\reality\
+* mixarelib\src\main\java\org\mixare\lib\reality\PhysicalPlace.java
+* mixarelib\src\main\java\org\mixare\lib\render\
+* mixarelib\src\main\java\org\mixare\lib\render\Camera.java
+* mixarelib\src\main\java\org\mixare\lib\render\Matrix.java
+* mixarelib\src\main\java\org\mixare\lib\render\MixVector.java
+* plugins\
+* plugins\mixare-arena-processor-plugin\
+* plugins\mixare-arena-processor-plugin\.classpath
+* plugins\mixare-arena-processor-plugin\.gitignore
+* plugins\mixare-arena-processor-plugin\.project
+* plugins\mixare-arena-processor-plugin\AndroidManifest.xml
+* plugins\mixare-arena-processor-plugin\proguard.cfg
+* plugins\mixare-arena-processor-plugin\project.properties
+* plugins\mixare-arena-processor-plugin\res\
+* plugins\mixare-arena-processor-plugin\res\drawable-hdpi\
+* plugins\mixare-arena-processor-plugin\res\drawable-hdpi\ic_launcher.png
+* plugins\mixare-arena-processor-plugin\res\drawable-ldpi\
+* plugins\mixare-arena-processor-plugin\res\drawable-ldpi\ic_launcher.png
+* plugins\mixare-arena-processor-plugin\res\drawable-ldpi\information.png
+* plugins\mixare-arena-processor-plugin\res\drawable-mdpi\
+* plugins\mixare-arena-processor-plugin\res\drawable-mdpi\ic_launcher.png
+* plugins\mixare-arena-processor-plugin\res\layout\
+* plugins\mixare-arena-processor-plugin\res\layout\main.xml
+* plugins\mixare-arena-processor-plugin\res\values\
+* plugins\mixare-arena-processor-plugin\res\values\strings.xml
+* plugins\mixare-arena-processor-plugin\src\
+* plugins\mixare-arena-processor-plugin\src\org\
+* plugins\mixare-arena-processor-plugin\src\org\mixare\
+* plugins\mixare-arena-processor-plugin\src\org\mixare\plugin\
+* plugins\mixare-arena-processor-plugin\src\org\mixare\plugin\arenaprocessor\
+* plugins\mixare-arena-processor-plugin\src\org\mixare\plugin\arenaprocessor\ArenaProcessor.java
+* plugins\mixare-arena-processor-plugin\src\org\mixare\plugin\arenaprocessor\service\
+* plugins\mixare-arena-processor-plugin\src\org\mixare\plugin\arenaprocessor\service\ArenaProcessorService.java
+* plugins\mixare-arena-splashscreen-plugin\
+* plugins\mixare-arena-splashscreen-plugin\.classpath
+* plugins\mixare-arena-splashscreen-plugin\.gitignore
+* plugins\mixare-arena-splashscreen-plugin\.project
+* plugins\mixare-arena-splashscreen-plugin\AndroidManifest.xml
+* plugins\mixare-arena-splashscreen-plugin\proguard.cfg
+* plugins\mixare-arena-splashscreen-plugin\project.properties
+* plugins\mixare-arena-splashscreen-plugin\res\
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-hdpi\
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-hdpi\ic_launcher.png
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-ldpi\
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-ldpi\ic_launcher.png
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-mdpi\
+* plugins\mixare-arena-splashscreen-plugin\res\drawable-mdpi\ic_launcher.png
+* plugins\mixare-arena-splashscreen-plugin\res\drawable\
+* plugins\mixare-arena-splashscreen-plugin\res\drawable\arena.png
+* plugins\mixare-arena-splashscreen-plugin\res\layout\
+* plugins\mixare-arena-splashscreen-plugin\res\layout\main.xml
+* plugins\mixare-arena-splashscreen-plugin\res\values\
+* plugins\mixare-arena-splashscreen-plugin\res\values\strings.xml
+* plugins\mixare-arena-splashscreen-plugin\src\
+* plugins\mixare-arena-splashscreen-plugin\src\org\
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\plugin\
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\plugin\arenasplash\
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\plugin\arenasplash\ArenaSplashActivity.java
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\plugin\arenasplash\service\
+* plugins\mixare-arena-splashscreen-plugin\src\org\mixare\plugin\arenasplash\service\ArenaSplashService.java
+* plugins\mixare-barcode-plugin\
+* plugins\mixare-barcode-plugin\.classpath
+* plugins\mixare-barcode-plugin\.gitignore
+* plugins\mixare-barcode-plugin\.project
+* plugins\mixare-barcode-plugin\AndroidManifest.xml
+* plugins\mixare-barcode-plugin\gen\
+* plugins\mixare-barcode-plugin\gen\org\
+* plugins\mixare-barcode-plugin\gen\org\mixare\
+* plugins\mixare-barcode-plugin\gen\org\mixare\lib\
+* plugins\mixare-barcode-plugin\gen\org\mixare\lib\R.java
+* plugins\mixare-barcode-plugin\gen\org\mixare\plugin\
+* plugins\mixare-barcode-plugin\gen\org\mixare\plugin\barcode\
+* plugins\mixare-barcode-plugin\gen\org\mixare\plugin\barcode\R.java
+* plugins\mixare-barcode-plugin\proguard.cfg
+* plugins\mixare-barcode-plugin\project.properties
+* plugins\mixare-barcode-plugin\res\
+* plugins\mixare-barcode-plugin\res\drawable-hdpi\
+* plugins\mixare-barcode-plugin\res\drawable-hdpi\ic_launcher.png
+* plugins\mixare-barcode-plugin\res\drawable-ldpi\
+* plugins\mixare-barcode-plugin\res\drawable-ldpi\ic_launcher.png
+* plugins\mixare-barcode-plugin\res\drawable-mdpi\
+* plugins\mixare-barcode-plugin\res\drawable-mdpi\ic_launcher.png
+* plugins\mixare-barcode-plugin\res\layout\
+* plugins\mixare-barcode-plugin\res\layout\main.xml
+* plugins\mixare-barcode-plugin\res\values\
+* plugins\mixare-barcode-plugin\res\values\strings.xml
+* plugins\mixare-barcode-plugin\src\
+* plugins\mixare-barcode-plugin\src\org\
+* plugins\mixare-barcode-plugin\src\org\mixare\
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\BarcodeActivity.java
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\intent\
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\intent\IntentIntegrator.java
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\intent\IntentResult.java
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\service\
+* plugins\mixare-barcode-plugin\src\org\mixare\plugin\barcode\service\BarcodeService.java
+* plugins\mixare-imagemarker-plugin\
+* plugins\mixare-imagemarker-plugin\.classpath
+* plugins\mixare-imagemarker-plugin\.gitignore
+* plugins\mixare-imagemarker-plugin\.project
+* plugins\mixare-imagemarker-plugin\AndroidManifest.xml
+* plugins\mixare-imagemarker-plugin\proguard.cfg
+* plugins\mixare-imagemarker-plugin\project.properties
+* plugins\mixare-imagemarker-plugin\res\
+* plugins\mixare-imagemarker-plugin\res\drawable-hdpi\
+* plugins\mixare-imagemarker-plugin\res\drawable-hdpi\ic_launcher.png
+* plugins\mixare-imagemarker-plugin\res\drawable-ldpi\
+* plugins\mixare-imagemarker-plugin\res\drawable-ldpi\ic_launcher.png
+* plugins\mixare-imagemarker-plugin\res\drawable-mdpi\
+* plugins\mixare-imagemarker-plugin\res\drawable-mdpi\ic_launcher.png
+* plugins\mixare-imagemarker-plugin\res\values\
+* plugins\mixare-imagemarker-plugin\res\values\strings.xml
+* plugins\mixare-imagemarker-plugin\src\
+* plugins\mixare-imagemarker-plugin\src\org\
+* plugins\mixare-imagemarker-plugin\src\org\mixare\
+* plugins\mixare-imagemarker-plugin\src\org\mixare\plugin\
+* plugins\mixare-imagemarker-plugin\src\org\mixare\plugin\imagemarker\
+* plugins\mixare-imagemarker-plugin\src\org\mixare\plugin\imagemarker\ImageMarker.java
+* plugins\mixare-imagemarker-plugin\src\org\mixare\plugin\imagemarker\service\
+* plugins\mixare-imagemarker-plugin\src\org\mixare\plugin\imagemarker\service\ImageMarkerService.java
+* plugins\mixare-library\
+* plugins\mixare-library\.classpath
+* plugins\mixare-library\.externalToolBuilders\
+* plugins\mixare-library\.externalToolBuilders\mixare-ant-builder.launch
+* plugins\mixare-library\.gitignore
+* plugins\mixare-library\.project
+* plugins\mixare-library\AndroidManifest.xml
+* plugins\mixare-library\build.xml
+* plugins\mixare-library\lint.xml
+* plugins\mixare-library\proguard.cfg
+* plugins\mixare-library\project.properties
+* plugins\mixare-library\src\
+* plugins\mixare-library\src\org\
+* plugins\mixare-library\src\org\mixare\
+* plugins\mixare-library\src\org\mixare\lib\
+* plugins\mixare-library\src\org\mixare\lib\HtmlUnescape.java
+* plugins\mixare-library\src\org\mixare\lib\MixContextInterface.java
+* plugins\mixare-library\src\org\mixare\lib\MixStateInterface.java
+* plugins\mixare-library\src\org\mixare\lib\MixUtils.java
+* plugins\mixare-library\src\org\mixare\lib\data\
+* plugins\mixare-library\src\org\mixare\lib\data\PluginDataProcessor.java
+* plugins\mixare-library\src\org\mixare\lib\gui\
+* plugins\mixare-library\src\org\mixare\lib\gui\Label.aidl
+* plugins\mixare-library\src\org\mixare\lib\gui\Label.java
+* plugins\mixare-library\src\org\mixare\lib\gui\PaintScreen.aidl
+* plugins\mixare-library\src\org\mixare\lib\gui\PaintScreen.java
+* plugins\mixare-library\src\org\mixare\lib\gui\ScreenLine.java
+* plugins\mixare-library\src\org\mixare\lib\gui\ScreenObj.java
+* plugins\mixare-library\src\org\mixare\lib\gui\TextObj.aidl
+* plugins\mixare-library\src\org\mixare\lib\gui\TextObj.java
+* plugins\mixare-library\src\org\mixare\lib\marker\
+* plugins\mixare-library\src\org\mixare\lib\marker\InitialMarkerData.aidl
+* plugins\mixare-library\src\org\mixare\lib\marker\InitialMarkerData.java
+* plugins\mixare-library\src\org\mixare\lib\marker\Marker.java
+* plugins\mixare-library\src\org\mixare\lib\marker\PluginMarker.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\ClickHandler.aidl
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\ClickHandler.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\DrawArrow.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\DrawCommand.aidl
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\DrawCommand.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\DrawImage.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\DrawTextBox.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\ParcelableProperty.aidl
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\ParcelableProperty.java
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\PrimitiveProperty.aidl
+* plugins\mixare-library\src\org\mixare\lib\marker\draw\PrimitiveProperty.java
+* plugins\mixare-library\src\org\mixare\lib\reality\
+* plugins\mixare-library\src\org\mixare\lib\reality\PhysicalPlace.java
+* plugins\mixare-library\src\org\mixare\lib\render\
+* plugins\mixare-library\src\org\mixare\lib\render\Camera.aidl
+* plugins\mixare-library\src\org\mixare\lib\render\Camera.java
+* plugins\mixare-library\src\org\mixare\lib\render\Matrix.java
+* plugins\mixare-library\src\org\mixare\lib\render\MixVector.aidl
+* plugins\mixare-library\src\org\mixare\lib\render\MixVector.java
+* plugins\mixare-library\src\org\mixare\lib\service\
+* plugins\mixare-library\src\org\mixare\lib\service\IBootStrap.aidl
+* plugins\mixare-library\src\org\mixare\lib\service\IDataHandlerService.aidl
+* plugins\mixare-library\src\org\mixare\lib\service\IMarkerService.aidl
+* plugins\mixare-mock-location-plugin\
+* plugins\mixare-mock-location-plugin\.classpath
+* plugins\mixare-mock-location-plugin\.gitignore
+* plugins\mixare-mock-location-plugin\.project
+* plugins\mixare-mock-location-plugin\AndroidManifest.xml
+* plugins\mixare-mock-location-plugin\assets\
+* plugins\mixare-mock-location-plugin\assets\data.txt
+* plugins\mixare-mock-location-plugin\proguard.cfg
+* plugins\mixare-mock-location-plugin\project.properties
+* plugins\mixare-mock-location-plugin\res\
+* plugins\mixare-mock-location-plugin\res\drawable-hdpi\
+* plugins\mixare-mock-location-plugin\res\drawable-hdpi\ic_launcher.png
+* plugins\mixare-mock-location-plugin\res\drawable-ldpi\
+* plugins\mixare-mock-location-plugin\res\drawable-ldpi\ic_launcher.png
+* plugins\mixare-mock-location-plugin\res\drawable-mdpi\
+* plugins\mixare-mock-location-plugin\res\drawable-mdpi\ic_launcher.png
+* plugins\mixare-mock-location-plugin\res\layout\
+* plugins\mixare-mock-location-plugin\res\layout\main.xml
+* plugins\mixare-mock-location-plugin\res\values\
+* plugins\mixare-mock-location-plugin\res\values\strings.xml
+* settings.gradle
+From mixarelib:
+* .externalToolBuilders\
+* .externalToolBuilders\mixare-ant-builder.launch
+* .gitignore
+* build.xml
+* proguard.cfg
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+In mixarelib:
+* AndroidManifest.xml => mixarelib\src\main\AndroidManifest.xml
+* lint.xml => mixarelib\lint.xml
+* src\ => mixarelib\src\main\java\
+* src\org\mixare\lib\gui\Label.aidl => mixarelib\src\main\aidl\org\mixare\lib\gui\Label.aidl
+* src\org\mixare\lib\gui\PaintScreen.aidl => mixarelib\src\main\aidl\org\mixare\lib\gui\PaintScreen.aidl
+* src\org\mixare\lib\gui\TextObj.aidl => mixarelib\src\main\aidl\org\mixare\lib\gui\TextObj.aidl
+* src\org\mixare\lib\marker\draw\ClickHandler.aidl => mixarelib\src\main\aidl\org\mixare\lib\marker\draw\ClickHandler.aidl
+* src\org\mixare\lib\marker\draw\DrawCommand.aidl => mixarelib\src\main\aidl\org\mixare\lib\marker\draw\DrawCommand.aidl
+* src\org\mixare\lib\marker\draw\ParcelableProperty.aidl => mixarelib\src\main\aidl\org\mixare\lib\marker\draw\ParcelableProperty.aidl
+* src\org\mixare\lib\marker\draw\PrimitiveProperty.aidl => mixarelib\src\main\aidl\org\mixare\lib\marker\draw\PrimitiveProperty.aidl
+* src\org\mixare\lib\marker\InitialMarkerData.aidl => mixarelib\src\main\aidl\org\mixare\lib\marker\InitialMarkerData.aidl
+* src\org\mixare\lib\render\Camera.aidl => mixarelib\src\main\aidl\org\mixare\lib\render\Camera.aidl
+* src\org\mixare\lib\render\MixVector.aidl => mixarelib\src\main\aidl\org\mixare\lib\render\MixVector.aidl
+* src\org\mixare\lib\service\IBootStrap.aidl => mixarelib\src\main\aidl\org\mixare\lib\service\IBootStrap.aidl
+* src\org\mixare\lib\service\IDataHandlerService.aidl => mixarelib\src\main\aidl\org\mixare\lib\service\IDataHandlerService.aidl
+* src\org\mixare\lib\service\IMarkerService.aidl => mixarelib\src\main\aidl\org\mixare\lib\service\IMarkerService.aidl
+In mixare:
+* AndroidManifest.xml => mixare\src\main\AndroidManifest.xml
+* res\ => mixare\src\main\res\
+* src\ => mixare\src\main\java\
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="unspecified"><source path="C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\exploded-aar\mixare\mixarelib\unspecified\assets"/></dataSet><dataSet config="main"><source path="C:\Users\user\Desktop\thesis\mixare\mixare\src\main\assets"/><source path="C:\Users\user\Desktop\thesis\mixare\mixare\build\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="C:\Users\user\Desktop\thesis\mixare\mixare\src\debug\assets"/></dataSet></merger>

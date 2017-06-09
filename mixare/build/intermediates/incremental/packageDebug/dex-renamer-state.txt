@@ -1,0 +1,7 @@
+#Fri Jun 09 15:04:28 KST 2017
+base.0=C\:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_d7ca373a3371686ceeb1274927fce67ffff240bf
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=C\:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_50da2ec8576690b884db7a1fb7557f360b3d3ed2\\classes.dex
+base.1=C\:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_50da2ec8576690b884db7a1fb7557f360b3d3ed2
+file.0=C\:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_d7ca373a3371686ceeb1274927fce67ffff240bf\\classes.dex

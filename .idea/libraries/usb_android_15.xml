@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="usb-android-15">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/AppData/Local/Android/Sdk/add-ons/addon-google_apis-google-15/libs/usb.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

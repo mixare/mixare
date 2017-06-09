@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/row_layout" android:orientation="vertical"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:gravity="fill_vertical">
+
+
+	<TextView android:id="@+id/list_text" android:layout_height="wrap_content"
+		android:text="textview" android:textColor="#ffffff"
+		android:layout_gravity="top" android:textSize="22sp"
+		android:layout_alignParentLeft="false" android:layout_width="wrap_content" />
+
+	<TextView android:id="@+id/description_text"
+		android:layout_width="260dip" android:layout_height="wrap_content"
+		android:textColor="#ffffff" android:layout_gravity="bottom"
+		android:textSize="11sp" android:text="no changes" />
+
+
+
+
+</RelativeLayout>
+</ScrollView>
+

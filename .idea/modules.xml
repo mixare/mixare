@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/mixare.iml" filepath="$PROJECT_DIR$/mixare.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mixare/mixare-mixare.iml" filepath="$PROJECT_DIR$/mixare/mixare-mixare.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mixarelib/mixarelib.iml" filepath="$PROJECT_DIR$/mixarelib/mixarelib.iml" />
+    </modules>
+  </component>
+</project>

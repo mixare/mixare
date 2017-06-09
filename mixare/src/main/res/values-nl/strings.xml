@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mixare</string>
+    <string name="search_hint">Zoek op locatie</string>
+    
+    <string name="N">N</string>
+    <string name="NE">NO</string>
+    <string name="E">O</string>
+    <string name="SE">ZO</string>
+    <string name="S">Z</string>
+    <string name="SW">ZW</string>
+    <string name="W">W</string>
+    <string name="NW">NW</string>
+    
+    <string name="OSM">Openstreetmap</string>
+    <string name="MIXARE">Mixare</string>
+    
+    <string name="CIRCLE_MARKER">Cirkels</string>
+    <string name="NAVIGATION_MARKER">Pijlen</string>
+    
+    <string name="empty_list">Sorry, \nEr is geen locatie informatie \nbeschikbaar binnen deze radius.\nProbeer het opnieuw met een grotere radius.</string>
+	<string name="option_not_available">Sorry, We zijn er nog mee bezig... \nDe optie zal binnenkort beschikbaar zijn!</string>
+
+	<string name="license">Copyright (C) 2010- Peer internet solutions 
+		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
+		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
+		or at your option) any later version. 
+		\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+		the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public 
+		License for more details. 
+		\n\n You should have received a copy of the GNU General Public License along with this program. 
+		If not, see &lt;http://www.gnu.org/licenses/&gt;
+	</string>
+
+	<string name="launch_plugins">Start plugins?</string>
+	<string name="plugin_message">Er zijn plugins gevonden, wil je die activeren?</string>
+	<string name="remember_this_decision">Onthoud deze beslissing</string>
+	<string name="yes">Ja</string>
+	<string name="no">Nee</string>
+	
+	<string name="menu_item_1">Databron</string>
+	<string name="menu_item_2">Lijst view</string>
+	<string name="menu_item_3">Map view</string>
+	<string name="menu_item_4">Zoom level</string>
+	<string name="menu_item_5">Zoeken</string>
+	<string name="menu_item_6">Info</string>
+	<string name="menu_item_7">Licentie</string>
+
+	<string name="cancel">Onderbreek</string>
+
+	<string name="data_source_edit_err">De databron kan niet aangepast worden.</string>
+	<string name="data_source_delete_err">De databron kan niet verwijderd worden.</string>
+
+	<string name="connection_error_dialog">Sorry, Er is een netwerk fout! \nControlleer of je verbonden bent met het internet.</string>
+	<string name="connection_error_dialog_button1">Opnieuw</string>
+	<string name="connection_error_dialog_button2">Open Instellingen</string>
+	<string name="connection_error_dialog_button3">Afsluiten</string>
+
+	<string name="connection_GPS_dialog_text">De GPS locatie kan niet aangepast worden... \nHet kan zijn dat de informatie niet op de juiste 
+		\nplaats weergeven wordt.</string>
+	<string name="connection_GPS_dialog_button1">Doorgaan</string>
+	<string name="connection_GPS_dialog_button2">Afsluiten</string>
+
+	<string name="no_website_available">Sorry, Er is geen informatie \nbeschikbaar.</string>
+
+	<string name="license_title">Licentie</string>
+	<string name="close_button">Afsluiten</string>
+	<string name="general_info_title">Algemene Informatie</string>
+
+	<string name="general_info_text">GPS info: </string>
+	<string name="longitude">Longitude: </string>
+	<string name="latitude">Latitude: </string>
+	<string name="altitude">Altitude: </string>
+	<string name="speed">Speed: </string>
+	<string name="accuracy">Accuracy: </string>
+	<string name="gps_last_fix">Last GPS fix: </string>
+
+	<string name="map_menu_normal_mode">Map</string>
+	<string name="map_menu_satellite_mode">Sateliet</string>
+	<string name="map_menu_cam_mode">Camera</string>
+	<string name="map_my_location">Mijn locatie</string>
+	<string name="map_toggle_path_on">Toon pad</string>
+	<string name="map_toggle_path_off">Verberg pad</string>
+
+	<string name="map_current_location_click">Jouw huidige locatie</string>
+
+	<string name="data_source_add">Voeg een data bron toe</string>
+	<string name="data_source_edit">Pas een data bron aan</string>
+	<string name="data_source_delete">Verwijder een data bron</string>
+	<string name="data_source_change_wikipedia">Verander de databron naar Wikipedia</string>
+	<string name="data_source_change_twitter">Verander de databron naar Twitter</string>
+	<string name="data_source_change_osm">Verander de databron naar OpenStreetMaps</string>
+
+	<string name="search_failed_notification">Geen zoekresultaten gevonden</string>
+	<string name="source_openstreetmap">Stations around</string>
+
+	<string name="search_active_1">Zoek op databronnen</string>
+	<string name="search_active_2">. Raak aan om te stoppen met zoeken</string>
+	<string name="download_error">Fout tijdens het downloaden</string>
+	<string name="download_received">Data ontvangen van</string>
+
+	<string name="add_osm_menu">Voeg OpenStreetMap URL toe</string>
+	<string name="insert_osm_url">OpenStreetMap URL</string>
+	<string name="osm_max_object_menu">Maximaal aantal objecten per URL</string>
+	<string name="set_osm_max_object">Maximaal aantal objecten per URL</string>
+	<string name="location_not_found">Locatie niet gevonden, zorg ervoor dat je wifi locatie of gps locatie aan staat bij de instellingen.</string>
+	<string name="refreshing">Vernieuwen</string>
+
+</resources>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mixare</string>
+    <string name="search_hint">Cerca Luogo</string>
+
+    <string name="N">N</string>
+    <string name="NE">NE</string>
+    <string name="E">E</string>
+    <string name="SE">SE</string>
+    <string name="S">S</string>
+    <string name="SW">SO</string>
+    <string name="W">O</string>
+    <string name="NW">NO</string>
+    
+    <string name="OSM">Openstreetmap</string>
+    <string name="MIXARE">Mixare</string>
+    
+    <string name="CIRCLE_MARKER">Cerchi</string>
+    <string name="NAVIGATION_MARKER">Frecce</string>
+    
+    <string name="empty_list">Purtroppo non sono disponibili informazioni\nin quest\'area. Provare ad aumentare il raggio.</string>
+	<string name="option_not_available">Questa opzione sará disponibile in\nuna versione futura dell\'applicazione!</string>
+	
+	<string name="license">Copyright &#169; 2010- Peer internet solutions 
+		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
+		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
+		or at your option) any later version. 
+		\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+		the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public 
+		License for more details. 
+		\n\n You should have received a copy of the GNU General Public License along with this program. 
+		If not, see &lt;http://www.gnu.org/licenses/&gt;
+	</string>
+	
+	<string name="menu_item_1">Scelta delle fonti</string>
+	<string name="menu_item_2">Lista dei risultati</string>
+	<string name="menu_item_3">Mappa</string>
+	<string name="menu_item_4">Raggio visualizzato</string>
+	<string name="menu_item_5">Ricerca</string>
+	<string name="menu_item_6">Info</string>
+	<string name="menu_item_7">Licenza</string>
+
+	<string name="cancel">Annulla</string>
+
+	<string name="data_source_edit_err">Questa sorgente dati non può essere modificata.</string>
+	<string name="data_source_delete_err">Questa sorgente dati non può essere rimossa.</string>
+
+	<string name="connection_error_dialog">I dati non possono essere scaricati!\nControllare che la connessione ad internet sia attiva.</string>
+	<string name="connection_error_dialog_button1">Riprova</string>
+	<string name="connection_error_dialog_button2">Apri impostazioni</string>
+	<string name="connection_error_dialog_button3">Chiudi mixare</string>
+
+	<string name="connection_GPS_dialog_text">Impossibile ottenere la posizione corretta\nSe si continua é possibile che le informazioni\nnon siano mostrate nella posizione corretta.</string>
+	<string name="connection_GPS_dialog_button1">Continua</string>
+	<string name="connection_GPS_dialog_button2">Chiudi mixare</string>
+
+	<string name="no_website_available">Ci dispiace, non sono disponibili ulteriori informazioni</string>
+
+	<string name="license_title">Licenza</string>
+	<string name="close_button">Chiudi</string>
+	<string name="general_info_title">Informazioni generali</string>
+	
+	<string name="general_info_text">GPS info: </string>
+	<string name="longitude">Longitudine: </string>
+	<string name="latitude">Latitudine: </string>
+	<string name="altitude">Altitudine: </string>
+	<string name="speed">velocità: </string>
+	<string name="accuracy">Precisione: </string>
+	<string name="gps_last_fix">Ultimo GPS update: </string>
+	
+	<string name="map_menu_normal_mode">Mappa</string>
+	<string name="map_menu_satellite_mode">Satellite</string>
+	<string name="map_menu_cam_mode">Camera</string>
+	<string name="map_my_location">La mia posizione</string>
+	
+	<string name="map_current_location_click">La tua posizione</string>
+
+	<string name="data_source_add">Aggiungi sorgente dati</string>
+	<string name="data_source_edit">Modifica sorgente dati</string>
+	<string name="data_source_delete">Rimuovi sorgente dati</string>
+	<string name="data_source_change_wikipedia">Vengono mostrati dati da Wikipedia</string>
+	<string name="data_source_change_twitter">Vengono mostrati dati da Twitter</string>
+	<string name="data_source_change_osm">Vengono mostrati dati da OpenStreetMap</string>
+	
+	<string name="search_failed_notification">Nessun risultato di ricerca</string>
+	<string name="source_openstreetmap">Stazioni nei dintorni</string>
+	
+	<string name="search_active_1">Ricerca nella fonte dei dati di</string>
+	<string name="search_active_2">. Clicca qui per terminare la ricerca</string>
+	<string name="download_error">Errore nella fase di aggiornamento dati</string>
+	<string name="download_received">Dati aggiornati da </string>
+
+	<string name="add_osm_menu">Aggiungi OpenStreetMap URL</string>
+	<string name="insert_osm_url">Inserici OpenStreetMap URL</string>
+	<string name="osm_max_object_menu">Inposta il massimo numero di punti di interesse per URL</string>
+	<string name="set_osm_max_object">Massimo numero di punti di interesse per URL</string>
+	<string name="location_not_found">Posizione non stabilita, assicurarsi di aver abilitato la geolocalizzazione tramite Wifi o GPS.</string>
+	<string name="refreshing">Aggiornamento</string>
+
+</resources>

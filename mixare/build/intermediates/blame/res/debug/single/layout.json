@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\layout\\datasourcelist.xml",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\layout\\datasourcelist.xml"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\layout\\main.xml",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\layout\\main.xml"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\layout\\splashscreen.xml",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\layout\\splashscreen.xml"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\layout\\datasourcedetails.xml",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\layout\\datasourcedetails.xml"
+    },
+    {
+        "merged": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\build\\intermediates\\res\\merged\\debug\\layout\\webview.xml",
+        "source": "C:\\Users\\user\\Desktop\\thesis\\mixare\\mixare\\src\\main\\res\\layout\\webview.xml"
+    }
+]

@@ -1,0 +1,190 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:2:1-83:12
+	package
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:4:60-80
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+	android:versionName
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:4:32-59
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:3:4-50
+	android:versionCode
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:4:7-31
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:2:11-69
+	android:installLocation
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:4:81-111
+uses-sdk
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:6:5-73
+MERGED from [mixare:mixarelib:unspecified] C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\exploded-aar\mixare\mixarelib\unspecified\AndroidManifest.xml:7:5-9:40
+	android:targetSdkVersion
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:6:42-71
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:6:15-41
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:8:2-76
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:8:19-73
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:9:2-64
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:9:19-61
+uses-permission#android.permission.CAMERA
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:10:2-62
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:10:19-59
+uses-feature#android.hardware.camera.autofocus
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:11:2-105
+	android:required
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:11:16-40
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:11:41-89
+uses-feature#android.hardware.camera.flash
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:12:2-101
+	android:required
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:12:16-40
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:12:41-85
+uses-feature#android.hardware.camera.front
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:13:2-101
+	android:required
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:13:16-40
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:13:41-85
+uses-permission#android.permission.WAKE_LOCK
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:14:2-81
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:14:19-62
+supports-screens
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:2-179
+	android:largeScreens
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:103-130
+	android:smallScreens
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:46-73
+	android:normalScreens
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:74-102
+	android:xlargeScreens
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:131-159
+	android:anyDensity
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:16:20-45
+application
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:19:5-81:15
+MERGED from [mixare:mixarelib:unspecified] C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\exploded-aar\mixare\mixarelib\unspecified\AndroidManifest.xml:11:5-12:19
+	android:label
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:19:18-50
+		REJECTED from [mixare:mixarelib:unspecified] C:\Users\user\Desktop\thesis\mixare\mixare\build\intermediates\exploded-aar\mixare\mixarelib\unspecified\AndroidManifest.xml:11:18-43
+	android:icon
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:19:81-117
+	tools:replace
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:19:51-80
+uses-library#com.google.android.maps
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:20:6-61
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:20:20-58
+activity#org.mixare.MainActivity
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:22:6-28:17
+	android:screenOrientation
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:23:40-77
+	android:label
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:23:7-39
+	android:icon
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:22:45-81
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:22:16-44
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:24:13-27:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:25:17-69
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:25:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:26:17-77
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:26:27-74
+activity#org.mixare.MixView
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:30:9-50:20
+	android:screenOrientation
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:31:9-46
+	android:label
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:30:19-51
+	android:launchMode
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:32:9-39
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:30:52-75
+intent-filter#android.intent.action.VIEW+android.intent.category.BROWSABLE+android.intent.category.DEFAULT
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:34:13-41:29
+action#android.intent.action.VIEW
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:35:19-71
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:35:27-68
+category#android.intent.category.DEFAULT
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:36:7-66
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:36:17-63
+category#android.intent.category.BROWSABLE
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:37:7-68
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:37:17-65
+data
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:38:7-79
+	android:scheme
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:38:13-34
+	android:mimeType
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:38:35-77
+intent-filter#android.intent.action.SEARCH
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:43:13-45:26
+action#android.intent.action.SEARCH
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:44:14-67
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:44:22-65
+meta-data#android.app.searchable
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:46:10-47:57
+	android:resource
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:47:21-55
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:46:21-58
+meta-data#android.app.default_searchable
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:48:13-49:45
+	android:value
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:49:18-42
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:48:24-69
+activity#org.mixare.PluginLoaderActivity
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:52:3-56:14
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:52:13-48
+intent-filter#android.intent.action.MAIN
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:53:7-55:24
+activity#org.mixare.MixListView
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:58:3-66:14
+	android:screenOrientation
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:59:4-36
+	android:launchMode
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:60:4-34
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:58:13-39
+activity#org.mixare.MixMap
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:68:3-76:14
+	android:screenOrientation
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:69:4-36
+	android:launchMode
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:70:4-34
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:68:13-34
+activity#org.mixare.data.DataSource
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:77:4-48
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:77:14-45
+activity#org.mixare.data.DataSourceList
+ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:78:4-52
+	android:name
+		ADDED from C:\Users\user\Desktop\thesis\mixare\mixare\src\main\AndroidManifest.xml:78:14-49
